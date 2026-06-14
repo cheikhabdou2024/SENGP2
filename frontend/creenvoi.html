@@ -1849,6 +1849,7 @@
             }
         }
     </style>
+    <script src="config.js"></script>
 </head>
 <body>
     <div class="mobile-frame">
@@ -1913,6 +1914,11 @@
                         <option value="fragile">⚠️ Fragile</option>
                         <option value="other">📦 Autre</option>
                     </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Poids du colis (kg) <span class="required">*</span></label>
+                    <input type="number" id="packageWeight" min="0.1" step="0.1" placeholder="Ex: 3" oninput="validateForm()" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:15px;" />
                 </div>
 
                 <div class="form-group">
@@ -2010,6 +2016,11 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Adresse de ramassage <span class="required">*</span></label>
+                    <input type="text" id="pickupAddress" placeholder="Adresse complète de ramassage" oninput="validateStep2()" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:15px;" />
+                </div>
+
+                <div class="form-group">
                     <label>Pays et ville d'arrivée <span class="required">*</span></label>
                     <div class="location-picker" id="arrivalLocation" onclick="openLocationModal('arrival')">
                         <span class="location-flag" id="arrivalFlag">🌍</span>
@@ -2019,6 +2030,16 @@
                         </div>
                         <span class="chevron">›</span>
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Adresse de livraison <span class="required">*</span></label>
+                    <input type="text" id="deliveryAddress" placeholder="Adresse complète de livraison" oninput="validateStep2()" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:15px;" />
+                </div>
+
+                <div class="form-group">
+                    <label>Date de départ souhaitée <span class="required">*</span></label>
+                    <input type="date" id="desiredDepartureDate" oninput="validateStep2()" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:15px;" />
                 </div>
 
                 <div class="form-group">
@@ -2305,22 +2326,15 @@
 
                     <div class="summary-item">
                         <div class="summary-row">
-                            <span class="summary-label">Poids estimé</span>
-                            <span class="summary-value" id="summaryWeight">5 kg</span>
+                            <span class="summary-label">Poids</span>
+                            <span class="summary-value" id="summaryWeight">- kg</span>
                         </div>
                     </div>
 
                     <div class="summary-item">
                         <div class="summary-row">
-                            <span class="summary-label">Prix par kg</span>
-                            <span class="summary-value" id="summaryPricePerKg">22,000 XOF</span>
-                        </div>
-                    </div>
-
-                    <div class="summary-item">
-                        <div class="summary-row">
-                            <span class="summary-label">Frais de service (10%)</span>
-                            <span class="summary-value" id="summaryServiceFee">11,000 XOF</span>
+                            <span class="summary-label">Prix proposé (FCFA)</span>
+                            <input type="number" id="offeredPrice" min="1" step="500" oninput="recomputeTotal()" placeholder="Ex: 15000" style="width:130px;text-align:right;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:15px;" />
                         </div>
                     </div>
 
@@ -2328,7 +2342,7 @@
 
                     <div class="summary-total">
                         <span class="total-label">Total à payer</span>
-                        <span class="total-value" id="summaryTotal">121,000 XOF</span>
+                        <span class="total-value" id="summaryTotal">0 FCFA</span>
                     </div>
                 </div>
 
@@ -2337,18 +2351,8 @@
                     <h3 class="section-title">Méthode de paiement</h3>
 
                     <!-- Payment Method Cards -->
+                    <!-- Note: card (Visa/Mastercard) is not supported by Wave/Orange Money (mobile money only). -->
                     <div class="payment-methods">
-                        <div class="payment-method" onclick="selectPaymentMethod('card')">
-                            <div class="method-icon">💳</div>
-                            <div class="method-info">
-                                <div class="method-name">Carte bancaire</div>
-                                <div class="method-description">Visa, Mastercard</div>
-                            </div>
-                            <div class="method-radio">
-                                <div class="radio-dot"></div>
-                            </div>
-                        </div>
-
                         <div class="payment-method" onclick="selectPaymentMethod('orange')">
                             <div class="method-icon">🟧</div>
                             <div class="method-info">
@@ -2585,9 +2589,11 @@
             document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
             document.getElementById('nextBtn').textContent = currentStep === totalSteps ? 'Confirmer' : 'Suivant';
 
-            // Filter GP by destination when entering step 3
-            if (currentStep === 3 && selectedArrival) {
-                filterGPByDestination();
+            // Load available GP trips when entering step 3 (selection is optional —
+            // the mission is created open, so any GP can accept it).
+            if (currentStep === 3) {
+                loadTrips();
+                updateNextButton(true);
             }
 
             // Update summary when entering step 4
@@ -2602,7 +2608,7 @@
         function updateOrderSummary() {
             // Package type
             const packageType = document.getElementById('packageType');
-            const packageTypeText = packageType.options[packageType.selectedIndex].text;
+            const packageTypeText = packageType.options[packageType.selectedIndex]?.text || '-';
             document.getElementById('summaryPackageType').textContent = packageTypeText;
 
             // Route
@@ -2619,18 +2625,92 @@
             const phone = document.getElementById('receiverPhone').value;
             document.getElementById('summaryPhone').textContent = `${countryCode} ${phone}`;
 
-            // GP selected (from step 3)
-            if (selectedGPId) {
-                const selectedCard = document.querySelector(`.gp-card[onclick*="${selectedGPId}"]`);
-                if (selectedCard) {
-                    const gpName = selectedCard.querySelector('.gp-name').textContent;
-                    const gpRating = selectedCard.querySelector('.rating').textContent;
-                    document.getElementById('summaryGP').textContent = `${gpName} (${gpRating})`;
+            // GP (optional — open mission)
+            document.getElementById('summaryGP').textContent = selectedTripId
+                ? 'GP présélectionné'
+                : 'Ouvert à tous les GP';
 
-                    const gpDate = selectedCard.querySelector('.gp-date').textContent;
-                    document.getElementById('summaryDate').textContent = gpDate;
-                }
+            // Date
+            const date = document.getElementById('desiredDepartureDate').value;
+            document.getElementById('summaryDate').textContent = date
+                ? new Date(date).toLocaleDateString('fr-FR')
+                : '-';
+
+            // Weight + suggested price
+            const weight = parseFloat(document.getElementById('packageWeight').value) || 0;
+            document.getElementById('summaryWeight').textContent = `${weight} kg`;
+
+            const priceInput = document.getElementById('offeredPrice');
+            if (!priceInput.value && weight > 0) {
+                priceInput.value = Math.round(weight * 3000); // suggestion ~3000 FCFA/kg
             }
+            recomputeTotal();
+        }
+
+        function recomputeTotal() {
+            const offered = parseFloat(document.getElementById('offeredPrice').value) || 0;
+            document.getElementById('summaryTotal').textContent = `${offered.toLocaleString('fr-FR')} FCFA`;
+        }
+
+        // Load real GP trips for the selected route (GET /trips/search).
+        async function loadTrips() {
+            const gpList = document.getElementById('gpList');
+            if (!selectedDeparture || !selectedArrival) {
+                gpList.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.6);padding:30px;">Sélectionnez d\'abord le départ et l\'arrivée.</p>';
+                return;
+            }
+
+            const token = localStorage.getItem('authToken');
+            gpList.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.6);padding:30px;">Recherche des GP disponibles...</p>';
+
+            try {
+                const params = new URLSearchParams({
+                    departure_city: selectedDeparture.city,
+                    arrival_city: selectedArrival.city,
+                });
+                const res = await fetch(`${window.API_BASE_URL}/trips/search?${params}`, {
+                    headers: { 'Authorization': `Bearer ${token}` },
+                });
+                const result = await res.json();
+                renderTrips(res.ok && result.data ? result.data : []);
+            } catch (e) {
+                console.error('Error loading trips:', e);
+                renderTrips([]);
+            }
+        }
+
+        function renderTrips(trips) {
+            const gpList = document.getElementById('gpList');
+            if (!trips.length) {
+                gpList.innerHTML = `
+                    <div style="padding:40px 20px;text-align:center;color:rgba(255,255,255,0.7);">
+                        <div style="font-size:48px;margin-bottom:16px;">📭</div>
+                        <div style="font-size:18px;font-weight:600;margin-bottom:8px;">Aucun GP pour le moment</div>
+                        <div style="font-size:14px;">Votre envoi sera publié et visible par les GP. Vous pouvez continuer.</div>
+                    </div>`;
+                return;
+            }
+
+            gpList.innerHTML = trips.map(t => {
+                const date = t.departure_date ? new Date(t.departure_date).toLocaleDateString('fr-FR') : '';
+                const rating = t.gp_rating ? Number(t.gp_rating).toFixed(1) : '–';
+                return `
+                    <div class="gp-card" data-rating="${t.gp_rating || 0}" onclick="selectGP('${t.id}')">
+                        <div class="gp-header">
+                            <div class="gp-info">
+                                <div class="gp-name">${t.gp_name || 'GP'}</div>
+                                <div class="gp-stats"><span class="stat-item">⭐ ${rating}</span></div>
+                            </div>
+                        </div>
+                        <div class="gp-route">
+                            <span class="route-city">${t.departure_city}</span> ✈️ <span class="route-city">${t.arrival_city}</span>
+                        </div>
+                        <div class="gp-details">
+                            <div class="detail-item"><span class="detail-icon">📅</span><span class="detail-text">Départ: ${date}</span></div>
+                            <div class="detail-item"><span class="detail-icon">⚖️</span><span class="detail-text">${t.available_weight} kg dispo</span></div>
+                        </div>
+                    </div>`;
+            }).join('');
         }
 
         // Filter GP by selected destination
@@ -2718,6 +2798,7 @@
         }
 
         let selectedPaymentMethod = null;
+        let selectedTripId = null;
 
         // === Audio Recording System ===
         let mediaRecorder = null;
@@ -3181,12 +3262,14 @@
         function validateStep1() {
             const packageType = document.getElementById('packageType').value;
             const description = document.getElementById('description').value.trim();
+            const weight = parseFloat(document.getElementById('packageWeight').value);
 
             const hasPackageType = packageType !== '';
+            const hasWeight = weight > 0;
             const hasDescription = description.length > 0;
             const hasMedia = uploadedMedia !== null;
 
-            const isValid = hasPackageType && (hasDescription || hasAudioRecording || hasMedia);
+            const isValid = hasPackageType && hasWeight && (hasDescription || hasAudioRecording || hasMedia);
 
             updateNextButton(isValid);
             return isValid;
@@ -3197,8 +3280,11 @@
             const hasArrival = selectedArrival !== null;
             const receiverPhone = document.getElementById('receiverPhone').value.trim();
             const hasPhone = receiverPhone.length >= 8;
+            const hasPickup = document.getElementById('pickupAddress').value.trim().length > 0;
+            const hasDelivery = document.getElementById('deliveryAddress').value.trim().length > 0;
+            const hasDate = !!document.getElementById('desiredDepartureDate').value;
 
-            const isValid = hasDeparture && hasArrival && hasPhone;
+            const isValid = hasDeparture && hasArrival && hasPhone && hasPickup && hasDelivery && hasDate;
 
             updateNextButton(isValid);
             return isValid;
@@ -3279,35 +3365,92 @@
             alert('Politique de Confidentialité\n\nDans la version complète, cela afficherait la politique de confidentialité en modal.');
         }
 
-        function processPayment() {
-            const paymentMethods = {
-                'card': 'Carte bancaire',
-                'orange': 'Orange Money',
-                'wave': 'Wave'
-            };
+        async function processPayment() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert('Session expirée. Veuillez vous reconnecter.');
+                window.location.href = 'connexion.html';
+                return;
+            }
 
-            const methodName = paymentMethods[selectedPaymentMethod];
+            // Gather + validate the required mission fields.
+            const packageType = document.getElementById('packageType');
+            const packageTypeText = packageType.options[packageType.selectedIndex]?.text || '';
+            const description = document.getElementById('description').value.trim();
+            const weight = parseFloat(document.getElementById('packageWeight').value);
+            const pickup = document.getElementById('pickupAddress').value.trim();
+            const delivery = document.getElementById('deliveryAddress').value.trim();
+            const date = document.getElementById('desiredDepartureDate').value;
+            const offered = parseFloat(document.getElementById('offeredPrice').value);
 
-            // Désactiver le bouton de paiement
+            if (!selectedDeparture || !selectedArrival) { alert('Veuillez sélectionner le départ et l\'arrivée.'); return; }
+            if (!weight || weight <= 0) { alert('Veuillez indiquer le poids du colis.'); return; }
+            if (!pickup || !delivery) { alert('Veuillez renseigner les adresses de ramassage et de livraison.'); return; }
+            if (!date) { alert('Veuillez choisir une date de départ.'); return; }
+            if (!offered || offered <= 0) { alert('Veuillez indiquer le prix proposé.'); return; }
+
+            const methodMap = { wave: 'wave', orange: 'orange_money' };
+            const payment_method = methodMap[selectedPaymentMethod];
+            if (!payment_method) {
+                alert('Veuillez choisir un mode de paiement en ligne (Wave ou Orange Money).');
+                return;
+            }
+
             const nextBtn = document.getElementById('nextBtn');
             nextBtn.disabled = true;
             nextBtn.textContent = 'Traitement en cours...';
 
-            // Simuler le traitement du paiement
-            setTimeout(() => {
-                // Générer un numéro de série unique
-                const serialNumber = generateSerialNumber();
+            try {
+                // 1. Create the mission (open — any GP can accept it).
+                const missionRes = await fetch(`${window.API_BASE_URL}/missions`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        departure_country: selectedDeparture.country,
+                        departure_city: selectedDeparture.city,
+                        pickup_address: pickup,
+                        arrival_country: selectedArrival.country,
+                        arrival_city: selectedArrival.city,
+                        delivery_address: delivery,
+                        package_weight: weight,
+                        package_description: description || packageTypeText,
+                        desired_departure_date: date,
+                        offered_price: offered,
+                        is_price_negotiable: true
+                    })
+                });
+                const missionResult = await missionRes.json();
+                if (!missionRes.ok || !missionResult.success) {
+                    throw new Error(missionResult.error || 'Création de la mission échouée');
+                }
+                const mission = missionResult.data;
 
-                // Générer le QR code
-                generateQRCode(serialNumber);
+                // 2. Initiate payment for the mission via the chosen provider.
+                const payRes = await fetch(`${window.API_BASE_URL}/payments`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mission_id: mission.id, payment_method })
+                });
+                const payResult = await payRes.json();
+                if (!payRes.ok || !payResult.success) {
+                    throw new Error(payResult.error || 'Initialisation du paiement échouée');
+                }
 
-                // Afficher le modal de succès
-                document.getElementById('qrModal').classList.add('active');
-
-                // Réactiver le bouton
+                // 3. Redirect the payer to the provider's payment page.
+                const redirectUrl = payResult.data?.redirect_url;
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                } else {
+                    alert('Mission créée, mais aucune URL de paiement n\'a été reçue.');
+                    nextBtn.disabled = false;
+                    nextBtn.textContent = 'Confirmer';
+                }
+            } catch (error) {
+                console.error('Payment flow error:', error);
+                alert('Erreur: ' + error.message);
                 nextBtn.disabled = false;
                 nextBtn.textContent = 'Confirmer';
-            }, 2000);
+            }
         }
 
         function generateSerialNumber() {
@@ -3430,20 +3573,15 @@
 
         let selectedGPId = null;
 
-        function selectGP(gpId) {
-            // Remove previous selection
+        function selectGP(tripId) {
+            // Selection is optional (the mission is created open). Just highlight.
             document.querySelectorAll('.gp-card').forEach(card => {
                 card.classList.remove('selected');
             });
-
-            // Add selection to clicked card
-            event.currentTarget.classList.add('selected');
-            selectedGPId = gpId;
-
-            // Enable next button
-            document.getElementById('nextBtn').disabled = false;
-
-            alert(`GP sélectionné: ${gpId}\n\nCliquez sur "Suivant" pour continuer vers le paiement.`);
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('selected');
+            }
+            selectedTripId = tripId;
         }
 
         function sortGPs() {

@@ -436,6 +436,7 @@
             box-shadow: 0 3px 10px rgba(255, 215, 0, 0.6);
         }
     </style>
+    <script src="config.js"></script>
 </head>
 <body>
     <div class="mobile-frame">
@@ -463,8 +464,8 @@
             <!-- Balance Section -->
             <div class="balance-section">
                 <div class="balance-label">Solde disponible</div>
-                <div class="balance-amount">1,245,000 FCFA</div>
-                <div class="balance-pending">En attente: 120,000 FCFA</div>
+                <div class="balance-amount" id="availableBalance">0 FCFA</div>
+                <div class="balance-pending" id="pendingBalance">En attente: 0 FCFA</div>
                 <button class="withdraw-btn" onclick="withdraw()">Retirer</button>
             </div>
 
@@ -472,25 +473,25 @@
             <div class="stats-section">
                 <div class="stat-card">
                     <div class="stat-icon">📅</div>
-                    <div class="stat-value">185k</div>
+                    <div class="stat-value" id="statThisMonth">0</div>
                     <div class="stat-label">Ce mois</div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-icon">📊</div>
-                    <div class="stat-value">52k</div>
+                    <div class="stat-value" id="statAverage">0</div>
                     <div class="stat-label">Moyenne</div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-icon">🎯</div>
-                    <div class="stat-value">34</div>
+                    <div class="stat-value" id="statMissions">0</div>
                     <div class="stat-label">Missions</div>
                 </div>
             </div>
 
             <!-- Transactions Section -->
-            <div class="transactions-section">
+            <div class="transactions-section" id="txnSection">
                 <div class="section-header">
                     <h2 class="section-title">Transactions</h2>
                     <button class="filter-btn" onclick="filterTransactions()">Filtrer ↕</button>
@@ -640,20 +641,135 @@
     </div>
 
     <script>
+        const API_BASE_URL = window.API_BASE_URL;
+        let availableBalance = 0;
+
+        function getAuthToken() {
+            return localStorage.getItem('authToken');
+        }
+
+        function formatFCFA(amount) {
+            return `${Number(amount || 0).toLocaleString('fr-FR')} FCFA`;
+        }
+
+        function shortAmount(amount) {
+            const n = Number(amount || 0);
+            if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+            if (n >= 1000) return `${Math.round(n / 1000)}k`;
+            return String(n);
+        }
+
         function goBack() {
             window.location.href = 'dashgp.html';
         }
 
-        function withdraw() {
-            alert('Retirer vos gains\n\nSolde disponible: 1,245,000 FCFA\n\nMéthodes de retrait:\n- Wave\n- Orange Money\n- Free Money\n- Virement bancaire\n\nMontant minimum: 10,000 FCFA\nDélai de traitement: 24-48h');
+        async function loadWallet() {
+            const token = getAuthToken();
+            if (!token) {
+                window.location.href = 'connexion.html';
+                return;
+            }
+
+            try {
+                const [walletRes, txnRes] = await Promise.all([
+                    fetch(`${API_BASE_URL}/wallet/me`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${API_BASE_URL}/wallet/transactions`, { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+
+                if (walletRes.ok) {
+                    const wallet = (await walletRes.json()).data;
+                    availableBalance = wallet.available_balance || 0;
+                    document.getElementById('availableBalance').textContent = formatFCFA(wallet.available_balance);
+                    document.getElementById('pendingBalance').textContent = `En attente: ${formatFCFA(wallet.pending_balance)}`;
+                    document.getElementById('statThisMonth').textContent = shortAmount(wallet.this_month);
+                    document.getElementById('statAverage').textContent = shortAmount(wallet.average);
+                    document.getElementById('statMissions').textContent = wallet.missions_completed || 0;
+                }
+
+                if (txnRes.ok) {
+                    const transactions = (await txnRes.json()).data || [];
+                    renderTransactions(transactions);
+                }
+            } catch (error) {
+                console.error('Error loading wallet:', error);
+            }
         }
 
-        function filterTransactions() {
-            alert('Filtrer les transactions\n\nOptions:\n- Toutes\n- Gains uniquement\n- Retraits uniquement\n- Ce mois\n- Ce trimestre\n- Cette année\n- Par montant');
+        function renderTransactions(transactions) {
+            const statusLabels = {
+                completed: 'Terminé', pending: 'En attente', processing: 'En cours',
+                failed: 'Échoué', approved: 'Approuvé', rejected: 'Rejeté'
+            };
+            const titles = { income: 'Paiement reçu', expense: 'Paiement envoyé', withdrawal: 'Retrait effectué' };
+
+            let cards = '';
+            if (transactions.length === 0) {
+                cards = '<p style="text-align:center;color:rgba(255,255,255,0.5);padding:40px;">Aucune transaction</p>';
+            } else {
+                cards = transactions.map(tx => {
+                    const isIncome = tx.direction === 'income';
+                    const sign = isIncome ? '+' : '-';
+                    const cls = isIncome ? 'income' : 'withdrawal';
+                    const icon = isIncome ? '💰' : '📤';
+                    const date = new Date(tx.created_at).toLocaleDateString('fr-FR');
+                    return `
+                        <div class="transaction-card">
+                            <div class="transaction-icon ${cls}">${icon}</div>
+                            <div class="transaction-info">
+                                <div class="transaction-title">${titles[tx.direction] || 'Transaction'}</div>
+                                <div class="transaction-details">${tx.method || ''} • ${tx.reference || ''}</div>
+                            </div>
+                            <div class="transaction-amount">
+                                <div class="amount-value ${cls}">${sign}${formatFCFA(tx.amount)}</div>
+                                <div class="transaction-time">${date}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            document.getElementById('txnSection').innerHTML = `
+                <div class="section-header">
+                    <h2 class="section-title">Transactions</h2>
+                </div>
+                ${cards}
+            `;
         }
 
-        function viewTransaction(txnId) {
-            alert(`Détails de la transaction ${txnId}\n\nInformations complètes:\n- Date et heure\n- Montant\n- Commission SEN GP\n- Montant net\n- Statut\n- Référence\n- Méthode de paiement\n\nOption de téléchargement du reçu PDF`);
+        async function withdraw() {
+            const token = getAuthToken();
+            if (availableBalance <= 0) {
+                alert('Solde insuffisant pour effectuer un retrait.');
+                return;
+            }
+
+            const amount = prompt(`Montant à retirer (solde disponible: ${formatFCFA(availableBalance)})`);
+            if (!amount) return;
+
+            const method = prompt('Méthode de retrait (wave, orange_money, free_money, bank_transfer):', 'wave');
+            if (!method) return;
+
+            const account_number = prompt('Numéro de compte / téléphone:');
+            if (!account_number) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/withdrawals`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: Number(amount), method, account_number })
+                });
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    alert('Demande de retrait envoyée !\n\nElle sera traitée par un administrateur sous 24-48h.');
+                    loadWallet();
+                } else {
+                    alert('Erreur: ' + (result.error || result.message || 'Demande de retrait échouée'));
+                }
+            } catch (error) {
+                console.error('Error requesting withdrawal:', error);
+                alert('Erreur de connexion au serveur.');
+            }
         }
 
         function navigateTo(section) {
@@ -669,6 +785,8 @@
                 window.location.href = pages[section];
             }
         }
+
+        window.addEventListener('load', loadWallet);
     </script>
 </body>
 </html>
