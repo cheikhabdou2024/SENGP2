@@ -1,14 +1,33 @@
 /**
  * Runtime API configuration for the SEN GP frontend.
  *
- * In local development the frontend is served separately (file:// or :8100)
- * while the backend runs on :5000, so we point at the local backend.
- * In production the backend serves these static files from the same origin and
- * exposes the API at /api/v1 (see backend/src/app.ts), so a relative path works.
+ * Resolution order:
+ *  - Native mobile app (Capacitor / Play Store / App Store): the app is bundled
+ *    on the device and loads from capacitor://localhost, so it has NO same-origin
+ *    backend. It must call the deployed API over HTTPS — set PROD_API_BASE_URL.
+ *  - Local web dev (localhost / file://): talk to the local backend on :5000.
+ *  - Deployed web: the backend serves these files from the same origin and
+ *    exposes /api/v1, so a relative path works.
  *
  * Pages read `window.API_BASE_URL`.
  */
 (function () {
+  // ⚠️ SET THIS to your deployed HTTPS API base URL before building the mobile
+  // app (e.g. https://api.sengp.com/api/v1). Must be HTTPS — Android/iOS block
+  // cleartext HTTP by default.
+  var PROD_API_BASE_URL = 'https://YOUR-DOMAIN/api/v1';
+
+  var isNative = !!(
+    window.Capacitor &&
+    typeof window.Capacitor.isNativePlatform === 'function' &&
+    window.Capacitor.isNativePlatform()
+  );
+
+  if (isNative) {
+    window.API_BASE_URL = PROD_API_BASE_URL;
+    return;
+  }
+
   var host = window.location.hostname;
   var isLocal = host === 'localhost' || host === '127.0.0.1' || host === '';
 
