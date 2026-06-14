@@ -572,6 +572,7 @@
     </style>
     <!-- jsQR Library for QR Code Scanning -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="config.js"></script>
 </head>
 <body>
     <div class="mobile-frame">
@@ -685,7 +686,7 @@
             document.getElementById('qrFileInput').click();
         }
 
-        const API_BASE_URL = 'http://localhost:5000/api/v1';
+        const API_BASE_URL = window.API_BASE_URL;
 
         function getAuthToken() {
             return localStorage.getItem('authToken');

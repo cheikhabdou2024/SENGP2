@@ -615,6 +615,7 @@
             box-shadow: 0 3px 10px rgba(255, 215, 0, 0.6);
         }
     </style>
+    <script src="config.js"></script>
 </head>
 <body>
     <div class="mobile-frame">
@@ -758,7 +759,7 @@
 
     <script>
         // API Configuration
-        const API_BASE_URL = 'http://localhost:5000/api/v1';
+        const API_BASE_URL = window.API_BASE_URL;
         let currentUser = null;
         let authToken = null;
 

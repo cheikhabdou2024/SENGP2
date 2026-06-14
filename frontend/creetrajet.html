@@ -460,6 +460,7 @@
             display: none;
         }
     </style>
+    <script src="config.js"></script>
 </head>
 <body>
     <div class="mobile-frame">
@@ -816,7 +817,7 @@
                 formData.append('available_weight', availableWeight);
 
                 // API call to create trip
-                const response = await fetch('http://localhost:5000/api/v1/trips', {
+                const response = await fetch(`${window.API_BASE_URL}/trips`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${authToken}`

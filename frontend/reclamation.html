@@ -557,6 +557,7 @@
             box-shadow: 0 12px 28px rgba(255, 107, 107, 0.5);
         }
     </style>
+    <script src="config.js"></script>
 </head>
 <body>
     <div class="mobile-frame">
@@ -709,7 +710,7 @@
             document.getElementById('claimForm').reset();
         }
 
-        const API_BASE_URL = 'http://localhost:5000/api/v1';
+        const API_BASE_URL = window.API_BASE_URL;
 
         function getAuthToken() {
             return localStorage.getItem('authToken');
