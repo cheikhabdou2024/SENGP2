@@ -52,6 +52,12 @@ router.get('/me/stats', async (req: any, res) => {
 
       const stats = missionsResult.rows[0];
 
+      const spentResult = await pool.query(
+        `SELECT COALESCE(total_spent, 0) AS total_spent FROM expediteur_profiles WHERE user_id = $1`,
+        [userId]
+      );
+      const revenue = Number(spentResult.rows[0]?.total_spent) || 0;
+
       res.json({
         success: true,
         data: {
@@ -59,7 +65,7 @@ router.get('/me/stats', async (req: any, res) => {
           pending: parseInt(stats.pending_missions) || 0,
           in_transit: parseInt(stats.in_transit_missions) || 0,
           delivered: parseInt(stats.delivered_missions) || 0,
-          revenue: 0 // TODO: Calculate from payments
+          revenue
         }
       });
     } else if (userType === 'gp') {
@@ -76,13 +82,23 @@ router.get('/me/stats', async (req: any, res) => {
 
       const stats = missionsResult.rows[0];
 
+      const walletResult = await pool.query(
+        `SELECT COALESCE(total_earned, 0) AS total_earned,
+                COALESCE(available_balance, 0) AS available_balance
+         FROM wallet_balances WHERE user_id = $1`,
+        [userId]
+      );
+      const earnings = Number(walletResult.rows[0]?.total_earned) || 0;
+      const available_balance = Number(walletResult.rows[0]?.available_balance) || 0;
+
       res.json({
         success: true,
         data: {
           total_deliveries: parseInt(stats.total_deliveries) || 0,
           active: parseInt(stats.active_deliveries) || 0,
           completed: parseInt(stats.completed_deliveries) || 0,
-          earnings: 0 // TODO: Calculate from wallet
+          earnings,
+          available_balance
         }
       });
     } else {

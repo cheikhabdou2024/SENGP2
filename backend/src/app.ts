@@ -17,6 +17,8 @@ import tripRoutes from './routes/trip.routes';
 import paymentRoutes from './routes/payment.routes';
 import notificationRoutes from './routes/notification.routes';
 import claimRoutes from './routes/claim.routes';
+import walletRoutes from './routes/wallet.routes';
+import withdrawalRoutes from './routes/withdrawal.routes';
 
 dotenv.config();
 
@@ -46,7 +48,15 @@ app.use(cors({
 }));
 
 // Body Parser Middleware
-app.use(express.json({ limit: '10mb' }));
+// Capture the raw body so payment-provider webhooks can verify HMAC signatures.
+app.use(
+  express.json({
+    limit: '10mb',
+    verify: (req, _res, buf) => {
+      (req as any).rawBody = buf;
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Compression Middleware
@@ -111,6 +121,8 @@ app.use(`/api/${apiVersion}/trips`, tripRoutes);
 app.use(`/api/${apiVersion}/payments`, paymentRoutes);
 app.use(`/api/${apiVersion}/notifications`, notificationRoutes);
 app.use(`/api/${apiVersion}/claims`, claimRoutes);
+app.use(`/api/${apiVersion}/wallet`, walletRoutes);
+app.use(`/api/${apiVersion}/withdrawals`, withdrawalRoutes);
 
 // Serve static frontend files in production
 if (process.env.NODE_ENV === 'production') {

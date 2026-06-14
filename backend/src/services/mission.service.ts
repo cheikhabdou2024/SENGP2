@@ -1,8 +1,9 @@
 import pool from '../config/database';
-import { Mission, MissionStatus, PaginatedResult } from '../types';
+import { Mission, MissionStatus, NotificationType, PaginatedResult } from '../types';
 import { Helpers } from '../utils/helpers';
 import logger from '../utils/logger';
 import QRCode from 'qrcode';
+import { NotificationService } from './notification.service';
 
 export class MissionService {
   /**
@@ -319,7 +320,8 @@ export class MissionService {
         [id, status, `Status changed to ${status}`, userId]
       );
 
-      // If delivered, update completion date
+      // If delivered, update completion date, credit the GP, and pay them out.
+      let creditedNet = 0;
       if (status === MissionStatus.DELIVERED) {
         await client.query(
           `UPDATE missions SET completed_at = CURRENT_TIMESTAMP, actual_delivery_date = CURRENT_TIMESTAMP
@@ -334,11 +336,54 @@ export class MissionService {
            WHERE user_id = $1`,
           [mission.gp_id]
         );
+
+        // Credit the GP wallet from the mission's completed (upfront) payment.
+        if (mission.gp_id) {
+          const payRes = await client.query(
+            `SELECT net_amount FROM payments
+             WHERE mission_id = $1 AND status = 'completed' AND transaction_type = 'mission_payment'
+             ORDER BY completed_at DESC LIMIT 1`,
+            [id]
+          );
+
+          if (payRes.rows.length > 0) {
+            creditedNet = Number(payRes.rows[0].net_amount) || 0;
+
+            await client.query(
+              `INSERT INTO wallet_balances (user_id) VALUES ($1) ON CONFLICT (user_id) DO NOTHING`,
+              [mission.gp_id]
+            );
+            await client.query(
+              `UPDATE wallet_balances
+               SET available_balance = available_balance + $1, total_earned = total_earned + $1
+               WHERE user_id = $2`,
+              [creditedNet, mission.gp_id]
+            );
+            await client.query(
+              `UPDATE gp_profiles SET total_earnings = total_earnings + $1 WHERE user_id = $2`,
+              [creditedNet, mission.gp_id]
+            );
+          }
+        }
       }
 
       await client.query('COMMIT');
 
       logger.info(`Mission ${id} status updated to ${status}`);
+
+      // Notify the GP of their earnings (best-effort, outside the transaction).
+      if (creditedNet > 0 && mission.gp_id) {
+        try {
+          await NotificationService.create({
+            user_id: mission.gp_id,
+            notification_type: NotificationType.PAYMENT_RECEIVED,
+            title: 'Gains crédités',
+            message: `Vous avez gagné ${Helpers.formatCurrency(creditedNet)} pour la mission ${mission.mission_code}.`,
+          });
+        } catch (e: any) {
+          logger.warn('Failed to create earnings notification:', e.message);
+        }
+      }
 
       return mission;
     } catch (error) {
