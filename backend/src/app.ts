@@ -24,6 +24,10 @@ dotenv.config();
 
 const app: Application = express();
 
+// Behind App Runner's proxy: trust the first hop so X-Forwarded-For / rate
+// limiting and client IPs are handled correctly.
+app.set('trust proxy', 1);
+
 // Security Middleware
 app.use(helmet());
 
