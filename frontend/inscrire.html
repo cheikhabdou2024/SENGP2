@@ -556,11 +556,7 @@
                 <div class="social-buttons">
                     <button type="button" class="social-btn" onclick="socialSignup('google')">
                         <span>🔍</span>
-                        <span>Google</span>
-                    </button>
-                    <button type="button" class="social-btn" onclick="socialSignup('facebook')">
-                        <span>📘</span>
-                        <span>Facebook</span>
+                        <span>Continuer avec Google</span>
                     </button>
                 </div>
 
@@ -804,8 +800,40 @@
             window.location.href = 'connexion.html';
         }
 
-        function socialSignup(provider) {
-            alert(`Inscription avec ${provider}`);
+        async function socialSignup(provider) {
+            if (provider !== 'google') return;
+            try {
+                const GoogleAuth = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth;
+                if (!GoogleAuth) {
+                    alert('L\'inscription Google est disponible dans l\'application mobile.');
+                    return;
+                }
+                const result = await GoogleAuth.signIn();
+                const idToken = result && result.authentication && result.authentication.idToken;
+                if (!idToken) throw new Error('Token Google manquant');
+
+                const accountType = new URLSearchParams(window.location.search).get('type');
+                const userType = accountType === 'carrier' ? 'gp' : 'expediteur';
+
+                const response = await fetch(`${window.API_BASE_URL}/auth/google`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_token: idToken, user_type: userType })
+                });
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    localStorage.setItem('authToken', data.data.token);
+                    localStorage.setItem('userData', JSON.stringify(data.data.user));
+                    const ut = data.data.user.user_type;
+                    window.location.href = ut === 'gp' ? 'dashgp.html' : 'dashexpediteur.html';
+                } else {
+                    alert('Erreur Google: ' + (data.error || 'Inscription échouée'));
+                }
+            } catch (e) {
+                console.error('Google sign-up error', e);
+                alert('Inscription Google annulée ou échouée.');
+            }
         }
 
         document.getElementById('signupForm').addEventListener('submit', async function(e) {
