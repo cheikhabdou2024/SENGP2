@@ -522,7 +522,7 @@
                 const response = await fetch(`${window.API_BASE_URL}/auth/google`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id_token: idToken })
+                    body: JSON.stringify({ id_token: idToken, ...(EXPECTED_TYPE ? { expected_type: EXPECTED_TYPE } : {}) })
                 });
                 const data = await response.json();
 
@@ -563,7 +563,8 @@
                         },
                         body: JSON.stringify({
                             email: identifier,
-                            password: password
+                            password: password,
+                            ...(EXPECTED_TYPE ? { expected_type: EXPECTED_TYPE } : {})
                         })
                     });
 
@@ -610,8 +611,8 @@
                         // Rediriger immédiatement après l'alerte
                         window.location.href = dashboardUrl;
                     } else {
-                        // Afficher l'erreur
-                        alert('Erreur de connexion:\n\n' + (result.message || 'Email ou mot de passe incorrect'));
+                        // Afficher l'erreur (inclut le refus de type de compte côté serveur)
+                        alert('Erreur de connexion:\n\n' + (result.error || result.message || 'Email ou mot de passe incorrect'));
                         submitButton.textContent = originalText;
                         submitButton.disabled = false;
                     }

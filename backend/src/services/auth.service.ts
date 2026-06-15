@@ -110,7 +110,8 @@ export class AuthService {
    */
   static async googleAuth(
     idToken: string,
-    userType?: UserType
+    userType?: UserType,
+    expectedType?: UserType
   ): Promise<{ user: Partial<User>; token: string; isNew: boolean }> {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     if (!clientId) {
@@ -143,6 +144,9 @@ export class AuthService {
       if (user.status === 'suspended') {
         throw new Error('Account is suspended');
       }
+      if (expectedType && user.user_type !== expectedType) {
+        throw new Error('Account type mismatch');
+      }
       await pool.query(
         'UPDATE users SET last_login_at = CURRENT_TIMESTAMP, is_email_verified = TRUE WHERE id = $1',
         [user.id]
@@ -153,7 +157,7 @@ export class AuthService {
     }
 
     // New user → create (no phone/password; verified email).
-    const finalType = userType || UserType.EXPEDITEUR;
+    const finalType = expectedType || userType || UserType.EXPEDITEUR;
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
@@ -199,6 +203,7 @@ export class AuthService {
   static async login(data: {
     email: string;
     password: string;
+    expectedType?: UserType;
   }): Promise<{ user: Partial<User>; token: string }> {
     const result = await pool.query(
       `SELECT id, email, phone, password_hash, user_type, first_name, last_name,
@@ -222,6 +227,11 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(data.password, user.password_hash);
     if (!isPasswordValid) {
       throw new Error('Invalid credentials');
+    }
+
+    // Enforce the expected account type (e.g. an Expéditeur cannot log into a GP account)
+    if (data.expectedType && user.user_type !== data.expectedType) {
+      throw new Error('Account type mismatch');
     }
 
     // Update last login

@@ -16,11 +16,13 @@ export const registerValidator = [
 export const googleAuthValidator = [
   body('id_token').notEmpty().withMessage('Google id_token is required'),
   body('user_type').optional().isIn(['expediteur', 'gp']).withMessage('Invalid user type'),
+  body('expected_type').optional().isIn(['expediteur', 'gp']).withMessage('Invalid expected type'),
 ];
 
 export const loginValidator = [
   body('email').isEmail().withMessage('Invalid email format').normalizeEmail(),
   body('password').notEmpty().withMessage('Password is required'),
+  body('expected_type').optional().isIn(['expediteur', 'gp']).withMessage('Invalid expected type'),
 ];
 
 export const changePasswordValidator = [
