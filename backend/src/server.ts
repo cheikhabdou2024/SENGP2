@@ -29,12 +29,16 @@ async function startServer() {
     await initDatabase();
     logger.info('✅ Database initialization complete');
 
-    // Connect to Redis
-    logger.info('🔌 Connecting to Redis...');
-    await connectRedis().catch(err => {
-      logger.warn('⚠️  Redis connection failed (optional):', err.message);
-      logger.info('📝 App will continue without Redis cache');
-    });
+    // Connect to Redis (optional — only attempt if explicitly configured)
+    if (process.env.REDIS_HOST) {
+      logger.info('🔌 Connecting to Redis...');
+      await connectRedis().catch(err => {
+        logger.warn('⚠️  Redis connection failed (optional):', err.message);
+        logger.info('📝 App will continue without Redis cache');
+      });
+    } else {
+      logger.info('📝 REDIS_HOST not set — running without Redis cache');
+    }
 
     // Create logs directory if it doesn't exist
     const fs = require('fs');
