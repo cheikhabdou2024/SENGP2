@@ -89,21 +89,22 @@
             transform: translateX(-100%);
         }
 
-        /* Onboarding full-bleed background images (with dark scrim for legible text) */
-        .screen1, .screen2, .screen3 {
+        /* Screen 1 keeps the original layout: image (onboarding1.png) in the top
+           half, animated text + dots + buttons below. */
+
+        /* Onboarding 2 & 3: full-bleed background images (dark scrim for legible text) */
+        .screen2, .screen3 {
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
-        .screen1 { background-image: linear-gradient(rgba(15,12,41,0.45), rgba(15,12,41,0.82)), url('im/onboarding1.png'); }
         .screen2 { background-image: linear-gradient(rgba(15,12,41,0.55), rgba(15,12,41,0.88)), url('im/onboarding2.png'); }
         .screen3 { background-image: linear-gradient(rgba(15,12,41,0.50), rgba(15,12,41,0.86)), url('im/onboarding3.png'); }
 
-        /* The provided images replace the old inline illustrations */
-        .illustration, .map-container, .money-container, .screen3-bg { display: none !important; }
+        /* Screens 2 & 3 use the background image; hide only their inline illustrations */
+        .screen2 .illustration, .map-container, .money-container, .screen3-bg { display: none !important; }
 
-        /* Lay onboarding text/buttons over the background image */
-        .screen1 .onboarding-content,
+        /* Lay screen 2 & 3 text/buttons over the background image */
         .screen2 .onboarding-content,
         .screen3 .screen3-content {
             height: 100%;
@@ -1207,9 +1208,9 @@
             <div class="screen screen1 active">
                 <div class="onboarding-content">
                     <div class="illustration">
-                        <img 
-                            src="im/im1.png" 
-                            alt="Transport international" 
+                        <img
+                            src="im/onboarding1.png"
+                            alt="Transport international"
                             class="hero-image"
                         />
                         <div class="image-overlay"></div>
