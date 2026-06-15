@@ -487,8 +487,24 @@
 
         function goToSignup() {
             event.preventDefault();
-            // Rediriger vers la page de choix du type de compte
-            window.location.href = 'index.html';
+            const t = new URLSearchParams(window.location.search).get('type');
+            window.location.href = t ? `inscrire.html?type=${t}` : 'inscrire.html';
+        }
+
+        // Account type chosen on the onboarding screen (carrier = GP, sender = Expéditeur).
+        const EXPECTED_TYPE = (() => {
+            const t = new URLSearchParams(window.location.search).get('type');
+            if (t === 'carrier' || t === 'gp') return 'gp';
+            if (t === 'sender' || t === 'expediteur') return 'expediteur';
+            return null;
+        })();
+        function typeLabel(t) { return t === 'gp' ? 'Gros Porteur' : 'Expéditeur'; }
+        function enforceAccountType(user) {
+            if (EXPECTED_TYPE && user && user.user_type !== EXPECTED_TYPE) {
+                alert(`Ce compte est un compte « ${typeLabel(user.user_type)} ». Vous avez choisi « ${typeLabel(EXPECTED_TYPE)} ». Connectez-vous avec le profil correspondant.`);
+                return false;
+            }
+            return true;
         }
 
         async function socialLogin(provider) {
@@ -511,6 +527,7 @@
                 const data = await response.json();
 
                 if (response.ok && data.success) {
+                    if (!enforceAccountType(data.data.user)) return;
                     localStorage.setItem('authToken', data.data.token);
                     localStorage.setItem('userData', JSON.stringify(data.data.user));
                     const ut = data.data.user.user_type;
@@ -561,6 +578,12 @@
                         // Sauvegarder le token et les données utilisateur
                         const token = result.data.token;
                         const user = result.data.user;
+
+                        if (!enforceAccountType(user)) {
+                            submitButton.textContent = originalText;
+                            submitButton.disabled = false;
+                            return;
+                        }
 
                         console.log('Token to save:', token);
                         console.log('User data to save:', user);
