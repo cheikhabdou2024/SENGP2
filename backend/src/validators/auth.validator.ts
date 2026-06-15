@@ -2,7 +2,7 @@ import { body } from 'express-validator';
 
 export const registerValidator = [
   body('email').isEmail().withMessage('Invalid email format').normalizeEmail(),
-  body('phone').notEmpty().withMessage('Phone number is required'),
+  body('phone').optional({ values: 'falsy' }).trim(),
   body('password')
     .isLength({ min: 8 })
     .withMessage('Password must be at least 8 characters long'),
@@ -11,6 +11,11 @@ export const registerValidator = [
     .withMessage('User type must be either expediteur or gp'),
   body('first_name').trim().notEmpty().withMessage('First name is required'),
   body('last_name').trim().notEmpty().withMessage('Last name is required'),
+];
+
+export const googleAuthValidator = [
+  body('id_token').notEmpty().withMessage('Google id_token is required'),
+  body('user_type').optional().isIn(['expediteur', 'gp']).withMessage('Invalid user type'),
 ];
 
 export const loginValidator = [

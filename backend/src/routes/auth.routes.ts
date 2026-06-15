@@ -6,6 +6,7 @@ import { RateLimitMiddleware } from '../middlewares/rateLimit.middleware';
 import {
   registerValidator,
   loginValidator,
+  googleAuthValidator,
   changePasswordValidator,
   forgotPasswordValidator,
 } from '../validators/auth.validator';
@@ -25,6 +26,13 @@ router.post(
   RateLimitMiddleware.auth,
   ValidationMiddleware.validate(loginValidator),
   AuthController.login
+);
+
+router.post(
+  '/google',
+  RateLimitMiddleware.auth,
+  ValidationMiddleware.validate(googleAuthValidator),
+  AuthController.googleAuth
 );
 
 router.post(

@@ -33,6 +33,11 @@ export async function initDatabase(): Promise<void> {
     } else {
       logger.info('✅ Database tables already exist');
     }
+
+    // Idempotent schema patches: email/Google auth makes phone + password optional.
+    await pool.query('ALTER TABLE users ALTER COLUMN phone DROP NOT NULL');
+    await pool.query('ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL');
+    logger.info('✅ Schema patches applied (phone/password nullable)');
   } catch (error) {
     logger.error('❌ Error initializing database:', error);
 
