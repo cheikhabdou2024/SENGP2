@@ -89,23 +89,21 @@
             transform: translateX(-100%);
         }
 
-        /* Screen 1 keeps the original layout: image (onboarding1.png) in the top
-           half, animated text + dots + buttons below. */
+        /* Screens 1 & 2 keep the original layout: image (onboarding1/2.png) in the
+           top half, animated content + text + dots + buttons below. */
 
-        /* Onboarding 2 & 3: full-bleed background images (dark scrim for legible text) */
-        .screen2, .screen3 {
+        /* Onboarding 3: full-bleed background image (dark scrim for legible text) */
+        .screen3 {
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            background-image: linear-gradient(rgba(15,12,41,0.50), rgba(15,12,41,0.86)), url('im/onboarding3.png');
         }
-        .screen2 { background-image: linear-gradient(rgba(15,12,41,0.55), rgba(15,12,41,0.88)), url('im/onboarding2.png'); }
-        .screen3 { background-image: linear-gradient(rgba(15,12,41,0.50), rgba(15,12,41,0.86)), url('im/onboarding3.png'); }
 
-        /* Screens 2 & 3 use the background image; hide only their inline illustrations */
-        .screen2 .illustration, .map-container, .money-container, .screen3-bg { display: none !important; }
+        /* Screen 3 uses the background image; hide its inline decorations */
+        .money-container, .screen3-bg { display: none !important; }
 
-        /* Lay screen 2 & 3 text/buttons over the background image */
-        .screen2 .onboarding-content,
+        /* Lay screen 3 text/buttons over the background image */
         .screen3 .screen3-content {
             height: 100%;
             justify-content: flex-end;
@@ -1246,9 +1244,9 @@
             <div class="screen screen2">
                 <div class="onboarding-content">
                     <div class="illustration">
-                        <img 
-                            src="im/suivi.png" 
-                            alt="Suivi de colis en temps réel" 
+                        <img
+                            src="im/onboarding2.png"
+                            alt="Suivi de colis en temps réel"
                             class="hero-image"
                         />
                         <div class="image-overlay"></div>
