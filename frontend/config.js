@@ -15,7 +15,7 @@
   // ⚠️ SET THIS to your deployed HTTPS API base URL before building the mobile
   // app (e.g. https://api.sengp.com/api/v1). Must be HTTPS — Android/iOS block
   // cleartext HTTP by default.
-  var PROD_API_BASE_URL = 'https://YOUR-DOMAIN/api/v1';
+  var PROD_API_BASE_URL = 'https://2txjgdd3cj.us-east-1.awsapprunner.com/api/v1';
 
   var isNative = !!(
     window.Capacitor &&
