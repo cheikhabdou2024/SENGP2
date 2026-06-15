@@ -491,22 +491,6 @@
                     <div class="validation-message" id="emailMessage"></div>
                 </div>
 
-                <!-- Téléphone -->
-                <div class="form-group">
-                    <label for="phone">Numéro de téléphone <span class="required">*</span></label>
-                    <div class="input-wrapper">
-                        <input 
-                            type="tel" 
-                            id="phone" 
-                            name="phone"
-                            placeholder="+221 77 123 45 67"
-                            onkeyup="validatePhone()"
-                            required
-                        />
-                        <span class="validation-icon" id="phoneIcon"></span>
-                    </div>
-                    <div class="validation-message" id="phoneMessage"></div>
-                </div>
 
                 <!-- Mot de passe -->
                 <div class="form-group">
@@ -592,7 +576,6 @@
         let validations = {
             fullname: false,
             email: false,
-            phone: false,
             password: false,
             confirmPassword: false,
             terms: false
@@ -839,7 +822,6 @@
                     // Récupérer les valeurs du formulaire
                     const fullname = document.getElementById('fullname').value;
                     const email = document.getElementById('email').value;
-                    const phone = document.getElementById('phone').value;
                     const password = document.getElementById('password').value;
 
                     // Séparer le nom complet en prénom et nom de famille
@@ -860,7 +842,6 @@
                         },
                         body: JSON.stringify({
                             email: email,
-                            phone: phone,
                             password: password,
                             user_type: userType,
                             first_name: firstName,
