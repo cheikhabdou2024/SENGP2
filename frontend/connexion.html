@@ -559,8 +559,15 @@
                 }
                 await ensureGoogleAuth(GoogleAuth);
                 const result = await GoogleAuth.signIn();
-                const idToken = result && result.authentication && result.authentication.idToken;
-                if (!idToken) throw new Error('Token Google manquant');
+                // L'emplacement de l'idToken varie selon la version du plugin / Capacitor.
+                const idToken =
+                    (result && result.authentication && (result.authentication.idToken || result.authentication.id_token)) ||
+                    (result && (result.idToken || result.id_token)) ||
+                    (result && result.authentication && result.authentication.accessToken);
+                if (!idToken) {
+                    alert('Réponse Google inattendue (pas d\'idToken).\n\nReçu:\n' + JSON.stringify(result).slice(0, 500));
+                    throw new Error('Token Google manquant');
+                }
 
                 const response = await fetch(`${window.API_BASE_URL}/auth/google`, {
                     method: 'POST',
@@ -580,9 +587,21 @@
                 }
             } catch (e) {
                 console.error('Google sign-in error', e);
-                // Détail de l'erreur pour diagnostiquer (le code 10 = config OAuth: SHA-1 / package / client ID).
-                const detail = (e && (e.message || e.errorMessage || e.code)) ? String(e.message || e.errorMessage || e.code) : '';
-                alert('Connexion Google échouée.' + (detail ? '\n\nDétail: ' + detail : '\n\n(Aucun détail fourni)'));
+                // Dump complet de l'erreur pour diagnostic (code, message, et toutes les propriétés).
+                let parts = [];
+                if (e) {
+                    if (e.message) parts.push('message: ' + e.message);
+                    if (e.code !== undefined) parts.push('code: ' + e.code);
+                    if (e.errorMessage) parts.push('errorMessage: ' + e.errorMessage);
+                    try {
+                        const all = {};
+                        Object.getOwnPropertyNames(e).forEach(k => { try { all[k] = e[k]; } catch (_) {} });
+                        const json = JSON.stringify(all);
+                        if (json && json !== '{}') parts.push('raw: ' + json);
+                    } catch (_) {}
+                    if (parts.length === 0) parts.push(String(e));
+                }
+                alert('Connexion Google échouée.\n\n' + (parts.join('\n') || '(aucun détail)'));
             }
         }
 
