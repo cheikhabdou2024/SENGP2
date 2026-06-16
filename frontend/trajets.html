@@ -403,91 +403,66 @@
             box-shadow: 0 6px 16px rgba(78, 205, 196, 0.5);
         }
 
-        /* Bottom Navigation */
+        /* Bottom Navigation (unified GP nav) */
         .bottom-nav {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 65px;
-            background: linear-gradient(180deg, rgba(15, 12, 41, 0.95) 0%, rgba(26, 22, 48, 0.98) 100%);
-            backdrop-filter: blur(30px);
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(18, 16, 36, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
+            justify-content: space-around;
+            align-items: stretch;
+            padding: 9px 6px calc(9px + env(safe-area-inset-bottom));
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35);
         }
-
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 4px;
             cursor: pointer;
-            transition: all 0.4s ease;
-            padding: 6px 10px;
-            border-radius: 12px;
             flex: 1;
-            max-width: 70px;
             position: relative;
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.15) 50%, rgba(78, 205, 196, 0.1) 100%);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            box-shadow: 0 8px 24px rgba(255, 215, 0, 0.25);
-            transform: translateY(-6px);
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            filter: grayscale(0.8) brightness(0.7);
-            transition: all 0.4s ease;
-        }
-
-        .nav-item.active .nav-icon {
-            filter: grayscale(0) brightness(1.2);
-            transform: scale(1.1);
-        }
-
-        .nav-label {
-            font-size: 9px;
+            padding: 6px 0;
+            border-radius: 14px;
             color: rgba(255, 255, 255, 0.5);
-            font-weight: 700;
-            text-transform: uppercase;
+            transition: color 0.25s ease;
+            -webkit-tap-highlight-color: transparent;
         }
-
-        .nav-item.active .nav-label {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #4ECDC4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
+        .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+        .nav-icon svg {
+            width: 24px; height: 24px; fill: none; stroke: currentColor;
+            stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+            transition: transform 0.25s ease;
         }
-
+        .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
+        .nav-item.active { color: #FFC107; }
+        .nav-item.active .nav-icon svg { transform: translateY(-1px) scale(1.06); }
+        .nav-item.active::after {
+            content: ''; position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+            width: 26px; height: 3px; border-radius: 0 0 3px 3px;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+        }
+        .nav-item:not(.active):active { color: rgba(255, 255, 255, 0.85); }
         .nav-badge {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            min-width: 18px;
-            height: 18px;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            font-weight: 800;
-            color: white;
-            padding: 0 5px;
-            box-shadow: 0 3px 10px rgba(255, 215, 0, 0.6);
+            position: absolute; top: 0px; left: calc(50% + 5px);
+            min-width: 17px; height: 17px; background: #FF4757;
+            border: 1.5px solid #121024; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 800; color: white; padding: 0 4px;
         }
+        .nav-badge.new { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #1a1a2e; }
+        .nav-badge.hidden { display: none; }
             /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
         </style>
+    <script src="config.js"></script>
 </head>
 <body>
     <div class="mobile-frame">
@@ -506,327 +481,237 @@
         <div class="content">
             <!-- Tabs -->
             <div class="tabs">
-                <button class="tab active" onclick="switchTab('active')">En cours (2)</button>
-                <button class="tab" onclick="switchTab('upcoming')">À venir (1)</button>
-                <button class="tab" onclick="switchTab('completed')">Terminés</button>
+                <button class="tab active" id="tab-active" onclick="switchTab('active', this)">En cours (0)</button>
+                <button class="tab" id="tab-upcoming" onclick="switchTab('upcoming', this)">À venir (0)</button>
+                <button class="tab" id="tab-completed" onclick="switchTab('completed', this)">Terminés (0)</button>
             </div>
 
-            <!-- Active Trips -->
-            <div id="activeTrips">
-                <!-- Trip Card 1 - Active -->
-                <div class="trip-card active">
-                    <div class="trip-header">
-                        <span class="trip-id">TRJ-2025-001</span>
-                        <span class="trip-status status-active">✈️ En vol</span>
-                    </div>
-
-                    <div class="trip-route">
-                        <div class="route-location">
-                            <span class="route-flag">🇸🇳</span>
-                            <div class="route-text">
-                                <div class="route-city">Dakar</div>
-                                <div class="route-country">Sénégal</div>
-                            </div>
-                        </div>
-                        <span class="route-arrow">→</span>
-                        <div class="route-location">
-                            <span class="route-flag">🇫🇷</span>
-                            <div class="route-text">
-                                <div class="route-city">Paris</div>
-                                <div class="route-country">France</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="trip-details">
-                        <div class="detail-box">
-                            <div class="detail-label">Départ</div>
-                            <div class="detail-value">19 Oct, 02:15</div>
-                        </div>
-                        <div class="detail-box">
-                            <div class="detail-label">Arrivée prévue</div>
-                            <div class="detail-value">21 Oct, 08:30</div>
-                        </div>
-                    </div>
-
-                    <div class="packages-section">
-                        <div class="section-title-small">Colis transportés (2)</div>
-                        <div class="package-item">
-                            <div class="package-info">
-                                <div class="package-client">Aissatou S.</div>
-                                <div class="package-details">4 kg • 35x30x20 cm</div>
-                            </div>
-                            <div class="package-price">55,000 FCFA</div>
-                        </div>
-                        <div class="package-item">
-                            <div class="package-info">
-                                <div class="package-client">Moussa D.</div>
-                                <div class="package-details">3.5 kg • 30x25x15 cm</div>
-                            </div>
-                            <div class="package-price">65,000 FCFA</div>
-                        </div>
-                    </div>
-
-                    <div class="earnings-summary">
-                        <span class="earnings-label">Gains du trajet</span>
-                        <span class="earnings-amount">120,000 FCFA</span>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary" onclick="viewTripDetails('TRJ-2025-001')">Détails</button>
-                        <button class="btn btn-primary" onclick="updateStatus('TRJ-2025-001')">Mettre à jour</button>
-                    </div>
-                </div>
-
-                <!-- Trip Card 2 - Active -->
-                <div class="trip-card">
-                    <div class="trip-header">
-                        <span class="trip-id">TRJ-2025-002</span>
-                        <span class="trip-status status-upcoming">📦 Récupération</span>
-                    </div>
-
-                    <div class="trip-route">
-                        <div class="route-location">
-                            <span class="route-flag">🇸🇳</span>
-                            <div class="route-text">
-                                <div class="route-city">Dakar</div>
-                                <div class="route-country">Sénégal</div>
-                            </div>
-                        </div>
-                        <span class="route-arrow">→</span>
-                        <div class="route-location">
-                            <span class="route-flag">🇪🇸</span>
-                            <div class="route-text">
-                                <div class="route-city">Madrid</div>
-                                <div class="route-country">Espagne</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="trip-details">
-                        <div class="detail-box">
-                            <div class="detail-label">Départ prévu</div>
-                            <div class="detail-value">28 Oct, 14:00</div>
-                        </div>
-                        <div class="detail-box">
-                            <div class="detail-label">Arrivée prévue</div>
-                            <div class="detail-value">29 Oct, 10:45</div>
-                        </div>
-                    </div>
-
-                    <div class="packages-section">
-                        <div class="section-title-small">Colis à récupérer (1)</div>
-                        <div class="package-item">
-                            <div class="package-info">
-                                <div class="package-client">Fatou S.</div>
-                                <div class="package-details">2 kg • 25x20x10 cm</div>
-                            </div>
-                            <div class="package-price">45,000 FCFA</div>
-                        </div>
-                    </div>
-
-                    <div class="earnings-summary">
-                        <span class="earnings-label">Gains du trajet</span>
-                        <span class="earnings-amount">45,000 FCFA</span>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary" onclick="viewTripDetails('TRJ-2025-002')">Détails</button>
-                        <button class="btn btn-primary" onclick="contactClient('TRJ-2025-002')">Contacter</button>
-                    </div>
-                </div>
+            <div id="tripsLoading" style="text-align:center;padding:50px 20px;color:rgba(255,255,255,0.6);font-size:13px;">
+                Chargement de vos trajets…
             </div>
-
-            <!-- Upcoming Trips (hidden by default) -->
-            <div id="upcomingTrips" style="display: none;">
-                <div class="trip-card">
-                    <div class="trip-header">
-                        <span class="trip-id">TRJ-2025-003</span>
-                        <span class="trip-status status-upcoming">🗓️ Planifié</span>
-                    </div>
-
-                    <div class="trip-route">
-                        <div class="route-location">
-                            <span class="route-flag">🇸🇳</span>
-                            <div class="route-text">
-                                <div class="route-city">Dakar</div>
-                                <div class="route-country">Sénégal</div>
-                            </div>
-                        </div>
-                        <span class="route-arrow">→</span>
-                        <div class="route-location">
-                            <span class="route-flag">🇺🇸</span>
-                            <div class="route-text">
-                                <div class="route-city">New York</div>
-                                <div class="route-country">États-Unis</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="trip-details">
-                        <div class="detail-box">
-                            <div class="detail-label">Départ prévu</div>
-                            <div class="detail-value">05 Nov, 18:30</div>
-                        </div>
-                        <div class="detail-box">
-                            <div class="detail-label">Arrivée prévue</div>
-                            <div class="detail-value">06 Nov, 06:15</div>
-                        </div>
-                    </div>
-
-                    <div class="packages-section">
-                        <div class="section-title-small">Emplacement disponible</div>
-                        <div style="text-align: center; padding: 20px; color: rgba(255, 255, 255, 0.6); font-size: 13px;">
-                            Vous pouvez accepter jusqu'à 3 colis pour ce trajet
-                        </div>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary" onclick="viewTripDetails('TRJ-2025-003')">Détails</button>
-                        <button class="btn btn-primary" onclick="searchPackages('TRJ-2025-003')">Chercher colis</button>
-                    </div>
-                </div>
+            <div id="tripsEmpty" style="display:none;text-align:center;padding:50px 20px;color:rgba(255,255,255,0.6);">
+                <div style="font-size:44px;margin-bottom:12px;">🧳</div>
+                <div id="tripsEmptyText" style="font-size:14px;line-height:1.5;">Aucun trajet ici.<br>Créez votre premier trajet avec le bouton +.</div>
             </div>
+            <div id="tripsList"></div>
 
-            <!-- Completed Trips (hidden by default) -->
-            <div id="completedTrips" style="display: none;">
-                <div class="trip-card">
-                    <div class="trip-header">
-                        <span class="trip-id">TRJ-2024-095</span>
-                        <span class="trip-status status-completed">✓ Terminé</span>
-                    </div>
-
-                    <div class="trip-route">
-                        <div class="route-location">
-                            <span class="route-flag">🇸🇳</span>
-                            <div class="route-text">
-                                <div class="route-city">Dakar</div>
-                                <div class="route-country">Sénégal</div>
-                            </div>
-                        </div>
-                        <span class="route-arrow">→</span>
-                        <div class="route-location">
-                            <span class="route-flag">🇺🇸</span>
-                            <div class="route-text">
-                                <div class="route-city">New York</div>
-                                <div class="route-country">États-Unis</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="trip-details">
-                        <div class="detail-box">
-                            <div class="detail-label">Départ</div>
-                            <div class="detail-value">10 Oct, 16:00</div>
-                        </div>
-                        <div class="detail-box">
-                            <div class="detail-label">Arrivée</div>
-                            <div class="detail-value">15 Oct, 09:30</div>
-                        </div>
-                    </div>
-
-                    <div class="packages-section">
-                        <div class="section-title-small">Colis livrés (1)</div>
-                        <div class="package-item">
-                            <div class="package-info">
-                                <div class="package-client">Ibrahima B.</div>
-                                <div class="package-details">3 kg • 28x22x12 cm</div>
-                            </div>
-                            <div class="package-price">50,000 FCFA</div>
-                        </div>
-                    </div>
-
-                    <div class="earnings-summary">
-                        <span class="earnings-label">Gains reçus ✓</span>
-                        <span class="earnings-amount">50,000 FCFA</span>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary" onclick="viewTripDetails('TRJ-2024-095')">Détails</button>
-                        <button class="btn btn-primary" onclick="viewReceipt('TRJ-2024-095')">Voir reçu</button>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
-            <div class="nav-item" onclick="navigateTo('home')">
-                <div class="nav-icon">🏠</div>
+            <div class="nav-item" onclick="navigateTo('home')" tabindex="0" role="button" aria-label="Accueil">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
                 <div class="nav-label">Accueil</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('missions')">
-                <div class="nav-icon">🔍</div>
+            <div class="nav-item" onclick="navigateTo('missions')" tabindex="0" role="button" aria-label="Missions">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
                 <div class="nav-label">Missions</div>
-                <div class="nav-badge">5</div>
             </div>
 
-            <div class="nav-item active" onclick="navigateTo('trips')">
-                <div class="nav-icon">✈️</div>
+            <div class="nav-item active" onclick="navigateTo('trips')" tabindex="0" role="button" aria-label="Trajets">
+                <div class="nav-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M22 16.21v-1.6l-8.5-5V4.5a1.5 1.5 0 0 0-3 0v5.11l-8.5 5v1.6l8.5-2.66v4.54l-2.5 1.4v1.5l4-1.18 4 1.18v-1.5l-2.5-1.4v-4.54z"/></svg></div>
                 <div class="nav-label">Trajets</div>
-                <div class="nav-badge">2</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('earnings')">
-                <div class="nav-icon">💰</div>
+            <div class="nav-item" onclick="navigateTo('earnings')" tabindex="0" role="button" aria-label="Gains">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
                 <div class="nav-label">Gains</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('profile')">
-                <div class="nav-icon">👤</div>
+            <div class="nav-item" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
                 <div class="nav-label">Profil</div>
             </div>
         </div>
     </div>
 
     <script>
+        const API_BASE_URL = window.API_BASE_URL;
+        const authToken = localStorage.getItem('authToken');
+
+        let allTrips = [];
+        let currentBucket = 'active';
+
+        const BUCKETS = {
+            active: ['active'],
+            upcoming: ['published', 'draft'],
+            completed: ['completed', 'cancelled']
+        };
+
+        const FLAGS = {
+            'Sénégal': '🇸🇳', 'Senegal': '🇸🇳', 'France': '🇫🇷', 'Espagne': '🇪🇸',
+            'Italie': '🇮🇹', 'USA': '🇺🇸', 'États-Unis': '🇺🇸', 'Etats-Unis': '🇺🇸',
+            'Canada': '🇨🇦', 'Royaume-Uni': '🇬🇧', 'Angleterre': '🇬🇧', 'Allemagne': '🇩🇪',
+            'Belgique': '🇧🇪', 'Maroc': '🇲🇦', 'Mali': '🇲🇱', 'Côte d\'Ivoire': '🇨🇮'
+        };
+        function flagFor(c) { return FLAGS[c] || '🌍'; }
+        function esc(s) {
+            return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+        function formatDateTime(d) {
+            if (!d) return '—';
+            try {
+                const dt = new Date(d);
+                return dt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ', ' +
+                       dt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            } catch (e) { return '—'; }
+        }
+        function statusMeta(s) {
+            switch (s) {
+                case 'active': return { cls: 'status-active', label: '✈️ En cours' };
+                case 'published': return { cls: 'status-upcoming', label: '🟢 Ouvert' };
+                case 'draft': return { cls: 'status-upcoming', label: '📝 Brouillon' };
+                case 'completed': return { cls: 'status-completed', label: '✓ Terminé' };
+                case 'cancelled': return { cls: 'status-completed', label: '✕ Annulé' };
+                default: return { cls: 'status-upcoming', label: s || '—' };
+            }
+        }
+
         function goBack() {
             window.location.href = 'dashgp.html';
         }
 
         function addTrip() {
-            alert('Ajouter un nouveau trajet\n\nDéclarez votre prochain voyage pour recevoir des propositions de colis.\n\n- Ville de départ\n- Ville d\'arrivée\n- Date et heure de départ\n- Date et heure d\'arrivée\n- Capacité disponible');
+            window.location.href = 'creetrajet.html';
         }
 
-        function switchTab(tab) {
-            // Update tab buttons
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-
-            // Show/hide trip lists
-            document.getElementById('activeTrips').style.display = 'none';
-            document.getElementById('upcomingTrips').style.display = 'none';
-            document.getElementById('completedTrips').style.display = 'none';
-
-            if (tab === 'active') {
-                document.getElementById('activeTrips').style.display = 'block';
-            } else if (tab === 'upcoming') {
-                document.getElementById('upcomingTrips').style.display = 'block';
-            } else if (tab === 'completed') {
-                document.getElementById('completedTrips').style.display = 'block';
+        async function loadTrips() {
+            if (!authToken) {
+                alert('Vous devez vous connecter pour accéder à cette page');
+                window.location.href = 'connexion.html';
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE_URL}/trips/my-trips?limit=100`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                if (!res.ok) throw new Error('Échec du chargement');
+                const json = await res.json();
+                allTrips = json.data || [];
+                document.getElementById('tripsLoading').style.display = 'none';
+                updateTabCounts();
+                // Sélectionner par défaut le premier onglet non vide.
+                const order = ['active', 'upcoming', 'completed'];
+                const firstNonEmpty = order.find(b => bucketTrips(b).length > 0);
+                if (firstNonEmpty) setActiveTab(firstNonEmpty);
+                renderTrips();
+            } catch (e) {
+                console.error('Erreur chargement trajets:', e);
+                document.getElementById('tripsLoading').style.display = 'none';
+                document.getElementById('tripsEmptyText').innerHTML =
+                    'Impossible de charger vos trajets.<br>Vérifiez votre connexion.';
+                document.getElementById('tripsEmpty').style.display = 'block';
             }
         }
 
+        function bucketTrips(bucket) {
+            const statuses = BUCKETS[bucket] || [];
+            return allTrips.filter(t => statuses.includes(t.status));
+        }
+
+        function updateTabCounts() {
+            document.getElementById('tab-active').textContent = `En cours (${bucketTrips('active').length})`;
+            document.getElementById('tab-upcoming').textContent = `À venir (${bucketTrips('upcoming').length})`;
+            document.getElementById('tab-completed').textContent = `Terminés (${bucketTrips('completed').length})`;
+        }
+
+        function setActiveTab(bucket) {
+            currentBucket = bucket;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            const el = document.getElementById('tab-' + bucket);
+            if (el) el.classList.add('active');
+        }
+
+        function switchTab(bucket, element) {
+            currentBucket = bucket;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            if (element) element.classList.add('active');
+            renderTrips();
+        }
+
+        function tripCard(t) {
+            const st = statusMeta(t.status);
+            const cap = `${t.current_packages || 0}/${t.max_packages || 0} colis`;
+            const isOpen = t.status === 'published' || t.status === 'draft';
+            return `
+            <div class="trip-card${t.status === 'active' ? ' active' : ''}">
+                <div class="trip-header">
+                    <span class="trip-id">${esc(t.trip_code || '')}</span>
+                    <span class="trip-status ${st.cls}">${st.label}</span>
+                </div>
+                <div class="trip-route">
+                    <div class="route-location">
+                        <span class="route-flag">${flagFor(t.departure_country)}</span>
+                        <div class="route-text">
+                            <div class="route-city">${esc(t.departure_city || '—')}</div>
+                            <div class="route-country">${esc(t.departure_country || '')}</div>
+                        </div>
+                    </div>
+                    <span class="route-arrow">→</span>
+                    <div class="route-location">
+                        <span class="route-flag">${flagFor(t.arrival_country)}</span>
+                        <div class="route-text">
+                            <div class="route-city">${esc(t.arrival_city || '—')}</div>
+                            <div class="route-country">${esc(t.arrival_country || '')}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="trip-details">
+                    <div class="detail-box">
+                        <div class="detail-label">Départ</div>
+                        <div class="detail-value">${formatDateTime(t.departure_date)}</div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-label">Arrivée</div>
+                        <div class="detail-value">${formatDateTime(t.arrival_date)}</div>
+                    </div>
+                </div>
+                <div class="trip-details">
+                    <div class="detail-box">
+                        <div class="detail-label">Capacité</div>
+                        <div class="detail-value">${parseFloat(t.available_weight) || 0} kg</div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-label">Colis acceptés</div>
+                        <div class="detail-value">${cap}</div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="viewTripDetails('${t.id}')">Détails</button>
+                    ${isOpen
+                        ? `<button class="btn btn-primary" onclick="navigateTo('missions')">Chercher colis</button>`
+                        : `<button class="btn btn-primary" onclick="navigateTo('missions')">Voir missions</button>`}
+                </div>
+            </div>`;
+        }
+
+        function renderTrips() {
+            const list = bucketTrips(currentBucket);
+            const container = document.getElementById('tripsList');
+            const empty = document.getElementById('tripsEmpty');
+            if (list.length === 0) {
+                container.innerHTML = '';
+                document.getElementById('tripsEmptyText').innerHTML =
+                    'Aucun trajet dans cette catégorie.<br>Créez un trajet avec le bouton +.';
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            container.innerHTML = list.map(tripCard).join('');
+        }
+
         function viewTripDetails(tripId) {
-            alert(`Détails du trajet ${tripId}\n\nInformations complètes:\n- Itinéraire complet\n- Informations de vol\n- Liste des colis\n- Coordonnées des clients\n- Points de récupération/livraison\n- Historique du trajet`);
-        }
-
-        function updateStatus(tripId) {
-            alert(`Mettre à jour le statut - ${tripId}\n\nStatuts disponibles:\n- Colis récupéré\n- En transit\n- Douane\n- En livraison\n- Livré`);
-        }
-
-        function contactClient(tripId) {
-            alert('Contacter le client\n\nOptions:\n- Appel téléphonique\n- Message SMS\n- Chat dans l\'application\n- Email');
-        }
-
-        function searchPackages(tripId) {
-            window.location.href = 'missions.html';
-        }
-
-        function viewReceipt(tripId) {
-            alert(`Reçu du trajet ${tripId}\n\nDétails de paiement:\n- Date de livraison\n- Montant reçu\n- Commission SEN GP\n- Montant net\n- Méthode de paiement\n\nOption de téléchargement PDF disponible`);
+            const t = allTrips.find(x => String(x.id) === String(tripId));
+            if (!t) return;
+            alert(
+                `Trajet ${t.trip_code || ''}\n\n` +
+                `${t.departure_city || t.departure_country} → ${t.arrival_city || t.arrival_country}\n` +
+                `Départ: ${formatDateTime(t.departure_date)}\nArrivée: ${formatDateTime(t.arrival_date)}\n` +
+                `Capacité: ${parseFloat(t.available_weight) || 0} kg\n` +
+                `Colis: ${t.current_packages || 0}/${t.max_packages || 0}\n` +
+                `Statut: ${statusMeta(t.status).label}`
+            );
         }
 
         function navigateTo(section) {
@@ -837,11 +722,10 @@
                 'earnings': 'gains.html',
                 'profile': 'profilegp.html'
             };
-
-            if (pages[section]) {
-                window.location.href = pages[section];
-            }
+            if (pages[section]) window.location.href = pages[section];
         }
+
+        document.addEventListener('DOMContentLoaded', loadTrips);
     </script>
 </body>
 </html>

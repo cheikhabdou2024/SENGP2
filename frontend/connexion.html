@@ -367,6 +367,26 @@
                 height: 100vh;
             }
         }
+        .back-to-choice {
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            z-index: 10;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.85);
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .back-to-choice:hover { background: rgba(255, 255, 255, 0.16); transform: translateX(-2px); }
             /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
@@ -375,6 +395,9 @@
 </head>
 <body>
     <div class="mobile-frame">
+
+        <!-- Back to account-type choice -->
+        <button class="back-to-choice" onclick="window.location.href='index.html'" aria-label="Retour au choix du compte">←</button>
 
         <!-- Content -->
         <div class="content">
