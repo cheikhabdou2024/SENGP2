@@ -47,6 +47,13 @@ jobs:
           mkdir -p ~/.android
           base64 -d frontend/ci/debug-keystore.base64 > ~/.android/debug.keystore
 
+      - name: Print signing SHA-1 / SHA-256 (register these in Google Cloud OAuth Android client)
+        run: |
+          echo "=== Debug keystore fingerprints (alias androiddebugkey) ==="
+          keytool -list -v -keystore ~/.android/debug.keystore \
+            -alias androiddebugkey -storepass android -keypass android \
+            | grep -iE "SHA1:|SHA256:" || true
+
       - name: Build debug APK
         working-directory: frontend/android
         run: |

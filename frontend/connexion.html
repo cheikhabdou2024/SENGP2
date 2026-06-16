@@ -557,7 +557,9 @@
                 }
             } catch (e) {
                 console.error('Google sign-in error', e);
-                alert('Connexion Google annulée ou échouée.');
+                // Détail de l'erreur pour diagnostiquer (le code 10 = config OAuth: SHA-1 / package / client ID).
+                const detail = (e && (e.message || e.errorMessage || e.code)) ? String(e.message || e.errorMessage || e.code) : '';
+                alert('Connexion Google échouée.' + (detail ? '\n\nDétail: ' + detail : '\n\n(Aucun détail fourni)'));
             }
         }
 
