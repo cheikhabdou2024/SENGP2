@@ -124,38 +124,41 @@ export class MissionService {
     const queryParams: any[] = [];
     let paramIndex = 1;
 
+    // NOTE: the data query JOINs users (which also has a `status` column), so every
+    // missions column referenced here must be qualified with the `m.` alias to avoid
+    // an "ambiguous column" error. The count query below aliases missions as `m` too.
     if (params.status) {
-      whereClause += ` AND status = $${paramIndex}`;
+      whereClause += ` AND m.status = $${paramIndex}`;
       queryParams.push(params.status);
       paramIndex++;
     }
 
     if (params.expediteur_id) {
-      whereClause += ` AND expediteur_id = $${paramIndex}`;
+      whereClause += ` AND m.expediteur_id = $${paramIndex}`;
       queryParams.push(params.expediteur_id);
       paramIndex++;
     }
 
     if (params.gp_id) {
-      whereClause += ` AND gp_id = $${paramIndex}`;
+      whereClause += ` AND m.gp_id = $${paramIndex}`;
       queryParams.push(params.gp_id);
       paramIndex++;
     }
 
     if (params.departure_city) {
-      whereClause += ` AND departure_city ILIKE $${paramIndex}`;
+      whereClause += ` AND m.departure_city ILIKE $${paramIndex}`;
       queryParams.push(`%${params.departure_city}%`);
       paramIndex++;
     }
 
     if (params.arrival_city) {
-      whereClause += ` AND arrival_city ILIKE $${paramIndex}`;
+      whereClause += ` AND m.arrival_city ILIKE $${paramIndex}`;
       queryParams.push(`%${params.arrival_city}%`);
       paramIndex++;
     }
 
-    // Get total count with separate query
-    const countQuery = `SELECT COUNT(*) FROM missions ${whereClause}`;
+    // Get total count with separate query (alias missions as m to match whereClause)
+    const countQuery = `SELECT COUNT(*) FROM missions m ${whereClause}`;
     const countResult = await pool.query(countQuery, queryParams);
     const total = parseInt(countResult.rows[0].count);
 
