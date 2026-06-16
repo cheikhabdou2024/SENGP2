@@ -158,7 +158,14 @@
     </div>
 
     <script>
-        const API = window.API_BASE_URL;
+        // Admin is a web tool used against production. When opened as a local file
+        // (file://) or on localhost, talk to the deployed API directly; otherwise
+        // use the runtime-resolved base (same-origin when served by the backend).
+        const PROD_API = 'https://2txjgdd3cj.us-east-1.awsapprunner.com/api/v1';
+        const _h = location.hostname;
+        const API = (location.protocol === 'file:' || _h === 'localhost' || _h === '127.0.0.1' || _h === '')
+            ? PROD_API
+            : (window.API_BASE_URL || '/api/v1');
         let token = localStorage.getItem('authToken');
         let me = null;
         try { me = JSON.parse(localStorage.getItem('userData') || 'null'); } catch (e) {}
