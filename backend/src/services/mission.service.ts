@@ -4,6 +4,7 @@ import { Helpers } from '../utils/helpers';
 import logger from '../utils/logger';
 import QRCode from 'qrcode';
 import crypto from 'crypto';
+import axios from 'axios';
 import { NotificationService } from './notification.service';
 
 export class MissionService {
@@ -546,13 +547,30 @@ export class MissionService {
     proof: { lat?: number; lng?: number } = {}
   ): Promise<{ already: boolean }> {
     const r = await pool.query(
-      'SELECT id, status, gp_id, expediteur_id FROM missions WHERE delivery_token = $1',
+      `SELECT id, status, gp_id, expediteur_id, arrival_city, arrival_country
+       FROM missions WHERE delivery_token = $1`,
       [token]
     );
     if (r.rows.length === 0) throw new Error('Not found');
     const m = r.rows[0];
     if (m.status === 'cancelled') throw new Error('Mission cancelled');
     if (m.status === 'delivered') return { already: true };
+
+    // Anti-fraude : si le destinataire partage sa position, elle doit être proche
+    // de la ville d'arrivée. (Si pas de GPS ou géocodage indisponible, on ne bloque pas.)
+    if (proof.lat != null && proof.lng != null) {
+      const dest = await this.geocodeCity(m.arrival_city, m.arrival_country);
+      if (dest) {
+        const km = this.haversineKm(proof.lat, proof.lng, dest.lat, dest.lng);
+        const limit = parseFloat(process.env.DELIVERY_GEOFENCE_KM || '60');
+        if (km > limit) {
+          throw new Error(
+            `Vous semblez loin du lieu de livraison (${m.arrival_city} · ~${Math.round(km)} km). ` +
+            `Confirmez la réception une fois sur place avec le colis.`
+          );
+        }
+      }
+    }
 
     const actor = m.gp_id || m.expediteur_id;
     // Full delivered transition (credits GP wallet, etc.)
@@ -564,6 +582,45 @@ export class MissionService {
       [m.id, proof.lat ?? null, proof.lng ?? null, actor]
     );
     return { already: false };
+  }
+
+  /** Process-level cache of geocoded city centres ("city,country" -> {lat,lng}). */
+  private static geocodeCache: Map<string, { lat: number; lng: number } | null> = new Map();
+
+  /** Geocode a city centre via OpenStreetMap Nominatim. Returns null on failure. */
+  static async geocodeCity(
+    city?: string,
+    country?: string
+  ): Promise<{ lat: number; lng: number } | null> {
+    const q = [city, country].filter(Boolean).join(', ').trim();
+    if (!q) return null;
+    if (this.geocodeCache.has(q)) return this.geocodeCache.get(q) as any;
+    try {
+      const res = await axios.get('https://nominatim.openstreetmap.org/search', {
+        params: { q, format: 'json', limit: 1 },
+        headers: { 'User-Agent': 'SENGP/1.0 (delivery-geofence)' },
+        timeout: 6000,
+      });
+      const hit = Array.isArray(res.data) && res.data[0];
+      const coords = hit ? { lat: parseFloat(hit.lat), lng: parseFloat(hit.lon) } : null;
+      this.geocodeCache.set(q, coords);
+      return coords;
+    } catch (e) {
+      logger.warn(`Geocoding failed for "${q}"`);
+      return null; // ne pas bloquer la confirmation si le géocodage échoue
+    }
+  }
+
+  /** Great-circle distance between two lat/lng points, in kilometres. */
+  static haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371;
+    const toRad = (d: number) => (d * Math.PI) / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(a)));
   }
 
   /**
