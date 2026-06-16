@@ -179,6 +179,7 @@
                     <div class="section-title">🗺️ Suivi en temps réel</div>
                     ${mapBlock}
                     <a class="map-btn" href="${mapsUrl}" target="_blank" rel="noopener">Voir l'itinéraire sur la carte</a>
+                    <button class="btn" style="background:rgba(78,205,196,.18);color:#4ECDC4;border:1px solid rgba(78,205,196,.3);" onclick="shareTracking()">🔗 Partager le suivi avec le destinataire</button>
                 </div>
 
                 <div class="card">
@@ -188,6 +189,23 @@
 
                 ${canCancel?`<button class="btn btn-cancel" onclick="cancelShipment()">Annuler l'envoi</button>`:''}
             `;
+        }
+
+        function publicTrackUrl(){
+            const origin = API.replace(/\/api\/v1\/?$/, '');
+            const token = (mission && (mission.tracking_number || mission.mission_code)) || '';
+            return origin + '/t/' + encodeURIComponent(token);
+        }
+        async function shareTracking(){
+            const url = publicTrackUrl();
+            const text = `Suivez votre colis SEN GP en temps réel : ${url}`;
+            try {
+                if (navigator.share) { await navigator.share({ title: 'Suivi du colis SEN GP', text, url }); return; }
+                await navigator.clipboard.writeText(url);
+                alert('Lien de suivi copié :\n\n' + url + '\n\nEnvoyez-le au destinataire (SMS, WhatsApp…).');
+            } catch (e) {
+                alert('Lien de suivi du destinataire :\n\n' + url);
+            }
         }
 
         async function cancelShipment(){

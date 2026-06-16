@@ -293,6 +293,53 @@ export class MissionService {
   }
 
   /**
+   * Public, read-only tracking by an opaque token (the tracking_number or
+   * mission_code). Returns ONLY non-sensitive fields (no addresses, prices,
+   * phones or internal ids) for the recipient's public tracking page.
+   */
+  static async getPublicTracking(token: string): Promise<any> {
+    const mRes = await pool.query(
+      `SELECT m.id, m.mission_code, m.tracking_number, m.status,
+              m.departure_country, m.departure_city, m.arrival_country, m.arrival_city,
+              m.package_weight, m.desired_departure_date, m.desired_arrival_date,
+              m.created_at, m.completed_at,
+              g.first_name AS gp_first_name
+       FROM missions m
+       LEFT JOIN users g ON m.gp_id = g.id
+       WHERE m.tracking_number = $1 OR m.mission_code = $1
+       LIMIT 1`,
+      [token]
+    );
+    if (mRes.rows.length === 0) throw new Error('Not found');
+    const m = mRes.rows[0];
+
+    const tRes = await pool.query(
+      `SELECT status, location, latitude, longitude, description, created_at
+       FROM mission_tracking WHERE mission_id = $1 ORDER BY created_at DESC`,
+      [m.id]
+    );
+
+    return {
+      mission: {
+        mission_code: m.mission_code,
+        tracking_number: m.tracking_number,
+        status: m.status,
+        departure_country: m.departure_country,
+        departure_city: m.departure_city,
+        arrival_country: m.arrival_country,
+        arrival_city: m.arrival_city,
+        package_weight: m.package_weight,
+        desired_departure_date: m.desired_departure_date,
+        desired_arrival_date: m.desired_arrival_date,
+        created_at: m.created_at,
+        completed_at: m.completed_at,
+        gp_first_name: m.gp_first_name,
+      },
+      tracking: tRes.rows,
+    };
+  }
+
+  /**
    * Record a live GPS position for a mission (sent by the assigned GP while in
    * transit). Stored as a `location` tracking entry so the expéditeur's map can
    * show the latest point. Only the assigned GP, on an active mission, may post.
