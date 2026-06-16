@@ -124,6 +124,7 @@ export class PublicController {
       if(String(m.status).toLowerCase()==='cancelled'){document.getElementById('content').innerHTML='<div class="empty">Cet envoi a été annulé.</div>';return}
       document.getElementById('content').innerHTML=
         '<div class="card"><div class="muted">Code de suivi</div><div style="font-weight:700">'+esc(m.tracking_number||m.mission_code||'')+'</div>'
+        +(m.recipient_name?'<div style="margin-top:8px;font-size:15px"><b>Colis pour :</b> '+esc(m.recipient_name)+'</div>':'')
         +'<div class="route"><span class="flag">'+flag(m.arrival_country)+'</span><span class="city">'+esc(m.arrival_city||'')+'</span></div>'
         +'<div class="muted">Poids : '+(parseFloat(m.package_weight)||0)+' kg · '+'<span class="badge b-blue">'+esc(m.status)+'</span></div></div>'
         +'<div class="card"><p style="font-size:14px;margin-bottom:14px">Avez-vous bien reçu ce colis ? En confirmant, la livraison sera marquée comme terminée.</p>'

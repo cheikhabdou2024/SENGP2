@@ -57,6 +57,18 @@
         .tl-desc { font-size:12px; color:rgba(255,255,255,.7); margin-top:2px; }
         .tl-date { font-size:11px; color:rgba(255,255,255,.45); margin-top:2px; }
         .loading,.empty { text-align:center; padding:40px; color:rgba(255,255,255,.5); }
+        /* Bottom sheet (partage) */
+        .sheet-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
+        .sheet-ov.open{opacity:1;pointer-events:auto}
+        .sheet{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#1d1b34;border-radius:22px 22px 0 0;
+            padding:10px 18px calc(22px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);z-index:51}
+        .sheet-ov.open .sheet{transform:translateY(0)}
+        .sheet-grip{width:42px;height:5px;border-radius:3px;background:rgba(255,255,255,.25);margin:6px auto 14px}
+        .sheet h3{font-size:16px;margin-bottom:4px}
+        .sheet .url{font-size:11px;color:rgba(255,255,255,.5);word-break:break-all;margin-bottom:14px}
+        .share-opt{display:flex;align-items:center;gap:14px;width:100%;padding:14px;border:none;border-radius:14px;background:rgba(255,255,255,.06);color:#fff;font-size:15px;font-weight:600;margin-bottom:10px;cursor:pointer;text-align:left}
+        .share-opt .ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px}
+        .ic-wa{background:#25D366}.ic-mail{background:#EA4335}.ic-copy{background:rgba(255,255,255,.15)}
     </style>
     <script src="config.js"></script>
 </head>
@@ -68,6 +80,18 @@
         </div>
         <div class="content" id="content">
             <div class="loading">Chargement…</div>
+        </div>
+    </div>
+
+    <!-- Bottom sheet de partage -->
+    <div class="sheet-ov" id="shareSheet" onclick="if(event.target===this)closeShareSheet()">
+        <div class="sheet">
+            <div class="sheet-grip"></div>
+            <h3>Partager le suivi</h3>
+            <div class="url" id="shareText"></div>
+            <button class="share-opt" id="waBtn"><span class="ic ic-wa">🟢</span> WhatsApp</button>
+            <button class="share-opt" id="mailBtn"><span class="ic ic-mail">✉️</span> Email / Gmail</button>
+            <button class="share-opt" id="copyBtn"><span class="ic ic-copy">🔗</span> Copier le lien</button>
         </div>
     </div>
 
@@ -151,6 +175,28 @@
                         <div class="arrow">→</div>
                         <div class="loc"><div class="flag">${flag(m.arrival_country)}</div><div class="city">${esc(m.arrival_city||'—')}</div><div class="country">${esc(m.arrival_country||'')}</div></div>
                     </div>
+                    <div class="kv" style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;">
+                        <div><div class="k">Destinataire</div><div class="v">${m.recipient_name?esc(m.recipient_name):'Non renseigné'}${m.recipient_phone?' · '+esc(m.recipient_phone):''}</div></div>
+                        <button onclick="editRecipient()" style="background:rgba(255,255,255,.1);border:none;color:#4ECDC4;border-radius:8px;padding:8px 11px;font-size:12px;font-weight:700;cursor:pointer;">✏️</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title">🗺️ Suivi en temps réel</div>
+                    ${mapBlock}
+                    <a class="map-btn" href="${mapsUrl}" target="_blank" rel="noopener">Voir l'itinéraire sur la carte</a>
+                    <button class="btn" style="background:rgba(78,205,196,.18);color:#4ECDC4;border:1px solid rgba(78,205,196,.3);" onclick="openShareSheet()">🔗 Partager le suivi avec le destinataire</button>
+                </div>
+
+                ${isActive ? `<div class="card">
+                    <div class="section-title">🏷️ Preuve de livraison (QR)</div>
+                    <div id="qrBox"><button class="btn" style="background:rgba(255,215,0,.15);color:#FFD700;border:1px solid rgba(255,215,0,.3);" onclick="loadDeliveryQR()">Générer l'étiquette QR du colis</button></div>
+                    <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:8px;">Imprimez / collez l'étiquette sur le colis. Le destinataire scanne ce QR à la réception.</div>
+                </div>` : ''}
+
+                <div class="card">
+                    <div class="section-title">📡 Historique du suivi</div>
+                    <div class="timeline">${tl}</div>
                 </div>
 
                 <div class="card">
@@ -176,24 +222,6 @@
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="section-title">🗺️ Suivi en temps réel</div>
-                    ${mapBlock}
-                    <a class="map-btn" href="${mapsUrl}" target="_blank" rel="noopener">Voir l'itinéraire sur la carte</a>
-                    <button class="btn" style="background:rgba(78,205,196,.18);color:#4ECDC4;border:1px solid rgba(78,205,196,.3);" onclick="shareTracking()">🔗 Partager le suivi avec le destinataire</button>
-                </div>
-
-                ${isActive ? `<div class="card">
-                    <div class="section-title">🏷️ Preuve de livraison (QR)</div>
-                    <div id="qrBox"><button class="btn" style="background:rgba(255,215,0,.15);color:#FFD700;border:1px solid rgba(255,215,0,.3);" onclick="loadDeliveryQR()">Générer le QR à coller sur le colis</button></div>
-                    <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:8px;">Le destinataire scanne ce QR à la réception pour confirmer la livraison.</div>
-                </div>` : ''}
-
-                <div class="card">
-                    <div class="section-title">📡 Historique du suivi</div>
-                    <div class="timeline">${tl}</div>
-                </div>
-
                 ${canCancel?`<button class="btn btn-cancel" onclick="cancelShipment()">Annuler l'envoi</button>`:''}
             `;
         }
@@ -212,25 +240,56 @@
                 });
                 const j = await res.json();
                 if (res.ok && j.success) {
-                    box.innerHTML = `<img src="${j.data.qr_code_url}" alt="QR de livraison" style="width:200px;height:200px;display:block;margin:10px auto;background:#fff;border-radius:12px;padding:8px;">
-                        <div style="font-size:11px;color:rgba(255,255,255,.55);word-break:break-all;text-align:center;">${j.data.confirm_url}</div>`;
+                    const m = mission || {};
+                    const recip = m.recipient_name ? esc(m.recipient_name) : '⚠️ Destinataire non renseigné';
+                    const code = esc(m.tracking_number || m.mission_code || '');
+                    // Étiquette à imprimer/coller : identité lisible + QR de confirmation.
+                    box.innerHTML = `
+                        <div style="background:#fff;color:#1a1a2e;border-radius:12px;padding:16px;text-align:center;">
+                            <div style="font-weight:800;font-size:15px;letter-spacing:1px;">SEN GP</div>
+                            <div style="font-size:15px;margin-top:6px;">Pour : <b>${recip}</b></div>
+                            <div style="font-size:12px;color:#555;margin-top:2px;">${esc(m.departure_city||'')} → ${esc(m.arrival_city||'')}</div>
+                            <img src="${j.data.qr_code_url}" alt="QR de livraison" style="width:200px;height:200px;display:block;margin:10px auto;">
+                            <div style="font-weight:800;letter-spacing:1.5px;font-size:15px;">${code}</div>
+                        </div>
+                        <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:8px;text-align:center;">À imprimer / coller sur le colis (capture d'écran possible).</div>`;
                 } else {
                     box.innerHTML = 'Erreur: ' + (j.error || j.message || 'génération échouée');
                 }
             } catch (e) { box.innerHTML = 'Erreur de connexion.'; }
         }
 
-        async function shareTracking(){
+        async function editRecipient(){
+            const m = mission || {};
+            const name = prompt('Nom du destinataire :', m.recipient_name || '');
+            if (name === null) return;
+            const phone = prompt('Téléphone du destinataire :', m.recipient_phone || '');
+            try {
+                const res = await fetch(`${API}/missions/${missionId}/recipient`, {
+                    method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' },
+                    body: JSON.stringify({ name: name.trim(), phone: (phone||'').trim() })
+                });
+                const j = await res.json();
+                if (res.ok && j.success){ await load(); }
+                else alert('Erreur: ' + (j.error || j.message || ''));
+            } catch(e){ alert('Erreur de connexion.'); }
+        }
+
+        // ---- Partage : bottom sheet WhatsApp / Email / Copier ----
+        function openShareSheet(){
             const url = publicTrackUrl();
             const text = `Suivez votre colis SEN GP en temps réel : ${url}`;
-            try {
-                if (navigator.share) { await navigator.share({ title: 'Suivi du colis SEN GP', text, url }); return; }
-                await navigator.clipboard.writeText(url);
-                alert('Lien de suivi copié :\n\n' + url + '\n\nEnvoyez-le au destinataire (SMS, WhatsApp…).');
-            } catch (e) {
-                alert('Lien de suivi du destinataire :\n\n' + url);
-            }
+            document.getElementById('shareText').textContent = url;
+            document.getElementById('waBtn').onclick = () => { window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank'); closeShareSheet(); };
+            document.getElementById('mailBtn').onclick = () => { window.location.href = 'mailto:?subject=' + encodeURIComponent('Suivi de votre colis SEN GP') + '&body=' + encodeURIComponent(text); closeShareSheet(); };
+            document.getElementById('copyBtn').onclick = async () => {
+                try { await navigator.clipboard.writeText(url); alert('Lien copié !'); } catch(e){ alert(url); }
+                closeShareSheet();
+            };
+            const ov = document.getElementById('shareSheet');
+            ov.classList.add('open');
         }
+        function closeShareSheet(){ document.getElementById('shareSheet').classList.remove('open'); }
 
         async function cancelShipment(){
             if (!confirm('Annuler cet envoi ? Cette action est irréversible.')) return;

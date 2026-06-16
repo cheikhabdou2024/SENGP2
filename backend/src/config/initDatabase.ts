@@ -40,7 +40,10 @@ export async function initDatabase(): Promise<void> {
     // Phase 2: secret token carried by the package QR for proof-of-delivery.
     await pool.query('ALTER TABLE missions ADD COLUMN IF NOT EXISTS delivery_token VARCHAR(64)');
     await pool.query('CREATE UNIQUE INDEX IF NOT EXISTS idx_missions_delivery_token ON missions(delivery_token)');
-    logger.info('✅ Schema patches applied (phone/password nullable, delivery_token)');
+    // Recipient identity for package-matching at delivery.
+    await pool.query('ALTER TABLE missions ADD COLUMN IF NOT EXISTS recipient_name VARCHAR(150)');
+    await pool.query('ALTER TABLE missions ADD COLUMN IF NOT EXISTS recipient_phone VARCHAR(30)');
+    logger.info('✅ Schema patches applied (phone/password nullable, delivery_token, recipient)');
   } catch (error) {
     logger.error('❌ Error initializing database:', error);
 

@@ -2037,6 +2037,14 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Nom du destinataire <span class="required">*</span></label>
+                    <input type="text" id="receiverName" placeholder="Ex: Awa Ndiaye" oninput="validateStep2()" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:15px;" />
+                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 6px;">
+                        👤 La personne qui recevra le colis (figurera sur l'étiquette)
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label>Contact destinataire <span class="required">*</span></label>
                     <div class="phone-input-container">
                         <div class="country-code-selector" id="countryCodeBtn" onclick="openCountryCodeModal()">
@@ -3410,7 +3418,9 @@
                         package_description: description || packageTypeText,
                         desired_departure_date: date,
                         offered_price: offered,
-                        is_price_negotiable: true
+                        is_price_negotiable: true,
+                        recipient_name: (document.getElementById('receiverName') ? document.getElementById('receiverName').value.trim() : '') || null,
+                        recipient_phone: ((document.getElementById('selectedCode') ? document.getElementById('selectedCode').textContent : '') + ' ' + (document.getElementById('receiverPhone') ? document.getElementById('receiverPhone').value.trim() : '')).trim() || null
                     })
                 });
                 const missionResult = await missionRes.json();

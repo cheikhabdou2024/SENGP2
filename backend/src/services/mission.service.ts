@@ -33,8 +33,8 @@ export class MissionService {
           arrival_country, arrival_city, delivery_address, package_weight, package_length,
           package_width, package_height, package_description, package_value, package_photos,
           desired_departure_date, desired_arrival_date, offered_price, is_price_negotiable,
-          is_insured, insurance_cost, tracking_number
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
+          is_insured, insurance_cost, tracking_number, recipient_name, recipient_phone
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)
         RETURNING *`,
         [
           mission_code,
@@ -59,6 +59,8 @@ export class MissionService {
           data.is_insured !== false,
           insurance_cost,
           tracking_number,
+          (data as any).recipient_name || null,
+          (data as any).recipient_phone || null,
         ]
       );
 
@@ -529,11 +531,29 @@ export class MissionService {
   static async getDeliveryInfo(token: string): Promise<any> {
     const r = await pool.query(
       `SELECT mission_code, tracking_number, status,
-              departure_city, arrival_city, arrival_country, package_weight
+              departure_city, arrival_city, arrival_country, package_weight,
+              recipient_name
        FROM missions WHERE delivery_token = $1`,
       [token]
     );
     if (r.rows.length === 0) throw new Error('Not found');
+    return r.rows[0];
+  }
+
+  /** Set/update the recipient identity (expediteur owner only). */
+  static async setRecipient(
+    missionId: string,
+    expediteurId: string,
+    name?: string,
+    phone?: string
+  ): Promise<any> {
+    const r = await pool.query(
+      `UPDATE missions SET recipient_name = $1, recipient_phone = $2, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $3 AND expediteur_id = $4
+       RETURNING id, recipient_name, recipient_phone`,
+      [name || null, phone || null, missionId, expediteurId]
+    );
+    if (r.rows.length === 0) throw new Error('Mission not found or not yours');
     return r.rows[0];
   }
 

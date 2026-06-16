@@ -204,6 +204,26 @@ export class MissionController {
   }
 
   /**
+   * Set the recipient identity (expediteur owner only)
+   * POST /api/v1/missions/:id/recipient  { name, phone }
+   */
+  static async setRecipient(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) { ResponseUtil.unauthorized(res); return; }
+      const data = await MissionService.setRecipient(
+        req.params.id, req.user.id, req.body.name, req.body.phone
+      );
+      ResponseUtil.success(res, data, 'Destinataire enregistré');
+    } catch (error: any) {
+      if (error.message && error.message.includes('not yours')) {
+        ResponseUtil.forbidden(res, error.message);
+        return;
+      }
+      ResponseUtil.badRequest(res, error.message || 'Échec');
+    }
+  }
+
+  /**
    * Record a live GPS position (assigned GP only)
    * POST /api/v1/missions/:id/location  { lat, lng }
    */
