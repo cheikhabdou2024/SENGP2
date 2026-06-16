@@ -19,6 +19,7 @@ import notificationRoutes from './routes/notification.routes';
 import claimRoutes from './routes/claim.routes';
 import walletRoutes from './routes/wallet.routes';
 import withdrawalRoutes from './routes/withdrawal.routes';
+import adminRoutes from './routes/admin.routes';
 
 dotenv.config();
 
@@ -127,6 +128,7 @@ app.use(`/api/${apiVersion}/notifications`, notificationRoutes);
 app.use(`/api/${apiVersion}/claims`, claimRoutes);
 app.use(`/api/${apiVersion}/wallet`, walletRoutes);
 app.use(`/api/${apiVersion}/withdrawals`, withdrawalRoutes);
+app.use(`/api/${apiVersion}/admin`, adminRoutes);
 
 // Serve static frontend files in production
 if (process.env.NODE_ENV === 'production') {
