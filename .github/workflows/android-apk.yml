@@ -42,15 +42,17 @@ jobs:
         working-directory: frontend
         run: npx cap sync android
 
-      - name: Restore stable debug keystore (fixed SHA-1 for Google Sign-In)
+      - name: Force deterministic debug signing (fixed SHA-1 for Google Sign-In)
         run: |
-          mkdir -p ~/.android
-          base64 -d frontend/ci/debug-keystore.base64 > ~/.android/debug.keystore
-
-      - name: Print signing SHA-1 / SHA-256 (register these in Google Cloud OAuth Android client)
-        run: |
-          echo "=== Debug keystore fingerprints (alias androiddebugkey) ==="
-          keytool -list -v -keystore ~/.android/debug.keystore \
+          # Decode our committed debug keystore into the app module.
+          base64 -d frontend/ci/debug-keystore.base64 > frontend/android/app/debug.keystore
+          # Also keep the conventional location as a fallback.
+          mkdir -p ~/.android && cp frontend/android/app/debug.keystore ~/.android/debug.keystore
+          # Append an explicit debug signingConfig so assembleDebug ALWAYS uses our key
+          # (the AGP-generated debug keystore is otherwise random/unstable).
+          printf '\nandroid {\n  signingConfigs {\n    debug {\n      storeFile file("debug.keystore")\n      storePassword "android"\n      keyAlias "androiddebugkey"\n      keyPassword "android"\n    }\n  }\n}\n' >> frontend/android/app/build.gradle
+          echo "=== keystore SHA-1 (expected on the APK) ==="
+          keytool -list -v -keystore frontend/android/app/debug.keystore \
             -alias androiddebugkey -storepass android -keypass android \
             | grep -iE "SHA1:|SHA256:" || true
 
@@ -59,6 +61,12 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
+
+      - name: Verify APK signing certificate SHA-1 (must match Google OAuth client)
+        run: |
+          echo "=== ACTUAL APK signing certificate ==="
+          keytool -printcert -jarfile frontend/android/app/build/outputs/apk/debug/app-debug.apk \
+            | grep -iE "SHA1:|SHA256:" || true
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
