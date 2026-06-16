@@ -111,14 +111,24 @@
             width: 48px;
             height: 48px;
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            background-size: cover;
+            background-position: center;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 16px;
+            font-weight: 800;
+            color: #1a1a2e;
             cursor: pointer;
             transition: transform 0.3s ease;
             box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.85);
+            overflow: hidden;
+        }
+
+        .profile-avatar.has-photo span {
+            display: none;
         }
 
         .profile-avatar:hover {
@@ -533,16 +543,15 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 65px;
-            background: linear-gradient(180deg, rgba(15, 12, 41, 0.95) 0%, rgba(26, 22, 48, 0.98) 100%);
-            backdrop-filter: blur(30px);
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(18, 16, 36, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+            justify-content: space-around;
+            align-items: stretch;
+            padding: 9px 6px calc(9px + env(safe-area-inset-bottom));
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35);
         }
 
         .nav-item {
@@ -550,55 +559,75 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 4px;
             cursor: pointer;
-            transition: all 0.4s ease;
-            padding: 6px 10px;
-            border-radius: 12px;
             flex: 1;
-            max-width: 70px;
             position: relative;
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.15) 50%, rgba(78, 205, 196, 0.1) 100%);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            box-shadow: 0 8px 24px rgba(255, 215, 0, 0.25);
-            transform: translateY(-6px);
+            padding: 6px 0;
+            border-radius: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            transition: color 0.25s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .nav-icon {
-            font-size: 20px;
-            filter: grayscale(0.8) brightness(0.7);
-            transition: all 0.4s ease;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .nav-item.active .nav-icon {
-            filter: grayscale(0) brightness(1.2);
-            transform: scale(1.1);
+        .nav-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: transform 0.25s ease;
         }
 
         .nav-label {
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 700;
-            text-transform: uppercase;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            color: inherit;
         }
 
-        .nav-item.active .nav-label {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #4ECDC4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
+        .nav-item.active {
+            color: #FFC107;
+        }
+
+        .nav-item.active .nav-icon svg {
+            transform: translateY(-1px) scale(1.06);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            top: -9px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 26px;
+            height: 3px;
+            border-radius: 0 0 3px 3px;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+        }
+
+        .nav-item:not(.active):active {
+            color: rgba(255, 255, 255, 0.85);
         }
 
         .nav-badge {
             position: absolute;
             top: 0px;
-            right: 0px;
-            min-width: 18px;
-            height: 18px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FF4757 100%);
+            left: calc(50% + 5px);
+            min-width: 17px;
+            height: 17px;
+            background: #FF4757;
+            border: 1.5px solid #121024;
             border-radius: 9px;
             display: flex;
             align-items: center;
@@ -606,13 +635,16 @@
             font-size: 9px;
             font-weight: 800;
             color: white;
-            padding: 0 5px;
-            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.6);
+            padding: 0 4px;
         }
 
         .nav-badge.new {
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            box-shadow: 0 3px 10px rgba(255, 215, 0, 0.6);
+            color: #1a1a2e;
+        }
+
+        .nav-badge.hidden {
+            display: none;
         }
             /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
@@ -632,8 +664,8 @@
                         <h1>Bonjour, GP 👋</h1>
                         <p>Prêt pour une nouvelle mission ?</p>
                     </div>
-                    <div class="profile-avatar" onclick="openProfile()">
-                        ✈️
+                    <div class="profile-avatar" id="profileAvatar" onclick="openProfile()">
+                        <span id="profileInitials">GP</span>
                     </div>
                 </div>
 
@@ -723,29 +755,29 @@
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
             <div class="nav-item active" onclick="navigateTo('home')" tabindex="0" role="button" aria-label="Accueil">
-                <div class="nav-icon">🏠</div>
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
                 <div class="nav-label">Accueil</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('missions')" tabindex="0" role="button" aria-label="Missions">
-                <div class="nav-icon">🔍</div>
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
                 <div class="nav-label">Missions</div>
                 <div class="nav-badge new">5</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('trips')" tabindex="0" role="button" aria-label="Mes trajets">
-                <div class="nav-icon">✈️</div>
+                <div class="nav-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M22 16.21v-1.6l-8.5-5V4.5a1.5 1.5 0 0 0-3 0v5.11l-8.5 5v1.6l8.5-2.66v4.54l-2.5 1.4v1.5l4-1.18 4 1.18v-1.5l-2.5-1.4v-4.54z"/></svg></div>
                 <div class="nav-label">Trajets</div>
                 <div class="nav-badge">2</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('claims')" tabindex="0" role="button" aria-label="Réclamations">
-                <div class="nav-icon">📝</div>
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6"/><path d="M9 17h6"/></svg></div>
                 <div class="nav-label">Réclamations</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil">
-                <div class="nav-icon">👤</div>
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
                 <div class="nav-label">Profil</div>
             </div>
         </div>
@@ -761,7 +793,16 @@
         window.addEventListener('DOMContentLoaded', async () => {
             await checkAuthentication();
             await loadDashboardData();
+            hideEmptyBadges();
         });
+
+        // Masque les pastilles dont la valeur est 0 ou vide (évite un « 0 » disgracieux).
+        function hideEmptyBadges() {
+            document.querySelectorAll('.nav-badge').forEach((b) => {
+                const n = parseInt((b.textContent || '').trim(), 10);
+                b.classList.toggle('hidden', !n);
+            });
+        }
 
         async function checkAuthentication() {
             authToken = localStorage.getItem('authToken');
@@ -795,6 +836,20 @@
             const greetingName = document.querySelector('.greeting h1');
             const firstName = currentUser.first_name || 'GP';
             greetingName.textContent = `Bonjour, ${firstName} 👋`;
+
+            // Avatar : photo de profil Google si disponible, sinon initiales.
+            const avatar = document.getElementById('profileAvatar');
+            const initialsEl = document.getElementById('profileInitials');
+            const photo = currentUser.profile_photo_url;
+            if (photo) {
+                avatar.style.backgroundImage = `url("${photo}")`;
+                avatar.classList.add('has-photo');
+            } else {
+                const a = (currentUser.first_name || '').charAt(0);
+                const b = (currentUser.last_name || '').charAt(0);
+                initialsEl.textContent = (a + b).toUpperCase() || 'GP';
+                avatar.classList.remove('has-photo');
+            }
         }
 
         async function loadDashboardData() {
