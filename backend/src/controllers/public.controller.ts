@@ -33,6 +33,124 @@ export class PublicController {
   }
 
   /**
+   * Public delivery info by secret QR token (no auth).
+   * GET /api/v1/public/delivery/:token
+   */
+  static async deliveryInfo(req: Request, res: Response): Promise<void> {
+    try {
+      const token = sanitizeToken(req.params.token);
+      if (!token) { ResponseUtil.badRequest(res, 'Invalid token'); return; }
+      const data = await MissionService.getDeliveryInfo(token);
+      ResponseUtil.success(res, data);
+    } catch (e: any) {
+      if (e.message === 'Not found') { ResponseUtil.notFound(res, 'Colis introuvable'); return; }
+      logger.error('Delivery info error:', e);
+      ResponseUtil.serverError(res, 'Erreur');
+    }
+  }
+
+  /**
+   * Recipient confirms delivery (no auth; possession of the QR token = proof).
+   * POST /api/v1/public/delivery/:token/confirm  { lat?, lng? }
+   */
+  static async confirmDelivery(req: Request, res: Response): Promise<void> {
+    try {
+      const token = sanitizeToken(req.params.token);
+      if (!token) { ResponseUtil.badRequest(res, 'Invalid token'); return; }
+      const lat = req.body && req.body.lat != null ? parseFloat(req.body.lat) : undefined;
+      const lng = req.body && req.body.lng != null ? parseFloat(req.body.lng) : undefined;
+      const r = await MissionService.confirmDeliveryByToken(token, {
+        lat: Number.isNaN(lat as number) ? undefined : lat,
+        lng: Number.isNaN(lng as number) ? undefined : lng,
+      });
+      ResponseUtil.success(res, r, r.already ? 'Déjà livré' : 'Réception confirmée');
+    } catch (e: any) {
+      if (e.message === 'Not found') { ResponseUtil.notFound(res, 'Colis introuvable'); return; }
+      logger.error('Confirm delivery error:', e);
+      ResponseUtil.badRequest(res, e.message || 'Confirmation échouée');
+    }
+  }
+
+  /**
+   * Public, self-contained HTML delivery-confirmation page (recipient scans the
+   * package QR which points here).
+   * GET /d/:token
+   */
+  static deliveryPage(req: Request, res: Response): void {
+    const token = sanitizeToken(req.params.token);
+    const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confirmer la réception - SEN GP</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;min-height:100vh;display:flex;justify-content:center}
+  .wrap{width:100%;max-width:440px;padding:22px}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .brand .logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#FF6B6B,#FFE66D);display:flex;align-items:center;justify-content:center;font-size:20px}
+  .brand h1{font-size:18px}
+  .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:20px;margin-bottom:16px}
+  .route{display:flex;align-items:center;gap:10px;margin-top:8px}
+  .route .flag{font-size:24px}.route .city{font-weight:700}.route .arrow{color:rgba(255,255,255,.4)}
+  .muted{font-size:12px;color:rgba(255,255,255,.55);margin-top:6px}
+  .badge{display:inline-block;padding:5px 12px;border-radius:9px;font-size:12px;font-weight:700}
+  .b-green{background:rgba(76,175,80,.2);color:#7ee081}.b-blue{background:rgba(78,205,196,.2);color:#4ECDC4}
+  .btn{display:block;width:100%;text-align:center;padding:16px;border:none;border-radius:14px;font-weight:800;font-size:16px;cursor:pointer;background:linear-gradient(135deg,#4CAF50,#45a049);color:#fff;margin-top:6px}
+  .btn:disabled{opacity:.6}
+  .ok{text-align:center;padding:30px 10px}
+  .ok .ic{font-size:60px;margin-bottom:12px}
+  .loading,.empty{text-align:center;padding:50px 20px;color:rgba(255,255,255,.55)}
+  .note{font-size:11px;color:rgba(255,255,255,.4);text-align:center;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><div class="logo">📦</div><h1>Réception du colis</h1></div>
+  <div id="content"><div class="loading">Chargement…</div></div>
+  <div class="note">SEN GP · Confirmez uniquement après avoir reçu le colis.</div>
+</div>
+<script>
+  var TOKEN=${JSON.stringify(token)};
+  var FLAGS={'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱'};
+  function flag(c){return FLAGS[c]||'🌍'}
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+  function load(){
+    fetch('/api/v1/public/delivery/'+encodeURIComponent(TOKEN)).then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j}})}).then(function(res){
+      if(!res.ok||!res.j.success){document.getElementById('content').innerHTML='<div class="empty">📭<br>Code de livraison invalide.</div>';return}
+      var m=res.j.data;
+      if(String(m.status).toLowerCase()==='delivered'){showDone();return}
+      if(String(m.status).toLowerCase()==='cancelled'){document.getElementById('content').innerHTML='<div class="empty">Cet envoi a été annulé.</div>';return}
+      document.getElementById('content').innerHTML=
+        '<div class="card"><div class="muted">Code de suivi</div><div style="font-weight:700">'+esc(m.tracking_number||m.mission_code||'')+'</div>'
+        +'<div class="route"><span class="flag">'+flag(m.arrival_country)+'</span><span class="city">'+esc(m.arrival_city||'')+'</span></div>'
+        +'<div class="muted">Poids : '+(parseFloat(m.package_weight)||0)+' kg · '+'<span class="badge b-blue">'+esc(m.status)+'</span></div></div>'
+        +'<div class="card"><p style="font-size:14px;margin-bottom:14px">Avez-vous bien reçu ce colis ? En confirmant, la livraison sera marquée comme terminée.</p>'
+        +'<button class="btn" id="cbtn" onclick="confirmIt()">✓ Confirmer la réception</button></div>';
+    }).catch(function(){document.getElementById('content').innerHTML='<div class="empty">Erreur de connexion.</div>'});
+  }
+  function showDone(){document.getElementById('content').innerHTML='<div class="card ok"><div class="ic">✅</div><div style="font-size:20px;font-weight:800;margin-bottom:6px">Livraison confirmée</div><div class="muted">Merci ! Le colis a bien été marqué comme livré.</div></div>'}
+  function post(coords){
+    var btn=document.getElementById('cbtn'); if(btn){btn.disabled=true;btn.textContent='Confirmation…'}
+    fetch('/api/v1/public/delivery/'+encodeURIComponent(TOKEN)+'/confirm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(coords||{})})
+      .then(function(r){return r.json()}).then(function(j){ if(j.success)showDone(); else {alert('Erreur: '+(j.error||j.message||'')); if(btn){btn.disabled=false;btn.textContent='✓ Confirmer la réception'}} })
+      .catch(function(){alert('Erreur de connexion.'); if(btn){btn.disabled=false;btn.textContent='✓ Confirmer la réception'}});
+  }
+  function confirmIt(){
+    if(navigator.geolocation){navigator.geolocation.getCurrentPosition(
+      function(p){post({lat:p.coords.latitude,lng:p.coords.longitude})},
+      function(){post({})},{timeout:8000});
+    } else { post({}); }
+  }
+  load();
+</script>
+</body>
+</html>`;
+    res.status(200).type('html').send(html);
+  }
+
+  /**
    * Public, self-contained HTML tracking page (no app/login needed).
    * GET /t/:token
    */

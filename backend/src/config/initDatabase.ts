@@ -37,7 +37,10 @@ export async function initDatabase(): Promise<void> {
     // Idempotent schema patches: email/Google auth makes phone + password optional.
     await pool.query('ALTER TABLE users ALTER COLUMN phone DROP NOT NULL');
     await pool.query('ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL');
-    logger.info('✅ Schema patches applied (phone/password nullable)');
+    // Phase 2: secret token carried by the package QR for proof-of-delivery.
+    await pool.query('ALTER TABLE missions ADD COLUMN IF NOT EXISTS delivery_token VARCHAR(64)');
+    await pool.query('CREATE UNIQUE INDEX IF NOT EXISTS idx_missions_delivery_token ON missions(delivery_token)');
+    logger.info('✅ Schema patches applied (phone/password nullable, delivery_token)');
   } catch (error) {
     logger.error('❌ Error initializing database:', error);
 

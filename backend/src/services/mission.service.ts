@@ -3,6 +3,7 @@ import { Mission, MissionStatus, NotificationType, PaginatedResult } from '../ty
 import { Helpers } from '../utils/helpers';
 import logger from '../utils/logger';
 import QRCode from 'qrcode';
+import crypto from 'crypto';
 import { NotificationService } from './notification.service';
 
 export class MissionService {
@@ -497,6 +498,72 @@ export class MissionService {
     );
 
     return qrCodeUrl;
+  }
+
+  /**
+   * Phase 2 — proof of delivery.
+   * Ensure the mission has a secret `delivery_token` (carried by the package QR),
+   * then return the public confirmation URL + a QR image (data URL) for it.
+   */
+  static async generateDeliveryQR(
+    missionId: string,
+    baseUrl: string
+  ): Promise<{ token: string; confirm_url: string; qr_code_url: string }> {
+    const mr = await pool.query(
+      'SELECT id, delivery_token, expediteur_id, gp_id FROM missions WHERE id = $1',
+      [missionId]
+    );
+    if (mr.rows.length === 0) throw new Error('Mission not found');
+    let token = mr.rows[0].delivery_token;
+    if (!token) {
+      token = crypto.randomBytes(16).toString('hex');
+      await pool.query('UPDATE missions SET delivery_token = $1 WHERE id = $2', [token, missionId]);
+    }
+    const confirm_url = `${baseUrl}/d/${token}`;
+    const qr_code_url = await QRCode.toDataURL(confirm_url, { margin: 1, width: 320 });
+    return { token, confirm_url, qr_code_url };
+  }
+
+  /** Public, minimal mission info for the delivery-confirmation page. */
+  static async getDeliveryInfo(token: string): Promise<any> {
+    const r = await pool.query(
+      `SELECT mission_code, tracking_number, status,
+              departure_city, arrival_city, arrival_country, package_weight
+       FROM missions WHERE delivery_token = $1`,
+      [token]
+    );
+    if (r.rows.length === 0) throw new Error('Not found');
+    return r.rows[0];
+  }
+
+  /**
+   * Recipient confirms delivery by scanning the package QR. Idempotent: if the
+   * mission is already delivered, it's a no-op. Otherwise it runs the full
+   * delivered transition (wallet credit, etc.) and records a proof entry.
+   */
+  static async confirmDeliveryByToken(
+    token: string,
+    proof: { lat?: number; lng?: number } = {}
+  ): Promise<{ already: boolean }> {
+    const r = await pool.query(
+      'SELECT id, status, gp_id, expediteur_id FROM missions WHERE delivery_token = $1',
+      [token]
+    );
+    if (r.rows.length === 0) throw new Error('Not found');
+    const m = r.rows[0];
+    if (m.status === 'cancelled') throw new Error('Mission cancelled');
+    if (m.status === 'delivered') return { already: true };
+
+    const actor = m.gp_id || m.expediteur_id;
+    // Full delivered transition (credits GP wallet, etc.)
+    await this.updateStatus(m.id, MissionStatus.DELIVERED, actor);
+    // Proof-of-delivery tracking entry (with the recipient's GPS if shared)
+    await pool.query(
+      `INSERT INTO mission_tracking (mission_id, status, latitude, longitude, description, created_by)
+       VALUES ($1, 'delivered', $2, $3, 'Réception confirmée par le destinataire (QR)', $4)`,
+      [m.id, proof.lat ?? null, proof.lng ?? null, actor]
+    );
+    return { already: false };
   }
 
   /**

@@ -126,6 +126,7 @@
             const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent((m.departure_city||'')+', '+(m.departure_country||''))}&destination=${encodeURIComponent((m.arrival_city||'')+', '+(m.arrival_country||''))}`;
 
             const canCancel = ['pending','matched'].includes(String(m.status||'').toLowerCase());
+            const isActive = !['delivered','cancelled'].includes(String(m.status||'').toLowerCase());
 
             // Les pings GPS (status 'location') alimentent la carte mais pas la timeline.
             const events = tracking.filter(t => String(t.status||'').toLowerCase() !== 'location');
@@ -182,6 +183,12 @@
                     <button class="btn" style="background:rgba(78,205,196,.18);color:#4ECDC4;border:1px solid rgba(78,205,196,.3);" onclick="shareTracking()">🔗 Partager le suivi avec le destinataire</button>
                 </div>
 
+                ${isActive ? `<div class="card">
+                    <div class="section-title">🏷️ Preuve de livraison (QR)</div>
+                    <div id="qrBox"><button class="btn" style="background:rgba(255,215,0,.15);color:#FFD700;border:1px solid rgba(255,215,0,.3);" onclick="loadDeliveryQR()">Générer le QR à coller sur le colis</button></div>
+                    <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:8px;">Le destinataire scanne ce QR à la réception pour confirmer la livraison.</div>
+                </div>` : ''}
+
                 <div class="card">
                     <div class="section-title">📡 Historique du suivi</div>
                     <div class="timeline">${tl}</div>
@@ -196,6 +203,23 @@
             const token = (mission && (mission.tracking_number || mission.mission_code)) || '';
             return origin + '/t/' + encodeURIComponent(token);
         }
+        async function loadDeliveryQR(){
+            const box = document.getElementById('qrBox');
+            box.innerHTML = 'Génération…';
+            try {
+                const res = await fetch(`${API}/missions/${missionId}/delivery-qr`, {
+                    method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' }
+                });
+                const j = await res.json();
+                if (res.ok && j.success) {
+                    box.innerHTML = `<img src="${j.data.qr_code_url}" alt="QR de livraison" style="width:200px;height:200px;display:block;margin:10px auto;background:#fff;border-radius:12px;padding:8px;">
+                        <div style="font-size:11px;color:rgba(255,255,255,.55);word-break:break-all;text-align:center;">${j.data.confirm_url}</div>`;
+                } else {
+                    box.innerHTML = 'Erreur: ' + (j.error || j.message || 'génération échouée');
+                }
+            } catch (e) { box.innerHTML = 'Erreur de connexion.'; }
+        }
+
         async function shareTracking(){
             const url = publicTrackUrl();
             const text = `Suivez votre colis SEN GP en temps réel : ${url}`;

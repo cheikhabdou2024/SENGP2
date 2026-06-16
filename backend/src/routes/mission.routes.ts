@@ -50,6 +50,9 @@ router.post(
   MissionController.addLocation
 );
 
+// Proof-of-delivery QR (expediteur owner / assigned GP / admin)
+router.post('/:id/delivery-qr', MissionController.deliveryQR);
+
 // Update mission status
 router.post(
   '/:id/status',

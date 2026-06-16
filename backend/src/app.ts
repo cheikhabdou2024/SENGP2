@@ -136,6 +136,7 @@ app.use(`/api/${apiVersion}/public`, publicRoutes);
 // Public recipient tracking page (self-contained HTML, no auth/app needed).
 // Registered before the production SPA catch-all so it isn't shadowed.
 app.get('/t/:token', PublicController.trackPage);
+app.get('/d/:token', PublicController.deliveryPage);
 
 // Serve static frontend files in production
 if (process.env.NODE_ENV === 'production') {

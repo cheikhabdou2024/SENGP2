@@ -171,6 +171,39 @@ export class MissionController {
   }
 
   /**
+   * Generate (or fetch) the proof-of-delivery QR for a mission.
+   * POST /api/v1/missions/:id/delivery-qr  (expediteur owner, assigned GP, or admin)
+   */
+  static async deliveryQR(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        ResponseUtil.unauthorized(res);
+        return;
+      }
+      const mission = await MissionService.getById(req.params.id);
+      if (!mission) {
+        ResponseUtil.notFound(res, 'Mission not found');
+        return;
+      }
+      const uid = req.user.id;
+      const isOwner =
+        mission.expediteur_id === uid ||
+        mission.gp_id === uid ||
+        req.user.user_type === UserType.ADMIN;
+      if (!isOwner) {
+        ResponseUtil.forbidden(res, 'Not your mission');
+        return;
+      }
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const data = await MissionService.generateDeliveryQR(req.params.id, baseUrl);
+      ResponseUtil.success(res, data, 'Delivery QR ready');
+    } catch (error: any) {
+      logger.error('Delivery QR error:', error);
+      ResponseUtil.badRequest(res, error.message || 'Failed to generate QR');
+    }
+  }
+
+  /**
    * Record a live GPS position (assigned GP only)
    * POST /api/v1/missions/:id/location  { lat, lng }
    */
