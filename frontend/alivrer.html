@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEN GP - Colis à livrer</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+            background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%); min-height:100vh; display:flex; justify-content:center; color:#fff; }
+        .mobile-frame { width:100%; max-width:480px; min-height:100vh; min-height:100dvh; position:relative;
+            background:linear-gradient(135deg, rgba(15,12,41,.95), rgba(36,36,62,.95)); }
+        .header { display:flex; align-items:center; gap:14px; padding:18px 20px; border-bottom:1px solid rgba(255,255,255,.1);
+            position:sticky; top:0; background:rgba(20,18,40,.85); backdrop-filter:blur(10px); z-index:5; }
+        .back-btn { width:38px; height:38px; border:none; border-radius:11px; cursor:pointer; background:rgba(255,255,255,.1); color:#fff; font-size:18px; }
+        .header h1 { font-size:18px; }
+        .content { padding:18px; }
+        .card { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:16px; margin-bottom:12px; }
+        .top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+        .recipient { font-size:16px; font-weight:800; }
+        .code { font-size:11px; color:rgba(255,255,255,.5); }
+        .badge { padding:4px 10px; border-radius:8px; font-size:11px; font-weight:700; }
+        .b-yellow{background:rgba(255,215,0,.18);color:#FFD700}.b-blue{background:rgba(78,205,196,.2);color:#4ECDC4}.b-green{background:rgba(76,175,80,.2);color:#7ee081}
+        .route { display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:10px; }
+        .route .flag{font-size:18px;} .route .arrow{color:rgba(255,255,255,.4);}
+        .line { font-size:13px; color:rgba(255,255,255,.8); margin-bottom:6px; }
+        .actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+        .btn { flex:1; min-width:120px; padding:11px; border:none; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; text-decoration:none; text-align:center; }
+        .btn-call { background:rgba(76,175,80,.25); color:#7ee081; }
+        .btn-next { background:linear-gradient(135deg,#FFD700,#FFA500); color:#1a1a2e; }
+        .note { font-size:12px; color:rgba(255,255,255,.55); margin-top:10px; }
+        .loading,.empty { text-align:center; padding:50px 20px; color:rgba(255,255,255,.55); }
+        .empty .ic{font-size:44px;margin-bottom:10px;}
+    </style>
+    <script src="config.js"></script>
+</head>
+<body>
+    <div class="mobile-frame">
+        <div class="header">
+            <button class="back-btn" onclick="location.href='dashgp.html'">←</button>
+            <h1>📬 Colis à livrer</h1>
+        </div>
+        <div class="content"><div id="list"><div class="loading">Chargement…</div></div></div>
+    </div>
+
+    <script>
+        const API = window.API_BASE_URL;
+        const token = localStorage.getItem('authToken');
+        let items = [];
+
+        const FLAGS={'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱'};
+        const flag=c=>FLAGS[c]||'🌍';
+        const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const ACTIVE=['accepted','picked_up','in_transit','in_customs','out_for_delivery'];
+        const STATUS={accepted:['Accepté','b-blue'],picked_up:['Récupéré','b-blue'],in_transit:['En transit','b-blue'],in_customs:['En douane','b-blue'],out_for_delivery:['En livraison','b-blue']};
+        // Étape suivante (le statut 'delivered' final est confirmé par le destinataire via QR).
+        const NEXT={accepted:['picked_up','Marquer récupéré'],picked_up:['in_transit','Départ en transit'],in_transit:['out_for_delivery','En livraison'],in_customs:['out_for_delivery','En livraison']};
+        function badge(s){var m=STATUS[String(s||'').toLowerCase()]||[s,'b-yellow'];return '<span class="badge '+m[1]+'">'+esc(m[0])+'</span>';}
+
+        async function load(){
+            if(!token){ location.href='connexion.html'; return; }
+            try{
+                const res=await fetch(`${API}/missions/my-missions?limit=200`,{headers:{'Authorization':'Bearer '+token}});
+                if(!res.ok) throw new Error('Chargement impossible');
+                const data=(await res.json()).data||[];
+                items=data.filter(m=>ACTIVE.includes(String(m.status||'').toLowerCase()));
+                render();
+            }catch(e){ document.getElementById('list').innerHTML='<div class="empty">Erreur: '+esc(e.message)+'</div>'; }
+        }
+
+        function render(){
+            const box=document.getElementById('list');
+            if(!items.length){ box.innerHTML='<div class="empty"><div class="ic">📭</div>Aucun colis à livrer pour le moment.</div>'; return; }
+            box.innerHTML=items.map(function(m){
+                const st=String(m.status||'').toLowerCase();
+                const phone=(m.recipient_phone||'').replace(/\s/g,'');
+                const nxt=NEXT[st];
+                return '<div class="card">'
+                    +'<div class="top"><div><div class="recipient">'+(m.recipient_name?esc(m.recipient_name):'⚠️ Destinataire non renseigné')+'</div>'
+                    +'<div class="code">'+esc(m.mission_code||m.tracking_number||'')+'</div></div>'+badge(m.status)+'</div>'
+                    +'<div class="route"><span class="flag">'+flag(m.departure_country)+'</span><span>'+esc(m.departure_city||'')+'</span><span class="arrow">→</span><span class="flag">'+flag(m.arrival_country)+'</span><span>'+esc(m.arrival_city||'')+'</span></div>'
+                    +(m.recipient_phone?'<div class="line">📞 '+esc(m.recipient_phone)+'</div>':'')
+                    +(m.delivery_address?'<div class="line">📍 '+esc(m.delivery_address)+'</div>':'')
+                    +'<div class="line">📦 '+(parseFloat(m.package_weight)||0)+' kg</div>'
+                    +'<div class="actions">'
+                    +(phone?'<a class="btn btn-call" href="tel:'+esc(phone)+'">📞 Appeler</a>':'')
+                    +(nxt?'<button class="btn btn-next" onclick="advance(\''+m.id+'\',\''+nxt[0]+'\')">'+nxt[1]+'</button>':'')
+                    +'</div>'
+                    +(st==='out_for_delivery'?'<div class="note">En attente de la confirmation du destinataire (scan du QR à la réception).</div>':'')
+                    +'</div>';
+            }).join('');
+        }
+
+        async function advance(id, next){
+            if(!confirm('Confirmer : passer ce colis à « '+next+' » ?')) return;
+            try{
+                const res=await fetch(`${API}/missions/${id}/status`,{method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({status:next})});
+                const j=await res.json();
+                if(res.ok&&j.success){ load(); } else alert('Erreur: '+(j.error||j.message||''));
+            }catch(e){ alert('Erreur de connexion.'); }
+        }
+
+        window.onPullRefresh = async () => { await load(); return true; };
+        load();
+    </script>
+    <script src="ptr.js"></script>
+</body>
+</html>
