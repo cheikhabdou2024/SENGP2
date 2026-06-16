@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEN GP - Détails de l'envoi</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);
+            min-height:100vh; display:flex; justify-content:center; color:#fff;
+        }
+        .mobile-frame {
+            width:100%; max-width:480px; min-height:100vh; min-height:100dvh; position:relative;
+            background: linear-gradient(135deg, rgba(15,12,41,.95), rgba(36,36,62,.95));
+        }
+        .header {
+            display:flex; align-items:center; gap:14px; padding:18px 20px;
+            border-bottom:1px solid rgba(255,255,255,.1); position:sticky; top:0;
+            background:rgba(20,18,40,.85); backdrop-filter:blur(10px); z-index:5;
+        }
+        .back-btn { width:38px; height:38px; border:none; border-radius:11px; cursor:pointer;
+            background:rgba(255,255,255,.1); color:#fff; font-size:18px; }
+        .header h1 { font-size:18px; }
+        .content { padding:20px; padding-bottom:40px; }
+        .card { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+            border-radius:16px; padding:18px; margin-bottom:16px; }
+        .price { font-size:26px; font-weight:800; color:#FFD700; }
+        .badge { display:inline-block; padding:5px 12px; border-radius:9px; font-size:12px; font-weight:700; margin-top:6px; }
+        .b-yellow{background:rgba(255,215,0,.18);color:#FFD700;} .b-blue{background:rgba(78,205,196,.2);color:#4ECDC4;}
+        .b-green{background:rgba(76,175,80,.2);color:#7ee081;} .b-red{background:rgba(255,107,107,.2);color:#ff8f8f;}
+        .route { display:flex; align-items:center; gap:10px; margin:14px 0; }
+        .route .loc { flex:1; }
+        .route .flag { font-size:26px; } .route .city { font-weight:700; } .route .country { font-size:12px; color:rgba(255,255,255,.6); }
+        .route .arrow { color:rgba(255,255,255,.4); font-size:20px; }
+        .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .kv { background:rgba(255,255,255,.04); border-radius:10px; padding:11px; }
+        .kv .k { font-size:11px; color:rgba(255,255,255,.5); text-transform:uppercase; margin-bottom:3px; }
+        .kv .v { font-size:14px; font-weight:600; }
+        .section-title { font-size:15px; font-weight:700; margin:4px 0 12px; }
+        .map-btn, .btn {
+            display:block; width:100%; text-align:center; padding:13px; border-radius:12px; border:none;
+            font-weight:700; font-size:14px; cursor:pointer; text-decoration:none; margin-top:10px;
+        }
+        .map-btn { background:linear-gradient(135deg,#4ECDC4,#44A08D); color:#06302c; }
+        .btn-cancel { background:rgba(255,107,107,.18); color:#ff8f8f; border:1px solid rgba(255,107,107,.3); }
+        iframe.map { width:100%; height:200px; border:0; border-radius:12px; margin-top:8px; }
+        /* timeline */
+        .timeline { position:relative; padding-left:24px; }
+        .timeline::before { content:''; position:absolute; left:7px; top:4px; bottom:4px; width:2px; background:rgba(255,255,255,.12); }
+        .tl-item { position:relative; padding-bottom:18px; }
+        .tl-item::before { content:''; position:absolute; left:-22px; top:3px; width:14px; height:14px; border-radius:50%;
+            background:#4ECDC4; box-shadow:0 0 0 3px rgba(78,205,196,.2); }
+        .tl-item.muted::before { background:rgba(255,255,255,.3); box-shadow:none; }
+        .tl-status { font-weight:700; font-size:14px; }
+        .tl-desc { font-size:12px; color:rgba(255,255,255,.7); margin-top:2px; }
+        .tl-date { font-size:11px; color:rgba(255,255,255,.45); margin-top:2px; }
+        .loading,.empty { text-align:center; padding:40px; color:rgba(255,255,255,.5); }
+    </style>
+    <script src="config.js"></script>
+</head>
+<body>
+    <div class="mobile-frame">
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <h1>Détails de l'envoi</h1>
+        </div>
+        <div class="content" id="content">
+            <div class="loading">Chargement…</div>
+        </div>
+    </div>
+
+    <script>
+        const API = window.API_BASE_URL;
+        const token = localStorage.getItem('authToken');
+        const params = new URLSearchParams(location.search);
+        const missionId = params.get('id');
+        let mission = null;
+
+        const FLAGS = {'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱'};
+        const flag = c => FLAGS[c] || '🌍';
+        const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const fcfa = n => (Number(n)||0).toLocaleString('fr-FR')+' FCFA';
+        const dt = d => d ? new Date(d).toLocaleString('fr-FR',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+
+        const STATUS = {
+            pending:['En attente','b-yellow'], matched:['Correspondance','b-yellow'], accepted:['Accepté','b-blue'],
+            picked_up:['Récupéré','b-blue'], in_transit:['En transit','b-blue'], in_customs:['En douane','b-blue'],
+            out_for_delivery:['En livraison','b-blue'], delivered:['Livré','b-green'], cancelled:['Annulé','b-red'], disputed:['Litige','b-red']
+        };
+        function statusBadge(s){ const m=STATUS[String(s||'').toLowerCase()]||[s,'b-yellow']; return `<span class="badge ${m[1]}">${esc(m[0])}</span>`; }
+
+        function goBack(){ if (history.length>1) history.back(); else location.href='dashexpediteur.html'; }
+
+        async function load(){
+            if (!token){ location.href='connexion.html'; return; }
+            if (!missionId){ document.getElementById('content').innerHTML='<div class="empty">Envoi introuvable.</div>'; return; }
+            try {
+                const [mRes, tRes] = await Promise.all([
+                    fetch(`${API}/missions/${missionId}`, { headers:{ 'Authorization':'Bearer '+token } }),
+                    fetch(`${API}/missions/${missionId}/tracking`, { headers:{ 'Authorization':'Bearer '+token } })
+                ]);
+                if (!mRes.ok) throw new Error('Chargement impossible');
+                mission = (await mRes.json()).data;
+                const tracking = tRes.ok ? ((await tRes.json()).data || []) : [];
+                render(mission, tracking);
+            } catch(e){
+                document.getElementById('content').innerHTML = `<div class="empty">Erreur: ${esc(e.message)}</div>`;
+            }
+        }
+
+        function render(m, tracking){
+            const dims = [m.package_length,m.package_width,m.package_height].every(x=>x!=null)
+                ? `${m.package_length}×${m.package_width}×${m.package_height} cm` : 'N/C';
+            // Carte: si une position GPS existe, l'afficher; sinon lien itinéraire.
+            const gps = tracking.find(t => t.latitude && t.longitude);
+            let mapBlock;
+            if (gps){
+                const la=Number(gps.latitude), lo=Number(gps.longitude), d=0.05;
+                mapBlock = `<iframe class="map" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=${lo-d}%2C${la-d}%2C${lo+d}%2C${la+d}&layer=mapnik&marker=${la}%2C${lo}"></iframe>`;
+            } else {
+                mapBlock = '<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px;">Position GPS non disponible. Voir l\'itinéraire prévu :</div>';
+            }
+            const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent((m.departure_city||'')+', '+(m.departure_country||''))}&destination=${encodeURIComponent((m.arrival_city||'')+', '+(m.arrival_country||''))}`;
+
+            const canCancel = ['pending','matched'].includes(String(m.status||'').toLowerCase());
+
+            const tl = tracking.length ? tracking.map((t,idx)=>`
+                <div class="tl-item ${idx>0?'muted':''}">
+                    <div class="tl-status">${esc((STATUS[String(t.status||'').toLowerCase()]||[t.status])[0])}</div>
+                    ${t.description?`<div class="tl-desc">${esc(t.description)}</div>`:''}
+                    ${t.location?`<div class="tl-desc">📍 ${esc(t.location)}</div>`:''}
+                    <div class="tl-date">${dt(t.created_at)}</div>
+                </div>`).join('')
+                : `<div class="tl-item"><div class="tl-status">${esc((STATUS[String(m.status||'').toLowerCase()]||[m.status])[0])}</div><div class="tl-date">${dt(m.created_at)}</div></div>`;
+
+            document.getElementById('content').innerHTML = `
+                <div class="card">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                        <div><div class="price">${fcfa(m.offered_price)}</div>
+                        <div style="font-size:12px;color:rgba(255,255,255,.5);">${esc(m.mission_code||'')}</div></div>
+                        <div style="text-align:right;">${statusBadge(m.status)}</div>
+                    </div>
+                    <div class="route">
+                        <div class="loc"><div class="flag">${flag(m.departure_country)}</div><div class="city">${esc(m.departure_city||'—')}</div><div class="country">${esc(m.departure_country||'')}</div></div>
+                        <div class="arrow">→</div>
+                        <div class="loc"><div class="flag">${flag(m.arrival_country)}</div><div class="city">${esc(m.arrival_city||'—')}</div><div class="country">${esc(m.arrival_country||'')}</div></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title">📦 Colis</div>
+                    <div class="grid">
+                        <div class="kv"><div class="k">Poids</div><div class="v">${parseFloat(m.package_weight)||0} kg</div></div>
+                        <div class="kv"><div class="k">Dimensions</div><div class="v">${esc(dims)}</div></div>
+                        <div class="kv"><div class="k">Valeur déclarée</div><div class="v">${m.package_value?fcfa(m.package_value):'—'}</div></div>
+                        <div class="kv"><div class="k">Assuré</div><div class="v">${m.is_insured?'Oui':'Non'}</div></div>
+                    </div>
+                    ${m.package_description?`<div class="kv" style="margin-top:10px;"><div class="k">Description</div><div class="v">${esc(m.package_description)}</div></div>`:''}
+                </div>
+
+                <div class="card">
+                    <div class="section-title">📋 Détails</div>
+                    <div class="grid">
+                        <div class="kv"><div class="k">Enlèvement</div><div class="v">${esc(m.pickup_address||'—')}</div></div>
+                        <div class="kv"><div class="k">Livraison</div><div class="v">${esc(m.delivery_address||'—')}</div></div>
+                        <div class="kv"><div class="k">Départ souhaité</div><div class="v">${m.desired_departure_date?new Date(m.desired_departure_date).toLocaleDateString('fr-FR'):'—'}</div></div>
+                        <div class="kv"><div class="k">Suivi n°</div><div class="v">${esc(m.tracking_number||'—')}</div></div>
+                        <div class="kv"><div class="k">GP</div><div class="v">${m.gp_first_name?esc(m.gp_first_name+' '+(m.gp_last_name||'')):'En recherche…'}</div></div>
+                        <div class="kv"><div class="k">Créé le</div><div class="v">${new Date(m.created_at).toLocaleDateString('fr-FR')}</div></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title">🗺️ Suivi en temps réel</div>
+                    ${mapBlock}
+                    <a class="map-btn" href="${mapsUrl}" target="_blank" rel="noopener">Voir l'itinéraire sur la carte</a>
+                </div>
+
+                <div class="card">
+                    <div class="section-title">📡 Historique du suivi</div>
+                    <div class="timeline">${tl}</div>
+                </div>
+
+                ${canCancel?`<button class="btn btn-cancel" onclick="cancelShipment()">Annuler l'envoi</button>`:''}
+            `;
+        }
+
+        async function cancelShipment(){
+            if (!confirm('Annuler cet envoi ? Cette action est irréversible.')) return;
+            try {
+                const res = await fetch(`${API}/missions/${missionId}/status`, {
+                    method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' },
+                    body: JSON.stringify({ status:'cancelled' })
+                });
+                const j = await res.json();
+                if (res.ok && j.success){ alert('Envoi annulé.'); load(); }
+                else alert('Erreur: '+(j.error||j.message||'Annulation échouée'));
+            } catch(e){ alert('Erreur de connexion.'); }
+        }
+
+        load();
+    </script>
+</body>
+</html>

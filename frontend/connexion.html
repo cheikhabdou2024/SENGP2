@@ -558,6 +558,9 @@
                     return;
                 }
                 await ensureGoogleAuth(GoogleAuth);
+                // Déconnecter la session Google précédente pour TOUJOURS afficher le
+                // sélecteur de compte (ne pas reprendre automatiquement le dernier compte).
+                try { await GoogleAuth.signOut(); } catch (_) {}
                 const result = await GoogleAuth.signIn();
                 // L'emplacement de l'idToken varie selon la version du plugin / Capacitor.
                 const idToken =

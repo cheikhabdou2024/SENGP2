@@ -839,7 +839,7 @@
             <!-- Stats Section -->
             <div class="stats-section">
                 <div class="stats-grid">
-                    <div class="stat-card primary">
+                    <div class="stat-card primary" style="cursor:pointer" onclick="location.href='envois.html?status=active'">
                         <div class="stat-header">
                             <span class="stat-label">En cours</span>
                             <span class="stat-icon">📦</span>
@@ -848,7 +848,7 @@
                         <div class="stat-change">Chargement...</div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card" style="cursor:pointer" onclick="location.href='envois.html?status=delivered'">
                         <div class="stat-header">
                             <span class="stat-label">Livrés</span>
                             <span class="stat-icon">✅</span>
@@ -857,7 +857,7 @@
                         <div class="stat-change">Chargement...</div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card" style="cursor:pointer" onclick="location.href='envois.html'">
                         <div class="stat-header">
                             <span class="stat-label">Dépenses</span>
                             <span class="stat-icon">💰</span>
@@ -866,7 +866,7 @@
                         <div class="stat-change">Chargement...</div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card" style="cursor:pointer" onclick="location.href='envois.html'">
                         <div class="stat-header">
                             <span class="stat-label">Économies</span>
                             <span class="stat-icon">💸</span>
@@ -1194,7 +1194,8 @@
         function createMissionCard(mission) {
             const card = document.createElement('div');
             card.className = 'shipment-card';
-            card.onclick = () => viewShipmentDetails(mission.mission_code);
+            card.style.cursor = 'pointer';
+            card.onclick = () => viewShipmentDetails(mission.id);
 
             const statusClass = getStatusClass(mission.status);
             const statusText = getStatusText(mission.status);
@@ -1416,12 +1417,13 @@
         }
 
         function viewShipmentDetails(id) {
-            alert(`Voir détails du colis\n\nID: ${id}\n\nInformations complètes, suivi en temps réel, carte, etc.`);
+            if (!id) return;
+            window.location.href = `detailenvoi.html?id=${id}`;
         }
 
         function viewAllShipments() {
-            event.preventDefault();
-            alert('Voir tous les envois\n\nListe complète avec filtres et recherche');
+            if (typeof event !== 'undefined' && event) event.preventDefault();
+            window.location.href = 'envois.html';
         }
 
         function openProfile() {
