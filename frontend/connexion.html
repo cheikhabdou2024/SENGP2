@@ -507,6 +507,25 @@
             return true;
         }
 
+        let googleAuthReady = false;
+        async function ensureGoogleAuth(GoogleAuth) {
+            if (googleAuthReady) return;
+            // Sans initialize(), le plugin natif Android lève une exception qui
+            // fait planter (fermer) l'application. On l'initialise donc une fois.
+            try {
+                if (typeof GoogleAuth.initialize === 'function') {
+                    await GoogleAuth.initialize({
+                        clientId: '1022151111172-re1mqoru6lo5fvgbnkrjqfk7vtoj1rco.apps.googleusercontent.com',
+                        scopes: ['profile', 'email'],
+                        grantOfflineAccess: false
+                    });
+                }
+                googleAuthReady = true;
+            } catch (e) {
+                console.warn('GoogleAuth.initialize a échoué (on continue):', e);
+            }
+        }
+
         async function socialLogin(provider) {
             if (provider !== 'google') return;
             try {
@@ -515,6 +534,7 @@
                     alert('La connexion Google est disponible dans l\'application mobile.');
                     return;
                 }
+                await ensureGoogleAuth(GoogleAuth);
                 const result = await GoogleAuth.signIn();
                 const idToken = result && result.authentication && result.authentication.idToken;
                 if (!idToken) throw new Error('Token Google manquant');

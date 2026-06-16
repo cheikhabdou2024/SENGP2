@@ -775,8 +775,9 @@
         }
 
         function goBack() {
-            // Retourner vers la page de choix du type de compte
-            window.location.href = 'index.html';
+            // Retourner vers la page de connexion (en conservant le type de compte choisi)
+            const t = new URLSearchParams(window.location.search).get('type');
+            window.location.href = t ? `connexion.html?type=${t}` : 'connexion.html';
         }
 
         function goToLogin() {
