@@ -231,25 +231,33 @@
 
         /* Photo Upload */
         .upload-area {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px dashed rgba(78, 205, 196, 0.3);
+            background-image: linear-gradient(rgba(18, 16, 40, 0.55), rgba(18, 16, 40, 0.6)), url('im/billet.jpeg');
+            background-size: cover;
+            background-position: center;
+            border: 2px dashed rgba(78, 205, 196, 0.5);
             border-radius: 16px;
-            padding: 40px 20px;
+            padding: 48px 20px;
+            min-height: 190px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .upload-area:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(78, 205, 196, 0.5);
+            border-color: rgba(78, 205, 196, 0.8);
         }
 
         .upload-area.has-file {
             border-style: solid;
             border-color: #4ECDC4;
-            background: rgba(78, 205, 196, 0.1);
+            background-image: none;
+            background-color: rgba(78, 205, 196, 0.1);
+            min-height: 0;
         }
 
         .upload-icon {
@@ -502,7 +510,6 @@
                 </div>
 
                 <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-                    <div class="upload-icon" id="uploadIcon">✈️</div>
                     <div class="upload-text">
                         <h3 id="uploadTitle">Ajouter votre billet</h3>
                         <p id="uploadDesc">Cliquez pour choisir un fichier</p>
@@ -512,14 +519,10 @@
 
                 <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
 
-                <div class="upload-options">
+                <div class="upload-options" style="grid-template-columns: 1fr;">
                     <div class="upload-option" onclick="openCamera()">
                         <div class="upload-option-icon">📷</div>
                         <div class="upload-option-text">Prendre une photo</div>
-                    </div>
-                    <div class="upload-option" onclick="document.getElementById('fileInput').click()">
-                        <div class="upload-option-icon">🖼️</div>
-                        <div class="upload-option-text">Depuis la galerie</div>
                     </div>
                 </div>
 
@@ -688,8 +691,7 @@
                     preview.style.display = 'block';
 
                     document.getElementById('uploadArea').classList.add('has-file');
-                    document.getElementById('uploadIcon').textContent = '✅';
-                    document.getElementById('uploadTitle').textContent = 'Billet ajouté';
+                    document.getElementById('uploadTitle').textContent = '✅ Billet ajouté';
                     document.getElementById('uploadDesc').textContent = file.name;
 
                     // Enable next button
