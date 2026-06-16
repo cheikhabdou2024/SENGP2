@@ -118,7 +118,8 @@
             let mapBlock;
             if (gps){
                 const la=Number(gps.latitude), lo=Number(gps.longitude), d=0.05;
-                mapBlock = `<iframe class="map" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=${lo-d}%2C${la-d}%2C${lo+d}%2C${la+d}&layer=mapnik&marker=${la}%2C${lo}"></iframe>`;
+                mapBlock = `<iframe class="map" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=${lo-d}%2C${la-d}%2C${lo+d}%2C${la+d}&layer=mapnik&marker=${la}%2C${lo}"></iframe>`
+                    + `<div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;">📍 Dernière position du GP · ${dt(gps.created_at)}</div>`;
             } else {
                 mapBlock = '<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px;">Position GPS non disponible. Voir l\'itinéraire prévu :</div>';
             }
@@ -126,7 +127,9 @@
 
             const canCancel = ['pending','matched'].includes(String(m.status||'').toLowerCase());
 
-            const tl = tracking.length ? tracking.map((t,idx)=>`
+            // Les pings GPS (status 'location') alimentent la carte mais pas la timeline.
+            const events = tracking.filter(t => String(t.status||'').toLowerCase() !== 'location');
+            const tl = events.length ? events.map((t,idx)=>`
                 <div class="tl-item ${idx>0?'muted':''}">
                     <div class="tl-status">${esc((STATUS[String(t.status||'').toLowerCase()]||[t.status])[0])}</div>
                     ${t.description?`<div class="tl-desc">${esc(t.description)}</div>`:''}
@@ -200,7 +203,16 @@
             } catch(e){ alert('Erreur de connexion.'); }
         }
 
+        // Pull-to-refresh recharge les données en place (sans recharger la page).
+        window.onPullRefresh = async () => { await load(); return true; };
+
         load();
+
+        // Rafraîchissement auto de la position toutes les 30 s tant que l'envoi est actif.
+        const ACTIVE = ['pending','matched','accepted','picked_up','in_transit','in_customs','out_for_delivery'];
+        setInterval(() => {
+            if (mission && ACTIVE.includes(String(mission.status||'').toLowerCase()) && !document.hidden) load();
+        }, 30000);
     </script>
     <script src="ptr.js"></script>
 </body>

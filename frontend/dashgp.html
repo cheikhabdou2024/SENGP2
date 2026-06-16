@@ -734,6 +734,16 @@
                     </div>
                     <div class="action-arrow">→</div>
                 </button>
+
+                <!-- Partager ma position (suivi live des colis en transit) -->
+                <button class="action-button action-button-secondary" id="locShareBtn" onclick="toggleLocationShare()">
+                    <div class="action-icon" id="locShareIcon">📍</div>
+                    <div class="action-text">
+                        <div class="action-title">Partager ma position</div>
+                        <div class="action-subtitle" id="locShareSub">Suivi live désactivé</div>
+                    </div>
+                    <div class="action-arrow" id="locShareState">○</div>
+                </button>
             </div>
 
             <!-- Info Message -->
@@ -794,7 +804,87 @@
             await checkAuthentication();
             await loadDashboardData();
             hideEmptyBadges();
+            initLocationShare();
         });
+
+        // ---------- Suivi live : partage de position GPS (Phase 1) ----------
+        const ACTIVE_STATUSES = ['accepted','picked_up','in_transit','in_customs','out_for_delivery'];
+        let locShareTimer = null;
+
+        function locShareUI(on, sub) {
+            document.getElementById('locShareIcon').textContent = on ? '🛰️' : '📍';
+            document.getElementById('locShareState').textContent = on ? '●' : '○';
+            document.getElementById('locShareSub').textContent = sub || (on ? 'Suivi live activé' : 'Suivi live désactivé');
+        }
+
+        function initLocationShare() {
+            if (localStorage.getItem('gpLiveShare') === '1') startLocationShare();
+            else locShareUI(false);
+        }
+
+        function toggleLocationShare() {
+            if (localStorage.getItem('gpLiveShare') === '1') stopLocationShare();
+            else startLocationShare();
+        }
+
+        function stopLocationShare() {
+            localStorage.removeItem('gpLiveShare');
+            if (locShareTimer) { clearInterval(locShareTimer); locShareTimer = null; }
+            locShareUI(false);
+        }
+
+        async function startLocationShare() {
+            localStorage.setItem('gpLiveShare', '1');
+            locShareUI(true, 'Activation…');
+            await sendLocationOnce();
+            if (locShareTimer) clearInterval(locShareTimer);
+            // Envoi périodique (toutes les 2 min) tant que l'app est ouverte.
+            locShareTimer = setInterval(sendLocationOnce, 120000);
+        }
+
+        async function getPosition() {
+            const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
+            if (Geo) {
+                try { await Geo.requestPermissions(); } catch (e) {}
+                const p = await Geo.getCurrentPosition({ enableHighAccuracy: true, timeout: 15000 });
+                return { lat: p.coords.latitude, lng: p.coords.longitude };
+            }
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) return reject(new Error('Géolocalisation indisponible'));
+                navigator.geolocation.getCurrentPosition(
+                    pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                    err => reject(err), { enableHighAccuracy: true, timeout: 15000 }
+                );
+            });
+        }
+
+        async function sendLocationOnce() {
+            if (localStorage.getItem('gpLiveShare') !== '1') return;
+            try {
+                // Missions actives du GP
+                const res = await fetch(`${API_BASE_URL}/missions/my-missions?limit=100`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const data = res.ok ? ((await res.json()).data || []) : [];
+                const active = data.filter(m => ACTIVE_STATUSES.includes(String(m.status || '').toLowerCase()));
+                if (active.length === 0) { locShareUI(true, 'Aucune mission en transit'); return; }
+
+                const pos = await getPosition();
+                let sent = 0;
+                await Promise.all(active.map(m =>
+                    fetch(`${API_BASE_URL}/missions/${m.id}/location`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ lat: pos.lat, lng: pos.lng })
+                    }).then(r => { if (r.ok) sent++; }).catch(() => {})
+                ));
+                const t = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                locShareUI(true, `Position envoyée (${sent}) · ${t}`);
+            } catch (e) {
+                console.warn('Location share error', e);
+                locShareUI(true, 'Position indisponible (autoriser le GPS)');
+            }
+        }
 
         // Masque les pastilles dont la valeur est 0 ou vide (évite un « 0 » disgracieux).
         function hideEmptyBadges() {

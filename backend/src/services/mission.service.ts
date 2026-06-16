@@ -293,6 +293,34 @@ export class MissionService {
   }
 
   /**
+   * Record a live GPS position for a mission (sent by the assigned GP while in
+   * transit). Stored as a `location` tracking entry so the expéditeur's map can
+   * show the latest point. Only the assigned GP, on an active mission, may post.
+   */
+  static async addLocation(
+    missionId: string,
+    gpId: string,
+    latitude: number,
+    longitude: number
+  ): Promise<void> {
+    const check = await pool.query(
+      'SELECT gp_id, status FROM missions WHERE id = $1',
+      [missionId]
+    );
+    if (check.rows.length === 0) throw new Error('Mission not found');
+    const m = check.rows[0];
+    if (m.gp_id !== gpId) throw new Error('Not your mission');
+    const active = ['accepted', 'picked_up', 'in_transit', 'in_customs', 'out_for_delivery'];
+    if (!active.includes(m.status)) throw new Error('Mission is not in transit');
+
+    await pool.query(
+      `INSERT INTO mission_tracking (mission_id, status, latitude, longitude, description, created_by)
+       VALUES ($1, 'location', $2, $3, 'Position GPS', $4)`,
+      [missionId, latitude, longitude, gpId]
+    );
+  }
+
+  /**
    * Update mission status
    */
   static async updateStatus(

@@ -171,6 +171,37 @@ export class MissionController {
   }
 
   /**
+   * Record a live GPS position (assigned GP only)
+   * POST /api/v1/missions/:id/location  { lat, lng }
+   */
+  static async addLocation(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        ResponseUtil.unauthorized(res);
+        return;
+      }
+      const lat = parseFloat(req.body.lat ?? req.body.latitude);
+      const lng = parseFloat(req.body.lng ?? req.body.longitude);
+      if (Number.isNaN(lat) || Number.isNaN(lng)) {
+        ResponseUtil.badRequest(res, 'lat and lng are required');
+        return;
+      }
+      await MissionService.addLocation(req.params.id, req.user.id, lat, lng);
+      ResponseUtil.success(res, undefined, 'Location recorded');
+    } catch (error: any) {
+      if (error.message === 'Not your mission') {
+        ResponseUtil.forbidden(res, error.message);
+        return;
+      }
+      if (error.message === 'Mission not found') {
+        ResponseUtil.notFound(res, error.message);
+        return;
+      }
+      ResponseUtil.badRequest(res, error.message || 'Failed to record location');
+    }
+  }
+
+  /**
    * Update mission status
    * POST /api/v1/missions/:id/status
    */
