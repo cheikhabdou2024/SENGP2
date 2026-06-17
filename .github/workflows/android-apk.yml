@@ -45,16 +45,19 @@ jobs:
       - name: Register sengp:// deep link scheme (AndroidManifest intent-filter)
         run: |
           python3 - <<'PY'
+          import re
           p = 'frontend/android/app/src/main/AndroidManifest.xml'
           s = open(p, encoding='utf-8').read()
-          # Microphone permission for voice messages (claims).
-          if 'android.permission.RECORD_AUDIO' not in s:
-              s = s.replace('<application', '<uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <application', 1)
-              print('RECORD_AUDIO permission added')
-          # Location permissions for live GPS sharing (GP).
-          if 'android.permission.ACCESS_FINE_LOCATION' not in s:
-              s = s.replace('<application', '<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <application', 1)
-              print('LOCATION permissions added')
+          # Permissions inserted right after the opening <manifest ...> tag.
+          perms = [
+              'android.permission.RECORD_AUDIO',
+              'android.permission.ACCESS_FINE_LOCATION',
+              'android.permission.ACCESS_COARSE_LOCATION',
+          ]
+          add = ''.join('\n    <uses-permission android:name="%s" />' % x for x in perms if x not in s)
+          if add:
+              s = re.sub(r'(<manifest\b[^>]*>)', lambda m: m.group(1) + add, s, count=1)
+          # sengp:// deep link on the main activity.
           if 'android:scheme="sengp"' not in s:
               intent = (
                   '\n            <intent-filter>\n'
@@ -65,12 +68,11 @@ jobs:
                   '            </intent-filter>\n        '
               )
               s = s.replace('</activity>', intent + '</activity>', 1)
-              open(p, 'w', encoding='utf-8').write(s)
-              print('sengp:// intent-filter added')
-          else:
-              print('sengp:// already present')
+          open(p, 'w', encoding='utf-8').write(s)
+          print('manifest patched')
           PY
-          grep -n "sengp" frontend/android/app/src/main/AndroidManifest.xml || true
+          echo "=== uses-permission / scheme in manifest ==="
+          grep -nE "uses-permission|android:scheme" frontend/android/app/src/main/AndroidManifest.xml || true
 
       - name: Force deterministic debug signing (fixed SHA-1 for Google Sign-In)
         run: |
