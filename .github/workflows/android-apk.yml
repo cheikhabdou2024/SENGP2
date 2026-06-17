@@ -42,6 +42,28 @@ jobs:
         working-directory: frontend
         run: npx cap sync android
 
+      - name: Register sengp:// deep link scheme (AndroidManifest intent-filter)
+        run: |
+          python3 - <<'PY'
+          p = 'frontend/android/app/src/main/AndroidManifest.xml'
+          s = open(p, encoding='utf-8').read()
+          if 'android:scheme="sengp"' not in s:
+              intent = (
+                  '\n            <intent-filter>\n'
+                  '                <action android:name="android.intent.action.VIEW" />\n'
+                  '                <category android:name="android.intent.category.DEFAULT" />\n'
+                  '                <category android:name="android.intent.category.BROWSABLE" />\n'
+                  '                <data android:scheme="sengp" />\n'
+                  '            </intent-filter>\n        '
+              )
+              s = s.replace('</activity>', intent + '</activity>', 1)
+              open(p, 'w', encoding='utf-8').write(s)
+              print('sengp:// intent-filter added')
+          else:
+              print('sengp:// already present')
+          PY
+          grep -n "sengp" frontend/android/app/src/main/AndroidManifest.xml || true
+
       - name: Force deterministic debug signing (fixed SHA-1 for Google Sign-In)
         run: |
           # Decode our committed debug keystore into the app module.
