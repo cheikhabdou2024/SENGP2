@@ -51,6 +51,10 @@ jobs:
           if 'android.permission.RECORD_AUDIO' not in s:
               s = s.replace('<application', '<uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <application', 1)
               print('RECORD_AUDIO permission added')
+          # Location permissions for live GPS sharing (GP).
+          if 'android.permission.ACCESS_FINE_LOCATION' not in s:
+              s = s.replace('<application', '<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <application', 1)
+              print('LOCATION permissions added')
           if 'android:scheme="sengp"' not in s:
               intent = (
                   '\n            <intent-filter>\n'

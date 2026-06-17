@@ -855,15 +855,31 @@
         async function getPosition() {
             const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
             if (Geo) {
-                try { await Geo.requestPermissions(); } catch (e) {}
-                const p = await Geo.getCurrentPosition({ enableHighAccuracy: true, timeout: 15000 });
-                return { lat: p.coords.latitude, lng: p.coords.longitude };
+                // Vérifier / demander la permission de localisation.
+                try {
+                    let perm = await Geo.checkPermissions();
+                    const granted = p => p && (p.location === 'granted' || p.coarseLocation === 'granted');
+                    if (!granted(perm) && Geo.requestPermissions) perm = await Geo.requestPermissions();
+                    if (!granted(perm)) throw new Error('Autorisez la localisation dans les réglages.');
+                } catch (e) {
+                    if (e && /Autorisez/.test(e.message)) throw e;
+                    // checkPermissions peut ne pas exister sur certaines versions : on continue.
+                }
+                // D'abord rapide (réseau), sinon haute précision (GPS).
+                try {
+                    const p = await Geo.getCurrentPosition({ enableHighAccuracy: false, timeout: 20000, maximumAge: 60000 });
+                    return { lat: p.coords.latitude, lng: p.coords.longitude };
+                } catch (e1) {
+                    const p = await Geo.getCurrentPosition({ enableHighAccuracy: true, timeout: 25000 });
+                    return { lat: p.coords.latitude, lng: p.coords.longitude };
+                }
             }
             return new Promise((resolve, reject) => {
                 if (!navigator.geolocation) return reject(new Error('Géolocalisation indisponible'));
                 navigator.geolocation.getCurrentPosition(
                     pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-                    err => reject(err), { enableHighAccuracy: true, timeout: 15000 }
+                    err => reject(new Error(err && err.message ? err.message : 'GPS indisponible')),
+                    { enableHighAccuracy: false, timeout: 20000, maximumAge: 60000 }
                 );
             });
         }
@@ -892,7 +908,7 @@
                 locShareUI(true, `Position envoyée (${sent}) · ${t}`);
             } catch (e) {
                 console.warn('Location share error', e);
-                locShareUI(true, 'Position indisponible (autoriser le GPS)');
+                locShareUI(true, 'Position indisponible : ' + (e && e.message ? e.message : 'GPS'));
             }
         }
 
@@ -1232,11 +1248,22 @@
             window.location.href = 'creetrajet.html';
         }
 
-        function searchMissions() {
-            // Check if user has created a trip first
-            // For now, show alert - will be replaced with actual check
-            alert('Veuillez créer un trajet d\'abord pour voir les missions disponibles.');
-            // window.location.href = 'missions.html';
+        async function searchMissions() {
+            // Le GP doit avoir au moins un trajet pour voir/accepter des missions.
+            try {
+                const res = await fetch(`${API_BASE_URL}/trips/my-trips?limit=1`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const data = res.ok ? ((await res.json()).data || []) : [];
+                if (data.length > 0) {
+                    window.location.href = 'missions.html';
+                } else {
+                    alert('Veuillez créer un trajet d\'abord pour voir les missions disponibles.');
+                }
+            } catch (e) {
+                // En cas d'erreur réseau, ne pas bloquer.
+                window.location.href = 'missions.html';
+            }
         }
 
         function viewAllMissions() {
