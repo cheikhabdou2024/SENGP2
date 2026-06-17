@@ -43,6 +43,8 @@ export async function initDatabase(): Promise<void> {
     // Recipient identity for package-matching at delivery.
     await pool.query('ALTER TABLE missions ADD COLUMN IF NOT EXISTS recipient_name VARCHAR(150)');
     await pool.query('ALTER TABLE missions ADD COLUMN IF NOT EXISTS recipient_phone VARCHAR(30)');
+    // National ID card back side (recto = existing identity_document_url).
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS identity_document_url_back VARCHAR(500)');
     logger.info('✅ Schema patches applied (phone/password nullable, delivery_token, recipient)');
   } catch (error) {
     logger.error('❌ Error initializing database:', error);
