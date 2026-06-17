@@ -153,11 +153,31 @@ export class AdminService {
     return result.rows[0];
   }
 
+  /** Hard-delete a mission and all its dependents (admin cleanup), in a transaction. */
   static async deleteMission(id: string) {
-    await pool.query(`DELETE FROM mission_tracking WHERE mission_id = $1`, [id]);
-    const result = await pool.query(`DELETE FROM missions WHERE id = $1 RETURNING id`, [id]);
-    if (result.rows.length === 0) throw new Error('Mission not found');
-    return { id, deleted: true };
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      // Detach withdrawals that point at this mission's payments, then remove dependents.
+      await client.query(
+        `UPDATE withdrawals SET payment_id = NULL
+         WHERE payment_id IN (SELECT id FROM payments WHERE mission_id = $1)`,
+        [id]
+      );
+      await client.query(`DELETE FROM payments WHERE mission_id = $1`, [id]);
+      await client.query(`DELETE FROM reviews WHERE mission_id = $1`, [id]);
+      await client.query(`DELETE FROM claims WHERE mission_id = $1`, [id]);
+      await client.query(`DELETE FROM mission_tracking WHERE mission_id = $1`, [id]);
+      const result = await client.query(`DELETE FROM missions WHERE id = $1 RETURNING id`, [id]);
+      if (result.rows.length === 0) throw new Error('Mission not found');
+      await client.query('COMMIT');
+      return { id, deleted: true };
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
   }
 
   // ---------- Trips ----------
