@@ -47,6 +47,10 @@ jobs:
           python3 - <<'PY'
           p = 'frontend/android/app/src/main/AndroidManifest.xml'
           s = open(p, encoding='utf-8').read()
+          # Microphone permission for voice messages (claims).
+          if 'android.permission.RECORD_AUDIO' not in s:
+              s = s.replace('<application', '<uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <application', 1)
+              print('RECORD_AUDIO permission added')
           if 'android:scheme="sengp"' not in s:
               intent = (
                   '\n            <intent-filter>\n'

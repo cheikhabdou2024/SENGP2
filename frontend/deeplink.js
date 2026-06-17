@@ -19,9 +19,7 @@
         if (url.indexOf('sengp://') !== 0) return;
         var Browser = window.Capacitor.Plugins.Browser;
         if (Browser && Browser.close) { try { Browser.close(); } catch (e) {} }
-        if (url.indexOf('payment/success') >= 0) {
-          window.location.href = 'envois.html';
-        } else if (url.indexOf('payment/error') >= 0) {
+        if (url.indexOf('payment/success') >= 0 || url.indexOf('payment/error') >= 0) {
           window.location.href = 'dashexpediteur.html';
         }
       } catch (e) { /* no-op */ }

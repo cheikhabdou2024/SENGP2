@@ -67,11 +67,14 @@ export class ClaimService {
       (data.title && String(data.title).trim()) ||
       `Réclamation: ${claim_type.replace(/_/g, ' ')}`;
 
+    // Optional attachments (e.g. a voice message stored as a data URL).
+    const evidence = Array.isArray(data.evidence_urls) ? data.evidence_urls : null;
+
     const result = await pool.query(
-      `INSERT INTO claims (claim_code, mission_id, claimant_id, claim_type, title, description)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO claims (claim_code, mission_id, claimant_id, claim_type, title, description, evidence_urls)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
-      [claim_code, mission.id, claimantId, claim_type, title, data.description]
+      [claim_code, mission.id, claimantId, claim_type, title, data.description, evidence ? JSON.stringify(evidence) : null]
     );
 
     const claim = result.rows[0];

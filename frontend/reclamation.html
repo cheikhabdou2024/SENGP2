@@ -556,6 +556,11 @@
             transform: translateY(-2px);
             box-shadow: 0 12px 28px rgba(255, 107, 107, 0.5);
         }
+        .chat-compose { display:flex; gap:10px; align-items:center; }
+        .voice-btn { width:48px; height:48px; flex-shrink:0; border:none; border-radius:50%;
+            background:#4ECDC4; color:#06302c; font-size:20px; cursor:pointer; transition:all .2s; }
+        .voice-btn.recording { background:#FF4757; color:#fff; animation:vpulse 1s infinite; }
+        @keyframes vpulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
             /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
@@ -644,13 +649,15 @@
                 <div class="modal-body">
                     <form id="claimForm">
                         <div class="form-group">
-                            <label class="form-label">Numéro de colis</label>
-                            <input type="text" class="form-input" placeholder="Ex: SG-20251020-A1B2" required>
+                            <label class="form-label">Colis concerné</label>
+                            <select class="form-select" id="packageNumber" required>
+                                <option value="">Chargement de vos envois…</option>
+                            </select>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Type de réclamation</label>
-                            <select class="form-select" required>
+                            <select class="form-select" id="claimType" required>
                                 <option value="">Sélectionnez un type</option>
                                 <option value="damaged">Colis endommagé</option>
                                 <option value="lost">Colis perdu</option>
@@ -661,8 +668,16 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Description détaillée</label>
-                            <textarea class="form-textarea" placeholder="Décrivez le problème rencontré..." required></textarea>
+                            <label class="form-label">Votre message</label>
+                            <div class="chat-compose">
+                                <input type="text" class="form-input" id="claimDescription" placeholder="Écrivez votre message…" style="flex:1;">
+                                <button type="button" id="voiceBtn" class="voice-btn" onclick="toggleVoice()" title="Message vocal">🎤</button>
+                            </div>
+                            <div id="voicePreview" style="display:none;margin-top:10px;">
+                                <audio id="voiceAudio" controls style="width:100%;"></audio>
+                                <button type="button" onclick="discardVoice()" style="margin-top:6px;background:rgba(255,107,107,.2);color:#ff8f8f;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;">🗑️ Supprimer le vocal</button>
+                            </div>
+                            <div id="voiceStatus" style="font-size:12px;color:rgba(255,255,255,.55);margin-top:8px;">🎙️ Appuyez sur le micro pour enregistrer un message vocal (parlez dans votre langue).</div>
                         </div>
                     </form>
                 </div>
@@ -697,14 +712,72 @@
 
         function openNewClaimModal() {
             document.getElementById('newClaimModal').classList.add('show');
+            loadMissionsForClaim();
         }
 
         function closeNewClaimModal() {
             document.getElementById('newClaimModal').classList.remove('show');
             document.getElementById('claimForm').reset();
+            discardVoice();
         }
 
         const API_BASE_URL = window.API_BASE_URL;
+
+        // Remplit la liste des colis par TYPE (choisi à la création de l'envoi).
+        async function loadMissionsForClaim() {
+            const sel = document.getElementById('packageNumber');
+            try {
+                const res = await fetch(`${API_BASE_URL}/missions/my-missions?limit=200`, {
+                    headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+                });
+                const data = res.ok ? ((await res.json()).data || []) : [];
+                if (!data.length) { sel.innerHTML = '<option value="">Aucun envoi</option>'; return; }
+                sel.innerHTML = '<option value="">Sélectionnez le colis</option>' + data.map(function(m){
+                    const type = (m.package_description || 'Colis').toString();
+                    const route = (m.departure_city || '') + ' → ' + (m.arrival_city || '');
+                    return '<option value="' + m.id + '">' + type + ' · ' + route + '</option>';
+                }).join('');
+            } catch (e) {
+                sel.innerHTML = '<option value="">Erreur de chargement</option>';
+            }
+        }
+
+        // --- Message vocal (façon WhatsApp) ---
+        let mediaRecorder = null, voiceChunks = [], voiceDataUrl = null;
+        async function toggleVoice() {
+            const btn = document.getElementById('voiceBtn');
+            if (mediaRecorder && mediaRecorder.state === 'recording') { mediaRecorder.stop(); return; }
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                voiceChunks = [];
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = function(e){ if (e.data.size > 0) voiceChunks.push(e.data); };
+                mediaRecorder.onstop = function(){
+                    const blob = new Blob(voiceChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+                    stream.getTracks().forEach(function(t){ t.stop(); });
+                    btn.classList.remove('recording'); btn.textContent = '🎤';
+                    const reader = new FileReader();
+                    reader.onload = function(){
+                        voiceDataUrl = reader.result;
+                        document.getElementById('voiceAudio').src = voiceDataUrl;
+                        document.getElementById('voicePreview').style.display = 'block';
+                        document.getElementById('voiceStatus').textContent = '✅ Message vocal enregistré.';
+                    };
+                    reader.readAsDataURL(blob);
+                };
+                mediaRecorder.start();
+                btn.classList.add('recording'); btn.textContent = '⏹';
+                document.getElementById('voiceStatus').textContent = '🔴 Enregistrement… appuyez de nouveau pour arrêter.';
+                setTimeout(function(){ if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop(); }, 60000);
+            } catch (e) {
+                alert('Micro indisponible ou permission refusée. Vous pouvez écrire votre message.');
+            }
+        }
+        function discardVoice() {
+            voiceDataUrl = null;
+            const p = document.getElementById('voicePreview'); if (p) p.style.display = 'none';
+            const s = document.getElementById('voiceStatus'); if (s) s.textContent = '🎙️ Appuyez sur le micro pour enregistrer un message vocal (parlez dans votre langue).';
+        }
 
         function getAuthToken() {
             return localStorage.getItem('authToken');
@@ -792,12 +865,23 @@
             const token = getAuthToken();
             const missionId = document.getElementById('packageNumber').value;
             const claimType = document.getElementById('claimType').value;
-            const description = document.getElementById('claimDescription').value;
+            const text = document.getElementById('claimDescription').value.trim();
 
-            if (!missionId || !claimType || !description) {
-                alert('Veuillez remplir tous les champs');
+            if (!missionId || !claimType) {
+                alert('Veuillez choisir le colis et le type de réclamation.');
                 return;
             }
+            if (!text && !voiceDataUrl) {
+                alert('Écrivez un message ou enregistrez un vocal.');
+                return;
+            }
+
+            const body = {
+                mission_id: missionId,
+                claim_type: claimType,
+                description: text || '[Message vocal]'
+            };
+            if (voiceDataUrl) body.evidence_urls = [voiceDataUrl];
 
             try {
                 const response = await fetch(`${API_BASE_URL}/claims`, {
@@ -806,20 +890,16 @@
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        mission_id: missionId,
-                        claim_type: claimType,
-                        description: description
-                    })
+                    body: JSON.stringify(body)
                 });
 
                 if (response.ok) {
                     alert('Réclamation soumise avec succès!\n\nVous recevrez une notification dès qu\'elle sera traitée.');
                     closeNewClaimModal();
-                    loadUserClaims(); // Reload claims
+                    loadUserClaims();
                 } else {
                     const error = await response.json();
-                    alert('Erreur: ' + (error.message || 'Impossible de soumettre la réclamation'));
+                    alert('Erreur: ' + (error.error || error.message || 'Impossible de soumettre la réclamation'));
                 }
             } catch (error) {
                 console.error('Error submitting claim:', error);

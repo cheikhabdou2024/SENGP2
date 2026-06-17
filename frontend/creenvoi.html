@@ -2355,25 +2355,25 @@
                     <!-- Payment Method Cards -->
                     <!-- Note: card (Visa/Mastercard) is not supported by Wave/Orange Money (mobile money only). -->
                     <div class="payment-methods">
-                        <div class="payment-method" onclick="selectPaymentMethod('orange')">
-                            <div class="method-icon">🟧</div>
-                            <div class="method-info">
-                                <div class="method-name">Orange Money</div>
-                                <div class="method-description">Paiement mobile</div>
-                            </div>
-                            <div class="method-radio">
-                                <div class="radio-dot"></div>
-                            </div>
-                        </div>
-
                         <div class="payment-method" onclick="selectPaymentMethod('wave')">
-                            <div class="method-icon">🌊</div>
+                            <div class="method-icon"><img src="im/wave.jpg" alt="Wave" style="width:40px;height:40px;object-fit:contain;border-radius:9px;"></div>
                             <div class="method-info">
                                 <div class="method-name">Wave</div>
                                 <div class="method-description">Transfert instantané</div>
                             </div>
                             <div class="method-radio">
                                 <div class="radio-dot"></div>
+                            </div>
+                        </div>
+
+                        <div class="payment-method" onclick="selectPaymentMethod('orange')" style="opacity:.6;">
+                            <div class="method-icon"><img src="im/orange-money.png" alt="Orange Money" style="width:40px;height:40px;object-fit:contain;border-radius:9px;background:#fff;padding:2px;"></div>
+                            <div class="method-info">
+                                <div class="method-name">Orange Money</div>
+                                <div class="method-description">Bientôt disponible</div>
+                            </div>
+                            <div class="method-badge">
+                                <span class="badge" style="background:rgba(255,255,255,.15);color:#fff;padding:4px 9px;border-radius:7px;font-size:11px;font-weight:700;">Coming soon</span>
                             </div>
                         </div>
 
@@ -3300,6 +3300,10 @@
         }
 
         function selectPaymentMethod(method) {
+            if (method === 'orange') {
+                alert('Orange Money sera bientôt disponible.\n\nChoisissez Wave ou le paiement à la livraison.');
+                return;
+            }
             // Remove previous selection
             document.querySelectorAll('.payment-method').forEach(pm => {
                 pm.classList.remove('selected');
@@ -3391,16 +3395,14 @@
             if (!date) { alert('Veuillez choisir une date de départ.'); return; }
             if (!offered || offered <= 0) { alert('Veuillez indiquer le prix proposé.'); return; }
 
-            const methodMap = { wave: 'wave', orange: 'orange_money' };
-            const payment_method = methodMap[selectedPaymentMethod];
-            if (!payment_method) {
-                alert('Veuillez choisir un mode de paiement en ligne (Wave ou Orange Money).');
-                return;
-            }
+            if (!selectedPaymentMethod) { alert('Veuillez choisir un mode de paiement.'); return; }
 
             const nextBtn = document.getElementById('nextBtn');
             nextBtn.disabled = true;
             nextBtn.textContent = 'Traitement en cours...';
+
+            const recipientName = (document.getElementById('receiverName') ? document.getElementById('receiverName').value.trim() : '') || null;
+            const recipientPhone = ((document.getElementById('selectedCode') ? document.getElementById('selectedCode').textContent : '') + ' ' + (document.getElementById('receiverPhone') ? document.getElementById('receiverPhone').value.trim() : '')).trim() || null;
 
             try {
                 // 1. Create the mission (open — any GP can accept it).
@@ -3419,8 +3421,8 @@
                         desired_departure_date: date,
                         offered_price: offered,
                         is_price_negotiable: true,
-                        recipient_name: (document.getElementById('receiverName') ? document.getElementById('receiverName').value.trim() : '') || null,
-                        recipient_phone: ((document.getElementById('selectedCode') ? document.getElementById('selectedCode').textContent : '') + ' ' + (document.getElementById('receiverPhone') ? document.getElementById('receiverPhone').value.trim() : '')).trim() || null
+                        recipient_name: recipientName,
+                        recipient_phone: recipientPhone
                     })
                 });
                 const missionResult = await missionRes.json();
@@ -3429,7 +3431,24 @@
                 }
                 const mission = missionResult.data;
 
-                // 2. Initiate payment for the mission via the chosen provider.
+                // 2a. Paiement à la livraison : aucun paiement en ligne, récap + dashboard.
+                if (selectedPaymentMethod === 'cod') {
+                    alert(
+                        'Envoi créé ✅\n\n' +
+                        'Type : ' + (packageTypeText || '—') + '\n' +
+                        'Trajet : ' + selectedDeparture.city + ' → ' + selectedArrival.city + '\n' +
+                        'Destinataire : ' + (recipientName || '—') + '\n' +
+                        'Poids : ' + weight + ' kg\n' +
+                        'Prix : ' + offered.toLocaleString('fr-FR') + ' FCFA\n' +
+                        'Paiement : à la livraison (espèces)\n' +
+                        'Suivi n° : ' + (mission.tracking_number || mission.mission_code || '')
+                    );
+                    window.location.href = 'dashexpediteur.html';
+                    return;
+                }
+
+                // 2b. Paiement en ligne (Wave).
+                const payment_method = 'wave';
                 const payRes = await fetch(`${window.API_BASE_URL}/payments`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -3468,12 +3487,11 @@
                             if (status !== 'completed') await new Promise(res => setTimeout(res, 2000));
                         }
                         if (status === 'completed') {
-                            alert('Paiement réussi ! Votre envoi est créé.');
-                            window.location.href = 'detailenvoi.html?id=' + mission.id;
+                            alert('Paiement réussi ✅\n\nVotre envoi est créé.\nTrajet : ' + selectedDeparture.city + ' → ' + selectedArrival.city + '\nSuivi n° : ' + (mission.tracking_number || mission.mission_code || ''));
                         } else {
-                            alert('Paiement en cours de validation. Vous le verrez dans « Mes envois » dès confirmation.');
-                            window.location.href = 'dashexpediteur.html';
+                            alert('Paiement en cours de validation. Votre envoi apparaîtra dès confirmation.');
                         }
+                        window.location.href = 'dashexpediteur.html';
                     };
                     try { await Browser.addListener('browserFinished', onFinish); } catch (e) {}
                     await Browser.open({ url: redirectUrl, presentationStyle: 'popover' });
