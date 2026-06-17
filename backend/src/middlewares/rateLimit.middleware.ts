@@ -34,6 +34,22 @@ export class RateLimitMiddleware {
   });
 
   /**
+   * Public tracking limiter (recipient pages, read-only).
+   * Generous because mobile users often share a carrier NAT IP and the pages
+   * auto-refresh. 300 requests / 5 minutes by default.
+   */
+  static publicTracking = rateLimit({
+    windowMs: parseInt(process.env.RATE_LIMIT_PUBLIC_WINDOW_MS || '300000'),
+    max: parseInt(process.env.RATE_LIMIT_PUBLIC_MAX || '300'),
+    message: {
+      success: false,
+      error: 'Too many requests, please try again later',
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  /**
    * File upload rate limiter
    * 10 requests per hour
    */

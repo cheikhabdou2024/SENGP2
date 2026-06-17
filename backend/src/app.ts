@@ -78,7 +78,14 @@ if (process.env.NODE_ENV !== 'test') {
   }));
 }
 
-// Rate Limiting
+// Public, read-only tracking — mounted BEFORE the strict API limiter, with its
+// own generous limiter (recipients share carrier IPs + pages auto-refresh).
+const apiVersionPublic = process.env.API_VERSION || 'v1';
+app.use(`/api/${apiVersionPublic}/public`, RateLimitMiddleware.publicTracking, publicRoutes);
+app.get('/t/:token', PublicController.trackPage);
+app.get('/d/:token', PublicController.deliveryPage);
+
+// Rate Limiting (strict) for the rest of the API
 app.use('/api/', RateLimitMiddleware.general);
 
 // Root Route - API Info
@@ -131,12 +138,6 @@ app.use(`/api/${apiVersion}/claims`, claimRoutes);
 app.use(`/api/${apiVersion}/wallet`, walletRoutes);
 app.use(`/api/${apiVersion}/withdrawals`, withdrawalRoutes);
 app.use(`/api/${apiVersion}/admin`, adminRoutes);
-app.use(`/api/${apiVersion}/public`, publicRoutes);
-
-// Public recipient tracking page (self-contained HTML, no auth/app needed).
-// Registered before the production SPA catch-all so it isn't shadowed.
-app.get('/t/:token', PublicController.trackPage);
-app.get('/d/:token', PublicController.deliveryPage);
 
 // Serve static frontend files in production
 if (process.env.NODE_ENV === 'production') {

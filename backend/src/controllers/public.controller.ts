@@ -117,7 +117,8 @@ export class PublicController {
   function flag(c){return FLAGS[c]||'🌍'}
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
   function load(){
-    fetch('/api/v1/public/delivery/'+encodeURIComponent(TOKEN)).then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j}})}).then(function(res){
+    fetch('/api/v1/public/delivery/'+encodeURIComponent(TOKEN)).then(function(r){return r.json().catch(function(){return {}}).then(function(j){return {status:r.status,ok:r.ok,j:j}})}).then(function(res){
+      if(res.status===429){document.getElementById('content').innerHTML='<div class="loading">Beaucoup de demandes… nouvelle tentative.</div>';setTimeout(load,6000);return}
       if(!res.ok||!res.j.success){document.getElementById('content').innerHTML='<div class="empty">📭<br>Code de livraison invalide.</div>';return}
       var m=res.j.data;
       if(String(m.status).toLowerCase()==='delivered'){showDone();return}
@@ -209,7 +210,8 @@ export class PublicController {
   var ACTIVE=['pending','matched','accepted','picked_up','in_transit','in_customs','out_for_delivery'];
 
   function load(){
-    fetch('/api/v1/public/track/'+encodeURIComponent(TOKEN)).then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j}})}).then(function(res){
+    fetch('/api/v1/public/track/'+encodeURIComponent(TOKEN)).then(function(r){return r.json().catch(function(){return {}}).then(function(j){return {status:r.status,ok:r.ok,j:j}})}).then(function(res){
+      if(res.status===429){document.getElementById('content').innerHTML='<div class="loading">Beaucoup de demandes en ce moment… nouvelle tentative.</div>';setTimeout(load,6000);return}
       if(!res.ok||!res.j.success){document.getElementById('content').innerHTML='<div class="empty">📭<br>Aucun suivi trouvé pour ce code.</div>';return}
       render(res.j.data.mission,res.j.data.tracking||[]);
     }).catch(function(){document.getElementById('content').innerHTML='<div class="empty">Erreur de connexion. Réessayez.</div>'});
@@ -233,7 +235,7 @@ export class PublicController {
       +'<div class="card"><div class="title">🗺️ Suivi en temps réel</div>'+mapBlock+'<a class="map-btn" href="'+mapsUrl+'" target="_blank" rel="noopener">Voir l\\'itinéraire sur la carte</a></div>'
       +'<div class="card"><div class="title">📡 Historique</div><div class="timeline">'+tl+'</div></div>';
 
-    if(ACTIVE.indexOf(String(m.status||'').toLowerCase())>=0){setTimeout(function(){if(!document.hidden)load()},30000)}
+    if(ACTIVE.indexOf(String(m.status||'').toLowerCase())>=0){setTimeout(function(){if(!document.hidden)load()},60000)}
   }
   load();
 </script>
