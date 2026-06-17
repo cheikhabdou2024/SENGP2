@@ -403,14 +403,20 @@
                     ]
                 },
                 claims: {
-                    head: ['Code','Titre','Type','Priorité','Statut','Demandeur','Actions'],
-                    row: c => [
-                        esc(c.claim_code), esc(c.title), esc(c.claim_type),
-                        `<span class="badge ${badgeFor(c.priority)}">${esc(c.priority)}</span>`,
-                        `<span class="badge ${badgeFor(c.status)}">${esc(c.status)}</span>`,
-                        esc(c.claimant_name||'—'),
-                        actions([['act-edit','Traiter',`editClaim('${c.id}','${esc(c.status)}')`]])
-                    ]
+                    head: ['Code','Type','Priorité','Statut','Demandeur','Message','Actions'],
+                    row: c => {
+                        const ev = (c.evidence_urls || []).filter(Boolean);
+                        const audio = ev.length ? `<button class="act act-ok" onclick="playEvidence('${encodeURIComponent(ev[0])}')">🔊 Vocal</button>` : '';
+                        const msg = `<div style="max-width:240px;white-space:normal;">${esc(c.description||'—')}</div>${audio}`;
+                        return [
+                            esc(c.claim_code), esc(c.claim_type),
+                            `<span class="badge ${badgeFor(c.priority)}">${esc(c.priority)}</span>`,
+                            `<span class="badge ${badgeFor(c.status)}">${esc(c.status)}</span>`,
+                            esc(c.claimant_name||'—'),
+                            msg,
+                            actions([['act-edit','Traiter',`editClaim('${c.id}','${esc(c.status)}')`]])
+                        ];
+                    }
                 }
             };
             const d = defs[view];
@@ -463,6 +469,10 @@
             const { ok, json } = await api('/admin/withdrawals/'+id+'/reject', { method:'PUT', body: JSON.stringify({ reason }) });
             alert(ok ? 'Retrait rejeté (solde recrédité)' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
         }
+        function playEvidence(u){
+            try { window.open(decodeURIComponent(u), '_blank'); } catch (e) { alert('Impossible de lire le fichier.'); }
+        }
+
         async function editClaim(id, cur){
             const status = prompt('Statut réclamation (open, investigating, resolved, closed):', cur);
             if (!status) return;

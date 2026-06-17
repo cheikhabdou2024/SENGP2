@@ -743,7 +743,7 @@
         }
 
         // --- Message vocal (façon WhatsApp) ---
-        let mediaRecorder = null, voiceChunks = [], voiceDataUrl = null;
+        let mediaRecorder = null, voiceChunks = [], voiceDataUrl = null, voiceBlob = null;
         async function toggleVoice() {
             const btn = document.getElementById('voiceBtn');
             if (mediaRecorder && mediaRecorder.state === 'recording') { mediaRecorder.stop(); return; }
@@ -754,6 +754,7 @@
                 mediaRecorder.ondataavailable = function(e){ if (e.data.size > 0) voiceChunks.push(e.data); };
                 mediaRecorder.onstop = function(){
                     const blob = new Blob(voiceChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+                    voiceBlob = blob;
                     stream.getTracks().forEach(function(t){ t.stop(); });
                     btn.classList.remove('recording'); btn.textContent = '🎤';
                     const reader = new FileReader();
@@ -774,7 +775,7 @@
             }
         }
         function discardVoice() {
-            voiceDataUrl = null;
+            voiceDataUrl = null; voiceBlob = null;
             const p = document.getElementById('voicePreview'); if (p) p.style.display = 'none';
             const s = document.getElementById('voiceStatus'); if (s) s.textContent = '🎙️ Appuyez sur le micro pour enregistrer un message vocal (parlez dans votre langue).';
         }
@@ -881,7 +882,23 @@
                 claim_type: claimType,
                 description: text || '[Message vocal]'
             };
-            if (voiceDataUrl) body.evidence_urls = [voiceDataUrl];
+
+            // Téléverser le vocal vers S3 (repli sur data-URL si l'upload échoue).
+            if (voiceBlob) {
+                try {
+                    const fd = new FormData();
+                    const ext = (voiceBlob.type.split('/')[1] || 'webm').split(';')[0];
+                    fd.append('file', voiceBlob, 'message.' + ext);
+                    const up = await fetch(`${API_BASE_URL}/uploads`, {
+                        method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: fd
+                    });
+                    const uj = await up.json();
+                    if (up.ok && uj.success && uj.data && uj.data.key) body.evidence_urls = [uj.data.key];
+                    else if (voiceDataUrl) body.evidence_urls = [voiceDataUrl];
+                } catch (e) {
+                    if (voiceDataUrl) body.evidence_urls = [voiceDataUrl];
+                }
+            }
 
             try {
                 const response = await fetch(`${API_BASE_URL}/claims`, {

@@ -21,6 +21,7 @@ import walletRoutes from './routes/wallet.routes';
 import withdrawalRoutes from './routes/withdrawal.routes';
 import adminRoutes from './routes/admin.routes';
 import publicRoutes from './routes/public.routes';
+import uploadRoutes from './routes/upload.routes';
 import { PublicController } from './controllers/public.controller';
 
 dotenv.config();
@@ -142,6 +143,7 @@ app.use(`/api/${apiVersion}/claims`, claimRoutes);
 app.use(`/api/${apiVersion}/wallet`, walletRoutes);
 app.use(`/api/${apiVersion}/withdrawals`, withdrawalRoutes);
 app.use(`/api/${apiVersion}/admin`, adminRoutes);
+app.use(`/api/${apiVersion}/uploads`, uploadRoutes);
 
 // Serve static frontend files in production
 if (process.env.NODE_ENV === 'production') {

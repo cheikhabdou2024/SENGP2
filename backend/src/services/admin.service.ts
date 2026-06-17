@@ -1,6 +1,7 @@
 import pool from '../config/database';
 import bcrypt from 'bcryptjs';
 import { Helpers } from '../utils/helpers';
+import { resolveEvidenceUrl } from '../utils/s3';
 
 /**
  * Admin service: read-only global overview + full CRUD over the main entities.
@@ -251,8 +252,8 @@ export class AdminService {
     const count = await pool.query(`SELECT COUNT(*) FROM claims c ${where}`, args);
     const total = parseInt(count.rows[0].count);
     const rows = await pool.query(
-      `SELECT c.id, c.claim_code, c.claim_type, c.title, c.status, c.priority, c.resolution,
-              c.compensation_amount, c.created_at,
+      `SELECT c.id, c.claim_code, c.claim_type, c.title, c.description, c.status, c.priority, c.resolution,
+              c.compensation_amount, c.evidence_urls, c.created_at,
               u.first_name || ' ' || u.last_name AS claimant_name,
               m.mission_code
        FROM claims c
@@ -261,7 +262,14 @@ export class AdminService {
        ${where} ORDER BY c.created_at DESC LIMIT $${i} OFFSET $${i + 1}`,
       [...args, limit, offset]
     );
-    return { data: rows.rows, pagination: { page, limit, total, totalPages: Helpers.calculateTotalPages(total, limit) } };
+    // Presign stored evidence keys so the admin can play/download attachments.
+    const data = rows.rows.map((r: any) => {
+      let ev = r.evidence_urls;
+      if (typeof ev === 'string') { try { ev = JSON.parse(ev); } catch (_) { ev = []; } }
+      if (Array.isArray(ev)) r.evidence_urls = ev.map((v: string) => resolveEvidenceUrl(v));
+      return r;
+    });
+    return { data, pagination: { page, limit, total, totalPages: Helpers.calculateTotalPages(total, limit) } };
   }
 
   static async updateClaim(id: string, adminId: string, data: any) {
