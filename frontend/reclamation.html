@@ -521,8 +521,8 @@
         <div class="content">
             <!-- Tabs -->
             <div class="tabs">
-                <button class="tab active" onclick="switchTab('active')">En cours (1)</button>
-                <button class="tab" onclick="switchTab('resolved')">Résolues (2)</button>
+                <button class="tab active" id="tab-active" onclick="switchTab('active')">En cours (0)</button>
+                <button class="tab" id="tab-resolved" onclick="switchTab('resolved')">Résolues (0)</button>
             </div>
 
             <!-- New Claim Button -->
@@ -745,12 +745,16 @@
         }
 
         function displayClaims(claims) {
-            const activeClaims = claims.filter(c => c.status !== 'resolved');
-            const resolvedClaims = claims.filter(c => c.status === 'resolved');
+            claims = claims || [];
+            const isResolved = c => ['resolved', 'closed', 'rejected'].includes(String(c.status || '').toLowerCase());
+            const activeClaims = claims.filter(c => !isResolved(c));
+            const resolvedClaims = claims.filter(isResolved);
 
-            // Update badges
-            document.querySelector('.tab-btn[onclick*="active"]').innerHTML = `Actifs (${activeClaims.length})`;
-            document.querySelector('.tab-btn[onclick*="resolved"]').innerHTML = `Résolus (${resolvedClaims.length})`;
+            // Update tab counts (real)
+            const ta = document.getElementById('tab-active');
+            const tr = document.getElementById('tab-resolved');
+            if (ta) ta.textContent = `En cours (${activeClaims.length})`;
+            if (tr) tr.textContent = `Résolues (${resolvedClaims.length})`;
 
             // Display active claims
             const activeContainer = document.getElementById('activeClaims');
