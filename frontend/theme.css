@@ -1,0 +1,137 @@
+/* ============================================================================
+   SEN GP — Design system (vanilla). Scoped under `.ds` on <body> so it elevates
+   existing pages with higher specificity (no !important, no JS changes).
+   Identity: dark glassmorphism, coral + gold + teal accents.
+   ============================================================================ */
+:root {
+  --brand: #FF6B6B;
+  --brand-2: #FFE66D;
+  --gold: #FFD700;
+  --teal: #4ECDC4;
+  --bg-0: #14122a;
+  --surface: rgba(255,255,255,0.055);
+  --surface-2: rgba(255,255,255,0.085);
+  --border: rgba(255,255,255,0.10);
+  --border-strong: rgba(255,255,255,0.18);
+  --text: #ffffff;
+  --muted: rgba(255,255,255,0.62);
+  --muted-2: rgba(255,255,255,0.45);
+  --radius: 16px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+  --shadow: 0 6px 22px rgba(0,0,0,0.28);
+  --shadow-lg: 0 14px 38px rgba(0,0,0,0.40);
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+
+/* ---- Global polish ---- */
+.ds, .ds * { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+.ds { letter-spacing: .1px; }
+.ds ::selection { background: rgba(255,107,107,.35); color: #fff; }
+.ds *::-webkit-scrollbar { width: 6px; height: 6px; }
+.ds *::-webkit-scrollbar-thumb { background: rgba(255,255,255,.16); border-radius: 6px; }
+.ds *::-webkit-scrollbar-track { background: transparent; }
+.ds :focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 8px; }
+.ds button, .ds .btn, .ds .action-button, .ds .tab, .ds .nav-item { transition: transform .18s var(--ease), background .25s var(--ease), box-shadow .25s var(--ease), color .25s var(--ease); }
+.ds button:active, .ds .btn:active, .ds .action-button:active { transform: scale(.985); }
+
+/* Subtle ambient glows behind the frame */
+.ds .mobile-frame {
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(255,107,107,.10), transparent 42%),
+    radial-gradient(120% 80% at 100% 0%, rgba(255,215,0,.07), transparent 45%),
+    linear-gradient(135deg, rgba(15,12,41,.96) 0%, rgba(28,24,54,.96) 55%, rgba(20,18,40,.98) 100%) !important;
+}
+
+/* ---- Headers ---- */
+.ds .header {
+  background: rgba(255,255,255,.035);
+  border-bottom: 1px solid var(--border);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+}
+.ds .greeting h1 { letter-spacing: -.3px; }
+
+/* ---- Cards (generic) ---- */
+.ds .card,
+.ds .stat-card,
+.ds .shipment-card,
+.ds .mission-card,
+.ds .trip-card,
+.ds .transaction-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: transform .2s var(--ease), border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.ds .card:hover,
+.ds .shipment-card:hover,
+.ds .mission-card:hover,
+.ds .trip-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Hero stat cards (dashboard) */
+.ds .stat-card { padding: 16px; }
+.ds .stat-card.primary {
+  background: linear-gradient(135deg, rgba(255,107,107,.20), rgba(255,230,109,.10));
+  border-color: rgba(255,107,107,.35);
+}
+.ds .stat-value { letter-spacing: -.5px; }
+.ds .stat-label, .ds .detail-label, .ds .kv .k { text-transform: uppercase; letter-spacing: .5px; }
+
+/* ---- Badges / pills ---- */
+.ds .badge {
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  letter-spacing: .2px;
+  padding: 5px 11px;
+}
+
+/* ---- Buttons ---- */
+.ds .btn, .ds .action-button, .ds .map-btn {
+  border-radius: 14px;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+.ds .action-button {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.ds .action-button:hover { border-color: var(--border-strong); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.ds .action-button-primary {
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  border: none; color: #1a1a2e;
+}
+
+/* ---- Inputs / selects ---- */
+.ds input, .ds select, .ds textarea, .ds .form-input, .ds .form-select, .ds .search-input {
+  border-radius: 12px;
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease);
+}
+.ds input:focus, .ds select:focus, .ds textarea:focus, .ds .form-input:focus, .ds .form-select:focus, .ds .search-input:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 4px rgba(78,205,196,.16);
+  outline: none;
+}
+
+/* ---- Section titles ---- */
+.ds .section-title { letter-spacing: -.2px; }
+
+/* ---- Tabs (segmented) ---- */
+.ds .tabs { background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 14px; }
+.ds .tab { border-radius: 11px; font-weight: 700; }
+.ds .tab.active { box-shadow: 0 6px 16px rgba(255,107,107,.30); }
+
+/* ---- Tracking step progress (suivi) ---- */
+.ds .step .dot { transition: background .25s var(--ease), box-shadow .25s var(--ease); }
+.ds .step.done .dot { background: var(--teal); box-shadow: 0 0 0 3px rgba(78,205,196,.22); }
+
+/* ---- Timeline (detailenvoi) ---- */
+.ds .tl-item::before { box-shadow: 0 0 0 3px rgba(78,205,196,.18); }
+
+/* ---- Empty / loading states ---- */
+.ds .empty, .ds .loading, .ds .notif-empty, .ds .missions-state { color: var(--muted); }

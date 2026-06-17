@@ -413,7 +413,31 @@
         }
 
         .stat-icon {
-            font-size: 18px;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .stat-card.primary .stat-icon {
+            background: rgba(255, 107, 107, 0.22);
+            color: #FFB199;
+        }
+
+        /* Reusable line-icon (Lucide style, matches bottom nav) */
+        .ico {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex: none;
         }
 
         .stat-value {
@@ -493,6 +517,13 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            color: #1a1a2e;
+        }
+
+        .action-icon .ico {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2;
         }
 
         .action-text {
@@ -639,9 +670,16 @@
         }
 
         .empty-icon {
-            font-size: 64px;
+            display: flex;
+            justify-content: center;
             margin-bottom: 16px;
-            opacity: 0.5;
+            opacity: 0.45;
+        }
+
+        .empty-icon .ico {
+            width: 60px;
+            height: 60px;
+            stroke-width: 1.4;
         }
 
         .empty-title {
@@ -794,8 +832,9 @@
         body{padding:0!important;}
         </style>
     <script src="config.js"></script>
+    <link rel="stylesheet" href="theme.css">
 </head>
-<body>
+<body class="ds">
     <div class="mobile-frame">
 
         <!-- Content -->
@@ -842,7 +881,7 @@
                     <div class="stat-card primary" style="cursor:pointer" onclick="location.href='envois.html?status=active'">
                         <div class="stat-header">
                             <span class="stat-label">En cours</span>
-                            <span class="stat-icon">📦</span>
+                            <span class="stat-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span>
                         </div>
                         <div class="stat-value">0</div>
                         <div class="stat-change">Chargement...</div>
@@ -851,7 +890,7 @@
                     <div class="stat-card" style="cursor:pointer" onclick="location.href='envois.html?status=delivered'">
                         <div class="stat-header">
                             <span class="stat-label">Livrés</span>
-                            <span class="stat-icon">✅</span>
+                            <span class="stat-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21.8 10A10 10 0 1 1 17 3.34"/><path d="m9 11 3 3L22 4"/></svg></span>
                         </div>
                         <div class="stat-value">0</div>
                         <div class="stat-change">Chargement...</div>
@@ -860,7 +899,7 @@
                     <div class="stat-card" style="cursor:pointer" onclick="location.href='envois.html'">
                         <div class="stat-header">
                             <span class="stat-label">Dépenses</span>
-                            <span class="stat-icon">💰</span>
+                            <span class="stat-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span>
                         </div>
                         <div class="stat-value">0</div>
                         <div class="stat-change">Chargement...</div>
@@ -869,7 +908,7 @@
                     <div class="stat-card" style="cursor:pointer" onclick="location.href='envois.html'">
                         <div class="stat-header">
                             <span class="stat-label">Économies</span>
-                            <span class="stat-icon">💸</span>
+                            <span class="stat-icon"><svg class="ico" viewBox="0 0 24 24"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg></span>
                         </div>
                         <div class="stat-value">0</div>
                         <div class="stat-change">vs services classiques</div>
@@ -884,7 +923,7 @@
                 </div>
 
                 <button class="action-button" onclick="createShipment()">
-                    <div class="action-icon">📦</div>
+                    <div class="action-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div>
                     <div class="action-text">
                         <div class="action-title">Créer un envoi</div>
                         <div class="action-subtitle">Trouvez un GP pour votre colis</div>
@@ -1174,7 +1213,7 @@
                 const emptyState = document.createElement('div');
                 emptyState.className = 'empty-state';
                 emptyState.innerHTML = `
-                    <div class="empty-icon">📦</div>
+                    <div class="empty-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div>
                     <div class="empty-title">Aucun envoi</div>
                     <div class="empty-description">Vous n'avez pas encore créé d'envoi. Commencez dès maintenant !</div>
                 `;

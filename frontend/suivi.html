@@ -47,10 +47,13 @@
   .actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
   .btn { flex:1; min-width:96px; padding:10px; border:none; border-radius:10px; font-size:12.5px; font-weight:700; cursor:pointer; text-decoration:none; text-align:center; }
   .btn-d{background:rgba(255,255,255,.1);color:#fff}.btn-call{background:rgba(76,175,80,.22);color:#7ee081}.btn-share{background:rgba(78,205,196,.2);color:#4ECDC4}
-  .alert { font-size:12px; padding:8px 10px; border-radius:10px; margin-top:10px; }
+  .ico { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+  .alert { font-size:12px; padding:8px 10px; border-radius:10px; margin-top:10px; display:flex; align-items:center; gap:6px; }
+  .alert .ico { width:14px; height:14px; }
   .alert-warn{background:rgba(255,215,0,.12);color:#FFD700}.alert-ok{background:rgba(76,175,80,.15);color:#7ee081}
   .loading,.empty { text-align:center; padding:50px 20px; color:rgba(255,255,255,.55); }
-  .empty .ic{font-size:46px;margin-bottom:10px}
+  .empty .ic{display:flex;justify-content:center;margin-bottom:12px;opacity:.85}
+  .empty .ic .ico{width:50px;height:50px;stroke-width:1.4}
   .empty .cta{display:inline-block;margin-top:14px;padding:11px 18px;border-radius:12px;background:linear-gradient(135deg,#FF6B6B,#FFE66D);color:#1a1a2e;font-weight:700;text-decoration:none}
   /* bottom nav */
   .bottom-nav{position:absolute;bottom:0;left:0;right:0;background:rgba(18,16,36,.92);backdrop-filter:blur(24px);border-top:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-around;align-items:stretch;padding:9px 6px calc(9px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px rgba(0,0,0,.35)}
@@ -72,8 +75,9 @@
   .ic-wa{background:#25D366}.ic-mail{background:#EA4335}.ic-copy{background:rgba(255,255,255,.15)}
 </style>
 <script src="config.js"></script>
+<link rel="stylesheet" href="theme.css">
 </head>
-<body>
+<body class="ds">
 <div class="mobile-frame">
   <div class="header">
     <h1>Suivi en temps réel</h1>
@@ -108,15 +112,29 @@
   <div class="sheet">
     <div class="sheet-grip"></div>
     <h3>Partager le suivi</h3>
-    <button class="share-opt" id="waBtn"><span class="ic ic-wa">🟢</span> WhatsApp</button>
-    <button class="share-opt" id="mailBtn"><span class="ic ic-mail">✉️</span> Email / Gmail</button>
-    <button class="share-opt" id="copyBtn"><span class="ic ic-copy">🔗</span> Copier le lien</button>
+    <button class="share-opt" id="waBtn"><span class="ic ic-wa"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.54-3.87c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 0 0 1.523 5.26l-.999 3.648 3.965-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg></span> WhatsApp</button>
+    <button class="share-opt" id="mailBtn"><span class="ic ic-mail"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span> Email / Gmail</button>
+    <button class="share-opt" id="copyBtn"><span class="ic ic-copy"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span> Copier le lien</button>
   </div>
 </div>
 
 <script>
   const API = window.API_BASE_URL;
   const token = localStorage.getItem('authToken');
+
+  // Icônes inline (style Lucide, alignées sur la nav) pour le contenu généré.
+  const svg = (p, sz=14) => `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex:none">${p}</svg>`;
+  const IC = {
+    pin:    svg('<path d="M20 10c0 4.4-5.4 9-8 11-2.6-2-8-6.6-8-11a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>'),
+    user:   svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>'),
+    truck:  svg('<path d="M10 17h4V5H2v12h3"/><path d="M14 9h4l4 4v4h-3"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>'),
+    calendar: svg('<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>'),
+    phone:  svg('<path d="M13.83 19.42a16 16 0 0 1-7.4-7.4l1.74-2.45a1.5 1.5 0 0 0 .12-1.45l-1-2.3A1.5 1.5 0 0 0 5.9 4.5H3.6A1.6 1.6 0 0 0 2 6.2 14 14 0 0 0 16 20.2a1.6 1.6 0 0 0 1.7-1.6v-2.3a1.5 1.5 0 0 0-1.32-1.49l-2.3-1a1.5 1.5 0 0 0-1.45.12z"/>', 14),
+    check:  svg('<path d="M21.8 10A10 10 0 1 1 17 3.34"/><path d="m9 11 3 3L22 4"/>'),
+    customs: svg('<path d="m12 2 8 5H4z"/><path d="M4 11h16"/><path d="M6 11v7"/><path d="M10 11v7"/><path d="M14 11v7"/><path d="M18 11v7"/><path d="M3 22h18"/>'),
+    clock:  svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+    package: svg('<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>', 50)
+  };
   let all = [];
   let tab = 'encours';
 
@@ -166,7 +184,7 @@
     const list=all.filter(m=>BUCKETS[tab].includes(String(m.status||'').toLowerCase()));
     const box=document.getElementById('list');
     if(!list.length){
-      box.innerHTML='<div class="empty"><div class="ic">📦</div>Aucun colis '+(tab==='encours'?'en cours':tab==='avenir'?'à venir':'livré')+'.'+
+      box.innerHTML='<div class="empty"><div class="ic">'+IC.package+'</div>Aucun colis '+(tab==='encours'?'en cours':tab==='avenir'?'à venir':'livré')+'.'+
         (tab==='encours'?'<br><a class="cta" href="creenvoi.html">Créer un envoi</a>':'')+'</div>';
       return;
     }
@@ -180,21 +198,21 @@
     const steps=STEP_LABELS.map((lbl,idx)=>{ const n=idx+1; const done=si>=n?'done':''; return '<div class="step '+done+'">'+(idx>0?'<div class="bar"></div>':'')+'<div class="dot"></div><div class="lbl">'+lbl+'</div></div>'; }).join('');
     const eta=m.desired_arrival_date||m.desired_departure_date;
     const late=eta && new Date(eta)<new Date() && si<5;
-    const alert = String(m.status).toLowerCase()==='delivered' ? '<div class="alert alert-ok">✅ Colis livré</div>'
-      : String(m.status).toLowerCase()==='in_customs' ? '<div class="alert alert-warn">🛃 En cours de dédouanement</div>'
-      : late ? '<div class="alert alert-warn">⏱️ Arrivée prévue dépassée — en attente de mise à jour</div>' : '';
+    const alert = String(m.status).toLowerCase()==='delivered' ? '<div class="alert alert-ok">'+IC.check+'Colis livré</div>'
+      : String(m.status).toLowerCase()==='in_customs' ? '<div class="alert alert-warn">'+IC.customs+'En cours de dédouanement</div>'
+      : late ? '<div class="alert alert-warn">'+IC.clock+'Arrivée prévue dépassée — en attente de mise à jour</div>' : '';
     const gpPhone=(m.gp_phone||'').replace(/\s/g,'');
     return '<div class="card">'
       +'<div class="row"><div><div class="ptype">'+esc(m.package_description||'Colis')+'</div><div class="code">'+esc(m.tracking_number||m.mission_code||'')+'</div></div>'+badge(m.status)+'</div>'
       +'<div class="route"><span class="flag">'+flag(m.departure_country)+'</span><span>'+esc(m.departure_city||'')+'</span><span class="arrow">→</span><span class="flag">'+flag(m.arrival_country)+'</span><span>'+esc(m.arrival_city||'')+'</span></div>'
       +'<div class="steps">'+steps+'</div>'
       +'<div id="map-'+m.id+'" class="map-ph">Localisation en cours…</div>'
-      +'<div class="meta"><span>🎯 Arrivée prévue : '+dt(eta)+'</span><span>👤 '+esc(m.recipient_name||'—')+'</span></div>'
-      + (m.gp_name?'<div class="meta"><span>🚚 '+esc(m.gp_name)+'</span><span id="upd-'+m.id+'"></span></div>':'')
+      +'<div class="meta"><span>'+IC.calendar+' Arrivée prévue : '+dt(eta)+'</span><span>'+IC.user+' '+esc(m.recipient_name||'—')+'</span></div>'
+      + (m.gp_name?'<div class="meta"><span>'+IC.truck+' '+esc(m.gp_name)+'</span><span id="upd-'+m.id+'"></span></div>':'')
       + alert
       +'<div class="actions">'
       +'<a class="btn btn-d" href="detailenvoi.html?id='+m.id+'">Détails</a>'
-      +(gpPhone?'<a class="btn btn-call" href="tel:'+esc(gpPhone)+'">📞 GP</a>':'')
+      +(gpPhone?'<a class="btn btn-call" href="tel:'+esc(gpPhone)+'">'+IC.phone+' GP</a>':'')
       +'<button class="btn btn-share" onclick="openShareSheet(\''+esc(publicUrl(m))+'\')">Partager</button>'
       +'</div></div>';
   }
@@ -212,7 +230,7 @@
         ifr.className='map'; ifr.loading='lazy';
         ifr.src='https://www.openstreetmap.org/export/embed.html?bbox='+(lo-d)+'%2C'+(la-d)+'%2C'+(lo+d)+'%2C'+(la+d)+'&layer=mapnik&marker='+la+'%2C'+lo;
         mapEl.replaceWith(ifr);
-        const upd=document.getElementById('upd-'+id); if(upd) upd.textContent='📍 '+timeAgo(gps.created_at);
+        const upd=document.getElementById('upd-'+id); if(upd) upd.innerHTML=IC.pin+' '+timeAgo(gps.created_at);
       } else if(mapEl){
         mapEl.textContent='Position GPS pas encore disponible';
       }
