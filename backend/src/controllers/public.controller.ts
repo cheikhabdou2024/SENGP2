@@ -32,6 +32,39 @@ export class PublicController {
     }
   }
 
+  /** Payment result pages shown by the provider redirect (success / error). */
+  static paymentResultPage(ok: boolean): (req: Request, res: Response) => void {
+    return (_req: Request, res: Response): void => {
+      const title = ok ? 'Paiement réussi' : 'Paiement non abouti';
+      const icon = ok ? '✅' : '❌';
+      const color = ok ? '#7ee081' : '#ff8f8f';
+      const msg = ok
+        ? "Votre paiement a bien été reçu. Vous pouvez fermer cette page et revenir à l'application SEN GP — votre envoi y apparaîtra."
+        : "Le paiement n'a pas abouti. Vous pouvez fermer cette page et réessayer depuis l'application SEN GP.";
+      const html = `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${title} - SEN GP</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
+  .card{max-width:380px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:34px 24px}
+  .ic{font-size:64px;margin-bottom:14px}
+  h1{font-size:22px;margin-bottom:10px;color:${color}}
+  p{font-size:14px;line-height:1.6;color:rgba(255,255,255,.75)}
+  .brand{margin-top:22px;font-size:12px;color:rgba(255,255,255,.4)}
+  .btn{display:inline-block;margin-top:20px;padding:13px 22px;border-radius:12px;background:linear-gradient(135deg,#FF6B6B,#FFE66D);color:#1a1a2e;font-weight:800;text-decoration:none}
+</style></head>
+<body><div class="card">
+  <div class="ic">${icon}</div>
+  <h1>${title}</h1>
+  <p>${msg}</p>
+  <a class="btn" href="sengp://payment/${ok ? 'success' : 'error'}" onclick="setTimeout(function(){window.close()},300)">Revenir à l'application</a>
+  <div class="brand">SEN GP</div>
+</div></body></html>`;
+      res.status(200).type('html').send(html);
+    };
+  }
+
   /**
    * Public delivery info by secret QR token (no auth).
    * GET /api/v1/public/delivery/:token

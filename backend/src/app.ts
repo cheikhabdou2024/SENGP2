@@ -85,6 +85,10 @@ app.use(`/api/${apiVersionPublic}/public`, RateLimitMiddleware.publicTracking, p
 app.get('/t/:token', PublicController.trackPage);
 app.get('/d/:token', PublicController.deliveryPage);
 
+// Payment provider redirect landing pages (success / error).
+app.get('/payment-success', PublicController.paymentResultPage(true));
+app.get('/payment-error', PublicController.paymentResultPage(false));
+
 // Rate Limiting (strict) for the rest of the API
 app.use('/api/', RateLimitMiddleware.general);
 

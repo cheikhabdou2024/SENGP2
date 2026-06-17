@@ -3440,14 +3440,46 @@
                     throw new Error(payResult.error || 'Initialisation du paiement échouée');
                 }
 
-                // 3. Redirect the payer to the provider's payment page.
+                // 3. Open the provider's payment page.
                 const redirectUrl = payResult.data?.redirect_url;
-                if (redirectUrl) {
-                    window.location.href = redirectUrl;
-                } else {
+                const paymentId = payResult.data?.payment?.id;
+                if (!redirectUrl) {
                     alert('Mission créée, mais aucune URL de paiement n\'a été reçue.');
                     nextBtn.disabled = false;
                     nextBtn.textContent = 'Confirmer';
+                    return;
+                }
+
+                const Browser = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser;
+                if (Browser) {
+                    // App native : ouvrir Wave dans un navigateur in-app pour rester dans l'app.
+                    let handled = false;
+                    const onFinish = async () => {
+                        if (handled) return; handled = true;
+                        try { if (Browser.removeAllListeners) await Browser.removeAllListeners(); } catch (e) {}
+                        // Le webhook Wave peut arriver juste après : on vérifie le statut quelques fois.
+                        let status = 'pending';
+                        for (let i = 0; i < 6 && status !== 'completed'; i++) {
+                            try {
+                                const r = await fetch(`${window.API_BASE_URL}/payments/${paymentId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                                const j = await r.json();
+                                status = (j.data && j.data.status) || status;
+                            } catch (e) {}
+                            if (status !== 'completed') await new Promise(res => setTimeout(res, 2000));
+                        }
+                        if (status === 'completed') {
+                            alert('Paiement réussi ! Votre envoi est créé.');
+                            window.location.href = 'detailenvoi.html?id=' + mission.id;
+                        } else {
+                            alert('Paiement en cours de validation. Vous le verrez dans « Mes envois » dès confirmation.');
+                            window.location.href = 'dashexpediteur.html';
+                        }
+                    };
+                    try { await Browser.addListener('browserFinished', onFinish); } catch (e) {}
+                    await Browser.open({ url: redirectUrl, presentationStyle: 'popover' });
+                } else {
+                    // Web : navigation directe.
+                    window.location.href = redirectUrl;
                 }
             } catch (error) {
                 console.error('Payment flow error:', error);
