@@ -1594,6 +1594,10 @@
         window.addEventListener('load', () => {
             updatePagination();
 
+            // Accès direct à l'écran de choix du compte (ex. après déconnexion).
+            const _p = new URLSearchParams(location.search);
+            if (_p.get('choice') === '1') { goToScreen(4); }
+
             // Swipe navigation between onboarding screens (left = next, right = previous)
             const sc = document.querySelector('.screens-container');
             if (sc) {
