@@ -224,6 +224,44 @@
             align-items: center;
             justify-content: center;
             margin-top: 10px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .world-map-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 102, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 102, 0.05) 1px, transparent 1px);
+            background-size: 15px 15px;
+            background-position: center center;
+        }
+
+        .gps-target {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px; height: 50px;
+            border: 1px dashed rgba(0, 255, 102, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .gps-target::before {
+            content: ''; position: absolute; width: 2px; height: 8px; background: rgba(0, 255, 102, 0.5); top: -4px;
+        }
+        .gps-target::after {
+            content: ''; position: absolute; width: 2px; height: 8px; background: rgba(0, 255, 102, 0.5); bottom: -4px;
+        }
+        .gps-target-h::before {
+            content: ''; position: absolute; height: 2px; width: 8px; background: rgba(0, 255, 102, 0.5); left: -4px; top: 50%; transform: translateY(-50%);
+        }
+        .gps-target-h::after {
+            content: ''; position: absolute; height: 2px; width: 8px; background: rgba(0, 255, 102, 0.5); right: -4px; top: 50%; transform: translateY(-50%);
         }
 
         .radar-ping {
@@ -233,8 +271,7 @@
             background: rgba(0, 255, 102, 0.1);
             border: 1px solid rgba(0, 255, 102, 0.4);
             border-radius: 50%;
-            top: 10px;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             animation: radar 2s infinite ease-out;
         }
@@ -259,20 +296,51 @@
         .route-curve svg {
             width: 100%;
             height: 100%;
-            opacity: 0.4;
+            opacity: 0.6;
+        }
+
+        .path-animate {
+            stroke-dasharray: 6,4;
+            animation: path-move 10s linear infinite;
+        }
+
+        @keyframes path-move {
+            to { stroke-dashoffset: -100; }
         }
 
         .moving-plane {
             position: absolute;
-            font-size: 20px;
+            font-size: 24px;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
-            animation: fly-plane 4s ease-in-out infinite;
+            animation: move-package 5s ease-in-out infinite;
+            display: flex;
+        }
+
+        .delivery-check {
+            position: absolute;
+            right: -10px;
+            top: -10px;
+            font-size: 16px;
+            opacity: 0;
+            animation: show-check 5s ease-in-out infinite;
+            background: #fff;
+            border-radius: 50%;
+            width: 18px; height: 18px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         
-        @keyframes fly-plane {
-            0% { left: 5%; top: 35px; transform: rotate(15deg); }
-            50% { left: 50%; top: -5px; transform: rotate(5deg); }
-            100% { left: 85%; top: 35px; transform: rotate(-10deg); }
+        @keyframes move-package {
+            0% { left: 5%; top: 30px; transform: scale(0.8); }
+            40% { left: 50%; top: -5px; transform: scale(1.2); }
+            80% { left: 85%; top: 30px; transform: scale(1); }
+            100% { left: 85%; top: 30px; transform: scale(1); }
+        }
+
+        @keyframes show-check {
+            0%, 75% { opacity: 0; transform: scale(0); }
+            80%, 95% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0; transform: scale(1); }
         }
 
         .location-nodes {
@@ -287,7 +355,7 @@
             font-size: 10px;
             color: #aaa;
             font-weight: 500;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.6);
             padding: 2px 6px;
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.1);
@@ -1490,18 +1558,29 @@
                         <div class="live-tracking-card">
                             <div class="live-header">
                                 <span class="live-dot pulse-green"></span>
-                                <span class="live-text">Localisation en direct</span>
+                                <span class="live-text">Localisation GPS en direct</span>
                                 <span class="live-time">Mise à jour: instant</span>
                             </div>
                             
                             <div class="live-map-area">
-                                <div class="radar-ping"></div>
-                                <div class="radar-ping delay"></div>
+                                <!-- The MAP Background Grid -->
+                                <div class="world-map-bg"></div>
+                                
+                                <!-- GPS Crosshair / Radar -->
+                                <div class="gps-target">
+                                    <div class="gps-target-h"></div>
+                                    <div class="radar-ping"></div>
+                                    <div class="radar-ping delay"></div>
+                                </div>
+
                                 <div class="route-curve">
                                     <svg viewBox="0 0 200 50" preserveAspectRatio="none">
-                                        <path d="M10 40 Q 100 -10, 190 40" fill="none" stroke="#FF6B6B" stroke-width="2" stroke-dasharray="6,4"/>
+                                        <path d="M10 40 Q 100 -10, 190 40" fill="none" stroke="#00FF66" stroke-width="2" class="path-animate"/>
                                     </svg>
-                                    <div class="moving-plane">✈️</div>
+                                    <div class="moving-plane">
+                                        📦
+                                        <span class="delivery-check">✅</span>
+                                    </div>
                                 </div>
                                 <div class="location-nodes">
                                     <div class="node origin">Départ</div>
