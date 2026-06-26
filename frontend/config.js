@@ -32,6 +32,6 @@
   var isLocal = host === 'localhost' || host === '127.0.0.1' || host === '';
 
   window.API_BASE_URL = isLocal
-    ? 'http://localhost:5000/api/v1'
+    ? PROD_API_BASE_URL
     : '/api/v1';
 })();
