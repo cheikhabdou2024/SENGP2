@@ -163,88 +163,134 @@
             display: none !important;
         }
 
-        /* Modern Tracking UI for Screen 2 Bottom */
-        .tracking-ui {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            padding: 5px 0;
+        /* Premium Live Tracking UI for Screen 2 Bottom */
+        .live-tracking-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 15px;
             margin: 5px 0;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02);
         }
 
-        .tracking-step {
+        .live-header {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            opacity: 0.5;
-            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            font-size: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 8px;
         }
 
-        .tracking-step.completed, .tracking-step.active {
-            opacity: 1;
-        }
-
-        .step-icon {
-            font-size: 20px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(5px);
-            width: 44px;
-            height: 44px;
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #00FF66;
             border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .pulse-green {
+            box-shadow: 0 0 0 rgba(0, 255, 102, 0.4);
+            animation: pulse-green 1.5s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 102, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(0, 255, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 102, 0); }
+        }
+
+        .live-text {
+            color: #fff;
+            font-weight: 600;
+            flex-grow: 1;
+            letter-spacing: 0.5px;
+        }
+
+        .live-time {
+            color: #888;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .live-map-area {
+            position: relative;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
+            margin-top: 10px;
         }
 
-        .tracking-step.active .step-icon {
-            background: rgba(255, 107, 107, 0.2);
-            border-color: #FF6B6B;
-            box-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
-            animation: pulse-ring 2s infinite;
+        .radar-ping {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 255, 102, 0.1);
+            border: 1px solid rgba(0, 255, 102, 0.4);
+            border-radius: 50%;
+            top: 10px;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: radar 2s infinite ease-out;
         }
 
-        .step-text {
-            font-size: 11px;
-            font-weight: 500;
-            color: #ccc;
+        .radar-ping.delay {
+            animation-delay: 1s;
         }
 
-        .tracking-step.active .step-text {
-            color: #fff;
-            font-weight: 600;
+        @keyframes radar {
+            0% { width: 10px; height: 10px; opacity: 1; }
+            100% { width: 80px; height: 80px; opacity: 0; }
         }
 
-        .tracking-line {
-            height: 2px;
-            flex-grow: 1;
-            background: rgba(255,255,255,0.1);
-            margin: 0 8px;
-            position: relative;
-            top: -12px;
-            border-radius: 2px;
-            overflow: hidden;
+        .route-curve {
+            position: absolute;
+            width: 100%;
+            height: 50px;
+            top: 0;
+            left: 0;
         }
 
-        .tracking-line-progress {
+        .route-curve svg {
+            width: 100%;
             height: 100%;
-            width: 50%;
-            background: linear-gradient(90deg, #FF6B6B, #FFA07A);
-            border-radius: 2px;
-            animation: load-progress 2s ease-out forwards;
+            opacity: 0.4;
         }
 
-        @keyframes pulse-ring {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+        .moving-plane {
+            position: absolute;
+            font-size: 20px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+            animation: fly-plane 4s ease-in-out infinite;
         }
         
-        @keyframes load-progress {
-            0% { width: 0%; }
-            100% { width: 100%; }
+        @keyframes fly-plane {
+            0% { left: 5%; top: 35px; transform: rotate(15deg); }
+            50% { left: 50%; top: -5px; transform: rotate(5deg); }
+            100% { left: 85%; top: 35px; transform: rotate(-10deg); }
+        }
+
+        .location-nodes {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            position: absolute;
+            bottom: -5px;
+        }
+
+        .node {
+            font-size: 10px;
+            color: #aaa;
+            font-weight: 500;
+            background: rgba(0,0,0,0.4);
+            padding: 2px 6px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .screen2 h1 {
@@ -1441,24 +1487,26 @@
                             Suivez votre colis en temps réel
                         </h1>
                         
-                        <div class="tracking-ui">
-                            <div class="tracking-step completed">
-                                <div class="step-icon">📦</div>
-                                <div class="step-text">Pris</div>
+                        <div class="live-tracking-card">
+                            <div class="live-header">
+                                <span class="live-dot pulse-green"></span>
+                                <span class="live-text">Localisation en direct</span>
+                                <span class="live-time">Mise à jour: instant</span>
                             </div>
-                            <div class="tracking-line">
-                                <div class="tracking-line-progress" style="width: 100%;"></div>
-                            </div>
-                            <div class="tracking-step active">
-                                <div class="step-icon">✈️</div>
-                                <div class="step-text">Vol</div>
-                            </div>
-                            <div class="tracking-line">
-                                <div class="tracking-line-progress" style="width: 30%;"></div>
-                            </div>
-                            <div class="tracking-step">
-                                <div class="step-icon">📍</div>
-                                <div class="step-text">Arrivée</div>
+                            
+                            <div class="live-map-area">
+                                <div class="radar-ping"></div>
+                                <div class="radar-ping delay"></div>
+                                <div class="route-curve">
+                                    <svg viewBox="0 0 200 50" preserveAspectRatio="none">
+                                        <path d="M10 40 Q 100 -10, 190 40" fill="none" stroke="#FF6B6B" stroke-width="2" stroke-dasharray="6,4"/>
+                                    </svg>
+                                    <div class="moving-plane">✈️</div>
+                                </div>
+                                <div class="location-nodes">
+                                    <div class="node origin">Départ</div>
+                                    <div class="node dest">Destination</div>
+                                </div>
                             </div>
                         </div>
          
