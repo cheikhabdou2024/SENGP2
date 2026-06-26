@@ -82,23 +82,19 @@
             }
         }
 
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
+        .logo-img {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
             border-radius: 20px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 20px rgba(255, 107, 107, 0.2);
             margin-bottom: 16px;
-            animation: float 3s ease-in-out infinite;
+            animation: float 4s ease-in-out infinite;
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-8px); }
         }
 
         .welcome-text h1 {
@@ -404,7 +400,7 @@
         <div class="content">
             <!-- Logo -->
             <div class="logo-container">
-                <div class="logo">📦</div>
+                <img src="im/sengp-logo.jpg" class="logo-img" alt="SENGP Logo">
                 <div class="welcome-text">
                     <h1>Bon retour !</h1>
                     <p>Connectez-vous à votre compte</p>
