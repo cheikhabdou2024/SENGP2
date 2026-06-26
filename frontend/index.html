@@ -466,7 +466,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 30px 30px 20px;
+            padding: 30px 30px 100px;
         }
 
         h1 {
@@ -811,7 +811,7 @@
            ACCOUNT TYPE SCREEN - STYLES
            ============================================ */
         .account-type-content {
-            padding: 30px 30px 20px;
+            padding: 30px 30px 100px;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -1026,6 +1026,31 @@
         .screen3 .dot.active {
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             box-shadow: 0 2px 8px rgba(255, 215, 0, 0.6);
+        }
+
+
+        .global-bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 30px 20px;
+            background: rgba(15, 12, 41, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            transition: all 0.3s ease;
+        }
+        .global-bottom-nav .pagination {
+            margin-bottom: 15px;
+        }
+        .global-bottom-nav .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .bottom-nav {
@@ -1274,7 +1299,32 @@
             }
 
             /* Bottom navigation */
-            .bottom-nav {
+    
+        .global-bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 30px 20px;
+            background: rgba(15, 12, 41, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            transition: all 0.3s ease;
+        }
+        .global-bottom-nav .pagination {
+            margin-bottom: 15px;
+        }
+        .global-bottom-nav .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bottom-nav {
                 padding: 14px 25px 25px;
             }
 
@@ -1445,7 +1495,32 @@
                 padding: 8px 0;
             }
 
-            .bottom-nav {
+    
+        .global-bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 30px 20px;
+            background: rgba(15, 12, 41, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            transition: all 0.3s ease;
+        }
+        .global-bottom-nav .pagination {
+            margin-bottom: 15px;
+        }
+        .global-bottom-nav .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bottom-nav {
                 padding: 12px 25px 20px;
             }
 
@@ -1492,7 +1567,32 @@
                 padding-right: max(20px, env(safe-area-inset-right));
             }
 
-            .bottom-nav {
+    
+        .global-bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 30px 20px;
+            background: rgba(15, 12, 41, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            transition: all 0.3s ease;
+        }
+        .global-bottom-nav .pagination {
+            margin-bottom: 15px;
+        }
+        .global-bottom-nav .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bottom-nav {
                 padding-bottom: max(30px, env(safe-area-inset-bottom));
             }
 
@@ -1553,23 +1653,7 @@
                             rapide et en toute sécurité
                         </h1>
          
-                        <div class="pagination">
-                            <div class="dot active"></div>
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                        </div>
-
-                        <div class="bottom-nav-inline">
-                            <button class="btn btn-skip" onclick="skipOnboarding()">Passer</button>
-                            <button class="btn btn-next" onclick="nextScreen()">Suivant</button>
-                        </div>
                     </div>
-                </div>
-
-                <div class="bottom-nav">
-                    <button class="btn btn-skip" onclick="skipOnboarding()">Passer</button>
-                    <button class="btn btn-next" onclick="nextScreen()">Suivant</button>
                 </div>
             </div>
 
@@ -1624,23 +1708,7 @@
                             </div>
                         </div>
          
-                        <div class="pagination">
-                            <div class="dot"></div>
-                            <div class="dot active"></div>
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                        </div>
-
-                        <div class="bottom-nav-inline">
-                            <button class="btn btn-back" onclick="previousScreen()">Retour</button>
-                            <button class="btn btn-next" onclick="nextScreen()">Suivant</button>
-                        </div>
                     </div>
-                </div>
-
-                <div class="bottom-nav">
-                    <button class="btn btn-back" onclick="previousScreen()">Retour</button>
-                    <button class="btn btn-next" onclick="nextScreen()">Suivant</button>
                 </div>
             </div>
 
@@ -1662,23 +1730,7 @@
                             transportant des colis sûrs et vérifiés
                         </h1>
          
-                        <div class="pagination">
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                            <div class="dot active"></div>
-                            <div class="dot"></div>
-                        </div>
-
-                        <div class="bottom-nav-inline">
-                            <button class="btn btn-back" onclick="previousScreen()">Retour</button>
-                            <button class="btn btn-start" onclick="nextScreen()">Commencer</button>
-                        </div>
                     </div>
-                </div>
-
-                <div class="bottom-nav">
-                    <button class="btn btn-back" onclick="previousScreen()">Retour</button>
-                    <button class="btn btn-start" onclick="nextScreen()">Commencer</button>
                 </div>
             </div>
 
@@ -1759,14 +1811,25 @@
                     </button>
                 </div>
 
-                <div class="bottom-nav" style="display: none;">
-                    <button class="btn btn-back" onclick="previousScreen()">Retour</button>
-                    <button class="btn btn-next">Suivant</button>
-                </div>
+
 
                 
             </div>
 
+        </div>
+
+        <!-- Global Fixed Navigation -->
+        <div class="global-bottom-nav" id="globalNav" style="display: none;">
+            <div class="pagination" id="globalPagination">
+                <div class="dot active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-skip" id="btnGlobalLeft" onclick="handleGlobalLeft()">Passer</button>
+                <button class="btn btn-next" id="btnGlobalRight" onclick="handleGlobalRight()">Suivant</button>
+            </div>
         </div>
     </div>
 
@@ -1822,6 +1885,61 @@
             }
         }
 
+        function handleGlobalLeft() {
+            if (currentScreen === 1) {
+                skipOnboarding();
+            } else {
+                previousScreen();
+            }
+        }
+
+        function handleGlobalRight() {
+            nextScreen();
+        }
+
+        function updateGlobalNav(screenNumber) {
+            const globalNav = document.getElementById('globalNav');
+            const btnLeft = document.getElementById('btnGlobalLeft');
+            const btnRight = document.getElementById('btnGlobalRight');
+            
+            if (screenNumber >= 1 && screenNumber <= 3) {
+                globalNav.style.display = 'flex';
+                
+                // Update Left Button
+                if (screenNumber === 1) {
+                    btnLeft.textContent = 'Passer';
+                    btnLeft.className = 'btn btn-skip';
+                } else {
+                    btnLeft.textContent = 'Retour';
+                    btnLeft.className = 'btn btn-back';
+                }
+                
+                // Update Right Button
+                if (screenNumber === 3) {
+                    btnRight.textContent = 'Commencer';
+                    btnRight.className = 'btn btn-start';
+                } else {
+                    btnRight.textContent = 'Suivant';
+                    btnRight.className = 'btn btn-next';
+                }
+                
+                // Update dots
+                const dots = document.getElementById('globalPagination').querySelectorAll('.dot');
+                dots.forEach((dot, idx) => {
+                    dot.classList.toggle('active', idx === screenNumber - 1);
+                    if (idx === 2 && screenNumber === 3) {
+                        dot.style.background = 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)';
+                        dot.style.boxShadow = '0 2px 8px rgba(255, 215, 0, 0.6)';
+                    } else {
+                        dot.style.background = '';
+                        dot.style.boxShadow = '';
+                    }
+                });
+            } else {
+                globalNav.style.display = 'none';
+            }
+        }
+
         function goToScreen(screenNumber) {
             const currentScreenEl = document.querySelector(`.screen${currentScreen}`);
             const nextScreenEl = document.querySelector(`.screen${screenNumber}`);
@@ -1845,6 +1963,7 @@
 
                 // Update pagination dots
                 updatePagination();
+                updateGlobalNav(screenNumber);
             }
         }
 
