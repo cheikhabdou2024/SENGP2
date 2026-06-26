@@ -822,19 +822,22 @@
         .logo-container {
             margin-bottom: 20px;
             flex-shrink: 0;
+            display: flex;
+            justify-content: center;
         }
 
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
+        .logo-img {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
             border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
-            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 20px rgba(255, 107, 107, 0.2);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
         .header-text {
@@ -877,10 +880,15 @@
         }
 
         .account-card.selected {
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 230, 109, 0.2) 100%);
-            border-color: #FF6B6B;
-            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #00FF66;
+            box-shadow: 0 15px 35px rgba(0, 255, 102, 0.2), inset 0 0 15px rgba(0, 255, 102, 0.1);
             transform: translateY(-5px);
+        }
+
+        .account-card.unselected {
+            opacity: 0.4;
+            transform: scale(0.98);
         }
 
         .card-header {
@@ -972,8 +980,9 @@
         }
 
         .account-card.selected .check-indicator {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-            border-color: #4CAF50;
+            background: linear-gradient(135deg, #00FF66 0%, #00cc52 100%);
+            border-color: #00FF66;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.5);
         }
 
         .check-indicator::before {
@@ -1091,11 +1100,14 @@
         .continue-btn.active {
             opacity: 1;
             pointer-events: auto;
+            background: linear-gradient(135deg, #00FF66 0%, #00cc52 100%);
+            box-shadow: 0 8px 25px rgba(0, 255, 102, 0.4);
+            color: #1a1a2e;
         }
 
         .continue-btn.active:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(255, 107, 107, 0.5);
+            box-shadow: 0 12px 28px rgba(0, 255, 102, 0.5);
         }
 
         .login-link {
@@ -1688,7 +1700,7 @@
             <div class="screen screen4">
                 <div class="account-type-content">
                     <div class="logo-container">
-                        <div class="logo">📦</div>
+                        <img src="im/sengp-logo.jpg" class="logo-img" alt="SENGP Logo">
                     </div>
 
                     <div class="header-text">
@@ -1755,7 +1767,7 @@
                     </div>
 
                     <button class="continue-btn" id="continueBtn" onclick="continueToSignup()">
-                        Se connecter
+                        Continuer
                     </button>
                 </div>
 
@@ -1869,9 +1881,11 @@
             // Remove selection from all cards
             document.querySelectorAll('.account-card').forEach(card => {
                 card.classList.remove('selected');
+                card.classList.add('unselected');
             });
 
             // Add selection to clicked card
+            element.classList.remove('unselected');
             element.classList.add('selected');
             
             // Store selected type
