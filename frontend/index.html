@@ -133,6 +133,119 @@
             margin-bottom: 10px;
         }
 
+        /* Custom Screen 2 Layout (60/40) */
+        .screen2 .onboarding-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen2 .illustration {
+            height: 60%;
+            margin-bottom: 0;
+            flex-shrink: 0;
+        }
+
+        .screen2 .text-content {
+            height: 40%;
+            flex: none;
+            padding: 15px 30px;
+            justify-content: space-evenly;
+        }
+
+        .screen2 .bottom-nav {
+            display: none !important;
+        }
+
+        /* Modern Tracking UI for Screen 2 Bottom */
+        .tracking-ui {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 5px 0;
+            margin: 5px 0;
+        }
+
+        .tracking-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+        .tracking-step.completed, .tracking-step.active {
+            opacity: 1;
+        }
+
+        .step-icon {
+            font-size: 20px;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(5px);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tracking-step.active .step-icon {
+            background: rgba(255, 107, 107, 0.2);
+            border-color: #FF6B6B;
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
+            animation: pulse-ring 2s infinite;
+        }
+
+        .step-text {
+            font-size: 11px;
+            font-weight: 500;
+            color: #ccc;
+        }
+
+        .tracking-step.active .step-text {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .tracking-line {
+            height: 2px;
+            flex-grow: 1;
+            background: rgba(255,255,255,0.1);
+            margin: 0 8px;
+            position: relative;
+            top: -12px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .tracking-line-progress {
+            height: 100%;
+            width: 50%;
+            background: linear-gradient(90deg, #FF6B6B, #FFA07A);
+            border-radius: 2px;
+            animation: load-progress 2s ease-out forwards;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+        }
+        
+        @keyframes load-progress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .screen2 h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
         /* Screens 1 & 2 keep the original layout: image (onboarding1/2.png) in the
            top half, animated content + text + dots + buttons below. */
 
@@ -1306,57 +1419,48 @@
             <div class="screen screen2">
                 <div class="onboarding-content">
                     <div class="illustration">
-                        <img
-                            src="im/onboarding2.png"
-                            alt="Suivi de colis en temps réel"
-                            class="hero-image"
-                        />
+                        <video class="hero-image" autoplay loop muted playsinline style="object-fit: cover;">
+                            <source src="video/onboarding2.mp4" type="video/mp4">
+                        </video>
                         <div class="image-overlay"></div>
                     </div>
 
                     <div class="text-content">
-                        <div class="map-container">
-                            <div class="map-grid"></div>
-                            
-                            <div class="route-path">
-                                <div class="path-line"></div>
-                            </div>
-                            
-                            <div class="marker marker-start">
-                                <div class="marker-icon">
-                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="white">
-                                        <path d="M10 0C6.13 0 3 3.13 3 7c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S8.62 4.5 10 4.5s2.5 1.12 2.5 2.5S11.38 9.5 10 9.5z"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            
-                            <div class="marker marker-end">
-                                <div class="marker-icon">
-                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="white">
-                                        <path d="M10 0C6.13 0 3 3.13 3 7c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S8.62 4.5 10 4.5s2.5 1.12 2.5 2.5S11.38 9.5 10 9.5z"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            
-                            <div class="moving-package">
-                                <div class="package-icon"></div>
-                            </div>
-                            
-                            <div class="status-labels">
-                                <div class="status-label active">En transit</div>
-                                <div class="status-label">2h restantes</div>
-                            </div>
-                        </div>
-
                         <h1>
                             Suivez votre colis en temps réel
                         </h1>
+                        
+                        <div class="tracking-ui">
+                            <div class="tracking-step completed">
+                                <div class="step-icon">📦</div>
+                                <div class="step-text">Pris</div>
+                            </div>
+                            <div class="tracking-line">
+                                <div class="tracking-line-progress" style="width: 100%;"></div>
+                            </div>
+                            <div class="tracking-step active">
+                                <div class="step-icon">✈️</div>
+                                <div class="step-text">Vol</div>
+                            </div>
+                            <div class="tracking-line">
+                                <div class="tracking-line-progress" style="width: 30%;"></div>
+                            </div>
+                            <div class="tracking-step">
+                                <div class="step-icon">📍</div>
+                                <div class="step-text">Arrivée</div>
+                            </div>
+                        </div>
          
                         <div class="pagination">
                             <div class="dot"></div>
                             <div class="dot active"></div>
                             <div class="dot"></div>
                             <div class="dot"></div>
+                        </div>
+
+                        <div class="bottom-nav-inline">
+                            <button class="btn btn-back" onclick="previousScreen()">Retour</button>
+                            <button class="btn btn-next" onclick="nextScreen()">Suivant</button>
                         </div>
                     </div>
                 </div>
