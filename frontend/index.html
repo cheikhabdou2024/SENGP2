@@ -366,7 +366,42 @@
             margin-bottom: 5px;
         }
 
-        /* Screens 1 & 2 keep the original layout: image (onboarding1/2.png) in the
+        /* Custom Screen 3 Layout (70/30) */
+        .screen3 .onboarding-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen3 .illustration {
+            height: 70%;
+            margin-bottom: 0;
+            flex-shrink: 0;
+            position: relative;
+            background-color: #030816;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .screen3 .text-content {
+            height: 30%;
+            flex: none;
+            padding: 15px 30px;
+            justify-content: space-evenly;
+        }
+
+        .screen3 .bottom-nav {
+            display: none !important;
+        }
+        
+        .screen3 h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        /* Screens keep the original layout: image (onboarding1/2.png) in the
            top half, animated content + text + dots + buttons below. */
 
         /* Onboarding 3: full-bleed background image (dark scrim for legible text) */
@@ -1613,18 +1648,17 @@
                  SCREEN 3 - Onboarding 3 (Earnings)
                  ============================================ -->
             <div class="screen screen3">
-                <div class="screen3-bg"></div>
-                <div class="screen3-content">
-                    <div class="money-container">
-                        <div class="money">💵</div>
-                        <div class="money">💶</div>
-                        <div class="money">💴</div>
-                        <div class="money">💷</div>
-                        <div class="money">💸</div>
-                        
-                        <div class="wallet-center">
-                            <div class="wallet"></div>
-                        </div>
+                <div class="onboarding-content">
+                    <div class="illustration">
+                        <!-- Blurred Background Video -->
+                        <video autoplay loop muted playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(25px); opacity: 0.6; transform: scale(1.1);">
+                            <source src="video/onboarding3.mp4" type="video/mp4">
+                        </video>
+                        <!-- Foreground Video (Contain) -->
+                        <video class="hero-image" autoplay loop muted playsinline style="position: relative; width: 100%; height: 100%; object-fit: contain; z-index: 1;">
+                            <source src="video/onboarding3.mp4" type="video/mp4">
+                        </video>
+                        <div class="image-overlay" style="z-index: 2;"></div>
                     </div>
 
                     <div class="text-content">
@@ -1632,40 +1666,17 @@
                             Gagnez de l'argent en<br>
                             transportant des colis sûrs et vérifiés
                         </h1>
-
-                        <div class="stats-container">
-                            <div class="stat-card">
-                                <div class="stat-icon">💰</div>
-                                <div class="stat-value">Plus de gains</div>
-                                <div class="stat-label">à avoir</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon">✈️</div>
-                                <div class="stat-value">Plus de colis</div>
-                                <div class="stat-label">à transporter</div>
-                            </div>
-                        </div>
-
-                        <div class="benefits-list">
-                            <div class="benefit-item">
-                                <div class="benefit-icon">✓</div>
-                                <div class="benefit-text">Revenus supplémentaires sans effort</div>
-                            </div>
-                            <div class="benefit-item">
-                                <div class="benefit-icon">🛡️</div>
-                                <div class="benefit-text">Assurance complète incluse</div>
-                            </div>
-                            <div class="benefit-item">
-                                <div class="benefit-icon">⚡</div>
-                                <div class="benefit-text">Paiement rapide après livraison</div>
-                            </div>
-                        </div>
-
+         
                         <div class="pagination">
                             <div class="dot"></div>
                             <div class="dot"></div>
                             <div class="dot active"></div>
                             <div class="dot"></div>
+                        </div>
+
+                        <div class="bottom-nav-inline">
+                            <button class="btn btn-back" onclick="previousScreen()">Retour</button>
+                            <button class="btn btn-start" onclick="nextScreen()">Commencer</button>
                         </div>
                     </div>
                 </div>
