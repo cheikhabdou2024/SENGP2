@@ -1528,10 +1528,8 @@
             <!-- ============================================
                  SCREEN 0 - Splash Screen
                  ============================================ -->
-            <div class="screen screen0 active" style="background-color: #030816; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                <video autoplay muted playsinline onended="goToScreen(1)" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
-                    <source src="video/Splashscreen.mp4" type="video/mp4">
-                </video>
+            <div class="screen screen0 active" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                <img src="video/Splashscreen.gif" style="width: 100%; height: 100%; object-fit: contain;" onload="setTimeout(() => goToScreen(1), 4000)" alt="Splashscreen GIF">
             </div>
 
             <!-- ============================================
