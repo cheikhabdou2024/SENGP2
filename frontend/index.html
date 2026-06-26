@@ -89,6 +89,50 @@
             transform: translateX(-100%);
         }
 
+        /* Splash Screen */
+        .screen0 {
+            background-color: #0f0c29;
+            z-index: 10;
+        }
+        
+        /* Custom Screen 1 Layout (70/30) */
+        .screen1 .onboarding-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen1 .illustration {
+            height: 70%;
+            margin-bottom: 0;
+            flex-shrink: 0;
+        }
+
+        .screen1 .text-content {
+            height: 30%;
+            flex: none;
+            padding: 15px 30px;
+            justify-content: space-evenly;
+        }
+
+        .screen1 .bottom-nav {
+            display: none !important; /* Hide default absolute nav */
+        }
+
+        .bottom-nav-inline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        /* Adjust h1 for Screen 1 so it fits in 30% */
+        .screen1 h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
         /* Screens 1 & 2 keep the original layout: image (onboarding1/2.png) in the
            top half, animated content + text + dots + buttons below. */
 
@@ -1202,16 +1246,23 @@
         <div class="screens-container">
             
             <!-- ============================================
+                 SCREEN 0 - Splash Screen
+                 ============================================ -->
+            <div class="screen screen0 active">
+                <video autoplay muted playsinline onended="goToScreen(1)" style="width: 100%; height: 100%; object-fit: cover;">
+                    <source src="video/Splashscreen.mp4" type="video/mp4">
+                </video>
+            </div>
+
+            <!-- ============================================
                  SCREEN 1 - Onboarding 1
                  ============================================ -->
-            <div class="screen screen1 active">
+            <div class="screen screen1">
                 <div class="onboarding-content">
                     <div class="illustration">
-                        <img
-                            src="im/onboarding1.png"
-                            alt="Transport international"
-                            class="hero-image"
-                        />
+                        <video class="hero-image" autoplay loop muted playsinline>
+                            <source src="video/onboarding1.mp4" type="video/mp4">
+                        </video>
                         <div class="image-overlay"></div>
                     </div>
 
@@ -1229,6 +1280,11 @@
                             <div class="dot"></div>
                             <div class="dot"></div>
                             <div class="dot"></div>
+                        </div>
+
+                        <div class="bottom-nav-inline">
+                            <button class="btn btn-skip" onclick="skipOnboarding()">Passer</button>
+                            <button class="btn btn-next" onclick="nextScreen()">Suivant</button>
                         </div>
                     </div>
                 </div>
@@ -1462,7 +1518,7 @@
     </div>
 
     <script>
-        let currentScreen = 1;
+        let currentScreen = 0;
         const totalScreens = 4;
         let selectedAccountType = null;
 
