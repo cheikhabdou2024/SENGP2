@@ -1629,7 +1629,7 @@
                  SCREEN 0 - Splash Screen
                  ============================================ -->
             <div class="screen screen0 active" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                <img src="video/splash.gif" style="width: 100%; height: 100%; object-fit: contain;" onload="setTimeout(() => goToScreen(1), 2900)" alt="Splashscreen">
+                <img src="im/splash.gif" style="width: 100%; height: 100%; object-fit: contain;" onload="scheduleSplashAdvance()" onerror="scheduleSplashAdvance()" alt="Splashscreen">
             </div>
 
             <!-- ============================================
@@ -1639,7 +1639,7 @@
                 <div class="onboarding-content">
                     <div class="illustration">
                         <video class="hero-image" autoplay loop muted playsinline>
-                            <source src="video/onboarding1.mp4" type="video/mp4">
+                            <source src="im/onboarding1.mp4" type="video/mp4">
                         </video>
                         <div class="image-overlay"></div>
                     </div>
@@ -1664,7 +1664,7 @@
                 <div class="onboarding-content">
                     <div class="illustration">
                         <video class="hero-image" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover;">
-                            <source src="video/onboarding2.mp4" type="video/mp4">
+                            <source src="im/onboarding2.mp4" type="video/mp4">
                         </video>
                         <div class="image-overlay" style="z-index: 2;"></div>
                     </div>
@@ -1719,7 +1719,7 @@
                 <div class="onboarding-content">
                     <div class="illustration">
                         <video class="hero-image" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover;">
-                            <source src="video/onboarding3.mp4" type="video/mp4">
+                            <source src="im/onboarding3.mp4" type="video/mp4">
                         </video>
                         <div class="image-overlay" style="z-index: 2;"></div>
                     </div>
@@ -1837,6 +1837,20 @@
         let currentScreen = 0;
         const totalScreens = 4;
         let selectedAccountType = null;
+
+        // Splash → onboarding handoff. The splash.gif plays for exactly 2.9s, then
+        // we advance to the first onboarding screen. Guarded so it only fires once
+        // (img onload/onerror + a hard fallback all funnel through here) and so a
+        // ?choice=1 deep-link to the account screen is never overridden.
+        let _splashAdvanced = false;
+        function scheduleSplashAdvance(delay) {
+            if (_splashAdvanced) return;
+            setTimeout(() => {
+                if (_splashAdvanced) return;
+                _splashAdvanced = true;
+                goToScreen(1);
+            }, delay === undefined ? 2900 : delay);
+        }
 
         // Text rotation for screen 1
         const texts = [
@@ -2027,7 +2041,14 @@
 
             // Accès direct à l'écran de choix du compte (ex. après déconnexion).
             const _p = new URLSearchParams(location.search);
-            if (_p.get('choice') === '1') { goToScreen(4); }
+            if (_p.get('choice') === '1') {
+                _splashAdvanced = true; // ne pas laisser le splash écraser cet écran
+                goToScreen(4);
+            } else {
+                // Filet de sécurité : si onload/onerror du GIF ne se déclenchent pas
+                // (décodage lent, cache), on quitte quand même le splash après 4s.
+                scheduleSplashAdvance(4000);
+            }
 
             // Swipe navigation between onboarding screens (left = next, right = previous)
             const sc = document.querySelector('.screens-container');

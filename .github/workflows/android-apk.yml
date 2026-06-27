@@ -74,6 +74,51 @@ jobs:
           echo "=== uses-permission / scheme in manifest ==="
           grep -nE "uses-permission|android:scheme" frontend/android/app/src/main/AndroidManifest.xml || true
 
+      - name: Dark native splash background (blend into splash.gif, no white flash)
+        run: |
+          python3 - <<'PY' || true
+          import re, os
+          base = 'frontend/android/app/src/main/res'
+          styles = base + '/values/styles.xml'
+          colors = base + '/values/colors.xml'
+          DARK = '#1a1a2e'  # same dark as the web splash background
+          # 1) ensure a dark splash color exists
+          try:
+              c = open(colors, encoding='utf-8').read() if os.path.exists(colors) \
+                  else '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n</resources>\n'
+              if 'name="splashBackground"' not in c:
+                  c = c.replace('</resources>',
+                                '    <color name="splashBackground">%s</color>\n</resources>' % DARK, 1)
+                  open(colors, 'w', encoding='utf-8').write(c)
+          except Exception as e:
+              print('colors patch skipped:', e)
+          # 2) point the generated launch theme at the dark background
+          try:
+              s = open(styles, encoding='utf-8').read()
+              m = re.search(r'<style name="AppTheme\.NoActionBarLaunch"[^>]*>.*?</style>', s, re.S)
+              if m:
+                  blk = m.group(0)
+                  add = ''
+                  # androidx Theme.SplashScreen attr (covers Android 12+ system splash)
+                  if 'SplashScreen' in blk and 'windowSplashScreenBackground' not in blk:
+                      add += '\n        <item name="windowSplashScreenBackground">@color/splashBackground</item>'
+                  # window background (covers pre-12 + the frame before the webview paints)
+                  if 'android:windowBackground' not in blk:
+                      add += '\n        <item name="android:windowBackground">@color/splashBackground</item>'
+                  if add:
+                      s = s[:m.start()] + blk.replace('</style>', add + '\n    </style>', 1) + s[m.end():]
+                      open(styles, 'w', encoding='utf-8').write(s)
+                      print('splash theme set to dark')
+                  else:
+                      print('splash theme already dark')
+              else:
+                  print('launch theme not found; native splash bg left as default')
+          except Exception as e:
+              print('styles patch skipped:', e)
+          PY
+          echo "=== launch theme ==="
+          grep -nA6 'NoActionBarLaunch' frontend/android/app/src/main/res/values/styles.xml || true
+
       - name: Force deterministic debug signing (fixed SHA-1 for Google Sign-In)
         run: |
           # Decode our committed debug keystore into the app module.
