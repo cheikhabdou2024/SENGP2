@@ -74,11 +74,12 @@ jobs:
           echo "=== uses-permission / scheme in manifest ==="
           grep -nE "uses-permission|android:scheme" frontend/android/app/src/main/AndroidManifest.xml || true
 
-      - name: Brand the native splash (dark bg + SEN GP splash icon)
+      - name: Plain navy native splash (transparent icon, no double logo)
         run: |
-          # Install the branded splash icon (a square crop of the gif's first
-          # frame) so the Android 12 system splash shows our SEN GP scene instead
-          # of the generic launcher icon. The web gif then animates from there.
+          # The Android 12 system splash can't be removed, but we make it a plain
+          # navy screen matching the web splash: a fully transparent icon hides the
+          # logo (otherwise it defaults to the launcher icon), so the logo appears
+          # only once -- in the web splash with the shimmer.
           mkdir -p frontend/android/app/src/main/res/drawable
           cp frontend/ci/splash_icon.png frontend/android/app/src/main/res/drawable/splash_icon.png
           python3 - <<'PY' || true
@@ -110,8 +111,8 @@ jobs:
                   # window background (covers pre-12 + the frame before the webview paints)
                   if 'android:windowBackground' not in blk:
                       add += '\n        <item name="android:windowBackground">@color/splashBackground</item>'
-                  # branded splash icon = SEN GP scene (replaces the launcher icon).
-                  # No icon background color -> shown unmasked, centered on the dark bg.
+                  # transparent splash icon -> hides the default launcher icon so the
+                  # system splash is just the navy background (no logo, no double logo).
                   if 'SplashScreen' in blk and 'windowSplashScreenAnimatedIcon' not in blk:
                       add += '\n        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>'
                   if add:
