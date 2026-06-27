@@ -982,8 +982,14 @@
         // ---------- Suivi live : partage de position GPS (Phase 1) ----------
         const ACTIVE_STATUSES = ['accepted','picked_up','in_transit','in_customs','out_for_delivery'];
         let locShareTimer = null;   // envoi périodique (filet de sécurité)
-        let locWatchId = null;      // suivi continu (watchPosition)
+        let locWatchId = null;      // suivi continu premier plan (watchPosition)
+        let bgWatcherId = null;     // suivi arrière-plan (service de premier plan)
         let _lastPushTs = 0, _lastLat = null, _lastLng = null;
+
+        const IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+        // Plugin de géoloc en arrière-plan (Android foreground-service / iOS background).
+        const BG_GEO = (IS_NATIVE && window.Capacitor && window.Capacitor.registerPlugin)
+            ? window.Capacitor.registerPlugin('BackgroundGeolocation') : null;
 
         function locShareUI(on, sub) {
             document.getElementById('locShareIcon').textContent = on ? '🛰️' : '📍';
@@ -1101,6 +1107,30 @@
 
         async function startLocationWatch() {
             stopLocationWatch();
+            // 1) Suivi en ARRIÈRE-PLAN : continue même app fermée / écran verrouillé.
+            //    Android : service de premier plan (notification persistante). iOS : background.
+            if (BG_GEO) {
+                try {
+                    bgWatcherId = await BG_GEO.addWatcher({
+                        backgroundTitle: 'SEN GP — suivi de livraison',
+                        backgroundMessage: 'Partage de votre position pendant le trajet.',
+                        requestPermissions: true,
+                        stale: false,
+                        distanceFilter: 50
+                    }, (location, error) => {
+                        if (error) {
+                            if (error.code === 'NOT_AUTHORIZED') {
+                                locShareUI(true, 'Autorisez « Toujours » la localisation');
+                            }
+                            console.warn('background geolocation', error);
+                            return;
+                        }
+                        if (location) _onWatchPos(location.latitude, location.longitude);
+                    });
+                    return;
+                } catch (e) { console.warn('background geolocation indisponible, fallback', e); }
+            }
+            // 2) Fallback PREMIER PLAN : watchPosition (Capacitor Geolocation ou Web/PWA).
             const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
             try {
                 if (Geo && Geo.watchPosition) {
@@ -1119,6 +1149,10 @@
         }
 
         function stopLocationWatch() {
+            if (bgWatcherId != null && BG_GEO) {
+                try { BG_GEO.removeWatcher({ id: bgWatcherId }); } catch (e) { /* ignore */ }
+                bgWatcherId = null;
+            }
             if (locWatchId == null) return;
             const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
             try {

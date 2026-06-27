@@ -53,6 +53,11 @@ jobs:
               'android.permission.RECORD_AUDIO',
               'android.permission.ACCESS_FINE_LOCATION',
               'android.permission.ACCESS_COARSE_LOCATION',
+              # Background location tracking (GP position during the whole trip)
+              'android.permission.ACCESS_BACKGROUND_LOCATION',
+              'android.permission.FOREGROUND_SERVICE',
+              'android.permission.FOREGROUND_SERVICE_LOCATION',
+              'android.permission.POST_NOTIFICATIONS',
           ]
           add = ''.join('\n    <uses-permission android:name="%s" />' % x for x in perms if x not in s)
           if add:
