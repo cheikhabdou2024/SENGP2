@@ -119,6 +119,31 @@ jobs:
           echo "=== launch theme ==="
           grep -nA6 'NoActionBarLaunch' frontend/android/app/src/main/res/values/styles.xml || true
 
+      - name: Allow muted video autoplay in the WebView (splash + onboarding)
+        run: |
+          mkdir -p frontend/android/app/src/main/java/com/sengp/app
+          cat > frontend/android/app/src/main/java/com/sengp/app/MainActivity.java <<'JAVA'
+          package com.sengp.app;
+
+          import android.os.Bundle;
+          import com.getcapacitor.BridgeActivity;
+
+          public class MainActivity extends BridgeActivity {
+              @Override
+              public void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  // Android WebView blocks autoplay without a user gesture by default,
+                  // which shows a play-button poster instead of playing the splash and
+                  // onboarding <video autoplay muted> elements. Allow muted autoplay.
+                  if (this.bridge != null && this.bridge.getWebView() != null) {
+                      this.bridge.getWebView().getSettings().setMediaPlaybackRequiresUserGesture(false);
+                  }
+              }
+          }
+          JAVA
+          echo "=== MainActivity.java ==="
+          cat frontend/android/app/src/main/java/com/sengp/app/MainActivity.java
+
       - name: Force deterministic debug signing (fixed SHA-1 for Google Sign-In)
         run: |
           # Decode our committed debug keystore into the app module.
