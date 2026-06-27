@@ -1415,7 +1415,7 @@
             const rows = list.map(m => {
                 const price = parseFloat(m.price || 0).toLocaleString('fr-FR');
                 const info = getStatusInfo(m.status);
-                return `<div class="sengp-list-item" onclick="window.location.href='detailenvoi.html?id=${m.id}'">
+                return `<div class="sengp-list-item" onclick="window.location.href='detailmissiongp.html?id=${m.id}'">
                     <div style="flex:1;min-width:0;">
                         <div style="font-weight:700;color:#fff;font-size:13px;">
                             ${getCountryFlag(m.departure_country)} ${m.departure_city || '?'} → ${getCountryFlag(m.arrival_country)} ${m.arrival_city || '?'}
