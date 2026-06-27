@@ -1721,6 +1721,28 @@
 
                     <div class="text-content">
                         <h1>
+                            Gagnez de l'argent en<br>
+                            transportant des colis sûrs et vérifiés
+                        </h1>
+         
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 SCREEN 3 - Onboarding 3 (Earnings)
+                 ============================================ -->
+            <div class="screen screen3">
+                <div class="onboarding-content">
+                    <div class="illustration">
+                        <video class="hero-image" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover;">
+                            <source src="im/onboarding2.mp4" type="video/mp4">
+                        </video>
+                        <div class="image-overlay" style="z-index: 2;"></div>
+                    </div>
+
+                    <div class="text-content">
+                        <h1>
                             Suivez votre colis en temps réel
                         </h1>
                         
@@ -1757,28 +1779,6 @@
                                 </div>
                             </div>
                         </div>
-         
-                    </div>
-                </div>
-            </div>
-
-            <!-- ============================================
-                 SCREEN 3 - Onboarding 3 (Earnings)
-                 ============================================ -->
-            <div class="screen screen3">
-                <div class="onboarding-content">
-                    <div class="illustration">
-                        <video class="hero-image" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover;">
-                            <source src="im/onboarding2.mp4" type="video/mp4">
-                        </video>
-                        <div class="image-overlay" style="z-index: 2;"></div>
-                    </div>
-
-                    <div class="text-content">
-                        <h1>
-                            Gagnez de l'argent en<br>
-                            transportant des colis sûrs et vérifiés
-                        </h1>
          
                     </div>
                 </div>
@@ -1888,7 +1888,7 @@
         let selectedAccountType = null;
 
         // Splash → onboarding handoff. The branded logo (with the glass shimmer)
-        // shows for 2.9s, then we advance to the first onboarding screen. Guarded so
+        // shows for 5s, then we advance to the first onboarding screen. Guarded so
         // it only fires once (img onload/onerror + a hard fallback all funnel through
         // here) and so a ?choice=1 deep-link to the account screen is never overridden.
         let _splashAdvanced = false;
@@ -1898,7 +1898,7 @@
                 if (_splashAdvanced) return;
                 _splashAdvanced = true;
                 goToScreen(1);
-            }, delay === undefined ? 2900 : delay);
+            }, delay === undefined ? 5000 : delay);
         }
 
         // Text rotation for screen 1
@@ -2094,9 +2094,9 @@
                 _splashAdvanced = true; // ne pas laisser le splash écraser cet écran
                 goToScreen(4);
             } else {
-                // Filet de sécurité : si onload/onerror du GIF ne se déclenchent pas
-                // (décodage lent, cache), on quitte quand même le splash après 4s.
-                scheduleSplashAdvance(4000);
+                // Filet de sécurité : si onload/onerror de l'image ne se déclenchent
+                // pas (décodage lent, cache), on quitte quand même le splash.
+                scheduleSplashAdvance(6500);
             }
 
             // Swipe navigation between onboarding screens (left = next, right = previous)
