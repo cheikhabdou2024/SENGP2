@@ -74,8 +74,13 @@ jobs:
           echo "=== uses-permission / scheme in manifest ==="
           grep -nE "uses-permission|android:scheme" frontend/android/app/src/main/AndroidManifest.xml || true
 
-      - name: Dark native splash background (blend into splash.gif, no white flash)
+      - name: Brand the native splash (dark bg + SEN GP splash icon)
         run: |
+          # Install the branded splash icon (a square crop of the gif's first
+          # frame) so the Android 12 system splash shows our SEN GP scene instead
+          # of the generic launcher icon. The web gif then animates from there.
+          mkdir -p frontend/android/app/src/main/res/drawable
+          cp frontend/ci/splash_icon.png frontend/android/app/src/main/res/drawable/splash_icon.png
           python3 - <<'PY' || true
           import re, os
           base = 'frontend/android/app/src/main/res'
@@ -105,6 +110,10 @@ jobs:
                   # window background (covers pre-12 + the frame before the webview paints)
                   if 'android:windowBackground' not in blk:
                       add += '\n        <item name="android:windowBackground">@color/splashBackground</item>'
+                  # branded splash icon = SEN GP scene (replaces the launcher icon).
+                  # No icon background color -> shown unmasked, centered on the dark bg.
+                  if 'SplashScreen' in blk and 'windowSplashScreenAnimatedIcon' not in blk:
+                      add += '\n        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>'
                   if add:
                       s = s[:m.start()] + blk.replace('</style>', add + '\n    </style>', 1) + s[m.end():]
                       open(styles, 'w', encoding='utf-8').write(s)
@@ -117,7 +126,8 @@ jobs:
               print('styles patch skipped:', e)
           PY
           echo "=== launch theme ==="
-          grep -nA6 'NoActionBarLaunch' frontend/android/app/src/main/res/values/styles.xml || true
+          grep -nA8 'NoActionBarLaunch' frontend/android/app/src/main/res/values/styles.xml || true
+          ls -l frontend/android/app/src/main/res/drawable/splash_icon.png || true
 
       - name: Allow muted video autoplay in the WebView (splash + onboarding)
         run: |
