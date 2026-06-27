@@ -646,6 +646,151 @@
         .nav-badge.hidden {
             display: none;
         }
+
+        /* ============ Popup GPS obligatoire ============ */
+        .gps-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: radial-gradient(130% 120% at 50% 0%, rgba(20,18,46,0.86) 0%, rgba(8,8,18,0.93) 100%);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+
+        .gps-gate.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .gps-gate-card {
+            width: 100%;
+            max-width: 340px;
+            position: relative;
+            text-align: center;
+            padding: 62px 24px 26px;
+            border-radius: 26px;
+            background: linear-gradient(160deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.04) 100%);
+            border: 1px solid rgba(255,215,0,0.28);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.12);
+            transform: translateY(16px) scale(0.96);
+            transition: transform 0.45s cubic-bezier(0.22,1,0.36,1);
+        }
+
+        .gps-gate.show .gps-gate-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .gps-gate-logo {
+            position: absolute;
+            top: -38px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 76px;
+            height: 76px;
+            border-radius: 22px;
+            object-fit: cover;
+            background: #0b1a30;
+            border: 2px solid rgba(255,215,0,0.6);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.5), 0 0 22px rgba(255,215,0,0.28);
+        }
+
+        .gps-gate-radar {
+            width: 92px;
+            height: 92px;
+            margin: 2px auto 16px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gps-gate-radar .pin {
+            font-size: 40px;
+            z-index: 2;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
+        }
+
+        .gps-gate-radar::before,
+        .gps-gate-radar::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 2px solid rgba(78,205,196,0.5);
+            animation: gpsPing 2s ease-out infinite;
+        }
+
+        .gps-gate-radar::after { animation-delay: 1s; }
+
+        @keyframes gpsPing {
+            0%   { transform: scale(0.4); opacity: 0.9; }
+            100% { transform: scale(1.25); opacity: 0; }
+        }
+
+        .gps-gate-card h2 {
+            font-size: 21px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 55%, #4ECDC4 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gps-gate-card p {
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.78);
+            margin-bottom: 22px;
+        }
+
+        .gps-gate-card p b { color: #FFE08A; font-weight: 700; }
+
+        .gps-gate-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 800;
+            color: #1a1a2e;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            box-shadow: 0 12px 26px rgba(255,184,0,0.45);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .gps-gate-btn:active { transform: translateY(1px) scale(0.99); }
+        .gps-gate-btn:disabled { opacity: 0.65; cursor: default; }
+
+        .gps-gate-status {
+            margin-top: 14px;
+            min-height: 16px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #FF8E8E;
+        }
+
+        .gps-gate-status.ok { color: #4ECDC4; }
+
+        .gps-gate-hint {
+            margin-top: 8px;
+            font-size: 11.5px;
+            color: rgba(255,255,255,0.45);
+        }
+
             /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
@@ -804,6 +949,21 @@
         </div>
     </div>
 
+    <!-- Popup GPS obligatoire (s'impose au GP avant toute action) -->
+    <div class="gps-gate" id="gpsGate" role="dialog" aria-modal="true" aria-labelledby="gpsGateTitle">
+        <div class="gps-gate-card">
+            <img src="im/sengp-logo.jpg" class="gps-gate-logo" alt="SEN GP">
+            <div class="gps-gate-radar"><span class="pin">📍</span></div>
+            <h2 id="gpsGateTitle">Activez votre GPS</h2>
+            <p>Pour accepter et réaliser des missions, SEN GP doit <b>suivre votre position en temps réel</b> pendant tout le trajet, jusqu'à la livraison. Activez le GPS avant de continuer.</p>
+            <button class="gps-gate-btn" id="gpsGateBtn" onclick="gpsGateOk()">
+                <span>🛰️</span><span id="gpsGateBtnLabel">OK, activer le GPS</span>
+            </button>
+            <div class="gps-gate-status" id="gpsGateStatus"></div>
+            <div class="gps-gate-hint">Vous pourrez gérer cette autorisation dans les réglages de votre téléphone.</div>
+        </div>
+    </div>
+
     <script>
         // API Configuration
         const API_BASE_URL = window.API_BASE_URL;
@@ -813,14 +973,17 @@
         // Check authentication on page load
         window.addEventListener('DOMContentLoaded', async () => {
             await checkAuthentication();
+            // Le popup GPS s'impose avant toute interaction avec le dashboard.
+            await enforceGpsGate();
             await loadDashboardData();
             hideEmptyBadges();
-            initLocationShare();
         });
 
         // ---------- Suivi live : partage de position GPS (Phase 1) ----------
         const ACTIVE_STATUSES = ['accepted','picked_up','in_transit','in_customs','out_for_delivery'];
-        let locShareTimer = null;
+        let locShareTimer = null;   // envoi périodique (filet de sécurité)
+        let locWatchId = null;      // suivi continu (watchPosition)
+        let _lastPushTs = 0, _lastLat = null, _lastLng = null;
 
         function locShareUI(on, sub) {
             document.getElementById('locShareIcon').textContent = on ? '🛰️' : '📍';
@@ -828,9 +991,72 @@
             document.getElementById('locShareSub').textContent = sub || (on ? 'Suivi live activé' : 'Suivi live désactivé');
         }
 
-        function initLocationShare() {
-            if (localStorage.getItem('gpLiveShare') === '1') startLocationShare();
-            else locShareUI(false);
+        // ---- Popup GPS obligatoire ----
+        function showGpsGate() { document.getElementById('gpsGate').classList.add('show'); }
+        function hideGpsGate() { document.getElementById('gpsGate').classList.remove('show'); }
+        function gpsGateStatus(msg, ok) {
+            const el = document.getElementById('gpsGateStatus');
+            el.textContent = msg || '';
+            el.classList.toggle('ok', !!ok);
+        }
+
+        // État de la permission de localisation (Capacitor natif ou Web/PWA).
+        async function gpsPermissionState() {
+            const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
+            if (Geo && Geo.checkPermissions) {
+                try {
+                    const p = await Geo.checkPermissions();
+                    return p.location || p.coarseLocation || 'prompt';
+                } catch (e) { /* ignore */ }
+            }
+            if (navigator.permissions && navigator.permissions.query) {
+                try { return (await navigator.permissions.query({ name: 'geolocation' })).state; }
+                catch (e) { /* ignore */ }
+            }
+            return 'prompt';
+        }
+
+        // S'impose au GP : si la permission n'est pas accordée (ou le suivi pas encore
+        // actif), on affiche le popup obligatoire ; sinon on relance le partage.
+        async function enforceGpsGate() {
+            locShareUI(false);
+            const st = await gpsPermissionState();
+            if (st === 'granted' && localStorage.getItem('gpLiveShare') === '1') {
+                startLocationShare();
+                return;
+            }
+            showGpsGate();
+        }
+
+        // Clic sur « OK, activer le GPS » : demande la permission puis démarre le suivi.
+        async function gpsGateOk() {
+            const btn = document.getElementById('gpsGateBtn');
+            btn.disabled = true;
+            gpsGateStatus('Activation du GPS…', true);
+            try {
+                const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
+                if (Geo && Geo.requestPermissions) {
+                    const p = await Geo.requestPermissions();
+                    const s = p.location || p.coarseLocation;
+                    if (s !== 'granted') {
+                        gpsGateStatus('Autorisation refusée. Activez la localisation dans les réglages, puis réessayez.', false);
+                        document.getElementById('gpsGateBtnLabel').textContent = 'Réessayer';
+                        btn.disabled = false;
+                        return;
+                    }
+                }
+                // Déclenche un vrai relevé (et, sur Android, l'invite à activer la
+                // localisation du téléphone si elle est éteinte).
+                await getPosition();
+                gpsGateStatus('GPS activé ✓', true);
+                await startLocationShare();
+                setTimeout(hideGpsGate, 500);
+            } catch (e) {
+                const msg = (e && e.message) ? e.message : 'GPS indisponible';
+                gpsGateStatus('Activez la localisation de votre téléphone, puis réessayez. (' + msg + ')', false);
+                document.getElementById('gpsGateBtnLabel').textContent = 'Réessayer';
+                btn.disabled = false;
+            }
         }
 
         function toggleLocationShare() {
@@ -841,6 +1067,7 @@
         function stopLocationShare() {
             localStorage.removeItem('gpLiveShare');
             if (locShareTimer) { clearInterval(locShareTimer); locShareTimer = null; }
+            stopLocationWatch();
             locShareUI(false);
         }
 
@@ -849,8 +1076,56 @@
             locShareUI(true, 'Activation…');
             await sendLocationOnce();
             if (locShareTimer) clearInterval(locShareTimer);
-            // Envoi périodique (toutes les 2 min) tant que l'app est ouverte.
+            // Filet : un envoi périodique même si watchPosition ne déclenche pas.
             locShareTimer = setInterval(sendLocationOnce, 120000);
+            // Suivi continu temps réel pendant tout le trajet.
+            startLocationWatch();
+        }
+
+        // ---- Suivi continu (watchPosition) ----
+        function _haversine(la1, lo1, la2, lo2) {
+            const R = 6371000, t = x => x * Math.PI / 180;
+            const dLa = t(la2 - la1), dLo = t(lo2 - lo1);
+            const a = Math.sin(dLa/2)**2 + Math.cos(t(la1)) * Math.cos(t(la2)) * Math.sin(dLo/2)**2;
+            return 2 * R * Math.asin(Math.sqrt(a));
+        }
+
+        function _onWatchPos(lat, lng) {
+            const now = Date.now();
+            const moved = (_lastLat == null) ? Infinity : _haversine(_lastLat, _lastLng, lat, lng);
+            // Throttle : au plus un envoi / 45 s, sauf déplacement > 120 m.
+            if (now - _lastPushTs < 45000 && moved < 120) return;
+            _lastPushTs = now; _lastLat = lat; _lastLng = lng;
+            pushLocationToActiveMissions(lat, lng);
+        }
+
+        async function startLocationWatch() {
+            stopLocationWatch();
+            const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
+            try {
+                if (Geo && Geo.watchPosition) {
+                    locWatchId = await Geo.watchPosition(
+                        { enableHighAccuracy: true, timeout: 30000, maximumAge: 10000 },
+                        (pos) => { if (pos && pos.coords) _onWatchPos(pos.coords.latitude, pos.coords.longitude); }
+                    );
+                } else if (navigator.geolocation && navigator.geolocation.watchPosition) {
+                    locWatchId = navigator.geolocation.watchPosition(
+                        (p) => _onWatchPos(p.coords.latitude, p.coords.longitude),
+                        (err) => console.warn('watch error', err),
+                        { enableHighAccuracy: true, timeout: 30000, maximumAge: 10000 }
+                    );
+                }
+            } catch (e) { console.warn('startLocationWatch', e); }
+        }
+
+        function stopLocationWatch() {
+            if (locWatchId == null) return;
+            const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
+            try {
+                if (Geo && Geo.clearWatch) Geo.clearWatch({ id: locWatchId });
+                else if (navigator.geolocation && navigator.geolocation.clearWatch) navigator.geolocation.clearWatch(locWatchId);
+            } catch (e) { /* ignore */ }
+            locWatchId = null;
         }
 
         async function getPosition() {
@@ -885,10 +1160,10 @@
             });
         }
 
-        async function sendLocationOnce() {
+        // Envoie une position (lat/lng) à toutes les missions en transit du GP.
+        async function pushLocationToActiveMissions(lat, lng) {
             if (localStorage.getItem('gpLiveShare') !== '1') return;
             try {
-                // Missions actives du GP
                 const res = await fetch(`${API_BASE_URL}/missions/my-missions?limit=100`, {
                     headers: { 'Authorization': `Bearer ${authToken}` }
                 });
@@ -896,17 +1171,29 @@
                 const active = data.filter(m => ACTIVE_STATUSES.includes(String(m.status || '').toLowerCase()));
                 if (active.length === 0) { locShareUI(true, 'Aucune mission en transit'); return; }
 
-                const pos = await getPosition();
                 let sent = 0;
                 await Promise.all(active.map(m =>
                     fetch(`${API_BASE_URL}/missions/${m.id}/location`, {
                         method: 'POST',
                         headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ lat: pos.lat, lng: pos.lng })
+                        body: JSON.stringify({ lat, lng })
                     }).then(r => { if (r.ok) sent++; }).catch(() => {})
                 ));
                 const t = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-                locShareUI(true, `Position envoyée (${sent}) · ${t}`);
+                locShareUI(true, `Position partagée (${sent}) · ${t}`);
+            } catch (e) {
+                console.warn('push location error', e);
+                locShareUI(true, 'Position indisponible : ' + (e && e.message ? e.message : 'GPS'));
+            }
+        }
+
+        // Un relevé GPS ponctuel (utilisé au démarrage et par le filet périodique).
+        async function sendLocationOnce() {
+            if (localStorage.getItem('gpLiveShare') !== '1') return;
+            try {
+                const pos = await getPosition();
+                _lastPushTs = Date.now(); _lastLat = pos.lat; _lastLng = pos.lng;
+                await pushLocationToActiveMissions(pos.lat, pos.lng);
             } catch (e) {
                 console.warn('Location share error', e);
                 locShareUI(true, 'Position indisponible : ' + (e && e.message ? e.message : 'GPS'));
