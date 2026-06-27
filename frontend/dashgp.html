@@ -226,6 +226,27 @@
             color: #4ECDC4;
         }
 
+        .stat-card[role="button"] { transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; }
+        .stat-card[role="button"]:active { transform: scale(0.98); }
+
+        .stat-eye {
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.55);
+            border-radius: 8px;
+            transition: color 0.2s ease, background 0.2s ease;
+        }
+        .stat-eye:hover { color: #FFD700; background: rgba(255, 255, 255, 0.08); }
+        .stat-eye svg {
+            width: 20px; height: 20px;
+            fill: none; stroke: currentColor;
+            stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+        }
+
         /* Full Width Stat Card */
         .stat-card-full {
             grid-column: 1 / -1;
@@ -796,6 +817,7 @@
         body{padding:0!important;}
         </style>
     <script src="config.js"></script>
+    <script src="ui.js"></script>
     <link rel="stylesheet" href="theme.css">
 </head>
 <body class="ds">
@@ -826,31 +848,31 @@
             <!-- Stats Section -->
             <div class="stats-section">
                 <div class="stats-grid">
-                    <div class="stat-card primary">
+                    <div class="stat-card primary" onclick="openMissionsModal('active')" role="button" tabindex="0" style="cursor:pointer;">
                         <div class="stat-header">
                             <span class="stat-label">Missions actives</span>
                             <span class="stat-icon">📦</span>
                         </div>
                         <div class="stat-value">--</div>
-                        <div class="stat-change">En cours</div>
+                        <div class="stat-change">En cours ›</div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card" onclick="openMissionsModal('completed')" role="button" tabindex="0" style="cursor:pointer;">
                         <div class="stat-header">
                             <span class="stat-label">Missions terminées</span>
                             <span class="stat-icon">✅</span>
                         </div>
                         <div class="stat-value">--</div>
-                        <div class="stat-change">--</div>
+                        <div class="stat-change">Voir ›</div>
                     </div>
 
-                    <div class="stat-card stat-card-full">
+                    <div class="stat-card stat-card-full" id="gainsCard" onclick="openGainsHistory()" role="button" tabindex="0" style="cursor:pointer;">
                         <div class="stat-header">
                             <span class="stat-label">Gains totaux</span>
-                            <span class="stat-icon">💰</span>
+                            <span class="stat-eye" id="gainsEye" onclick="toggleGainsVisibility(event)" role="button" tabindex="0" title="Afficher / Masquer le montant"></span>
                         </div>
-                        <div class="stat-value">-- FCFA</div>
-                        <div class="stat-change info">--</div>
+                        <div class="stat-value" id="gainsValue">•••••• FCFA</div>
+                        <div class="stat-change info">Voir l'historique ›</div>
                     </div>
                 </div>
             </div>
@@ -977,6 +999,7 @@
             await enforceGpsGate();
             await loadDashboardData();
             hideEmptyBadges();
+            renderGains();
         });
 
         // ---------- Suivi live : partage de position GPS (Phase 1) ----------
@@ -1341,12 +1364,83 @@
                 // Update UI
                 document.querySelectorAll('.stat-value')[0].textContent = activeMissions;
                 document.querySelectorAll('.stat-value')[1].textContent = completedMissions;
-                document.querySelectorAll('.stat-value')[2].textContent =
-                    `${totalEarnings.toLocaleString('fr-FR')} FCFA`;
+                window._gpTotalEarnings = totalEarnings;
+                renderGains();
 
             } catch (error) {
                 console.error('Error loading stats:', error);
             }
+        }
+
+        // ---- Cartes statistiques interactives ----
+        const EYE_OPEN = '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+        const EYE_OFF  = '<svg viewBox="0 0 24 24"><path d="m3 3 18 18"/><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.4 0 10 7 10 7a18.4 18.4 0 0 1-2.6 3.5"/><path d="M6.6 6.6C3.9 8.3 2 12 2 12s3.6 7 10 7a10.5 10.5 0 0 0 4.1-.8"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+
+        function renderGains() {
+            const hidden = localStorage.getItem('gpGainsHidden') === '1';
+            const v = document.getElementById('gainsValue');
+            const eye = document.getElementById('gainsEye');
+            if (v) v.textContent = hidden ? '•••••• FCFA'
+                : ((window._gpTotalEarnings || 0).toLocaleString('fr-FR') + ' FCFA');
+            if (eye) eye.innerHTML = hidden ? EYE_OFF : EYE_OPEN;
+        }
+
+        function toggleGainsVisibility(ev) {
+            if (ev) ev.stopPropagation();   // ne pas déclencher le clic de la carte
+            if (localStorage.getItem('gpGainsHidden') === '1') localStorage.removeItem('gpGainsHidden');
+            else localStorage.setItem('gpGainsHidden', '1');
+            renderGains();
+        }
+
+        function openGainsHistory() {
+            window.location.href = 'gains.html';
+        }
+
+        // Popup (design unifié) listant les missions actives ou terminées.
+        async function openMissionsModal(kind) {
+            let missions = [];
+            try {
+                const r = await fetch(`${API_BASE_URL}/missions/my-missions?limit=1000`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                missions = r.ok ? ((await r.json()).data || []) : [];
+            } catch (e) { /* réseau */ }
+
+            const ACTIVE = ['accepted', 'in_transit', 'picked_up', 'in_customs', 'out_for_delivery'];
+            const list = missions.filter(m => {
+                const s = String(m.status || '').toLowerCase();
+                return kind === 'active' ? ACTIVE.includes(s) : s === 'delivered';
+            });
+
+            const rows = list.map(m => {
+                const price = parseFloat(m.price || 0).toLocaleString('fr-FR');
+                const info = getStatusInfo(m.status);
+                return `<div class="sengp-list-item" onclick="window.location.href='trajets.html'">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:700;color:#fff;font-size:13px;">
+                            ${getCountryFlag(m.departure_country)} ${m.departure_city || '?'} → ${getCountryFlag(m.arrival_country)} ${m.arrival_city || '?'}
+                        </div>
+                        <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:3px;">${formatDate(m.departure_date)}</div>
+                    </div>
+                    <div style="text-align:right;flex-shrink:0;">
+                        <div style="color:#FFD700;font-weight:800;font-size:13px;">${price} FCFA</div>
+                        <span class="mission-status ${info.class}" style="display:inline-block;margin-top:4px;">${info.label}</span>
+                    </div>
+                </div>`;
+            }).join('');
+
+            const body = `<div class="sengp-list">${rows ||
+                '<div class="sengp-list-empty">Aucune mission dans cette catégorie pour le moment.</div>'}</div>`;
+            const title = (kind === 'active' ? 'Missions actives' : 'Missions terminées') + ` (${list.length})`;
+
+            sengpModal({
+                title: title,
+                bodyHTML: body,
+                actions: [
+                    { label: 'Fermer', value: false },
+                    { label: 'Voir tout', primary: true, value: true }
+                ]
+            }).then(v => { if (v) window.location.href = 'trajets.html'; });
         }
 
         async function loadNewMissions() {
