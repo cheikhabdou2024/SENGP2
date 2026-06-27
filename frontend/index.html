@@ -91,8 +91,56 @@
 
         /* Splash Screen */
         .screen0 {
-            background-color: #0f0c29;
+            background-color: #0b1a30;
             z-index: 10;
+        }
+
+        /* Branded splash: logo centered with a glass-shimmer sweep */
+        .splash-logo-wrap {
+            position: relative;
+            width: 88%;
+            max-width: 420px;
+            aspect-ratio: 1 / 1;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+            animation: splashIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .splash-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* The moving glass glare, clipped to the logo card */
+        .splash-shimmer {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                115deg,
+                transparent 28%,
+                rgba(255, 255, 255, 0.10) 42%,
+                rgba(255, 255, 255, 0.42) 50%,
+                rgba(255, 255, 255, 0.10) 58%,
+                transparent 72%
+            );
+            transform: translateX(-130%);
+            animation: splashShimmer 2.4s ease-in-out infinite;
+            mix-blend-mode: screen;
+            pointer-events: none;
+        }
+
+        @keyframes splashShimmer {
+            0%   { transform: translateX(-130%); }
+            55%  { transform: translateX(130%); }
+            100% { transform: translateX(130%); }
+        }
+
+        @keyframes splashIn {
+            from { opacity: 0; transform: scale(0.92); }
+            to   { opacity: 1; transform: scale(1); }
         }
         
         /* Custom Screen 1 Layout (70/30) */
@@ -1628,8 +1676,11 @@
             <!-- ============================================
                  SCREEN 0 - Splash Screen
                  ============================================ -->
-            <div class="screen screen0 active" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                <video src="im/splash.mp4" autoplay muted playsinline loop style="width: 100%; height: 100%; object-fit: contain;" onloadeddata="scheduleSplashAdvance()" onerror="scheduleSplashAdvance()"></video>
+            <div class="screen screen0 active" style="background:#0b1a30; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                <div class="splash-logo-wrap">
+                    <img src="im/splash-logo.jpg" class="splash-logo" onload="scheduleSplashAdvance()" onerror="scheduleSplashAdvance()" alt="SEN GP">
+                    <div class="splash-shimmer"></div>
+                </div>
             </div>
 
             <!-- ============================================
@@ -1838,10 +1889,10 @@
         const totalScreens = 4;
         let selectedAccountType = null;
 
-        // Splash → onboarding handoff. The splash.gif plays for exactly 2.9s, then
-        // we advance to the first onboarding screen. Guarded so it only fires once
-        // (img onload/onerror + a hard fallback all funnel through here) and so a
-        // ?choice=1 deep-link to the account screen is never overridden.
+        // Splash → onboarding handoff. The branded logo (with the glass shimmer)
+        // shows for 2.9s, then we advance to the first onboarding screen. Guarded so
+        // it only fires once (img onload/onerror + a hard fallback all funnel through
+        // here) and so a ?choice=1 deep-link to the account screen is never overridden.
         let _splashAdvanced = false;
         function scheduleSplashAdvance(delay) {
             if (_splashAdvanced) return;

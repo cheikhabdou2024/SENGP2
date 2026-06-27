@@ -86,7 +86,7 @@ jobs:
           base = 'frontend/android/app/src/main/res'
           styles = base + '/values/styles.xml'
           colors = base + '/values/colors.xml'
-          DARK = '#1a1a2e'  # same dark as the web splash background
+          DARK = '#0b1a30'  # deep navy = the SEN GP logo background, matches web splash
           # 1) ensure a dark splash color exists
           try:
               c = open(colors, encoding='utf-8').read() if os.path.exists(colors) \
