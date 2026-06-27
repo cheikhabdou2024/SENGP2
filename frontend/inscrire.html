@@ -436,19 +436,16 @@
                 height: 100vh;
             }
         }
-    </style>
+            /* sengp-responsive-override */
+        .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
+        body{padding:0!important;}
+        </style>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="theme.css">
+    <script src="ui.js"></script>
 </head>
-<body>
+<body class="ds">
     <div class="mobile-frame">
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <span class="time">9:41</span>
-            <div class="indicators">
-                <div class="signal"></div>
-                <div class="wifi"></div>
-                <div class="battery"></div>
-            </div>
-        </div>
 
         <!-- Header -->
         <div class="header">
@@ -496,22 +493,6 @@
                     <div class="validation-message" id="emailMessage"></div>
                 </div>
 
-                <!-- Téléphone -->
-                <div class="form-group">
-                    <label for="phone">Numéro de téléphone <span class="required">*</span></label>
-                    <div class="input-wrapper">
-                        <input 
-                            type="tel" 
-                            id="phone" 
-                            name="phone"
-                            placeholder="+221 77 123 45 67"
-                            onkeyup="validatePhone()"
-                            required
-                        />
-                        <span class="validation-icon" id="phoneIcon"></span>
-                    </div>
-                    <div class="validation-message" id="phoneMessage"></div>
-                </div>
 
                 <!-- Mot de passe -->
                 <div class="form-group">
@@ -566,25 +547,6 @@
                     Créer mon compte
                 </button>
 
-                <!-- Divider -->
-                <div class="divider">
-                    <div class="divider-line"></div>
-                    <span class="divider-text">Ou continuer avec</span>
-                    <div class="divider-line"></div>
-                </div>
-
-                <!-- Social Buttons -->
-                <div class="social-buttons">
-                    <button type="button" class="social-btn" onclick="socialSignup('google')">
-                        <span>🔍</span>
-                        <span>Google</span>
-                    </button>
-                    <button type="button" class="social-btn" onclick="socialSignup('facebook')">
-                        <span>📘</span>
-                        <span>Facebook</span>
-                    </button>
-                </div>
-
                 <!-- Login Link -->
                 <div class="login-link">
                     Vous avez déjà un compte ? <a href="#" onclick="goToLogin()">Se connecter</a>
@@ -597,7 +559,6 @@
         let validations = {
             fullname: false,
             email: false,
-            phone: false,
             password: false,
             confirmPassword: false,
             terms: false
@@ -816,8 +777,9 @@
         }
 
         function goBack() {
-            // Retourner vers la page de choix du type de compte
-            window.location.href = 'index.html';
+            // Retourner vers la page de connexion (en conservant le type de compte choisi)
+            const t = new URLSearchParams(window.location.search).get('type');
+            window.location.href = t ? `connexion.html?type=${t}` : 'connexion.html';
         }
 
         function goToLogin() {
@@ -826,8 +788,40 @@
             window.location.href = 'connexion.html';
         }
 
-        function socialSignup(provider) {
-            alert(`Inscription avec ${provider}`);
+        async function socialSignup(provider) {
+            if (provider !== 'google') return;
+            try {
+                const GoogleAuth = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth;
+                if (!GoogleAuth) {
+                    alert('L\'inscription Google est disponible dans l\'application mobile.');
+                    return;
+                }
+                const result = await GoogleAuth.signIn();
+                const idToken = result && result.authentication && result.authentication.idToken;
+                if (!idToken) throw new Error('Token Google manquant');
+
+                const accountType = new URLSearchParams(window.location.search).get('type');
+                const userType = accountType === 'carrier' ? 'gp' : 'expediteur';
+
+                const response = await fetch(`${window.API_BASE_URL}/auth/google`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_token: idToken, user_type: userType })
+                });
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    localStorage.setItem('authToken', data.data.token);
+                    localStorage.setItem('userData', JSON.stringify(data.data.user));
+                    const ut = data.data.user.user_type;
+                    window.location.href = ut === 'gp' ? 'dashgp.html' : 'dashexpediteur.html';
+                } else {
+                    alert('Erreur Google: ' + (data.error || 'Inscription échouée'));
+                }
+            } catch (e) {
+                console.error('Google sign-up error', e);
+                alert('Inscription Google annulée ou échouée.');
+            }
         }
 
         document.getElementById('signupForm').addEventListener('submit', async function(e) {
@@ -844,7 +838,6 @@
                     // Récupérer les valeurs du formulaire
                     const fullname = document.getElementById('fullname').value;
                     const email = document.getElementById('email').value;
-                    const phone = document.getElementById('phone').value;
                     const password = document.getElementById('password').value;
 
                     // Séparer le nom complet en prénom et nom de famille
@@ -858,14 +851,13 @@
                     const userType = accountType === 'carrier' ? 'gp' : 'expediteur';
 
                     // Appeler l'API d'inscription
-                    const response = await fetch('http://localhost:5000/api/v1/auth/register', {
+                    const response = await fetch(`${window.API_BASE_URL}/auth/register`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
                             email: email,
-                            phone: phone,
                             password: password,
                             user_type: userType,
                             first_name: firstName,

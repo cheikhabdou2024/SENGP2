@@ -15,7 +15,8 @@
 - ✅ EC2 Instance (t3.small)
 - ✅ RDS PostgreSQL Database (db.t3.micro)
   - Username: sengpadmin
-  - Password: SengP2024SecureDB!
+  - Password: <REDACTED — stored in EB env / AWS Secrets Manager. ROTATE: the
+    previous value was committed to git history and must be considered leaked.>
   - Engine: PostgreSQL 16.6
 - ✅ Application Load Balancer
 - ✅ Auto Scaling Group

@@ -1,0 +1,194 @@
+name: Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ deploy/aws-android-prep ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/android-apk.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Build web assets (www)
+        working-directory: frontend
+        run: npm run build
+
+      - name: Add Android platform
+        working-directory: frontend
+        run: npx cap add android
+
+      - name: Sync Capacitor
+        working-directory: frontend
+        run: npx cap sync android
+
+      - name: Register sengp:// deep link scheme (AndroidManifest intent-filter)
+        run: |
+          python3 - <<'PY'
+          import re
+          p = 'frontend/android/app/src/main/AndroidManifest.xml'
+          s = open(p, encoding='utf-8').read()
+          # Permissions inserted right after the opening <manifest ...> tag.
+          perms = [
+              'android.permission.RECORD_AUDIO',
+              'android.permission.ACCESS_FINE_LOCATION',
+              'android.permission.ACCESS_COARSE_LOCATION',
+              # Background location tracking (GP position during the whole trip)
+              'android.permission.ACCESS_BACKGROUND_LOCATION',
+              'android.permission.FOREGROUND_SERVICE',
+              'android.permission.FOREGROUND_SERVICE_LOCATION',
+              'android.permission.POST_NOTIFICATIONS',
+          ]
+          add = ''.join('\n    <uses-permission android:name="%s" />' % x for x in perms if x not in s)
+          if add:
+              s = re.sub(r'(<manifest\b[^>]*>)', lambda m: m.group(1) + add, s, count=1)
+          # sengp:// deep link on the main activity.
+          if 'android:scheme="sengp"' not in s:
+              intent = (
+                  '\n            <intent-filter>\n'
+                  '                <action android:name="android.intent.action.VIEW" />\n'
+                  '                <category android:name="android.intent.category.DEFAULT" />\n'
+                  '                <category android:name="android.intent.category.BROWSABLE" />\n'
+                  '                <data android:scheme="sengp" />\n'
+                  '            </intent-filter>\n        '
+              )
+              s = s.replace('</activity>', intent + '</activity>', 1)
+          open(p, 'w', encoding='utf-8').write(s)
+          print('manifest patched')
+          PY
+          echo "=== uses-permission / scheme in manifest ==="
+          grep -nE "uses-permission|android:scheme" frontend/android/app/src/main/AndroidManifest.xml || true
+
+      - name: Plain navy native splash (transparent icon, no double logo)
+        run: |
+          # The Android 12 system splash can't be removed, but we make it a plain
+          # navy screen matching the web splash: a fully transparent icon hides the
+          # logo (otherwise it defaults to the launcher icon), so the logo appears
+          # only once -- in the web splash with the shimmer.
+          mkdir -p frontend/android/app/src/main/res/drawable
+          cp frontend/ci/splash_icon.png frontend/android/app/src/main/res/drawable/splash_icon.png
+          python3 - <<'PY' || true
+          import re, os
+          base = 'frontend/android/app/src/main/res'
+          styles = base + '/values/styles.xml'
+          colors = base + '/values/colors.xml'
+          DARK = '#0b1a30'  # deep navy = the SEN GP logo background, matches web splash
+          # 1) ensure a dark splash color exists
+          try:
+              c = open(colors, encoding='utf-8').read() if os.path.exists(colors) \
+                  else '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n</resources>\n'
+              if 'name="splashBackground"' not in c:
+                  c = c.replace('</resources>',
+                                '    <color name="splashBackground">%s</color>\n</resources>' % DARK, 1)
+                  open(colors, 'w', encoding='utf-8').write(c)
+          except Exception as e:
+              print('colors patch skipped:', e)
+          # 2) point the generated launch theme at the dark background
+          try:
+              s = open(styles, encoding='utf-8').read()
+              m = re.search(r'<style name="AppTheme\.NoActionBarLaunch"[^>]*>.*?</style>', s, re.S)
+              if m:
+                  blk = m.group(0)
+                  add = ''
+                  # androidx Theme.SplashScreen attr (covers Android 12+ system splash)
+                  if 'SplashScreen' in blk and 'windowSplashScreenBackground' not in blk:
+                      add += '\n        <item name="windowSplashScreenBackground">@color/splashBackground</item>'
+                  # window background (covers pre-12 + the frame before the webview paints)
+                  if 'android:windowBackground' not in blk:
+                      add += '\n        <item name="android:windowBackground">@color/splashBackground</item>'
+                  # transparent splash icon -> hides the default launcher icon so the
+                  # system splash is just the navy background (no logo, no double logo).
+                  if 'SplashScreen' in blk and 'windowSplashScreenAnimatedIcon' not in blk:
+                      add += '\n        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>'
+                  if add:
+                      s = s[:m.start()] + blk.replace('</style>', add + '\n    </style>', 1) + s[m.end():]
+                      open(styles, 'w', encoding='utf-8').write(s)
+                      print('splash theme set to dark')
+                  else:
+                      print('splash theme already dark')
+              else:
+                  print('launch theme not found; native splash bg left as default')
+          except Exception as e:
+              print('styles patch skipped:', e)
+          PY
+          echo "=== launch theme ==="
+          grep -nA8 'NoActionBarLaunch' frontend/android/app/src/main/res/values/styles.xml || true
+          ls -l frontend/android/app/src/main/res/drawable/splash_icon.png || true
+
+      - name: Allow muted video autoplay in the WebView (splash + onboarding)
+        run: |
+          mkdir -p frontend/android/app/src/main/java/com/sengp/app
+          cat > frontend/android/app/src/main/java/com/sengp/app/MainActivity.java <<'JAVA'
+          package com.sengp.app;
+
+          import android.os.Bundle;
+          import com.getcapacitor.BridgeActivity;
+
+          public class MainActivity extends BridgeActivity {
+              @Override
+              public void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  // Android WebView blocks autoplay without a user gesture by default,
+                  // which shows a play-button poster instead of playing the splash and
+                  // onboarding <video autoplay muted> elements. Allow muted autoplay.
+                  if (this.bridge != null && this.bridge.getWebView() != null) {
+                      this.bridge.getWebView().getSettings().setMediaPlaybackRequiresUserGesture(false);
+                  }
+              }
+          }
+          JAVA
+          echo "=== MainActivity.java ==="
+          cat frontend/android/app/src/main/java/com/sengp/app/MainActivity.java
+
+      - name: Force deterministic debug signing (fixed SHA-1 for Google Sign-In)
+        run: |
+          # Decode our committed debug keystore into the app module.
+          base64 -d frontend/ci/debug-keystore.base64 > frontend/android/app/debug.keystore
+          # Also keep the conventional location as a fallback.
+          mkdir -p ~/.android && cp frontend/android/app/debug.keystore ~/.android/debug.keystore
+          # Append an explicit debug signingConfig so assembleDebug ALWAYS uses our key
+          # (the AGP-generated debug keystore is otherwise random/unstable).
+          printf '\nandroid {\n  signingConfigs {\n    debug {\n      storeFile file("debug.keystore")\n      storePassword "android"\n      keyAlias "androiddebugkey"\n      keyPassword "android"\n    }\n  }\n}\n' >> frontend/android/app/build.gradle
+          echo "=== keystore SHA-1 (expected on the APK) ==="
+          keytool -list -v -keystore frontend/android/app/debug.keystore \
+            -alias androiddebugkey -storepass android -keypass android \
+            | grep -iE "SHA1:|SHA256:" || true
+
+      - name: Build debug APK
+        working-directory: frontend/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Verify APK signing certificate SHA-1 (must match Google OAuth client)
+        run: |
+          echo "=== ACTUAL APK signing certificate ==="
+          keytool -printcert -jarfile frontend/android/app/build/outputs/apk/debug/app-debug.apk \
+            | grep -iE "SHA1:|SHA256:" || true
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sengp-debug-apk
+          path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error

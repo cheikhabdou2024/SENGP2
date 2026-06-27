@@ -111,14 +111,24 @@
             width: 48px;
             height: 48px;
             background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
+            background-size: cover;
+            background-position: center;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 16px;
+            font-weight: 800;
+            color: #1a1a2e;
             cursor: pointer;
             transition: transform 0.3s ease;
             box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.85);
+            overflow: hidden;
+        }
+
+        .profile-avatar.has-photo span {
+            display: none;
         }
 
         .profile-avatar:hover {
@@ -403,7 +413,31 @@
         }
 
         .stat-icon {
-            font-size: 18px;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .stat-card.primary .stat-icon {
+            background: rgba(255, 107, 107, 0.22);
+            color: #FFB199;
+        }
+
+        /* Reusable line-icon (Lucide style, matches bottom nav) */
+        .ico {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex: none;
         }
 
         .stat-value {
@@ -483,6 +517,13 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            color: #1a1a2e;
+        }
+
+        .action-icon .ico {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2;
         }
 
         .action-text {
@@ -629,9 +670,16 @@
         }
 
         .empty-icon {
-            font-size: 64px;
+            display: flex;
+            justify-content: center;
             margin-bottom: 16px;
-            opacity: 0.5;
+            opacity: 0.45;
+        }
+
+        .empty-icon .ico {
+            width: 60px;
+            height: 60px;
+            stroke-width: 1.4;
         }
 
         .empty-title {
@@ -653,17 +701,15 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 65px;
-            background: linear-gradient(180deg, rgba(15, 12, 41, 0.95) 0%, rgba(26, 22, 48, 0.98) 100%);
-            backdrop-filter: blur(30px);
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(18, 16, 36, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3),
-                        0 -1px 0 rgba(255, 107, 107, 0.1) inset;
+            justify-content: space-around;
+            align-items: stretch;
+            padding: 9px 6px calc(9px + env(safe-area-inset-bottom));
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35);
         }
 
         .nav-item {
@@ -671,75 +717,35 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 4px;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 6px 10px;
-            border-radius: 12px;
-            min-width: 52px;
             flex: 1;
-            max-width: 70px;
             position: relative;
-            overflow: visible;
-        }
-
-        .nav-item::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            background: linear-gradient(135deg, #FF6B6B, #FFE66D, #4ECDC4);
-            border-radius: 18px;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            z-index: -1;
-            filter: blur(8px);
-        }
-
-        .nav-item:hover::before {
-            opacity: 0.3;
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-4px) scale(1.05);
+            padding: 6px 0;
+            border-radius: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            transition: color 0.25s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .nav-item.active {
-            background: linear-gradient(135deg, 
-                rgba(255, 107, 107, 0.2) 0%, 
-                rgba(255, 230, 109, 0.15) 50%,
-                rgba(78, 205, 196, 0.1) 100%);
-            border: 1px solid rgba(255, 107, 107, 0.3);
-            box-shadow: 0 8px 24px rgba(255, 107, 107, 0.25),
-                        0 0 20px rgba(255, 230, 109, 0.15) inset;
-            transform: translateY(-6px);
+            color: #FF6B6B;
         }
 
         .nav-item.active::after {
             content: '';
             position: absolute;
-            top: -12px;
+            top: -9px;
             left: 50%;
             transform: translateX(-50%);
-            width: 40px;
+            width: 26px;
             height: 3px;
-            background: linear-gradient(90deg, #FF6B6B 0%, #FFE66D 50%, #4ECDC4 100%);
             border-radius: 0 0 3px 3px;
-            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.5);
-            animation: slideDown 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            background: linear-gradient(90deg, #FF6B6B, #FFE66D);
         }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-8px);
-                width: 24px;
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-                width: 40px;
-            }
+        .nav-item:not(.active):active {
+            color: rgba(255, 255, 255, 0.85);
         }
 
         .nav-icon-wrapper {
@@ -747,75 +753,48 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .nav-item.active .nav-icon-wrapper {
-            background: linear-gradient(135deg,
-                rgba(255, 107, 107, 0.3) 0%,
-                rgba(255, 230, 109, 0.2) 100%);
-            border-radius: 10px;
-            box-shadow: 0 3px 12px rgba(255, 107, 107, 0.3);
+            width: 24px;
+            height: 24px;
         }
 
         .nav-icon {
-            font-size: 20px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            filter: grayscale(0.8) brightness(0.7);
-            position: relative;
-            z-index: 1;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .nav-item.active .nav-icon {
-            filter: grayscale(0) brightness(1.2) drop-shadow(0 0 6px rgba(255, 107, 107, 0.6));
-            transform: scale(1.1);
-            animation: iconPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        .nav-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: transform 0.25s ease;
         }
 
-        @keyframes iconPop {
-            0% { transform: scale(0.85) rotate(-8deg); }
-            50% { transform: scale(1.15) rotate(4deg); }
-            100% { transform: scale(1.1) rotate(0deg); }
-        }
-
-        .nav-item:hover .nav-icon {
-            filter: grayscale(0.3) brightness(1);
-            transform: scale(1.05) rotate(-3deg);
+        .nav-item.active .nav-icon svg {
+            transform: translateY(-1px) scale(1.06);
         }
 
         .nav-label {
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 700;
-            transition: all 0.4s ease;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        }
-
-        .nav-item.active .nav-label {
-            background: linear-gradient(135deg, #FFE66D 0%, #FF6B6B 50%, #4ECDC4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 800;
-            transform: scale(1.05);
-        }
-
-        .nav-item:hover .nav-label {
-            color: rgba(255, 255, 255, 0.9);
-            transform: translateY(-2px);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            color: inherit;
         }
 
         .nav-badge {
             position: absolute;
-            top: 0px;
-            right: 0px;
-            min-width: 18px;
-            height: 18px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FF4757 100%);
+            top: -4px;
+            left: calc(50% + 4px);
+            min-width: 17px;
+            height: 17px;
+            background: #FF4757;
+            border: 1.5px solid #121024;
             border-radius: 9px;
             display: flex;
             align-items: center;
@@ -823,187 +802,23 @@
             font-size: 9px;
             font-weight: 800;
             color: white;
-            padding: 0 5px;
-            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.6),
-                        0 0 0 2px rgba(15, 12, 41, 0.8),
-                        0 0 0 4px rgba(255, 107, 107, 0.3);
-            animation: pulse-badge 2.5s ease-in-out infinite;
+            padding: 0 4px;
             z-index: 2;
         }
 
-        @keyframes pulse-badge {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 3px 10px rgba(255, 107, 107, 0.6),
-                            0 0 0 2px rgba(15, 12, 41, 0.8),
-                            0 0 0 4px rgba(255, 107, 107, 0.3);
-            }
-            50% {
-                transform: scale(1.1);
-                box-shadow: 0 3px 14px rgba(255, 107, 107, 0.8),
-                            0 0 0 2px rgba(15, 12, 41, 0.8),
-                            0 0 0 5px rgba(255, 107, 107, 0.5);
-            }
-        }
-
-        /* Ripple effect on tap */
-        .nav-item::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 18px;
-            background: radial-gradient(circle, rgba(255, 107, 107, 0.4) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.6s ease;
-        }
-
-        .nav-item:active::before {
-            opacity: 1;
-            animation: ripple 0.6s ease-out;
-        }
-
-        @keyframes ripple {
-            from {
-                transform: scale(0);
-                opacity: 1;
-            }
-            to {
-                transform: scale(2);
-                opacity: 0;
-            }
-        }
-
-        /* Floating particles effect for active item */
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            inset: -8px;
-            background: linear-gradient(135deg, 
-                transparent 0%, 
-                rgba(255, 107, 107, 0.1) 25%,
-                rgba(255, 230, 109, 0.1) 50%,
-                rgba(78, 205, 196, 0.1) 75%,
-                transparent 100%);
-            border-radius: 20px;
-            opacity: 1;
-            filter: blur(10px);
-            animation: rotate 8s linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .nav-badge.hidden {
+            display: none;
         }
 
         /* Accessibility - Focus states */
-        .nav-item:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.5);
-        }
-
         .nav-item:focus-visible {
-            outline: 3px solid #4ECDC4;
-            outline-offset: 3px;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 375px) {
-            .bottom-nav {
-                height: 60px;
-                padding: 6px 12px;
-                gap: 6px;
-            }
-
-            .nav-item {
-                padding: 5px 8px;
-                min-width: 48px;
-                max-width: 65px;
-                gap: 1px;
-            }
-
-            .nav-icon-wrapper {
-                width: 32px;
-                height: 32px;
-            }
-
-            .nav-icon {
-                font-size: 18px;
-            }
-
-            .nav-label {
-                font-size: 8px;
-                letter-spacing: 0.2px;
-            }
-
-            .nav-badge {
-                min-width: 16px;
-                height: 16px;
-                font-size: 8px;
-                padding: 0 4px;
-            }
-
-            .nav-item.active::after {
-                width: 35px;
-                height: 2.5px;
-                top: -10px;
-            }
-        }
-
-        @media (min-width: 376px) and (max-width: 414px) {
-            .bottom-nav {
-                height: 62px;
-                gap: 7px;
-            }
-
-            .nav-item {
-                padding: 6px 9px;
-                min-width: 50px;
-                max-width: 68px;
-            }
-
-            .nav-icon-wrapper {
-                width: 34px;
-                height: 34px;
-            }
-
-            .nav-icon {
-                font-size: 19px;
-            }
+            outline: 2px solid #FF6B6B;
+            outline-offset: 2px;
+            border-radius: 12px;
         }
 
         @media (min-width: 768px) {
-            .bottom-nav {
-                height: 70px;
-                padding: 8px 20px;
-                gap: 12px;
-            }
-
-            .nav-item {
-                padding: 8px 14px;
-                min-width: 60px;
-                max-width: 80px;
-                gap: 3px;
-            }
-
-            .nav-icon-wrapper {
-                width: 40px;
-                height: 40px;
-            }
-
-            .nav-icon {
-                font-size: 22px;
-            }
-
-            .nav-label {
-                font-size: 10px;
-            }
-
-            .nav-badge {
-                min-width: 20px;
-                height: 20px;
-                font-size: 10px;
-            }
+            .nav-label { font-size: 11px; }
         }
 
         @media (max-width: 375px) {
@@ -1012,19 +827,16 @@
                 height: 100vh;
             }
         }
-    </style>
+            /* sengp-responsive-override */
+        .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
+        body{padding:0!important;}
+        </style>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="theme.css">
+    <script src="ui.js"></script>
 </head>
-<body>
+<body class="ds">
     <div class="mobile-frame">
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <span class="time">9:41</span>
-            <div class="indicators">
-                <div class="signal"></div>
-                <div class="wifi"></div>
-                <div class="battery"></div>
-            </div>
-        </div>
 
         <!-- Content -->
         <div class="content">
@@ -1035,8 +847,8 @@
                         <h1>Chargement... 👋</h1>
                         <p>Prêt à envoyer un colis ?</p>
                     </div>
-                    <div class="profile-avatar" onclick="openProfile()">
-                        👤
+                    <div class="profile-avatar" id="profileAvatar" onclick="openProfile()">
+                        <span id="profileInitials">EX</span>
                     </div>
                 </div>
 
@@ -1067,37 +879,37 @@
             <!-- Stats Section -->
             <div class="stats-section">
                 <div class="stats-grid">
-                    <div class="stat-card primary">
+                    <div class="stat-card primary" style="cursor:pointer" onclick="location.href='envois.html?status=active'">
                         <div class="stat-header">
                             <span class="stat-label">En cours</span>
-                            <span class="stat-icon">📦</span>
+                            <span class="stat-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span>
                         </div>
                         <div class="stat-value">0</div>
                         <div class="stat-change">Chargement...</div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card" style="cursor:pointer" onclick="location.href='envois.html?status=delivered'">
                         <div class="stat-header">
                             <span class="stat-label">Livrés</span>
-                            <span class="stat-icon">✅</span>
+                            <span class="stat-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21.8 10A10 10 0 1 1 17 3.34"/><path d="m9 11 3 3L22 4"/></svg></span>
                         </div>
                         <div class="stat-value">0</div>
                         <div class="stat-change">Chargement...</div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card" style="cursor:pointer" onclick="location.href='envois.html'">
                         <div class="stat-header">
                             <span class="stat-label">Dépenses</span>
-                            <span class="stat-icon">💰</span>
+                            <span class="stat-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span>
                         </div>
                         <div class="stat-value">0</div>
                         <div class="stat-change">Chargement...</div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card" style="cursor:pointer" onclick="location.href='envois.html'">
                         <div class="stat-header">
                             <span class="stat-label">Économies</span>
-                            <span class="stat-icon">💸</span>
+                            <span class="stat-icon"><svg class="ico" viewBox="0 0 24 24"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg></span>
                         </div>
                         <div class="stat-value">0</div>
                         <div class="stat-change">vs services classiques</div>
@@ -1112,7 +924,7 @@
                 </div>
 
                 <button class="action-button" onclick="createShipment()">
-                    <div class="action-icon">📦</div>
+                    <div class="action-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div>
                     <div class="action-text">
                         <div class="action-title">Créer un envoi</div>
                         <div class="action-subtitle">Trouvez un GP pour votre colis</div>
@@ -1136,14 +948,14 @@
         <div class="bottom-nav">
             <div class="nav-item active" onclick="navigateTo('home')" tabindex="0" role="button" aria-label="Accueil">
                 <div class="nav-icon-wrapper">
-                    <div class="nav-icon">🏠</div>
+                    <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
                 </div>
                 <div class="nav-label">Accueil</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('reclamation')" tabindex="0" role="button" aria-label="Réclamation">
                 <div class="nav-icon-wrapper">
-                    <div class="nav-icon">⚠️</div>
+                    <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10.3 4 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
                     <div class="nav-badge">1</div>
                 </div>
                 <div class="nav-label">Réclamation</div>
@@ -1151,7 +963,7 @@
 
             <div class="nav-item" onclick="navigateTo('tracking')" tabindex="0" role="button" aria-label="Suivi">
                 <div class="nav-icon-wrapper">
-                    <div class="nav-icon">📍</div>
+                    <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
                     <div class="nav-badge">3</div>
                 </div>
                 <div class="nav-label">Suivi</div>
@@ -1159,7 +971,7 @@
 
             <div class="nav-item" onclick="navigateTo('notifications')" tabindex="0" role="button" aria-label="Notifications">
                 <div class="nav-icon-wrapper">
-                    <div class="nav-icon">🔔</div>
+                    <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
                     <div class="nav-badge">5</div>
                 </div>
                 <div class="nav-label">Notifications</div>
@@ -1167,7 +979,7 @@
 
             <div class="nav-item" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil">
                 <div class="nav-icon-wrapper">
-                    <div class="nav-icon">👤</div>
+                    <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
                 </div>
                 <div class="nav-label">Profil</div>
             </div>
@@ -1197,7 +1009,7 @@
 
     <script>
         // Configuration de l'API
-        const API_BASE_URL = 'http://localhost:5000/api/v1';
+        const API_BASE_URL = window.API_BASE_URL;
 
         // Récupérer le token d'authentification
         function getAuthToken() {
@@ -1243,6 +1055,26 @@
             // Mettre à jour le nom de l'utilisateur
             const firstName = userData.first_name || userData.firstName || 'Utilisateur';
             document.querySelector('.greeting h1').textContent = `Bonjour, ${firstName} 👋`;
+
+            // Avatar : photo de profil Google si disponible, sinon initiales.
+            const avatar = document.getElementById('profileAvatar');
+            const initialsEl = document.getElementById('profileInitials');
+            const photo = userData.profile_photo_url;
+            if (photo) {
+                avatar.style.backgroundImage = `url("${photo}")`;
+                avatar.classList.add('has-photo');
+            } else {
+                const a = (userData.first_name || '').charAt(0);
+                const b = (userData.last_name || '').charAt(0);
+                initialsEl.textContent = (a + b).toUpperCase() || 'EX';
+                avatar.classList.remove('has-photo');
+            }
+
+            // Masque les pastilles dont la valeur est 0 ou vide.
+            document.querySelectorAll('.nav-badge').forEach((bdg) => {
+                const n = parseInt((bdg.textContent || '').trim(), 10);
+                bdg.classList.toggle('hidden', !n);
+            });
 
             try {
                 // Charger les missions de l'utilisateur
@@ -1382,7 +1214,7 @@
                 const emptyState = document.createElement('div');
                 emptyState.className = 'empty-state';
                 emptyState.innerHTML = `
-                    <div class="empty-icon">📦</div>
+                    <div class="empty-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div>
                     <div class="empty-title">Aucun envoi</div>
                     <div class="empty-description">Vous n'avez pas encore créé d'envoi. Commencez dès maintenant !</div>
                 `;
@@ -1402,7 +1234,8 @@
         function createMissionCard(mission) {
             const card = document.createElement('div');
             card.className = 'shipment-card';
-            card.onclick = () => viewShipmentDetails(mission.mission_code);
+            card.style.cursor = 'pointer';
+            card.onclick = () => viewShipmentDetails(mission.id);
 
             const statusClass = getStatusClass(mission.status);
             const statusText = getStatusText(mission.status);
@@ -1624,12 +1457,13 @@
         }
 
         function viewShipmentDetails(id) {
-            alert(`Voir détails du colis\n\nID: ${id}\n\nInformations complètes, suivi en temps réel, carte, etc.`);
+            if (!id) return;
+            window.location.href = `detailenvoi.html?id=${id}`;
         }
 
         function viewAllShipments() {
-            event.preventDefault();
-            alert('Voir tous les envois\n\nListe complète avec filtres et recherche');
+            if (typeof event !== 'undefined' && event) event.preventDefault();
+            window.location.href = 'envois.html';
         }
 
         function openProfile() {
@@ -1691,5 +1525,7 @@
             }, 100);
         });
     </script>
+    <script src="ptr.js"></script>
+    <script src="deeplink.js"></script>
 </body>
 </html>

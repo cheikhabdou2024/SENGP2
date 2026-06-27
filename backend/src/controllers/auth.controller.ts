@@ -27,12 +27,55 @@ export class AuthController {
   }
 
   /**
+   * Google sign-in / sign-up
+   * POST /api/v1/auth/google
+   */
+  static async googleAuth(req: Request, res: Response): Promise<void> {
+    try {
+      const { id_token, user_type, expected_type } = req.body;
+      const { user, token, isNew } = await AuthService.googleAuth(id_token, user_type, expected_type);
+
+      ResponseUtil.success(
+        res,
+        { user, token, isNew },
+        isNew ? 'Account created' : 'Login successful'
+      );
+    } catch (error: any) {
+      logger.error('Google auth error:', error);
+
+      if (error.message.includes('Invalid Google')) {
+        ResponseUtil.unauthorized(res, error.message);
+        return;
+      }
+      if (error.message === 'Account type mismatch') {
+        ResponseUtil.forbidden(res, 'This account belongs to a different profile type');
+        return;
+      }
+      if (error.message.includes('not configured')) {
+        ResponseUtil.serverError(res, error.message);
+        return;
+      }
+      if (error.message.includes('suspended')) {
+        ResponseUtil.forbidden(res, error.message);
+        return;
+      }
+
+      ResponseUtil.badRequest(res, error.message || 'Google authentication failed');
+    }
+  }
+
+  /**
    * Login user
    * POST /api/v1/auth/login
    */
   static async login(req: Request, res: Response): Promise<void> {
     try {
-      const { user, token } = await AuthService.login(req.body);
+      const { email, password, expected_type } = req.body;
+      const { user, token } = await AuthService.login({
+        email,
+        password,
+        expectedType: expected_type,
+      });
 
       ResponseUtil.success(res, { user, token }, 'Login successful');
     } catch (error: any) {
@@ -40,6 +83,11 @@ export class AuthController {
 
       if (error.message === 'Invalid credentials') {
         ResponseUtil.unauthorized(res, 'Invalid email or password');
+        return;
+      }
+
+      if (error.message === 'Account type mismatch') {
+        ResponseUtil.forbidden(res, 'This account belongs to a different profile type');
         return;
       }
 

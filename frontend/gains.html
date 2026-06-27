@@ -354,100 +354,71 @@
             color: #FFE66D;
         }
 
-        /* Bottom Navigation */
+        /* Bottom Navigation (unified GP nav) */
         .bottom-nav {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 65px;
-            background: linear-gradient(180deg, rgba(15, 12, 41, 0.95) 0%, rgba(26, 22, 48, 0.98) 100%);
-            backdrop-filter: blur(30px);
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(18, 16, 36, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
+            justify-content: space-around;
+            align-items: stretch;
+            padding: 9px 6px calc(9px + env(safe-area-inset-bottom));
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35);
         }
-
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 4px;
             cursor: pointer;
-            transition: all 0.4s ease;
-            padding: 6px 10px;
-            border-radius: 12px;
             flex: 1;
-            max-width: 70px;
             position: relative;
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.15) 50%, rgba(78, 205, 196, 0.1) 100%);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            box-shadow: 0 8px 24px rgba(255, 215, 0, 0.25);
-            transform: translateY(-6px);
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            filter: grayscale(0.8) brightness(0.7);
-            transition: all 0.4s ease;
-        }
-
-        .nav-item.active .nav-icon {
-            filter: grayscale(0) brightness(1.2);
-            transform: scale(1.1);
-        }
-
-        .nav-label {
-            font-size: 9px;
+            padding: 6px 0;
+            border-radius: 14px;
             color: rgba(255, 255, 255, 0.5);
-            font-weight: 700;
-            text-transform: uppercase;
+            transition: color 0.25s ease;
+            -webkit-tap-highlight-color: transparent;
         }
-
-        .nav-item.active .nav-label {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #4ECDC4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
+        .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+        .nav-icon svg {
+            width: 24px; height: 24px; fill: none; stroke: currentColor;
+            stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+            transition: transform 0.25s ease;
         }
-
+        .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
+        .nav-item.active { color: #FFC107; }
+        .nav-item.active .nav-icon svg { transform: translateY(-1px) scale(1.06); }
+        .nav-item.active::after {
+            content: ''; position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+            width: 26px; height: 3px; border-radius: 0 0 3px 3px;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+        }
+        .nav-item:not(.active):active { color: rgba(255, 255, 255, 0.85); }
         .nav-badge {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            min-width: 18px;
-            height: 18px;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            font-weight: 800;
-            color: white;
-            padding: 0 5px;
-            box-shadow: 0 3px 10px rgba(255, 215, 0, 0.6);
+            position: absolute; top: 0px; left: calc(50% + 5px);
+            min-width: 17px; height: 17px; background: #FF4757;
+            border: 1.5px solid #121024; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 800; color: white; padding: 0 4px;
         }
-    </style>
+        .nav-badge.new { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #1a1a2e; }
+        .nav-badge.hidden { display: none; }
+            /* sengp-responsive-override */
+        .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
+        body{padding:0!important;}
+        </style>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="theme.css">
+    <script src="ui.js"></script>
 </head>
-<body>
+<body class="ds">
     <div class="mobile-frame">
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <span class="time">9:41</span>
-            <div class="indicators">
-                <div class="signal"></div>
-                <div class="wifi"></div>
-                <div class="battery"></div>
-            </div>
-        </div>
 
         <!-- Header -->
         <div class="header">
@@ -463,8 +434,8 @@
             <!-- Balance Section -->
             <div class="balance-section">
                 <div class="balance-label">Solde disponible</div>
-                <div class="balance-amount">1,245,000 FCFA</div>
-                <div class="balance-pending">En attente: 120,000 FCFA</div>
+                <div class="balance-amount" id="availableBalance">0 FCFA</div>
+                <div class="balance-pending" id="pendingBalance">En attente: 0 FCFA</div>
                 <button class="withdraw-btn" onclick="withdraw()">Retirer</button>
             </div>
 
@@ -472,188 +443,193 @@
             <div class="stats-section">
                 <div class="stat-card">
                     <div class="stat-icon">📅</div>
-                    <div class="stat-value">185k</div>
+                    <div class="stat-value" id="statThisMonth">0</div>
                     <div class="stat-label">Ce mois</div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-icon">📊</div>
-                    <div class="stat-value">52k</div>
+                    <div class="stat-value" id="statAverage">0</div>
                     <div class="stat-label">Moyenne</div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-icon">🎯</div>
-                    <div class="stat-value">34</div>
+                    <div class="stat-value" id="statMissions">0</div>
                     <div class="stat-label">Missions</div>
                 </div>
             </div>
 
             <!-- Transactions Section -->
-            <div class="transactions-section">
+            <div class="transactions-section" id="txnSection">
                 <div class="section-header">
                     <h2 class="section-title">Transactions</h2>
                     <button class="filter-btn" onclick="filterTransactions()">Filtrer ↕</button>
                 </div>
 
-                <div class="date-separator">Aujourd'hui</div>
-
-                <!-- Transaction 1 - Income -->
-                <div class="transaction-card" onclick="viewTransaction('TXN-001')">
-                    <div class="transaction-icon income">💰</div>
-                    <div class="transaction-info">
-                        <div class="transaction-title">Paiement reçu</div>
-                        <div class="transaction-details">Mission Paris • Moussa D.</div>
-                    </div>
-                    <div class="transaction-amount">
-                        <div class="amount-value income">+65,000 FCFA</div>
-                        <div class="transaction-status status-completed">Terminé</div>
-                    </div>
-                </div>
-
-                <!-- Transaction 2 - Income -->
-                <div class="transaction-card" onclick="viewTransaction('TXN-002')">
-                    <div class="transaction-icon income">💰</div>
-                    <div class="transaction-info">
-                        <div class="transaction-title">Paiement reçu</div>
-                        <div class="transaction-details">Mission Paris • Aissatou S.</div>
-                    </div>
-                    <div class="transaction-amount">
-                        <div class="amount-value income">+55,000 FCFA</div>
-                        <div class="transaction-status status-pending">En attente</div>
-                    </div>
-                </div>
-
-                <div class="date-separator">Hier</div>
-
-                <!-- Transaction 3 - Withdrawal -->
-                <div class="transaction-card" onclick="viewTransaction('TXN-003')">
-                    <div class="transaction-icon withdrawal">📤</div>
-                    <div class="transaction-info">
-                        <div class="transaction-title">Retrait effectué</div>
-                        <div class="transaction-details">Wave • **** 1234</div>
-                    </div>
-                    <div class="transaction-amount">
-                        <div class="amount-value withdrawal">-200,000 FCFA</div>
-                        <div class="transaction-time">Hier, 14:30</div>
-                    </div>
-                </div>
-
-                <div class="date-separator">Cette semaine</div>
-
-                <!-- Transaction 4 - Income -->
-                <div class="transaction-card" onclick="viewTransaction('TXN-004')">
-                    <div class="transaction-icon income">💰</div>
-                    <div class="transaction-info">
-                        <div class="transaction-title">Paiement reçu</div>
-                        <div class="transaction-details">Mission New York • Ibrahima B.</div>
-                    </div>
-                    <div class="transaction-amount">
-                        <div class="amount-value income">+50,000 FCFA</div>
-                        <div class="transaction-time">15 Oct, 10:20</div>
-                    </div>
-                </div>
-
-                <!-- Transaction 5 - Income -->
-                <div class="transaction-card" onclick="viewTransaction('TXN-005')">
-                    <div class="transaction-icon income">💰</div>
-                    <div class="transaction-info">
-                        <div class="transaction-title">Paiement reçu</div>
-                        <div class="transaction-details">Mission Londres • Aminata K.</div>
-                    </div>
-                    <div class="transaction-amount">
-                        <div class="amount-value income">+60,000 FCFA</div>
-                        <div class="transaction-time">13 Oct, 16:45</div>
-                    </div>
-                </div>
-
-                <!-- Transaction 6 - Withdrawal -->
-                <div class="transaction-card" onclick="viewTransaction('TXN-006')">
-                    <div class="transaction-icon withdrawal">📤</div>
-                    <div class="transaction-info">
-                        <div class="transaction-title">Retrait effectué</div>
-                        <div class="transaction-details">Orange Money • **** 5678</div>
-                    </div>
-                    <div class="transaction-amount">
-                        <div class="amount-value withdrawal">-150,000 FCFA</div>
-                        <div class="transaction-time">12 Oct, 09:15</div>
-                    </div>
-                </div>
-
-                <!-- Transaction 7 - Income -->
-                <div class="transaction-card" onclick="viewTransaction('TXN-007')">
-                    <div class="transaction-icon income">💰</div>
-                    <div class="transaction-info">
-                        <div class="transaction-title">Bonus de performance</div>
-                        <div class="transaction-details">10 missions réussies</div>
-                    </div>
-                    <div class="transaction-amount">
-                        <div class="amount-value income">+25,000 FCFA</div>
-                        <div class="transaction-time">10 Oct, 12:00</div>
-                    </div>
-                </div>
-
-                <!-- Transaction 8 - Income -->
-                <div class="transaction-card" onclick="viewTransaction('TXN-008')">
-                    <div class="transaction-icon income">💰</div>
-                    <div class="transaction-info">
-                        <div class="transaction-title">Paiement reçu</div>
-                        <div class="transaction-details">Mission Madrid • Khady N.</div>
-                    </div>
-                    <div class="transaction-amount">
-                        <div class="amount-value income">+45,000 FCFA</div>
-                        <div class="transaction-time">08 Oct, 18:30</div>
-                    </div>
-                </div>
+                <p style="text-align:center;color:rgba(255,255,255,0.5);padding:40px;">Chargement des transactions…</p>
             </div>
         </div>
 
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
-            <div class="nav-item" onclick="navigateTo('home')">
-                <div class="nav-icon">🏠</div>
+            <div class="nav-item" onclick="navigateTo('home')" tabindex="0" role="button" aria-label="Accueil">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
                 <div class="nav-label">Accueil</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('missions')">
-                <div class="nav-icon">🔍</div>
+            <div class="nav-item" onclick="navigateTo('missions')" tabindex="0" role="button" aria-label="Missions">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
                 <div class="nav-label">Missions</div>
-                <div class="nav-badge">5</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('trips')">
-                <div class="nav-icon">✈️</div>
+            <div class="nav-item" onclick="navigateTo('trips')" tabindex="0" role="button" aria-label="Trajets">
+                <div class="nav-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M22 16.21v-1.6l-8.5-5V4.5a1.5 1.5 0 0 0-3 0v5.11l-8.5 5v1.6l8.5-2.66v4.54l-2.5 1.4v1.5l4-1.18 4 1.18v-1.5l-2.5-1.4v-4.54z"/></svg></div>
                 <div class="nav-label">Trajets</div>
-                <div class="nav-badge">2</div>
             </div>
 
-            <div class="nav-item active" onclick="navigateTo('earnings')">
-                <div class="nav-icon">💰</div>
+            <div class="nav-item active" onclick="navigateTo('earnings')" tabindex="0" role="button" aria-label="Gains">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
                 <div class="nav-label">Gains</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('profile')">
-                <div class="nav-icon">👤</div>
+            <div class="nav-item" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
                 <div class="nav-label">Profil</div>
             </div>
         </div>
     </div>
 
     <script>
+        const API_BASE_URL = window.API_BASE_URL;
+        let availableBalance = 0;
+
+        function getAuthToken() {
+            return localStorage.getItem('authToken');
+        }
+
+        function formatFCFA(amount) {
+            return `${Number(amount || 0).toLocaleString('fr-FR')} FCFA`;
+        }
+
+        function shortAmount(amount) {
+            const n = Number(amount || 0);
+            if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+            if (n >= 1000) return `${Math.round(n / 1000)}k`;
+            return String(n);
+        }
+
         function goBack() {
             window.location.href = 'dashgp.html';
         }
 
-        function withdraw() {
-            alert('Retirer vos gains\n\nSolde disponible: 1,245,000 FCFA\n\nMéthodes de retrait:\n- Wave\n- Orange Money\n- Free Money\n- Virement bancaire\n\nMontant minimum: 10,000 FCFA\nDélai de traitement: 24-48h');
+        async function loadWallet() {
+            const token = getAuthToken();
+            if (!token) {
+                window.location.href = 'connexion.html';
+                return;
+            }
+
+            try {
+                const [walletRes, txnRes] = await Promise.all([
+                    fetch(`${API_BASE_URL}/wallet/me`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${API_BASE_URL}/wallet/transactions`, { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+
+                if (walletRes.ok) {
+                    const wallet = (await walletRes.json()).data;
+                    availableBalance = wallet.available_balance || 0;
+                    document.getElementById('availableBalance').textContent = formatFCFA(wallet.available_balance);
+                    document.getElementById('pendingBalance').textContent = `En attente: ${formatFCFA(wallet.pending_balance)}`;
+                    document.getElementById('statThisMonth').textContent = shortAmount(wallet.this_month);
+                    document.getElementById('statAverage').textContent = shortAmount(wallet.average);
+                    document.getElementById('statMissions').textContent = wallet.missions_completed || 0;
+                }
+
+                if (txnRes.ok) {
+                    const transactions = (await txnRes.json()).data || [];
+                    renderTransactions(transactions);
+                }
+            } catch (error) {
+                console.error('Error loading wallet:', error);
+            }
         }
 
-        function filterTransactions() {
-            alert('Filtrer les transactions\n\nOptions:\n- Toutes\n- Gains uniquement\n- Retraits uniquement\n- Ce mois\n- Ce trimestre\n- Cette année\n- Par montant');
+        function renderTransactions(transactions) {
+            const statusLabels = {
+                completed: 'Terminé', pending: 'En attente', processing: 'En cours',
+                failed: 'Échoué', approved: 'Approuvé', rejected: 'Rejeté'
+            };
+            const titles = { income: 'Paiement reçu', expense: 'Paiement envoyé', withdrawal: 'Retrait effectué' };
+
+            let cards = '';
+            if (transactions.length === 0) {
+                cards = '<p style="text-align:center;color:rgba(255,255,255,0.5);padding:40px;">Aucune transaction</p>';
+            } else {
+                cards = transactions.map(tx => {
+                    const isIncome = tx.direction === 'income';
+                    const sign = isIncome ? '+' : '-';
+                    const cls = isIncome ? 'income' : 'withdrawal';
+                    const icon = isIncome ? '💰' : '📤';
+                    const date = new Date(tx.created_at).toLocaleDateString('fr-FR');
+                    return `
+                        <div class="transaction-card">
+                            <div class="transaction-icon ${cls}">${icon}</div>
+                            <div class="transaction-info">
+                                <div class="transaction-title">${titles[tx.direction] || 'Transaction'}</div>
+                                <div class="transaction-details">${tx.method || ''} • ${tx.reference || ''}</div>
+                            </div>
+                            <div class="transaction-amount">
+                                <div class="amount-value ${cls}">${sign}${formatFCFA(tx.amount)}</div>
+                                <div class="transaction-time">${date}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            document.getElementById('txnSection').innerHTML = `
+                <div class="section-header">
+                    <h2 class="section-title">Transactions</h2>
+                </div>
+                ${cards}
+            `;
         }
 
-        function viewTransaction(txnId) {
-            alert(`Détails de la transaction ${txnId}\n\nInformations complètes:\n- Date et heure\n- Montant\n- Commission SEN GP\n- Montant net\n- Statut\n- Référence\n- Méthode de paiement\n\nOption de téléchargement du reçu PDF`);
+        async function withdraw() {
+            const token = getAuthToken();
+            if (availableBalance <= 0) {
+                alert('Solde insuffisant pour effectuer un retrait.');
+                return;
+            }
+
+            const amount = prompt(`Montant à retirer (solde disponible: ${formatFCFA(availableBalance)})`);
+            if (!amount) return;
+
+            const method = prompt('Méthode de retrait (wave, orange_money, free_money, bank_transfer):', 'wave');
+            if (!method) return;
+
+            const account_number = prompt('Numéro de compte / téléphone:');
+            if (!account_number) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/withdrawals`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: Number(amount), method, account_number })
+                });
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    alert('Demande de retrait envoyée !\n\nElle sera traitée par un administrateur sous 24-48h.');
+                    loadWallet();
+                } else {
+                    alert('Erreur: ' + (result.error || result.message || 'Demande de retrait échouée'));
+                }
+            } catch (error) {
+                console.error('Error requesting withdrawal:', error);
+                alert('Erreur de connexion au serveur.');
+            }
         }
 
         function navigateTo(section) {
@@ -669,6 +645,8 @@
                 window.location.href = pages[section];
             }
         }
+
+        window.addEventListener('load', loadWallet);
     </script>
 </body>
 </html>

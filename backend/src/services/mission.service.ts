@@ -1,8 +1,11 @@
 import pool from '../config/database';
-import { Mission, MissionStatus, PaginatedResult } from '../types';
+import { Mission, MissionStatus, NotificationType, PaginatedResult } from '../types';
 import { Helpers } from '../utils/helpers';
 import logger from '../utils/logger';
 import QRCode from 'qrcode';
+import crypto from 'crypto';
+import axios from 'axios';
+import { NotificationService } from './notification.service';
 
 export class MissionService {
   /**
@@ -30,8 +33,8 @@ export class MissionService {
           arrival_country, arrival_city, delivery_address, package_weight, package_length,
           package_width, package_height, package_description, package_value, package_photos,
           desired_departure_date, desired_arrival_date, offered_price, is_price_negotiable,
-          is_insured, insurance_cost, tracking_number
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
+          is_insured, insurance_cost, tracking_number, recipient_name, recipient_phone
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)
         RETURNING *`,
         [
           mission_code,
@@ -56,6 +59,8 @@ export class MissionService {
           data.is_insured !== false,
           insurance_cost,
           tracking_number,
+          (data as any).recipient_name || null,
+          (data as any).recipient_phone || null,
         ]
       );
 
@@ -123,38 +128,41 @@ export class MissionService {
     const queryParams: any[] = [];
     let paramIndex = 1;
 
+    // NOTE: the data query JOINs users (which also has a `status` column), so every
+    // missions column referenced here must be qualified with the `m.` alias to avoid
+    // an "ambiguous column" error. The count query below aliases missions as `m` too.
     if (params.status) {
-      whereClause += ` AND status = $${paramIndex}`;
+      whereClause += ` AND m.status = $${paramIndex}`;
       queryParams.push(params.status);
       paramIndex++;
     }
 
     if (params.expediteur_id) {
-      whereClause += ` AND expediteur_id = $${paramIndex}`;
+      whereClause += ` AND m.expediteur_id = $${paramIndex}`;
       queryParams.push(params.expediteur_id);
       paramIndex++;
     }
 
     if (params.gp_id) {
-      whereClause += ` AND gp_id = $${paramIndex}`;
+      whereClause += ` AND m.gp_id = $${paramIndex}`;
       queryParams.push(params.gp_id);
       paramIndex++;
     }
 
     if (params.departure_city) {
-      whereClause += ` AND departure_city ILIKE $${paramIndex}`;
+      whereClause += ` AND m.departure_city ILIKE $${paramIndex}`;
       queryParams.push(`%${params.departure_city}%`);
       paramIndex++;
     }
 
     if (params.arrival_city) {
-      whereClause += ` AND arrival_city ILIKE $${paramIndex}`;
+      whereClause += ` AND m.arrival_city ILIKE $${paramIndex}`;
       queryParams.push(`%${params.arrival_city}%`);
       paramIndex++;
     }
 
-    // Get total count with separate query
-    const countQuery = `SELECT COUNT(*) FROM missions ${whereClause}`;
+    // Get total count with separate query (alias missions as m to match whereClause)
+    const countQuery = `SELECT COUNT(*) FROM missions m ${whereClause}`;
     const countResult = await pool.query(countQuery, queryParams);
     const total = parseInt(countResult.rows[0].count);
 
@@ -289,6 +297,81 @@ export class MissionService {
   }
 
   /**
+   * Public, read-only tracking by an opaque token (the tracking_number or
+   * mission_code). Returns ONLY non-sensitive fields (no addresses, prices,
+   * phones or internal ids) for the recipient's public tracking page.
+   */
+  static async getPublicTracking(token: string): Promise<any> {
+    const mRes = await pool.query(
+      `SELECT m.id, m.mission_code, m.tracking_number, m.status,
+              m.departure_country, m.departure_city, m.arrival_country, m.arrival_city,
+              m.package_weight, m.desired_departure_date, m.desired_arrival_date,
+              m.created_at, m.completed_at,
+              g.first_name AS gp_first_name
+       FROM missions m
+       LEFT JOIN users g ON m.gp_id = g.id
+       WHERE m.tracking_number = $1 OR m.mission_code = $1
+       LIMIT 1`,
+      [token]
+    );
+    if (mRes.rows.length === 0) throw new Error('Not found');
+    const m = mRes.rows[0];
+
+    const tRes = await pool.query(
+      `SELECT status, location, latitude, longitude, description, created_at
+       FROM mission_tracking WHERE mission_id = $1 ORDER BY created_at DESC`,
+      [m.id]
+    );
+
+    return {
+      mission: {
+        mission_code: m.mission_code,
+        tracking_number: m.tracking_number,
+        status: m.status,
+        departure_country: m.departure_country,
+        departure_city: m.departure_city,
+        arrival_country: m.arrival_country,
+        arrival_city: m.arrival_city,
+        package_weight: m.package_weight,
+        desired_departure_date: m.desired_departure_date,
+        desired_arrival_date: m.desired_arrival_date,
+        created_at: m.created_at,
+        completed_at: m.completed_at,
+        gp_first_name: m.gp_first_name,
+      },
+      tracking: tRes.rows,
+    };
+  }
+
+  /**
+   * Record a live GPS position for a mission (sent by the assigned GP while in
+   * transit). Stored as a `location` tracking entry so the expéditeur's map can
+   * show the latest point. Only the assigned GP, on an active mission, may post.
+   */
+  static async addLocation(
+    missionId: string,
+    gpId: string,
+    latitude: number,
+    longitude: number
+  ): Promise<void> {
+    const check = await pool.query(
+      'SELECT gp_id, status FROM missions WHERE id = $1',
+      [missionId]
+    );
+    if (check.rows.length === 0) throw new Error('Mission not found');
+    const m = check.rows[0];
+    if (m.gp_id !== gpId) throw new Error('Not your mission');
+    const active = ['accepted', 'picked_up', 'in_transit', 'in_customs', 'out_for_delivery'];
+    if (!active.includes(m.status)) throw new Error('Mission is not in transit');
+
+    await pool.query(
+      `INSERT INTO mission_tracking (mission_id, status, latitude, longitude, description, created_by)
+       VALUES ($1, 'location', $2, $3, 'Position GPS', $4)`,
+      [missionId, latitude, longitude, gpId]
+    );
+  }
+
+  /**
    * Update mission status
    */
   static async updateStatus(
@@ -319,7 +402,8 @@ export class MissionService {
         [id, status, `Status changed to ${status}`, userId]
       );
 
-      // If delivered, update completion date
+      // If delivered, update completion date, credit the GP, and pay them out.
+      let creditedNet = 0;
       if (status === MissionStatus.DELIVERED) {
         await client.query(
           `UPDATE missions SET completed_at = CURRENT_TIMESTAMP, actual_delivery_date = CURRENT_TIMESTAMP
@@ -334,11 +418,54 @@ export class MissionService {
            WHERE user_id = $1`,
           [mission.gp_id]
         );
+
+        // Credit the GP wallet from the mission's completed (upfront) payment.
+        if (mission.gp_id) {
+          const payRes = await client.query(
+            `SELECT net_amount FROM payments
+             WHERE mission_id = $1 AND status = 'completed' AND transaction_type = 'mission_payment'
+             ORDER BY completed_at DESC LIMIT 1`,
+            [id]
+          );
+
+          if (payRes.rows.length > 0) {
+            creditedNet = Number(payRes.rows[0].net_amount) || 0;
+
+            await client.query(
+              `INSERT INTO wallet_balances (user_id) VALUES ($1) ON CONFLICT (user_id) DO NOTHING`,
+              [mission.gp_id]
+            );
+            await client.query(
+              `UPDATE wallet_balances
+               SET available_balance = available_balance + $1, total_earned = total_earned + $1
+               WHERE user_id = $2`,
+              [creditedNet, mission.gp_id]
+            );
+            await client.query(
+              `UPDATE gp_profiles SET total_earnings = total_earnings + $1 WHERE user_id = $2`,
+              [creditedNet, mission.gp_id]
+            );
+          }
+        }
       }
 
       await client.query('COMMIT');
 
       logger.info(`Mission ${id} status updated to ${status}`);
+
+      // Notify the GP of their earnings (best-effort, outside the transaction).
+      if (creditedNet > 0 && mission.gp_id) {
+        try {
+          await NotificationService.create({
+            user_id: mission.gp_id,
+            notification_type: NotificationType.PAYMENT_RECEIVED,
+            title: 'Gains crédités',
+            message: `Vous avez gagné ${Helpers.formatCurrency(creditedNet)} pour la mission ${mission.mission_code}.`,
+          });
+        } catch (e: any) {
+          logger.warn('Failed to create earnings notification:', e.message);
+        }
+      }
 
       return mission;
     } catch (error) {
@@ -374,6 +501,146 @@ export class MissionService {
     );
 
     return qrCodeUrl;
+  }
+
+  /**
+   * Phase 2 — proof of delivery.
+   * Ensure the mission has a secret `delivery_token` (carried by the package QR),
+   * then return the public confirmation URL + a QR image (data URL) for it.
+   */
+  static async generateDeliveryQR(
+    missionId: string,
+    baseUrl: string
+  ): Promise<{ token: string; confirm_url: string; qr_code_url: string }> {
+    const mr = await pool.query(
+      'SELECT id, delivery_token, expediteur_id, gp_id FROM missions WHERE id = $1',
+      [missionId]
+    );
+    if (mr.rows.length === 0) throw new Error('Mission not found');
+    let token = mr.rows[0].delivery_token;
+    if (!token) {
+      token = crypto.randomBytes(16).toString('hex');
+      await pool.query('UPDATE missions SET delivery_token = $1 WHERE id = $2', [token, missionId]);
+    }
+    const confirm_url = `${baseUrl}/d/${token}`;
+    const qr_code_url = await QRCode.toDataURL(confirm_url, { margin: 1, width: 320 });
+    return { token, confirm_url, qr_code_url };
+  }
+
+  /** Public, minimal mission info for the delivery-confirmation page. */
+  static async getDeliveryInfo(token: string): Promise<any> {
+    const r = await pool.query(
+      `SELECT mission_code, tracking_number, status,
+              departure_city, arrival_city, arrival_country, package_weight,
+              recipient_name
+       FROM missions WHERE delivery_token = $1`,
+      [token]
+    );
+    if (r.rows.length === 0) throw new Error('Not found');
+    return r.rows[0];
+  }
+
+  /** Set/update the recipient identity (expediteur owner only). */
+  static async setRecipient(
+    missionId: string,
+    expediteurId: string,
+    name?: string,
+    phone?: string
+  ): Promise<any> {
+    const r = await pool.query(
+      `UPDATE missions SET recipient_name = $1, recipient_phone = $2, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $3 AND expediteur_id = $4
+       RETURNING id, recipient_name, recipient_phone`,
+      [name || null, phone || null, missionId, expediteurId]
+    );
+    if (r.rows.length === 0) throw new Error('Mission not found or not yours');
+    return r.rows[0];
+  }
+
+  /**
+   * Recipient confirms delivery by scanning the package QR. Idempotent: if the
+   * mission is already delivered, it's a no-op. Otherwise it runs the full
+   * delivered transition (wallet credit, etc.) and records a proof entry.
+   */
+  static async confirmDeliveryByToken(
+    token: string,
+    proof: { lat?: number; lng?: number } = {}
+  ): Promise<{ already: boolean }> {
+    const r = await pool.query(
+      `SELECT id, status, gp_id, expediteur_id, arrival_city, arrival_country
+       FROM missions WHERE delivery_token = $1`,
+      [token]
+    );
+    if (r.rows.length === 0) throw new Error('Not found');
+    const m = r.rows[0];
+    if (m.status === 'cancelled') throw new Error('Mission cancelled');
+    if (m.status === 'delivered') return { already: true };
+
+    // Anti-fraude : si le destinataire partage sa position, elle doit être proche
+    // de la ville d'arrivée. (Si pas de GPS ou géocodage indisponible, on ne bloque pas.)
+    if (proof.lat != null && proof.lng != null) {
+      const dest = await this.geocodeCity(m.arrival_city, m.arrival_country);
+      if (dest) {
+        const km = this.haversineKm(proof.lat, proof.lng, dest.lat, dest.lng);
+        const limit = parseFloat(process.env.DELIVERY_GEOFENCE_KM || '60');
+        if (km > limit) {
+          throw new Error(
+            `Vous semblez loin du lieu de livraison (${m.arrival_city} · ~${Math.round(km)} km). ` +
+            `Confirmez la réception une fois sur place avec le colis.`
+          );
+        }
+      }
+    }
+
+    const actor = m.gp_id || m.expediteur_id;
+    // Full delivered transition (credits GP wallet, etc.)
+    await this.updateStatus(m.id, MissionStatus.DELIVERED, actor);
+    // Proof-of-delivery tracking entry (with the recipient's GPS if shared)
+    await pool.query(
+      `INSERT INTO mission_tracking (mission_id, status, latitude, longitude, description, created_by)
+       VALUES ($1, 'delivered', $2, $3, 'Réception confirmée par le destinataire (QR)', $4)`,
+      [m.id, proof.lat ?? null, proof.lng ?? null, actor]
+    );
+    return { already: false };
+  }
+
+  /** Process-level cache of geocoded city centres ("city,country" -> {lat,lng}). */
+  private static geocodeCache: Map<string, { lat: number; lng: number } | null> = new Map();
+
+  /** Geocode a city centre via OpenStreetMap Nominatim. Returns null on failure. */
+  static async geocodeCity(
+    city?: string,
+    country?: string
+  ): Promise<{ lat: number; lng: number } | null> {
+    const q = [city, country].filter(Boolean).join(', ').trim();
+    if (!q) return null;
+    if (this.geocodeCache.has(q)) return this.geocodeCache.get(q) as any;
+    try {
+      const res = await axios.get('https://nominatim.openstreetmap.org/search', {
+        params: { q, format: 'json', limit: 1 },
+        headers: { 'User-Agent': 'SENGP/1.0 (delivery-geofence)' },
+        timeout: 6000,
+      });
+      const hit = Array.isArray(res.data) && res.data[0];
+      const coords = hit ? { lat: parseFloat(hit.lat), lng: parseFloat(hit.lon) } : null;
+      this.geocodeCache.set(q, coords);
+      return coords;
+    } catch (e) {
+      logger.warn(`Geocoding failed for "${q}"`);
+      return null; // ne pas bloquer la confirmation si le géocodage échoue
+    }
+  }
+
+  /** Great-circle distance between two lat/lng points, in kilometres. */
+  static haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371;
+    const toRad = (d: number) => (d * Math.PI) / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(a)));
   }
 
   /**

@@ -19,21 +19,23 @@ const logger = winston.createLogger({
   ],
 });
 
-// If we're not in production, log to the console as well
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple(),
-        winston.format.printf(({ timestamp, level, message, ...rest }) => {
-          return `${timestamp} [${level}]: ${message} ${
-            Object.keys(rest).length ? JSON.stringify(rest, null, 2) : ''
-          }`;
-        })
-      ),
-    })
-  );
-}
+// Always log to the console so hosting platforms (App Runner / CloudWatch, etc.)
+// capture application logs. JSON in production, pretty output in development.
+logger.add(
+  new winston.transports.Console({
+    format:
+      process.env.NODE_ENV === 'production'
+        ? winston.format.json()
+        : winston.format.combine(
+            winston.format.colorize(),
+            winston.format.simple(),
+            winston.format.printf(({ timestamp, level, message, ...rest }) => {
+              return `${timestamp} [${level}]: ${message} ${
+                Object.keys(rest).length ? JSON.stringify(rest, null, 2) : ''
+              }`;
+            })
+          ),
+  })
+);
 
 export default logger;

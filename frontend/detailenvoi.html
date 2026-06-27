@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEN GP - Détails de l'envoi</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);
+            min-height:100vh; display:flex; justify-content:center; color:#fff;
+        }
+        .mobile-frame {
+            width:100%; max-width:480px; min-height:100vh; min-height:100dvh; position:relative;
+            background: linear-gradient(135deg, rgba(15,12,41,.95), rgba(36,36,62,.95));
+        }
+        .header {
+            display:flex; align-items:center; gap:14px; padding:18px 20px;
+            border-bottom:1px solid rgba(255,255,255,.1); position:sticky; top:0;
+            background:rgba(20,18,40,.85); backdrop-filter:blur(10px); z-index:5;
+        }
+        .back-btn { width:44px; height:44px; border:none; border-radius:12px; cursor:pointer;
+            background:rgba(255,255,255,.1); color:#fff; display:flex; align-items:center; justify-content:center; }
+        .ico { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+        .header h1 { font-size:18px; }
+        .content { padding:20px; padding-bottom:40px; }
+        .card { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+            border-radius:16px; padding:18px; margin-bottom:16px; }
+        .price { font-size:26px; font-weight:800; color:#FFD700; }
+        .badge { display:inline-block; padding:5px 12px; border-radius:9px; font-size:12px; font-weight:700; margin-top:6px; }
+        .b-yellow{background:rgba(255,215,0,.18);color:#FFD700;} .b-blue{background:rgba(78,205,196,.2);color:#4ECDC4;}
+        .b-green{background:rgba(76,175,80,.2);color:#7ee081;} .b-red{background:rgba(255,107,107,.2);color:#ff8f8f;}
+        .route { display:flex; align-items:center; gap:10px; margin:14px 0; }
+        .route .loc { flex:1; }
+        .route .flag { font-size:26px; } .route .city { font-weight:700; } .route .country { font-size:12px; color:rgba(255,255,255,.6); }
+        .route .arrow { color:rgba(255,255,255,.4); font-size:20px; }
+        .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .kv { background:rgba(255,255,255,.04); border-radius:10px; padding:11px; }
+        .kv .k { font-size:11px; color:rgba(255,255,255,.5); text-transform:uppercase; margin-bottom:3px; }
+        .kv .v { font-size:14px; font-weight:600; }
+        .section-title { font-size:15px; font-weight:700; margin:4px 0 12px; display:flex; align-items:center; gap:8px; }
+        .section-title .ico { color:#4ECDC4; width:17px; height:17px; }
+        .map-btn, .btn {
+            display:block; width:100%; text-align:center; padding:13px; border-radius:12px; border:none;
+            font-weight:700; font-size:14px; cursor:pointer; text-decoration:none; margin-top:10px;
+        }
+        .map-btn { background:linear-gradient(135deg,#4ECDC4,#44A08D); color:#06302c; }
+        .btn-cancel { background:rgba(255,107,107,.18); color:#ff8f8f; border:1px solid rgba(255,107,107,.3); }
+        iframe.map { width:100%; height:200px; border:0; border-radius:12px; margin-top:8px; }
+        /* timeline */
+        .timeline { position:relative; padding-left:24px; }
+        .timeline::before { content:''; position:absolute; left:7px; top:4px; bottom:4px; width:2px; background:rgba(255,255,255,.12); }
+        .tl-item { position:relative; padding-bottom:18px; }
+        .tl-item::before { content:''; position:absolute; left:-22px; top:3px; width:14px; height:14px; border-radius:50%;
+            background:#4ECDC4; box-shadow:0 0 0 3px rgba(78,205,196,.2); }
+        .tl-item.muted::before { background:rgba(255,255,255,.3); box-shadow:none; }
+        .tl-status { font-weight:700; font-size:14px; }
+        .tl-desc { font-size:12px; color:rgba(255,255,255,.7); margin-top:2px; }
+        .tl-date { font-size:11px; color:rgba(255,255,255,.45); margin-top:2px; }
+        .loading,.empty { text-align:center; padding:40px; color:rgba(255,255,255,.5); }
+        /* Bottom sheet (partage) */
+        .sheet-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
+        .sheet-ov.open{opacity:1;pointer-events:auto}
+        .sheet{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#1d1b34;border-radius:22px 22px 0 0;
+            padding:10px 18px calc(22px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);z-index:51}
+        .sheet-ov.open .sheet{transform:translateY(0)}
+        .sheet-grip{width:42px;height:5px;border-radius:3px;background:rgba(255,255,255,.25);margin:6px auto 14px}
+        .sheet h3{font-size:16px;margin-bottom:4px}
+        .sheet .url{font-size:11px;color:rgba(255,255,255,.5);word-break:break-all;margin-bottom:14px}
+        .share-opt{display:flex;align-items:center;gap:14px;width:100%;padding:14px;border:none;border-radius:14px;background:rgba(255,255,255,.06);color:#fff;font-size:15px;font-weight:600;margin-bottom:10px;cursor:pointer;text-align:left}
+        .share-opt .ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px}
+        .ic-wa{background:#25D366}.ic-mail{background:#EA4335}.ic-copy{background:rgba(255,255,255,.15)}
+    </style>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="theme.css">
+    <script src="ui.js"></script>
+</head>
+<body class="ds">
+    <div class="mobile-frame">
+        <div class="header">
+            <button class="back-btn" onclick="goBack()" aria-label="Retour"><svg class="ico" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
+            <h1>Détails de l'envoi</h1>
+        </div>
+        <div class="content" id="content">
+            <div class="loading">Chargement…</div>
+        </div>
+    </div>
+
+    <!-- Bottom sheet de partage -->
+    <div class="sheet-ov" id="shareSheet" onclick="if(event.target===this)closeShareSheet()">
+        <div class="sheet">
+            <div class="sheet-grip"></div>
+            <h3>Partager le suivi</h3>
+            <div class="url" id="shareText"></div>
+            <button class="share-opt" id="waBtn"><span class="ic ic-wa"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.54-3.87c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 0 0 1.523 5.26l-.999 3.648 3.965-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg></span> WhatsApp</button>
+            <button class="share-opt" id="mailBtn"><span class="ic ic-mail"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span> Email / Gmail</button>
+            <button class="share-opt" id="copyBtn"><span class="ic ic-copy"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span> Copier le lien</button>
+        </div>
+    </div>
+
+    <script>
+        const API = window.API_BASE_URL;
+        const token = localStorage.getItem('authToken');
+        const params = new URLSearchParams(location.search);
+        const missionId = params.get('id');
+        let mission = null;
+
+        const FLAGS = {'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱'};
+        const flag = c => FLAGS[c] || '🌍';
+        const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const fcfa = n => (Number(n)||0).toLocaleString('fr-FR')+' FCFA';
+        const dt = d => d ? new Date(d).toLocaleString('fr-FR',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+
+        const STATUS = {
+            pending:['En attente','b-yellow'], matched:['Correspondance','b-yellow'], accepted:['Accepté','b-blue'],
+            picked_up:['Récupéré','b-blue'], in_transit:['En transit','b-blue'], in_customs:['En douane','b-blue'],
+            out_for_delivery:['En livraison','b-blue'], delivered:['Livré','b-green'], cancelled:['Annulé','b-red'], disputed:['Litige','b-red']
+        };
+        function statusBadge(s){ const m=STATUS[String(s||'').toLowerCase()]||[s,'b-yellow']; return `<span class="badge ${m[1]}">${esc(m[0])}</span>`; }
+
+        function goBack(){ if (history.length>1) history.back(); else location.href='dashexpediteur.html'; }
+
+        async function load(){
+            if (!token){ location.href='connexion.html'; return; }
+            if (!missionId){ document.getElementById('content').innerHTML='<div class="empty">Envoi introuvable.</div>'; return; }
+            try {
+                const [mRes, tRes] = await Promise.all([
+                    fetch(`${API}/missions/${missionId}`, { headers:{ 'Authorization':'Bearer '+token } }),
+                    fetch(`${API}/missions/${missionId}/tracking`, { headers:{ 'Authorization':'Bearer '+token } })
+                ]);
+                if (!mRes.ok) throw new Error('Chargement impossible');
+                mission = (await mRes.json()).data;
+                const tracking = tRes.ok ? ((await tRes.json()).data || []) : [];
+                render(mission, tracking);
+            } catch(e){
+                document.getElementById('content').innerHTML = `<div class="empty">Erreur: ${esc(e.message)}</div>`;
+            }
+        }
+
+        function render(m, tracking){
+            const dims = [m.package_length,m.package_width,m.package_height].every(x=>x!=null)
+                ? `${m.package_length}×${m.package_width}×${m.package_height} cm` : 'N/C';
+            // Carte: si une position GPS existe, l'afficher; sinon lien itinéraire.
+            const gps = tracking.find(t => t.latitude && t.longitude);
+            let mapBlock;
+            if (gps){
+                const la=Number(gps.latitude), lo=Number(gps.longitude), d=0.05;
+                mapBlock = `<iframe class="map" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=${lo-d}%2C${la-d}%2C${lo+d}%2C${la+d}&layer=mapnik&marker=${la}%2C${lo}"></iframe>`
+                    + `<div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.4-5.4 9-8 11-2.6-2-8-6.6-8-11a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>Dernière position du GP · ${dt(gps.created_at)}</div>`;
+            } else {
+                mapBlock = '<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px;">Position GPS non disponible. Voir l\'itinéraire prévu :</div>';
+            }
+            const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent((m.departure_city||'')+', '+(m.departure_country||''))}&destination=${encodeURIComponent((m.arrival_city||'')+', '+(m.arrival_country||''))}`;
+
+            const canCancel = ['pending','matched'].includes(String(m.status||'').toLowerCase());
+            const isActive = !['delivered','cancelled'].includes(String(m.status||'').toLowerCase());
+
+            // Les pings GPS (status 'location') alimentent la carte mais pas la timeline.
+            const events = tracking.filter(t => String(t.status||'').toLowerCase() !== 'location');
+            const tl = events.length ? events.map((t,idx)=>`
+                <div class="tl-item ${idx>0?'muted':''}">
+                    <div class="tl-status">${esc((STATUS[String(t.status||'').toLowerCase()]||[t.status])[0])}</div>
+                    ${t.description?`<div class="tl-desc">${esc(t.description)}</div>`:''}
+                    ${t.location?`<div class="tl-desc" style="display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.4-5.4 9-8 11-2.6-2-8-6.6-8-11a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(t.location)}</div>`:''}
+                    <div class="tl-date">${dt(t.created_at)}</div>
+                </div>`).join('')
+                : `<div class="tl-item"><div class="tl-status">${esc((STATUS[String(m.status||'').toLowerCase()]||[m.status])[0])}</div><div class="tl-date">${dt(m.created_at)}</div></div>`;
+
+            document.getElementById('content').innerHTML = `
+                <div class="card">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                        <div><div class="price">${fcfa(m.offered_price)}</div>
+                        <div style="font-size:12px;color:rgba(255,255,255,.5);">${esc(m.mission_code||'')}</div></div>
+                        <div style="text-align:right;">${statusBadge(m.status)}</div>
+                    </div>
+                    <div class="route">
+                        <div class="loc"><div class="flag">${flag(m.departure_country)}</div><div class="city">${esc(m.departure_city||'—')}</div><div class="country">${esc(m.departure_country||'')}</div></div>
+                        <div class="arrow">→</div>
+                        <div class="loc"><div class="flag">${flag(m.arrival_country)}</div><div class="city">${esc(m.arrival_city||'—')}</div><div class="country">${esc(m.arrival_country||'')}</div></div>
+                    </div>
+                    <div class="kv" style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;">
+                        <div><div class="k">Destinataire</div><div class="v">${m.recipient_name?esc(m.recipient_name):'Non renseigné'}${m.recipient_phone?' · '+esc(m.recipient_phone):''}</div></div>
+                        <button onclick="editRecipient()" aria-label="Modifier le destinataire" style="background:rgba(255,255,255,.1);border:none;color:#4ECDC4;border-radius:8px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.76v15"/><path d="M9 3.24v15"/></svg>Suivi en temps réel</div>
+                    ${mapBlock}
+                    <a class="map-btn" href="${mapsUrl}" target="_blank" rel="noopener">Voir l'itinéraire sur la carte</a>
+                    <button class="btn" style="background:rgba(78,205,196,.18);color:#4ECDC4;border:1px solid rgba(78,205,196,.3);" onclick="openShareSheet()"><svg class="ico" viewBox="0 0 24 24" style="display:inline-block;vertical-align:-4px;margin-right:6px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Partager le suivi avec le destinataire</button>
+                </div>
+
+                ${isActive ? `<div class="card">
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>Preuve de livraison (QR)</div>
+                    <div id="qrBox"><button class="btn" style="background:rgba(255,215,0,.15);color:#FFD700;border:1px solid rgba(255,215,0,.3);" onclick="loadDeliveryQR()">Générer l'étiquette QR du colis</button></div>
+                    <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:8px;">Imprimez / collez l'étiquette sur le colis. Le destinataire scanne ce QR à la réception.</div>
+                </div>` : ''}
+
+                <div class="card">
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>Historique du suivi</div>
+                    <div class="timeline">${tl}</div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>Colis</div>
+                    <div class="grid">
+                        <div class="kv"><div class="k">Poids</div><div class="v">${parseFloat(m.package_weight)||0} kg</div></div>
+                        <div class="kv"><div class="k">Dimensions</div><div class="v">${esc(dims)}</div></div>
+                        <div class="kv"><div class="k">Valeur déclarée</div><div class="v">${m.package_value?fcfa(m.package_value):'—'}</div></div>
+                        <div class="kv"><div class="k">Assuré</div><div class="v">${m.is_insured?'Oui':'Non'}</div></div>
+                    </div>
+                    ${m.package_description?`<div class="kv" style="margin-top:10px;"><div class="k">Description</div><div class="v">${esc(m.package_description)}</div></div>`:''}
+                </div>
+
+                <div class="card">
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>Détails</div>
+                    <div class="grid">
+                        <div class="kv"><div class="k">Enlèvement</div><div class="v">${esc(m.pickup_address||'—')}</div></div>
+                        <div class="kv"><div class="k">Livraison</div><div class="v">${esc(m.delivery_address||'—')}</div></div>
+                        <div class="kv"><div class="k">Départ souhaité</div><div class="v">${m.desired_departure_date?new Date(m.desired_departure_date).toLocaleDateString('fr-FR'):'—'}</div></div>
+                        <div class="kv"><div class="k">Suivi n°</div><div class="v">${esc(m.tracking_number||'—')}</div></div>
+                        <div class="kv"><div class="k">GP</div><div class="v">${m.gp_first_name?esc(m.gp_first_name+' '+(m.gp_last_name||'')):'En recherche…'}</div></div>
+                        <div class="kv"><div class="k">Créé le</div><div class="v">${new Date(m.created_at).toLocaleDateString('fr-FR')}</div></div>
+                    </div>
+                </div>
+
+                ${canCancel?`<button class="btn btn-cancel" onclick="cancelShipment()">Annuler l'envoi</button>`:''}
+            `;
+        }
+
+        function publicTrackUrl(){
+            const origin = API.replace(/\/api\/v1\/?$/, '');
+            const token = (mission && (mission.tracking_number || mission.mission_code)) || '';
+            return origin + '/t/' + encodeURIComponent(token);
+        }
+        async function loadDeliveryQR(){
+            const box = document.getElementById('qrBox');
+            box.innerHTML = 'Génération…';
+            try {
+                const res = await fetch(`${API}/missions/${missionId}/delivery-qr`, {
+                    method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' }
+                });
+                const j = await res.json();
+                if (res.ok && j.success) {
+                    const m = mission || {};
+                    const recip = m.recipient_name ? esc(m.recipient_name) : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#d9480f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> <span style="color:#d9480f">Destinataire non renseigné</span>';
+                    const code = esc(m.tracking_number || m.mission_code || '');
+                    // Étiquette à imprimer/coller : identité lisible + QR de confirmation.
+                    box.innerHTML = `
+                        <div style="background:#fff;color:#1a1a2e;border-radius:12px;padding:16px;text-align:center;">
+                            <div style="font-weight:800;font-size:15px;letter-spacing:1px;">SEN GP</div>
+                            <div style="font-size:15px;margin-top:6px;">Pour : <b>${recip}</b></div>
+                            <div style="font-size:12px;color:#555;margin-top:2px;">${esc(m.departure_city||'')} → ${esc(m.arrival_city||'')}</div>
+                            <img src="${j.data.qr_code_url}" alt="QR de livraison" style="width:200px;height:200px;display:block;margin:10px auto;">
+                            <div style="font-weight:800;letter-spacing:1.5px;font-size:15px;">${code}</div>
+                        </div>
+                        <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:8px;text-align:center;">À imprimer / coller sur le colis (capture d'écran possible).</div>`;
+                } else {
+                    box.innerHTML = 'Erreur: ' + (j.error || j.message || 'génération échouée');
+                }
+            } catch (e) { box.innerHTML = 'Erreur de connexion.'; }
+        }
+
+        async function editRecipient(){
+            const m = mission || {};
+            const name = prompt('Nom du destinataire :', m.recipient_name || '');
+            if (name === null) return;
+            const phone = prompt('Téléphone du destinataire :', m.recipient_phone || '');
+            try {
+                const res = await fetch(`${API}/missions/${missionId}/recipient`, {
+                    method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' },
+                    body: JSON.stringify({ name: name.trim(), phone: (phone||'').trim() })
+                });
+                const j = await res.json();
+                if (res.ok && j.success){ await load(); }
+                else alert('Erreur: ' + (j.error || j.message || ''));
+            } catch(e){ alert('Erreur de connexion.'); }
+        }
+
+        // ---- Partage : bottom sheet WhatsApp / Email / Copier ----
+        function openShareSheet(){
+            const url = publicTrackUrl();
+            const text = `Suivez votre colis SEN GP en temps réel : ${url}`;
+            document.getElementById('shareText').textContent = url;
+            document.getElementById('waBtn').onclick = () => { window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank'); closeShareSheet(); };
+            document.getElementById('mailBtn').onclick = () => { window.location.href = 'mailto:?subject=' + encodeURIComponent('Suivi de votre colis SEN GP') + '&body=' + encodeURIComponent(text); closeShareSheet(); };
+            document.getElementById('copyBtn').onclick = async () => {
+                try { await navigator.clipboard.writeText(url); alert('Lien copié !'); } catch(e){ alert(url); }
+                closeShareSheet();
+            };
+            const ov = document.getElementById('shareSheet');
+            ov.classList.add('open');
+        }
+        function closeShareSheet(){ document.getElementById('shareSheet').classList.remove('open'); }
+
+        async function cancelShipment(){
+            if (!confirm('Annuler cet envoi ? Cette action est irréversible.')) return;
+            try {
+                const res = await fetch(`${API}/missions/${missionId}/status`, {
+                    method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' },
+                    body: JSON.stringify({ status:'cancelled' })
+                });
+                const j = await res.json();
+                if (res.ok && j.success){ alert('Envoi annulé.'); load(); }
+                else alert('Erreur: '+(j.error||j.message||'Annulation échouée'));
+            } catch(e){ alert('Erreur de connexion.'); }
+        }
+
+        // Pull-to-refresh recharge les données en place (sans recharger la page).
+        window.onPullRefresh = async () => { await load(); return true; };
+
+        load();
+
+        // Rafraîchissement auto de la position toutes les 30 s tant que l'envoi est actif.
+        const ACTIVE = ['pending','matched','accepted','picked_up','in_transit','in_customs','out_for_delivery'];
+        setInterval(() => {
+            if (mission && ACTIVE.includes(String(mission.status||'').toLowerCase()) && !document.hidden) load();
+        }, 30000);
+    </script>
+    <script src="ptr.js"></script>
+</body>
+</html>

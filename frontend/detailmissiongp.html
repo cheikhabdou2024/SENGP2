@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEN GP - Détails de la mission</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);
+            min-height:100vh; display:flex; justify-content:center; color:#fff;
+        }
+        .mobile-frame {
+            width:100%; max-width:480px; min-height:100vh; min-height:100dvh; position:relative;
+            background: linear-gradient(135deg, rgba(15,12,41,.95), rgba(36,36,62,.95));
+        }
+        .header {
+            display:flex; align-items:center; gap:14px; padding:18px 20px;
+            border-bottom:1px solid rgba(255,255,255,.1); position:sticky; top:0;
+            background:rgba(20,18,40,.85); backdrop-filter:blur(10px); z-index:5;
+        }
+        .back-btn { width:44px; height:44px; border:none; border-radius:12px; cursor:pointer;
+            background:rgba(255,255,255,.1); color:#fff; display:flex; align-items:center; justify-content:center; }
+        .ico { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+        .header h1 { font-size:18px; }
+        .content { padding:20px; padding-bottom:40px; }
+        .card { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+            border-radius:16px; padding:18px; margin-bottom:16px; }
+        .price { font-size:26px; font-weight:800; color:#FFD700; }
+        .price-lbl { font-size:11px; color:rgba(255,255,255,.5); text-transform:uppercase; letter-spacing:.5px; }
+        .badge { display:inline-block; padding:5px 12px; border-radius:9px; font-size:12px; font-weight:700; margin-top:6px; }
+        .b-yellow{background:rgba(255,215,0,.18);color:#FFD700;} .b-blue{background:rgba(78,205,196,.2);color:#4ECDC4;}
+        .b-green{background:rgba(76,175,80,.2);color:#7ee081;} .b-red{background:rgba(255,107,107,.2);color:#ff8f8f;}
+        .route { display:flex; align-items:center; gap:10px; margin:14px 0; }
+        .route .loc { flex:1; }
+        .route .flag { font-size:26px; } .route .city { font-weight:700; } .route .country { font-size:12px; color:rgba(255,255,255,.6); }
+        .route .arrow { color:rgba(255,255,255,.4); font-size:20px; }
+        .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .kv { background:rgba(255,255,255,.04); border-radius:10px; padding:11px; }
+        .kv .k { font-size:11px; color:rgba(255,255,255,.5); text-transform:uppercase; margin-bottom:3px; }
+        .kv .v { font-size:14px; font-weight:600; }
+        .section-title { font-size:15px; font-weight:700; margin:4px 0 12px; display:flex; align-items:center; gap:8px; }
+        .section-title .ico { color:#FFD700; width:17px; height:17px; }
+        .btn {
+            display:block; width:100%; text-align:center; padding:14px; border-radius:12px; border:none;
+            font-weight:800; font-size:14px; cursor:pointer; text-decoration:none; margin-top:10px;
+        }
+        .btn-gold { background:linear-gradient(135deg,#FFD700,#FFA500); color:#1a1a2e; box-shadow:0 8px 20px rgba(255,184,0,.35); }
+        .btn-teal { background:linear-gradient(135deg,#4ECDC4,#44A08D); color:#06302c; }
+        .btn-ghost { background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.18); }
+        .btn-soft-gold { background:rgba(255,215,0,.15); color:#FFD700; border:1px solid rgba(255,215,0,.3); }
+        .btn-soft-teal { background:rgba(78,205,196,.18); color:#4ECDC4; border:1px solid rgba(78,205,196,.3); }
+        iframe.map { width:100%; height:200px; border:0; border-radius:12px; margin-top:8px; }
+        /* call row */
+        .person { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+        .person + .person { margin-top:10px; border-top:1px solid rgba(255,255,255,.08); padding-top:10px; }
+        .person .who .role { font-size:11px; color:rgba(255,255,255,.5); text-transform:uppercase; }
+        .person .who .name { font-size:14px; font-weight:700; }
+        .call-btn { width:44px; height:44px; border-radius:12px; border:none; cursor:pointer; flex:none;
+            background:linear-gradient(135deg,#4CAF50,#2e9e52); color:#fff; display:flex; align-items:center; justify-content:center; }
+        .call-btn.disabled { background:rgba(255,255,255,.08); color:rgba(255,255,255,.35); pointer-events:none; }
+        /* status stepper */
+        .stepper { display:flex; flex-direction:column; gap:0; margin-top:4px; }
+        .step { position:relative; padding-left:30px; padding-bottom:16px; }
+        .step:last-child { padding-bottom:0; }
+        .step::before { content:''; position:absolute; left:8px; top:18px; bottom:-2px; width:2px; background:rgba(255,255,255,.12); }
+        .step:last-child::before { display:none; }
+        .step .dot { position:absolute; left:0; top:2px; width:18px; height:18px; border-radius:50%;
+            background:rgba(255,255,255,.12); border:2px solid rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; }
+        .step.done .dot { background:#4ECDC4; border-color:#4ECDC4; }
+        .step.current .dot { background:#FFD700; border-color:#FFD700; box-shadow:0 0 0 4px rgba(255,215,0,.18); }
+        .step .dot svg { width:10px; height:10px; stroke:#1a1a2e; stroke-width:3; fill:none; }
+        .step .lbl { font-size:13.5px; font-weight:600; color:rgba(255,255,255,.55); }
+        .step.done .lbl, .step.current .lbl { color:#fff; }
+        .step.current .lbl { color:#FFD700; }
+        /* timeline */
+        .timeline { position:relative; padding-left:24px; }
+        .timeline::before { content:''; position:absolute; left:7px; top:4px; bottom:4px; width:2px; background:rgba(255,255,255,.12); }
+        .tl-item { position:relative; padding-bottom:18px; }
+        .tl-item::before { content:''; position:absolute; left:-22px; top:3px; width:14px; height:14px; border-radius:50%;
+            background:#4ECDC4; box-shadow:0 0 0 3px rgba(78,205,196,.2); }
+        .tl-item.muted::before { background:rgba(255,255,255,.3); box-shadow:none; }
+        .tl-status { font-weight:700; font-size:14px; }
+        .tl-desc { font-size:12px; color:rgba(255,255,255,.7); margin-top:2px; }
+        .tl-date { font-size:11px; color:rgba(255,255,255,.45); margin-top:2px; }
+        .loading,.empty { text-align:center; padding:40px; color:rgba(255,255,255,.5); }
+        .hint { font-size:11px; color:rgba(255,255,255,.5); margin-top:8px; }
+    </style>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="theme.css">
+    <script src="ui.js"></script>
+</head>
+<body class="ds">
+    <div class="mobile-frame">
+        <div class="header">
+            <button class="back-btn" onclick="goBack()" aria-label="Retour"><svg class="ico" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
+            <h1>Détails de la mission</h1>
+        </div>
+        <div class="content" id="content">
+            <div class="loading">Chargement…</div>
+        </div>
+    </div>
+
+    <script>
+        const API = window.API_BASE_URL;
+        const token = localStorage.getItem('authToken');
+        const params = new URLSearchParams(location.search);
+        const missionId = params.get('id');
+        let mission = null;
+
+        const FLAGS = {'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱'};
+        const flag = c => FLAGS[c] || '🌍';
+        const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const fcfa = n => (Number(n)||0).toLocaleString('fr-FR')+' FCFA';
+        const dt = d => d ? new Date(d).toLocaleString('fr-FR',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+
+        const STATUS = {
+            pending:['En attente','b-yellow'], matched:['Correspondance','b-yellow'], accepted:['Acceptée','b-blue'],
+            picked_up:['Récupéré','b-blue'], in_transit:['En transit','b-blue'], in_customs:['En douane','b-blue'],
+            out_for_delivery:['En livraison','b-blue'], delivered:['Livré','b-green'], cancelled:['Annulé','b-red'], disputed:['Litige','b-red']
+        };
+        function statusBadge(s){ const m=STATUS[String(s||'').toLowerCase()]||[s,'b-yellow']; return `<span class="badge ${m[1]}">${esc(m[0])}</span>`; }
+
+        // Workflow GP : étape suivante selon le statut courant.
+        function nextActionFor(status){
+            const map = {
+                accepted:        { to:'picked_up',        label:'Marquer comme récupéré' },
+                picked_up:       { to:'in_transit',       label:'Démarrer le transit' },
+                in_transit:      { to:'out_for_delivery', label:'Mettre en livraison' },
+                in_customs:      { to:'out_for_delivery', label:'Mettre en livraison' },
+                out_for_delivery:{ to:'delivered',        label:'Confirmer la livraison', confirm:'Confirmer la livraison de ce colis au destinataire ? Cette action est définitive.' }
+            };
+            return map[String(status||'').toLowerCase()] || null;
+        }
+
+        function goBack(){ if (history.length>1) history.back(); else location.href='dashgp.html'; }
+
+        async function load(){
+            if (!token){ location.href='connexion.html'; return; }
+            if (!missionId){ document.getElementById('content').innerHTML='<div class="empty">Mission introuvable.</div>'; return; }
+            try {
+                const [mRes, tRes] = await Promise.all([
+                    fetch(`${API}/missions/${missionId}`, { headers:{ 'Authorization':'Bearer '+token } }),
+                    fetch(`${API}/missions/${missionId}/tracking`, { headers:{ 'Authorization':'Bearer '+token } })
+                ]);
+                if (!mRes.ok) throw new Error('Chargement impossible');
+                mission = (await mRes.json()).data;
+                const tracking = tRes.ok ? ((await tRes.json()).data || []) : [];
+                render(mission, tracking);
+            } catch(e){
+                document.getElementById('content').innerHTML = `<div class="empty">Erreur: ${esc(e.message)}</div>`;
+            }
+        }
+
+        function stepper(status){
+            const order = ['accepted','picked_up','in_transit','out_for_delivery','delivered'];
+            const labels = { accepted:'Mission acceptée', picked_up:'Colis récupéré', in_transit:'En transit', out_for_delivery:'En cours de livraison', delivered:'Livré' };
+            let cur = String(status||'').toLowerCase();
+            if (cur === 'in_customs') cur = 'in_transit';
+            let ci = order.indexOf(cur); if (ci < 0) ci = -1;
+            const check = '<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>';
+            return order.map((s,i)=>{
+                const cls = i < ci ? 'done' : (i === ci ? 'current' : '');
+                return `<div class="step ${cls}"><div class="dot">${i<ci?check:''}</div><div class="lbl">${labels[s]}</div></div>`;
+            }).join('');
+        }
+
+        function render(m, tracking){
+            const dims = [m.package_length,m.package_width,m.package_height].every(x=>x!=null)
+                ? `${m.package_length}×${m.package_width}×${m.package_height} cm` : 'N/C';
+            const gps = tracking.find(t => t.latitude && t.longitude);
+            let mapBlock;
+            if (gps){
+                const la=Number(gps.latitude), lo=Number(gps.longitude), d=0.05;
+                mapBlock = `<iframe class="map" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=${lo-d}%2C${la-d}%2C${lo+d}%2C${la+d}&layer=mapnik&marker=${la}%2C${lo}"></iframe>`
+                    + `<div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;">Dernière position envoyée · ${dt(gps.created_at)}</div>`;
+            } else {
+                mapBlock = '<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px;">Aucune position partagée pour le moment.</div>';
+            }
+            const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent((m.departure_city||'')+', '+(m.departure_country||''))}&destination=${encodeURIComponent((m.arrival_city||'')+', '+(m.arrival_country||''))}`;
+
+            const s = String(m.status||'').toLowerCase();
+            const isActive = !['delivered','cancelled','disputed'].includes(s);
+            const isPending = ['pending','matched'].includes(s);
+            const action = nextActionFor(s);
+
+            // Personnes : expéditeur + destinataire (avec appel).
+            const senderName  = m.expediteur_name || ((m.expediteur_first_name||'') + ' ' + (m.expediteur_last_name||'')).trim() || 'Expéditeur';
+            const senderPhone = m.expediteur_phone || m.sender_phone || '';
+            const recipName   = m.recipient_name || '';
+            const recipPhone  = m.recipient_phone || '';
+            const callBtn = (phone) => phone
+                ? `<a class="call-btn" href="tel:${esc(phone)}" aria-label="Appeler"><svg class="ico" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></a>`
+                : `<span class="call-btn disabled" title="Numéro non disponible"><svg class="ico" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>`;
+
+            document.getElementById('content').innerHTML = `
+                <div class="card">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                        <div><div class="price-lbl">Rémunération</div><div class="price">${fcfa(m.offered_price)}</div>
+                        <div style="font-size:12px;color:rgba(255,255,255,.5);">${esc(m.mission_code||m.tracking_number||'')}</div></div>
+                        <div style="text-align:right;">${statusBadge(m.status)}</div>
+                    </div>
+                    <div class="route">
+                        <div class="loc"><div class="flag">${flag(m.departure_country)}</div><div class="city">${esc(m.departure_city||'—')}</div><div class="country">${esc(m.departure_country||'')}</div></div>
+                        <div class="arrow">→</div>
+                        <div class="loc"><div class="flag">${flag(m.arrival_country)}</div><div class="city">${esc(m.arrival_city||'—')}</div><div class="country">${esc(m.arrival_country||'')}</div></div>
+                    </div>
+                </div>
+
+                ${isPending ? `<div class="card" style="border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.06);">
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>En attente</div>
+                    <div style="font-size:13px;color:rgba(255,255,255,.8);">Cette mission n'est pas encore acceptée. Acceptez-la depuis la page Missions pour démarrer le suivi.</div>
+                </div>` : ''}
+
+                ${(isActive && !isPending) ? `<div class="card">
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Progression de la livraison</div>
+                    <div class="stepper">${stepper(m.status)}</div>
+                    ${action ? `<button class="btn btn-gold" onclick="advance('${action.to}', ${action.confirm?`'${esc(action.confirm).replace(/'/g,"\\'")}'`:'null'})">${esc(action.label)}</button>` : ''}
+                    ${s==='in_transit' ? `<button class="btn btn-ghost" onclick="advance('in_customs', null)">Passer en douane</button>` : ''}
+                    <button class="btn btn-soft-teal" onclick="updatePositionNow()"><svg class="ico" viewBox="0 0 24 24" style="display:inline-block;vertical-align:-4px;margin-right:6px;"><path d="M20 10c0 4.4-5.4 9-8 11-2.6-2-8-6.6-8-11a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>Envoyer ma position maintenant</button>
+                </div>` : ''}
+
+                <div class="card">
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Contacts</div>
+                    <div class="person">
+                        <div class="who"><div class="role">Expéditeur</div><div class="name">${esc(senderName)}${senderPhone?` · ${esc(senderPhone)}`:''}</div></div>
+                        ${callBtn(senderPhone)}
+                    </div>
+                    <div class="person">
+                        <div class="who"><div class="role">Destinataire</div><div class="name">${recipName?esc(recipName):'Non renseigné'}${recipPhone?` · ${esc(recipPhone)}`:''}</div></div>
+                        ${callBtn(recipPhone)}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24" style="color:#4ECDC4;"><path d="M20 10c0 4.4-5.4 9-8 11-2.6-2-8-6.6-8-11a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>Itinéraire & position</div>
+                    ${mapBlock}
+                    <a class="btn btn-teal" href="${mapsUrl}" target="_blank" rel="noopener">Ouvrir l'itinéraire (GPS)</a>
+                </div>
+
+                ${(isActive && !isPending) ? `<div class="card">
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>Étiquette QR du colis</div>
+                    <div id="qrBox"><button class="btn btn-soft-gold" onclick="loadDeliveryQR()">Afficher l'étiquette QR</button></div>
+                    <div class="hint">Collez l'étiquette sur le colis. Le destinataire scanne ce QR à la réception pour confirmer la livraison.</div>
+                </div>` : ''}
+
+                <div class="card">
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>Colis</div>
+                    <div class="grid">
+                        <div class="kv"><div class="k">Poids</div><div class="v">${parseFloat(m.package_weight)||0} kg</div></div>
+                        <div class="kv"><div class="k">Dimensions</div><div class="v">${esc(dims)}</div></div>
+                        <div class="kv"><div class="k">Valeur déclarée</div><div class="v">${m.package_value?fcfa(m.package_value):'—'}</div></div>
+                        <div class="kv"><div class="k">Assuré</div><div class="v">${m.is_insured?'Oui':'Non'}</div></div>
+                    </div>
+                    ${m.package_description?`<div class="kv" style="margin-top:10px;"><div class="k">Description</div><div class="v">${esc(m.package_description)}</div></div>`:''}
+                </div>
+
+                <div class="card">
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>Adresses & dates</div>
+                    <div class="grid">
+                        <div class="kv"><div class="k">Enlèvement</div><div class="v">${esc(m.pickup_address||'—')}</div></div>
+                        <div class="kv"><div class="k">Livraison</div><div class="v">${esc(m.delivery_address||'—')}</div></div>
+                        <div class="kv"><div class="k">Départ souhaité</div><div class="v">${m.desired_departure_date?new Date(m.desired_departure_date).toLocaleDateString('fr-FR'):'—'}</div></div>
+                        <div class="kv"><div class="k">Suivi n°</div><div class="v">${esc(m.tracking_number||'—')}</div></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>Historique du suivi</div>
+                    <div class="timeline">${timelineHTML(m, tracking)}</div>
+                </div>
+            `;
+        }
+
+        function timelineHTML(m, tracking){
+            const events = tracking.filter(t => String(t.status||'').toLowerCase() !== 'location');
+            if (!events.length) return `<div class="tl-item"><div class="tl-status">${esc((STATUS[String(m.status||'').toLowerCase()]||[m.status])[0])}</div><div class="tl-date">${dt(m.created_at)}</div></div>`;
+            return events.map((t,idx)=>`
+                <div class="tl-item ${idx>0?'muted':''}">
+                    <div class="tl-status">${esc((STATUS[String(t.status||'').toLowerCase()]||[t.status])[0])}</div>
+                    ${t.description?`<div class="tl-desc">${esc(t.description)}</div>`:''}
+                    ${t.location?`<div class="tl-desc">${esc(t.location)}</div>`:''}
+                    <div class="tl-date">${dt(t.created_at)}</div>
+                </div>`).join('');
+        }
+
+        // ---- Actions GP ----
+        async function advance(newStatus, confirmMsg){
+            if (confirmMsg && confirmMsg !== 'null'){
+                const ok = await sengpConfirm(confirmMsg, { okLabel:'Confirmer', cancelLabel:'Annuler' });
+                if (!ok) return;
+            }
+            try {
+                const res = await fetch(`${API}/missions/${missionId}/status`, {
+                    method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' },
+                    body: JSON.stringify({ status:newStatus })
+                });
+                const j = await res.json();
+                if (res.ok && j.success){ await sengpAlert('Statut mis à jour ✓'); load(); }
+                else sengpAlert('Erreur : ' + (j.error || j.message || 'mise à jour échouée'));
+            } catch(e){ sengpAlert('Erreur de connexion.'); }
+        }
+
+        async function getGpPos(){
+            const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
+            if (Geo){
+                try { if (Geo.requestPermissions) await Geo.requestPermissions(); } catch(e){}
+                const p = await Geo.getCurrentPosition({ enableHighAccuracy:true, timeout:20000 });
+                return { lat:p.coords.latitude, lng:p.coords.longitude };
+            }
+            return new Promise((res,rej)=> navigator.geolocation
+                ? navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lng:p.coords.longitude}), e=>rej(new Error(e.message||'GPS')), {enableHighAccuracy:true,timeout:20000})
+                : rej(new Error('Géolocalisation indisponible')));
+        }
+
+        async function updatePositionNow(){
+            try {
+                const pos = await getGpPos();
+                const res = await fetch(`${API}/missions/${missionId}/location`, {
+                    method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' },
+                    body: JSON.stringify({ lat:pos.lat, lng:pos.lng })
+                });
+                if (res.ok){ await sengpAlert('Position envoyée ✓'); load(); }
+                else sengpAlert('Envoi de la position impossible.');
+            } catch(e){ sengpAlert('GPS indisponible : ' + (e && e.message ? e.message : '')); }
+        }
+
+        async function loadDeliveryQR(){
+            const box = document.getElementById('qrBox');
+            box.innerHTML = 'Génération…';
+            try {
+                const res = await fetch(`${API}/missions/${missionId}/delivery-qr`, {
+                    method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' }
+                });
+                const j = await res.json();
+                if (res.ok && j.success) {
+                    const m = mission || {};
+                    const recip = m.recipient_name ? esc(m.recipient_name) : 'Destinataire';
+                    const code = esc(m.tracking_number || m.mission_code || '');
+                    box.innerHTML = `
+                        <div style="background:#fff;color:#1a1a2e;border-radius:12px;padding:16px;text-align:center;">
+                            <div style="font-weight:800;font-size:15px;letter-spacing:1px;">SEN GP</div>
+                            <div style="font-size:15px;margin-top:6px;">Pour : <b>${recip}</b></div>
+                            <div style="font-size:12px;color:#555;margin-top:2px;">${esc(m.departure_city||'')} → ${esc(m.arrival_city||'')}</div>
+                            <img src="${j.data.qr_code_url}" alt="QR de livraison" style="width:200px;height:200px;display:block;margin:10px auto;">
+                            <div style="font-weight:800;letter-spacing:1.5px;font-size:15px;">${code}</div>
+                        </div>
+                        <div class="hint" style="text-align:center;">À coller sur le colis (capture d'écran possible).</div>`;
+                } else {
+                    box.innerHTML = 'Erreur : ' + (j.error || j.message || 'génération échouée');
+                }
+            } catch (e) { box.innerHTML = 'Erreur de connexion.'; }
+        }
+
+        // Pull-to-refresh.
+        window.onPullRefresh = async () => { await load(); return true; };
+
+        load();
+
+        // Rafraîchissement auto tant que la mission est active.
+        const ACTIVE = ['accepted','picked_up','in_transit','in_customs','out_for_delivery'];
+        setInterval(() => {
+            if (mission && ACTIVE.includes(String(mission.status||'').toLowerCase()) && !document.hidden) load();
+        }, 30000);
+    </script>
+    <script src="ptr.js"></script>
+</body>
+</html>

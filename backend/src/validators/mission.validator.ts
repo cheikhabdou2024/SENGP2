@@ -19,6 +19,8 @@ export const createMissionValidator = [
     .withMessage('Offered price must be greater than 0'),
   body('is_price_negotiable').optional().isBoolean(),
   body('is_insured').optional().isBoolean(),
+  body('recipient_name').optional().trim(),
+  body('recipient_phone').optional().trim(),
 ];
 
 export const updateStatusValidator = [

@@ -453,100 +453,80 @@
             box-shadow: 0 6px 16px rgba(255, 215, 0, 0.5);
         }
 
-        /* Bottom Navigation */
+        /* Bottom Navigation (unified GP nav) */
         .bottom-nav {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 65px;
-            background: linear-gradient(180deg, rgba(15, 12, 41, 0.95) 0%, rgba(26, 22, 48, 0.98) 100%);
-            backdrop-filter: blur(30px);
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(18, 16, 36, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
+            justify-content: space-around;
+            align-items: stretch;
+            padding: 9px 6px calc(9px + env(safe-area-inset-bottom));
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35);
         }
-
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 4px;
             cursor: pointer;
-            transition: all 0.4s ease;
-            padding: 6px 10px;
-            border-radius: 12px;
             flex: 1;
-            max-width: 70px;
             position: relative;
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.15) 50%, rgba(78, 205, 196, 0.1) 100%);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            box-shadow: 0 8px 24px rgba(255, 215, 0, 0.25);
-            transform: translateY(-6px);
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            filter: grayscale(0.8) brightness(0.7);
-            transition: all 0.4s ease;
-        }
-
-        .nav-item.active .nav-icon {
-            filter: grayscale(0) brightness(1.2);
-            transform: scale(1.1);
-        }
-
-        .nav-label {
-            font-size: 9px;
+            padding: 6px 0;
+            border-radius: 14px;
             color: rgba(255, 255, 255, 0.5);
-            font-weight: 700;
-            text-transform: uppercase;
+            transition: color 0.25s ease;
+            -webkit-tap-highlight-color: transparent;
         }
-
-        .nav-item.active .nav-label {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #4ECDC4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
+        .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+        .nav-icon svg {
+            width: 24px; height: 24px; fill: none; stroke: currentColor;
+            stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+            transition: transform 0.25s ease;
         }
-
+        .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
+        .nav-item.active { color: #FFC107; }
+        .nav-item.active .nav-icon svg { transform: translateY(-1px) scale(1.06); }
+        .nav-item.active::after {
+            content: ''; position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+            width: 26px; height: 3px; border-radius: 0 0 3px 3px;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+        }
+        .nav-item:not(.active):active { color: rgba(255, 255, 255, 0.85); }
         .nav-badge {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            min-width: 18px;
-            height: 18px;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            font-weight: 800;
-            color: white;
-            padding: 0 5px;
-            box-shadow: 0 3px 10px rgba(255, 215, 0, 0.6);
+            position: absolute; top: 0px; left: calc(50% + 5px);
+            min-width: 17px; height: 17px; background: #FF4757;
+            border: 1.5px solid #121024; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 800; color: white; padding: 0 4px;
         }
-    </style>
+        .nav-badge.new { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #1a1a2e; }
+        .nav-badge.hidden { display: none; }
+            /* sengp-responsive-override */
+        .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
+        body{padding:0!important;}
+
+        /* Loading / empty states */
+        .missions-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .missions-state .state-icon { font-size: 44px; margin-bottom: 12px; }
+        .missions-state .state-text { font-size: 14px; line-height: 1.5; }
+        </style>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="theme.css">
+    <script src="ui.js"></script>
 </head>
-<body>
+<body class="ds">
     <div class="mobile-frame">
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <span class="time">9:41</span>
-            <div class="indicators">
-                <div class="signal"></div>
-                <div class="wifi"></div>
-                <div class="battery"></div>
-            </div>
-        </div>
 
         <!-- Header -->
         <div class="header">
@@ -554,7 +534,7 @@
                 <button class="back-btn" onclick="goBack()">←</button>
                 <div class="header-title">
                     <h1>Recherche de missions</h1>
-                    <p>12 missions disponibles</p>
+                    <p id="missionsCount">Chargement…</p>
                 </div>
             </div>
 
@@ -585,289 +565,320 @@
                 <button class="sort-btn" onclick="sortMissions()">Trier par ↕</button>
             </div>
 
-            <!-- Mission Card 1 - Featured & Urgent -->
-            <div class="mission-card featured">
-                <div class="mission-header">
-                    <div class="mission-price-section">
-                        <div class="mission-price">75,000 FCFA</div>
-                        <div class="price-type">Prix négociable</div>
-                    </div>
-                    <div class="mission-badges">
-                        <span class="badge badge-new">🔥 Nouveau</span>
-                        <span class="badge badge-urgent">⚡ Urgent</span>
-                    </div>
-                </div>
-                <div class="mission-route">
-                    <div class="route-location">
-                        <span class="flag">🇸🇳</span>
-                        <span>Dakar</span>
-                    </div>
-                    <span class="route-arrow">→</span>
-                    <div class="route-location">
-                        <span class="flag">🇫🇷</span>
-                        <span>Paris</span>
-                    </div>
-                </div>
-                <div class="mission-details">
-                    <div class="detail-item">
-                        <span>📦</span>
-                        <span>3.5 kg</span>
-                    </div>
-                    <div class="detail-item">
-                        <span>📏</span>
-                        <span>30x25x15 cm</span>
-                    </div>
-                    <div class="detail-item">
-                        <span>📅</span>
-                        <span>Départ: 25 Oct</span>
-                    </div>
-                    <div class="detail-item">
-                        <span>🎯</span>
-                        <span>Arrivée: 26 Oct</span>
-                    </div>
-                </div>
-                <div class="mission-footer">
-                    <div class="mission-client">
-                        <div class="client-avatar">MD</div>
-                        <span class="client-name">Moussa D.</span>
-                        <span class="client-rating">⭐ 4.8</span>
-                    </div>
-                    <span class="mission-date">Publié il y a 2h</span>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-details" onclick="viewDetails('MIS-001')">Détails</button>
-                    <button class="btn btn-accept" onclick="acceptMission('MIS-001')">Accepter</button>
-                </div>
+            <!-- Missions (rendered from real backend data) -->
+            <div id="missionsLoading" class="missions-state">
+                <div class="state-icon">⏳</div>
+                <div class="state-text">Chargement des missions…</div>
             </div>
-
-            <!-- Mission Card 2 -->
-            <div class="mission-card">
-                <div class="mission-header">
-                    <div class="mission-price-section">
-                        <div class="mission-price">65,000 FCFA</div>
-                        <div class="price-type">Prix fixe</div>
-                    </div>
-                    <div class="mission-badges">
-                        <span class="badge badge-verified">✓ Vérifié</span>
-                    </div>
-                </div>
-                <div class="mission-route">
-                    <div class="route-location">
-                        <span class="flag">🇸🇳</span>
-                        <span>Dakar</span>
-                    </div>
-                    <span class="route-arrow">→</span>
-                    <div class="route-location">
-                        <span class="flag">🇬🇧</span>
-                        <span>Londres</span>
-                    </div>
-                </div>
-                <div class="mission-details">
-                    <div class="detail-item">
-                        <span>📦</span>
-                        <span>2.8 kg</span>
-                    </div>
-                    <div class="detail-item">
-                        <span>📏</span>
-                        <span>28x22x18 cm</span>
-                    </div>
-                    <div class="detail-item">
-                        <span>📅</span>
-                        <span>Départ: 27 Oct</span>
-                    </div>
-                    <div class="detail-item">
-                        <span>🎯</span>
-                        <span>Arrivée: 28 Oct</span>
-                    </div>
-                </div>
-                <div class="mission-footer">
-                    <div class="mission-client">
-                        <div class="client-avatar">AS</div>
-                        <span class="client-name">Aissatou S.</span>
-                        <span class="client-rating">⭐ 5.0</span>
-                    </div>
-                    <span class="mission-date">Publié il y a 5h</span>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-details" onclick="viewDetails('MIS-002')">Détails</button>
-                    <button class="btn btn-accept" onclick="acceptMission('MIS-002')">Accepter</button>
-                </div>
+            <div id="missionsEmpty" class="missions-state" style="display: none;">
+                <div class="state-icon">📭</div>
+                <div class="state-text">Aucune mission disponible pour le moment.<br>Revenez plus tard.</div>
             </div>
-
-            <!-- Mission Card 3 -->
-            <div class="mission-card">
-                <div class="mission-header">
-                    <div class="mission-price-section">
-                        <div class="mission-price">45,000 FCFA</div>
-                        <div class="price-type">Prix fixe</div>
-                    </div>
-                    <div class="mission-badges">
-                        <span class="badge badge-new">🔥 Nouveau</span>
-                    </div>
-                </div>
-                <div class="mission-route">
-                    <div class="route-location">
-                        <span class="flag">🇸🇳</span>
-                        <span>Dakar</span>
-                    </div>
-                    <span class="route-arrow">→</span>
-                    <div class="route-location">
-                        <span class="flag">🇪🇸</span>
-                        <span>Madrid</span>
-                    </div>
-                </div>
-                <div class="mission-details">
-                    <div class="detail-item">
-                        <span>📦</span>
-                        <span>2 kg</span>
-                    </div>
-                    <div class="detail-item">
-                        <span>📏</span>
-                        <span>25x20x10 cm</span>
-                    </div>
-                    <div class="detail-item">
-                        <span>📅</span>
-                        <span>Départ: 28 Oct</span>
-                    </div>
-                    <div class="detail-item">
-                        <span>🎯</span>
-                        <span>Arrivée: 29 Oct</span>
-                    </div>
-                </div>
-                <div class="mission-footer">
-                    <div class="mission-client">
-                        <div class="client-avatar">FS</div>
-                        <span class="client-name">Fatou S.</span>
-                        <span class="client-rating">⭐ 4.9</span>
-                    </div>
-                    <span class="mission-date">Publié il y a 1 jour</span>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-details" onclick="viewDetails('MIS-003')">Détails</button>
-                    <button class="btn btn-accept" onclick="acceptMission('MIS-003')">Accepter</button>
-                </div>
-            </div>
-
-            <!-- Mission Card 4 -->
-            <div class="mission-card">
-                <div class="mission-header">
-                    <div class="mission-price-section">
-                        <div class="mission-price">55,000 FCFA</div>
-                        <div class="price-type">Prix fixe</div>
-                    </div>
-                    <div class="mission-badges">
-                        <span class="badge badge-verified">✓ Vérifié</span>
-                    </div>
-                </div>
-                <div class="mission-route">
-                    <div class="route-location">
-                        <span class="flag">🇸🇳</span>
-                        <span>Dakar</span>
-                    </div>
-                    <span class="route-arrow">→</span>
-                    <div class="route-location">
-                        <span class="flag">🇺🇸</span>
-                        <span>New York</span>
-                    </div>
-                </div>
-                <div class="mission-details">
-                    <div class="detail-item">
-                        <span>📦</span>
-                        <span>4.2 kg</span>
-                    </div>
-                    <div class="detail-item">
-                        <span>📏</span>
-                        <span>32x28x20 cm</span>
-                    </div>
-                    <div class="detail-item">
-                        <span>📅</span>
-                        <span>Départ: 30 Oct</span>
-                    </div>
-                    <div class="detail-item">
-                        <span>🎯</span>
-                        <span>Arrivée: 31 Oct</span>
-                    </div>
-                </div>
-                <div class="mission-footer">
-                    <div class="mission-client">
-                        <div class="client-avatar">IB</div>
-                        <span class="client-name">Ibrahima B.</span>
-                        <span class="client-rating">⭐ 4.7</span>
-                    </div>
-                    <span class="mission-date">Publié il y a 2 jours</span>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-details" onclick="viewDetails('MIS-004')">Détails</button>
-                    <button class="btn btn-accept" onclick="acceptMission('MIS-004')">Accepter</button>
-                </div>
-            </div>
+            <div id="missionsList"></div>
         </div>
 
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
-            <div class="nav-item" onclick="navigateTo('home')">
-                <div class="nav-icon">🏠</div>
+            <div class="nav-item" onclick="navigateTo('home')" tabindex="0" role="button" aria-label="Accueil">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
                 <div class="nav-label">Accueil</div>
             </div>
 
-            <div class="nav-item active" onclick="navigateTo('missions')">
-                <div class="nav-icon">🔍</div>
+            <div class="nav-item active" onclick="navigateTo('missions')" tabindex="0" role="button" aria-label="Missions">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
                 <div class="nav-label">Missions</div>
-                <div class="nav-badge">12</div>
+                <div class="nav-badge" id="navMissionsBadge" style="display:none;">0</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('trips')">
-                <div class="nav-icon">✈️</div>
+            <div class="nav-item" onclick="navigateTo('trips')" tabindex="0" role="button" aria-label="Trajets">
+                <div class="nav-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M22 16.21v-1.6l-8.5-5V4.5a1.5 1.5 0 0 0-3 0v5.11l-8.5 5v1.6l8.5-2.66v4.54l-2.5 1.4v1.5l4-1.18 4 1.18v-1.5l-2.5-1.4v-4.54z"/></svg></div>
                 <div class="nav-label">Trajets</div>
-                <div class="nav-badge">2</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('earnings')">
-                <div class="nav-icon">💰</div>
+            <div class="nav-item" onclick="navigateTo('earnings')" tabindex="0" role="button" aria-label="Gains">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
                 <div class="nav-label">Gains</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('profile')">
-                <div class="nav-icon">👤</div>
+            <div class="nav-item" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
                 <div class="nav-label">Profil</div>
             </div>
         </div>
     </div>
 
     <script>
+        const API_BASE_URL = window.API_BASE_URL;
+        const authToken = localStorage.getItem('authToken');
+
+        let allMissions = [];     // missions réelles chargées depuis l'API
+        let myTripId = null;      // 1er trajet du GP (pour l'acceptation)
+        let activeFilter = 'all';
+        let searchTerm = '';
+        let priceSortAsc = false;
+
+        // Drapeaux par pays (repli 🌍).
+        const FLAGS = {
+            'Sénégal': '🇸🇳', 'Senegal': '🇸🇳', 'France': '🇫🇷', 'Espagne': '🇪🇸',
+            'Italie': '🇮🇹', 'USA': '🇺🇸', 'États-Unis': '🇺🇸', 'Etats-Unis': '🇺🇸',
+            'Canada': '🇨🇦', 'Royaume-Uni': '🇬🇧', 'Angleterre': '🇬🇧', 'Allemagne': '🇩🇪',
+            'Belgique': '🇧🇪', 'Maroc': '🇲🇦', 'Mali': '🇲🇱', 'Côte d\'Ivoire': '🇨🇮'
+        };
+        function flagFor(country) { return FLAGS[country] || '🌍'; }
+
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function initials(name) {
+            if (!name) return '👤';
+            const parts = name.trim().split(/\s+/);
+            return ((parts[0] || '').charAt(0) + (parts[1] || '').charAt(0)).toUpperCase() || '👤';
+        }
+
+        function shortName(name) {
+            if (!name) return 'Client';
+            const parts = name.trim().split(/\s+/);
+            return parts[0] + (parts[1] ? ' ' + parts[1].charAt(0) + '.' : '');
+        }
+
+        function formatPrice(p) {
+            const n = parseFloat(p) || 0;
+            return n.toLocaleString('fr-FR') + ' FCFA';
+        }
+
+        function formatDate(d) {
+            if (!d) return '—';
+            try {
+                return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+            } catch (e) { return '—'; }
+        }
+
+        function timeAgo(d) {
+            if (!d) return '';
+            const diff = Date.now() - new Date(d).getTime();
+            const h = Math.floor(diff / 3600000);
+            if (h < 1) return 'À l\'instant';
+            if (h < 24) return `Publié il y a ${h}h`;
+            const days = Math.floor(h / 24);
+            return `Publié il y a ${days} jour${days > 1 ? 's' : ''}`;
+        }
+
+        function isNewMission(d) {
+            if (!d) return false;
+            return (Date.now() - new Date(d).getTime()) < 24 * 3600000;
+        }
+
+        function isUrgent(m) {
+            if (!m.departure_date) return false;
+            const diff = new Date(m.departure_date).getTime() - Date.now();
+            return diff > 0 && diff < 3 * 24 * 3600000;
+        }
+
         function goBack() {
             window.location.href = 'dashgp.html';
         }
 
+        async function loadMissions() {
+            if (!authToken) {
+                alert('Vous devez vous connecter pour accéder à cette page');
+                window.location.href = 'connexion.html';
+                return;
+            }
+            try {
+                // Trajet du GP (utilisé à l'acceptation), best-effort.
+                try {
+                    const tripsRes = await fetch(`${API_BASE_URL}/trips/my-trips?limit=1`, {
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    });
+                    if (tripsRes.ok) {
+                        const tripsJson = await tripsRes.json();
+                        const trips = tripsJson.data || [];
+                        if (trips.length) myTripId = trips[0].id;
+                    }
+                } catch (e) { /* ignore */ }
+
+                // Missions en attente (disponibles à l'acceptation).
+                const res = await fetch(`${API_BASE_URL}/missions?status=pending&limit=50`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                if (!res.ok) throw new Error('Échec du chargement');
+                const json = await res.json();
+                allMissions = json.data || [];
+
+                document.getElementById('missionsLoading').style.display = 'none';
+                renderMissions();
+            } catch (error) {
+                console.error('Erreur chargement missions:', error);
+                document.getElementById('missionsLoading').style.display = 'none';
+                const empty = document.getElementById('missionsEmpty');
+                empty.querySelector('.state-text').innerHTML =
+                    'Impossible de charger les missions.<br>Vérifiez votre connexion.';
+                empty.style.display = 'block';
+                document.getElementById('missionsCount').textContent = 'Erreur de chargement';
+            }
+        }
+
+        function getVisibleMissions() {
+            let list = allMissions.slice();
+
+            // Filtre par onglet
+            if (activeFilter === 'high-pay') list = list.filter(m => (parseFloat(m.price) || 0) >= 50000);
+            else if (activeFilter === 'urgent') list = list.filter(isUrgent);
+            else if (activeFilter === 'verified') list = list.filter(m => m.is_insured);
+            else if (activeFilter === 'light') list = list.filter(m => (parseFloat(m.weight) || 0) <= 3);
+
+            // Recherche texte (villes / pays)
+            if (searchTerm) {
+                const q = searchTerm.toLowerCase();
+                list = list.filter(m =>
+                    [m.departure_city, m.arrival_city, m.departure_country, m.arrival_country]
+                        .filter(Boolean).some(v => String(v).toLowerCase().includes(q))
+                );
+            }
+
+            // Tri par prix
+            list.sort((a, b) => {
+                const pa = parseFloat(a.price) || 0, pb = parseFloat(b.price) || 0;
+                return priceSortAsc ? pa - pb : pb - pa;
+            });
+
+            return list;
+        }
+
+        function renderMissions() {
+            const list = getVisibleMissions();
+            const container = document.getElementById('missionsList');
+            const empty = document.getElementById('missionsEmpty');
+
+            // Compteurs (entête + badge nav) basés sur le total réel chargé.
+            const total = allMissions.length;
+            document.getElementById('missionsCount').textContent =
+                `${total} mission${total > 1 ? 's' : ''} disponible${total > 1 ? 's' : ''}`;
+            const navBadge = document.getElementById('navMissionsBadge');
+            if (total > 0) { navBadge.textContent = total; navBadge.style.display = 'flex'; }
+            else { navBadge.style.display = 'none'; }
+
+            if (list.length === 0) {
+                container.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+
+            container.innerHTML = list.map((m, idx) => {
+                const featured = idx === 0 ? ' featured' : '';
+                const badges = [];
+                if (isNewMission(m.created_at)) badges.push('<span class="badge badge-new">🔥 Nouveau</span>');
+                if (isUrgent(m)) badges.push('<span class="badge badge-urgent">⚡ Urgent</span>');
+                if (m.is_insured) badges.push('<span class="badge badge-verified">✓ Assuré</span>');
+
+                const priceType = m.is_price_negotiable ? 'Prix négociable' : 'Prix fixe';
+                const dims = (m.dimensions && m.dimensions !== 'xx') ? m.dimensions : 'N/C';
+                const weight = (parseFloat(m.weight) || 0);
+
+                return `
+                <div class="mission-card${featured}">
+                    <div class="mission-header">
+                        <div class="mission-price-section">
+                            <div class="mission-price">${formatPrice(m.price)}</div>
+                            <div class="price-type">${priceType}</div>
+                        </div>
+                        <div class="mission-badges">${badges.join('')}</div>
+                    </div>
+                    <div class="mission-route">
+                        <div class="route-location">
+                            <span class="flag">${flagFor(m.departure_country)}</span>
+                            <span>${esc(m.departure_city || m.departure_country || '—')}</span>
+                        </div>
+                        <span class="route-arrow">→</span>
+                        <div class="route-location">
+                            <span class="flag">${flagFor(m.arrival_country)}</span>
+                            <span>${esc(m.arrival_city || m.arrival_country || '—')}</span>
+                        </div>
+                    </div>
+                    <div class="mission-details">
+                        <div class="detail-item"><span>📦</span><span>${weight} kg</span></div>
+                        <div class="detail-item"><span>📏</span><span>${esc(dims)} cm</span></div>
+                        <div class="detail-item"><span>📅</span><span>Départ: ${formatDate(m.departure_date)}</span></div>
+                        <div class="detail-item"><span>🎯</span><span>Arrivée: ${formatDate(m.desired_arrival_date)}</span></div>
+                    </div>
+                    <div class="mission-footer">
+                        <div class="mission-client">
+                            <div class="client-avatar">${esc(initials(m.expediteur_name))}</div>
+                            <span class="client-name">${esc(shortName(m.expediteur_name))}</span>
+                        </div>
+                        <span class="mission-date">${timeAgo(m.created_at)}</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-details" onclick="viewDetails('${m.id}')">Détails</button>
+                        <button class="btn btn-accept" onclick="acceptMission('${m.id}')">Accepter</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
         function openFilters() {
-            alert('Filtres avancés\n\nOptions:\n- Destination\n- Prix minimum/maximum\n- Poids maximum\n- Date de départ\n- Type de client (vérifié, nouveau)\n- Distance');
+            // Recentre l'utilisateur sur la barre de recherche (filtres avancés à venir).
+            const input = document.querySelector('.search-input');
+            if (input) input.focus();
         }
 
         function filterMissions(type, element) {
-            // Remove active class from all tags
-            document.querySelectorAll('.filter-tag').forEach(tag => {
-                tag.classList.remove('active');
-            });
-
-            // Add active class to clicked tag
+            document.querySelectorAll('.filter-tag').forEach(tag => tag.classList.remove('active'));
             element.classList.add('active');
-
-            alert(`Filtrer par: ${type}\n\nAffichage des missions correspondantes...`);
+            activeFilter = type;
+            renderMissions();
         }
 
         function sortMissions() {
-            alert('Trier les missions\n\nOptions:\n- Prix (croissant/décroissant)\n- Date de départ\n- Poids\n- Distance\n- Note du client');
+            priceSortAsc = !priceSortAsc;
+            renderMissions();
         }
 
         function viewDetails(missionId) {
-            alert(`Détails de la mission ${missionId}\n\nInformations complètes:\n- Description du colis\n- Photos\n- Itinéraire détaillé\n- Profil du client\n- Conditions de transport\n- Assurance\n- Modalités de paiement`);
+            const m = allMissions.find(x => String(x.id) === String(missionId));
+            if (!m) return;
+            const desc = m.package_description ? `\nColis: ${m.package_description}` : '';
+            alert(
+                `Mission ${m.mission_code || ''}\n\n` +
+                `${m.departure_city || m.departure_country} → ${m.arrival_city || m.arrival_country}\n` +
+                `Prix: ${formatPrice(m.price)} (${m.is_price_negotiable ? 'négociable' : 'fixe'})\n` +
+                `Poids: ${parseFloat(m.weight) || 0} kg${desc}\n` +
+                `Départ: ${formatDate(m.departure_date)} — Arrivée: ${formatDate(m.desired_arrival_date)}\n` +
+                `Expéditeur: ${m.expediteur_name || '—'}`
+            );
         }
 
-        function acceptMission(missionId) {
-            const confirmed = confirm(`Accepter la mission ${missionId}?\n\nEn acceptant, vous vous engagez à transporter ce colis selon les conditions établies.`);
-
-            if (confirmed) {
-                alert(`Mission ${missionId} acceptée ✓\n\nLe client sera notifié.\n\nVous recevrez les détails de récupération par email et notification.`);
+        async function acceptMission(missionId) {
+            const m = allMissions.find(x => String(x.id) === String(missionId));
+            const label = m ? `${m.departure_city || ''} → ${m.arrival_city || ''}` : missionId;
+            if (!confirm(`Accepter la mission ${label} ?\n\nVous vous engagez à transporter ce colis selon les conditions établies.`)) {
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE_URL}/missions/${missionId}/accept`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(myTripId ? { trip_id: myTripId } : {})
+                });
+                const json = await res.json();
+                if (res.ok && json.success) {
+                    alert('Mission acceptée ✓\n\nL\'expéditeur sera notifié.');
+                    // Retirer la mission acceptée de la liste et rafraîchir.
+                    allMissions = allMissions.filter(x => String(x.id) !== String(missionId));
+                    renderMissions();
+                } else {
+                    alert('Impossible d\'accepter la mission:\n\n' + (json.error || json.message || 'Erreur inconnue'));
+                }
+            } catch (error) {
+                console.error('Erreur acceptation:', error);
+                alert('Erreur de connexion au serveur. Veuillez réessayer.');
             }
         }
 
@@ -879,11 +890,20 @@
                 'earnings': 'gains.html',
                 'profile': 'profilegp.html'
             };
-
-            if (pages[section]) {
-                window.location.href = pages[section];
-            }
+            if (pages[section]) window.location.href = pages[section];
         }
+
+        // Recherche en direct
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.querySelector('.search-input');
+            if (input) {
+                input.addEventListener('input', (e) => {
+                    searchTerm = e.target.value.trim();
+                    renderMissions();
+                });
+            }
+            loadMissions();
+        });
     </script>
 </body>
 </html>

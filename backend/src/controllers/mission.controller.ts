@@ -171,6 +171,90 @@ export class MissionController {
   }
 
   /**
+   * Generate (or fetch) the proof-of-delivery QR for a mission.
+   * POST /api/v1/missions/:id/delivery-qr  (expediteur owner, assigned GP, or admin)
+   */
+  static async deliveryQR(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        ResponseUtil.unauthorized(res);
+        return;
+      }
+      const mission = await MissionService.getById(req.params.id);
+      if (!mission) {
+        ResponseUtil.notFound(res, 'Mission not found');
+        return;
+      }
+      const uid = req.user.id;
+      const isOwner =
+        mission.expediteur_id === uid ||
+        mission.gp_id === uid ||
+        req.user.user_type === UserType.ADMIN;
+      if (!isOwner) {
+        ResponseUtil.forbidden(res, 'Not your mission');
+        return;
+      }
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const data = await MissionService.generateDeliveryQR(req.params.id, baseUrl);
+      ResponseUtil.success(res, data, 'Delivery QR ready');
+    } catch (error: any) {
+      logger.error('Delivery QR error:', error);
+      ResponseUtil.badRequest(res, error.message || 'Failed to generate QR');
+    }
+  }
+
+  /**
+   * Set the recipient identity (expediteur owner only)
+   * POST /api/v1/missions/:id/recipient  { name, phone }
+   */
+  static async setRecipient(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) { ResponseUtil.unauthorized(res); return; }
+      const data = await MissionService.setRecipient(
+        req.params.id, req.user.id, req.body.name, req.body.phone
+      );
+      ResponseUtil.success(res, data, 'Destinataire enregistré');
+    } catch (error: any) {
+      if (error.message && error.message.includes('not yours')) {
+        ResponseUtil.forbidden(res, error.message);
+        return;
+      }
+      ResponseUtil.badRequest(res, error.message || 'Échec');
+    }
+  }
+
+  /**
+   * Record a live GPS position (assigned GP only)
+   * POST /api/v1/missions/:id/location  { lat, lng }
+   */
+  static async addLocation(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        ResponseUtil.unauthorized(res);
+        return;
+      }
+      const lat = parseFloat(req.body.lat ?? req.body.latitude);
+      const lng = parseFloat(req.body.lng ?? req.body.longitude);
+      if (Number.isNaN(lat) || Number.isNaN(lng)) {
+        ResponseUtil.badRequest(res, 'lat and lng are required');
+        return;
+      }
+      await MissionService.addLocation(req.params.id, req.user.id, lat, lng);
+      ResponseUtil.success(res, undefined, 'Location recorded');
+    } catch (error: any) {
+      if (error.message === 'Not your mission') {
+        ResponseUtil.forbidden(res, error.message);
+        return;
+      }
+      if (error.message === 'Mission not found') {
+        ResponseUtil.notFound(res, error.message);
+        return;
+      }
+      ResponseUtil.badRequest(res, error.message || 'Failed to record location');
+    }
+  }
+
+  /**
    * Update mission status
    * POST /api/v1/missions/:id/status
    */

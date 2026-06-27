@@ -43,6 +43,19 @@ router.post(
   MissionController.accept
 );
 
+// Record live GPS position (assigned GP only)
+router.post(
+  '/:id/location',
+  AuthMiddleware.requireRole(UserType.GP),
+  MissionController.addLocation
+);
+
+// Proof-of-delivery QR (expediteur owner / assigned GP / admin)
+router.post('/:id/delivery-qr', MissionController.deliveryQR);
+
+// Set recipient identity (expediteur owner)
+router.post('/:id/recipient', MissionController.setRecipient);
+
 // Update mission status
 router.post(
   '/:id/status',

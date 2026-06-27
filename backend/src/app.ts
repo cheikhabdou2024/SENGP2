@@ -17,10 +17,20 @@ import tripRoutes from './routes/trip.routes';
 import paymentRoutes from './routes/payment.routes';
 import notificationRoutes from './routes/notification.routes';
 import claimRoutes from './routes/claim.routes';
+import walletRoutes from './routes/wallet.routes';
+import withdrawalRoutes from './routes/withdrawal.routes';
+import adminRoutes from './routes/admin.routes';
+import publicRoutes from './routes/public.routes';
+import uploadRoutes from './routes/upload.routes';
+import { PublicController } from './controllers/public.controller';
 
 dotenv.config();
 
 const app: Application = express();
+
+// Behind App Runner's proxy: trust the first hop so X-Forwarded-For / rate
+// limiting and client IPs are handled correctly.
+app.set('trust proxy', 1);
 
 // Security Middleware
 app.use(helmet());
@@ -46,7 +56,15 @@ app.use(cors({
 }));
 
 // Body Parser Middleware
-app.use(express.json({ limit: '10mb' }));
+// Capture the raw body so payment-provider webhooks can verify HMAC signatures.
+app.use(
+  express.json({
+    limit: '10mb',
+    verify: (req, _res, buf) => {
+      (req as any).rawBody = buf;
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Compression Middleware
@@ -61,7 +79,18 @@ if (process.env.NODE_ENV !== 'test') {
   }));
 }
 
-// Rate Limiting
+// Public, read-only tracking — mounted BEFORE the strict API limiter, with its
+// own generous limiter (recipients share carrier IPs + pages auto-refresh).
+const apiVersionPublic = process.env.API_VERSION || 'v1';
+app.use(`/api/${apiVersionPublic}/public`, RateLimitMiddleware.publicTracking, publicRoutes);
+app.get('/t/:token', PublicController.trackPage);
+app.get('/d/:token', PublicController.deliveryPage);
+
+// Payment provider redirect landing pages (success / error).
+app.get('/payment-success', PublicController.paymentResultPage(true));
+app.get('/payment-error', PublicController.paymentResultPage(false));
+
+// Rate Limiting (strict) for the rest of the API
 app.use('/api/', RateLimitMiddleware.general);
 
 // Root Route - API Info
@@ -111,6 +140,10 @@ app.use(`/api/${apiVersion}/trips`, tripRoutes);
 app.use(`/api/${apiVersion}/payments`, paymentRoutes);
 app.use(`/api/${apiVersion}/notifications`, notificationRoutes);
 app.use(`/api/${apiVersion}/claims`, claimRoutes);
+app.use(`/api/${apiVersion}/wallet`, walletRoutes);
+app.use(`/api/${apiVersion}/withdrawals`, withdrawalRoutes);
+app.use(`/api/${apiVersion}/admin`, adminRoutes);
+app.use(`/api/${apiVersion}/uploads`, uploadRoutes);
 
 // Serve static frontend files in production
 if (process.env.NODE_ENV === 'production') {

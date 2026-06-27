@@ -4,6 +4,7 @@ import pool from '../config/database';
 import { User, UserType, TokenPayload } from '../types';
 import { Helpers } from '../utils/helpers';
 import logger from '../utils/logger';
+import { OAuth2Client } from 'google-auth-library';
 
 export class AuthService {
   /**
@@ -11,7 +12,7 @@ export class AuthService {
    */
   static async register(data: {
     email: string;
-    phone: string;
+    phone?: string;
     password: string;
     user_type: UserType;
     first_name: string;
@@ -34,14 +35,16 @@ export class AuthService {
         throw new Error('Email already registered');
       }
 
-      // Check if phone already exists
-      const phoneCheck = await client.query(
-        'SELECT id FROM users WHERE phone = $1',
-        [data.phone]
-      );
+      // Check if phone already exists (phone is optional for email registration)
+      if (data.phone) {
+        const phoneCheck = await client.query(
+          'SELECT id FROM users WHERE phone = $1',
+          [data.phone]
+        );
 
-      if (phoneCheck.rows.length > 0) {
-        throw new Error('Phone number already registered');
+        if (phoneCheck.rows.length > 0) {
+          throw new Error('Phone number already registered');
+        }
       }
 
       // Hash password
@@ -56,7 +59,7 @@ export class AuthService {
         RETURNING id, email, phone, user_type, first_name, last_name, country, city, status, created_at`,
         [
           data.email,
-          data.phone,
+          data.phone || null,
           password_hash,
           data.user_type,
           data.first_name,
@@ -102,11 +105,105 @@ export class AuthService {
   }
 
   /**
+   * Authenticate (or register) a user via a Google ID token.
+   * Verifies the token against GOOGLE_CLIENT_ID and upserts the user by email.
+   */
+  static async googleAuth(
+    idToken: string,
+    userType?: UserType,
+    expectedType?: UserType
+  ): Promise<{ user: Partial<User>; token: string; isNew: boolean }> {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      throw new Error('Google auth is not configured');
+    }
+
+    let payload: any;
+    try {
+      const oauthClient = new OAuth2Client(clientId);
+      const ticket = await oauthClient.verifyIdToken({ idToken, audience: clientId });
+      payload = ticket.getPayload();
+    } catch (e) {
+      throw new Error('Invalid Google token');
+    }
+
+    if (!payload || !payload.email) {
+      throw new Error('Invalid Google token');
+    }
+    const email = String(payload.email).toLowerCase();
+
+    // Existing user → log in.
+    const existing = await pool.query(
+      `SELECT id, email, phone, user_type, first_name, last_name, status, profile_photo_url
+       FROM users WHERE email = $1 AND deleted_at IS NULL`,
+      [email]
+    );
+
+    if (existing.rows.length > 0) {
+      const user = existing.rows[0];
+      if (user.status === 'suspended') {
+        throw new Error('Account is suspended');
+      }
+      if (expectedType && user.user_type !== expectedType) {
+        throw new Error('Account type mismatch');
+      }
+      await pool.query(
+        'UPDATE users SET last_login_at = CURRENT_TIMESTAMP, is_email_verified = TRUE WHERE id = $1',
+        [user.id]
+      );
+      const token = this.generateToken(user);
+      logger.info(`Google login: ${email}`);
+      return { user, token, isNew: false };
+    }
+
+    // New user → create (no phone/password; verified email).
+    const finalType = expectedType || userType || UserType.EXPEDITEUR;
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      const userResult = await client.query(
+        `INSERT INTO users (
+           email, user_type, first_name, last_name, is_email_verified, profile_photo_url, status
+         ) VALUES ($1, $2, $3, $4, TRUE, $5, 'verified')
+         RETURNING id, email, phone, user_type, first_name, last_name, country, city, status, created_at`,
+        [
+          email,
+          finalType,
+          payload.given_name || 'Utilisateur',
+          payload.family_name || '',
+          payload.picture || null,
+        ]
+      );
+      const user = userResult.rows[0];
+
+      if (finalType === UserType.GP) {
+        await client.query('INSERT INTO gp_profiles (user_id) VALUES ($1)', [user.id]);
+        await client.query('INSERT INTO wallet_balances (user_id) VALUES ($1)', [user.id]);
+      } else {
+        await client.query('INSERT INTO expediteur_profiles (user_id) VALUES ($1)', [user.id]);
+      }
+
+      await client.query('COMMIT');
+
+      const token = this.generateToken(user);
+      logger.info(`Google signup: ${email} (${finalType})`);
+      return { user, token, isNew: true };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
    * Login user
    */
   static async login(data: {
     email: string;
     password: string;
+    expectedType?: UserType;
   }): Promise<{ user: Partial<User>; token: string }> {
     const result = await pool.query(
       `SELECT id, email, phone, password_hash, user_type, first_name, last_name,
@@ -130,6 +227,11 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(data.password, user.password_hash);
     if (!isPasswordValid) {
       throw new Error('Invalid credentials');
+    }
+
+    // Enforce the expected account type (e.g. an Expéditeur cannot log into a GP account)
+    if (data.expectedType && user.user_type !== data.expectedType) {
+      throw new Error('Account type mismatch');
     }
 
     // Update last login

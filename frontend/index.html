@@ -13,21 +13,23 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #0f0c29;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 0;
         }
 
         .mobile-frame {
             width: 100%;
-            max-width: 375px;
-            height: 667px;
+            max-width: 480px;
+            height: 100vh;
+            height: 100dvh;
             background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            border-radius: 40px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border-radius: 0;
+            box-shadow: none;
             overflow: hidden;
             position: relative;
         }
@@ -62,7 +64,7 @@
         /* Screen Container */
         .screens-container {
             position: relative;
-            height: calc(100% - 44px);
+            height: 100%;
             overflow: hidden;
         }
 
@@ -87,6 +89,386 @@
             transform: translateX(-100%);
         }
 
+        /* Splash Screen */
+        .screen0 {
+            background-color: #0b1a30;
+            z-index: 10;
+        }
+
+        /* Branded splash: logo centered with a glass-shimmer sweep */
+        .splash-logo-wrap {
+            position: relative;
+            width: 88%;
+            max-width: 420px;
+            aspect-ratio: 1 / 1;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+            animation: splashIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .splash-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* The moving glass glare, clipped to the logo card */
+        .splash-shimmer {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                115deg,
+                transparent 28%,
+                rgba(255, 255, 255, 0.10) 42%,
+                rgba(255, 255, 255, 0.42) 50%,
+                rgba(255, 255, 255, 0.10) 58%,
+                transparent 72%
+            );
+            transform: translateX(-130%);
+            animation: splashShimmer 7s ease-out infinite;
+            mix-blend-mode: screen;
+            pointer-events: none;
+        }
+
+        @keyframes splashShimmer {
+            0%   { transform: translateX(-130%); }
+            100% { transform: translateX(130%); }
+        }
+
+        @keyframes splashIn {
+            from { opacity: 0; transform: scale(0.92); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        
+        /* Custom Screen 1 Layout (70/30) */
+        .screen1 .onboarding-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen1 .illustration {
+            height: 60%;
+            margin-bottom: 0;
+            flex-shrink: 0;
+        }
+
+        .screen1 .text-content {
+            height: 30%;
+            flex: none;
+            padding: 15px 30px;
+            justify-content: space-evenly;
+        }
+
+        .screen1 .bottom-nav {
+            display: none !important; /* Hide default absolute nav */
+        }
+
+        .bottom-nav-inline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        /* Adjust h1 for Screen 1 so it fits in 30% */
+        .screen1 h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        /* Custom Screen 2 Layout (60/40) */
+        .screen2 .onboarding-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen2 .illustration {
+            height: 60%;
+            margin-bottom: 0;
+            flex-shrink: 0;
+            position: relative;
+            background-color: #030816;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .screen2 .text-content {
+            height: 40%;
+            flex: none;
+            padding: 15px 30px;
+            justify-content: space-evenly;
+        }
+
+        .screen2 .bottom-nav {
+            display: none !important;
+        }
+
+        /* Premium Live Tracking UI for Screen 2 Bottom */
+        .live-tracking-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 15px;
+            margin: 5px 0;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02);
+        }
+
+        .live-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 8px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #00FF66;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .pulse-green {
+            box-shadow: 0 0 0 rgba(0, 255, 102, 0.4);
+            animation: pulse-green 1.5s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 102, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(0, 255, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 102, 0); }
+        }
+
+        .live-text {
+            color: #fff;
+            font-weight: 600;
+            flex-grow: 1;
+            letter-spacing: 0.5px;
+        }
+
+        .live-time {
+            color: #888;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .live-map-area {
+            position: relative;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .world-map-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 102, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 102, 0.05) 1px, transparent 1px);
+            background-size: 15px 15px;
+            background-position: center center;
+        }
+
+        .gps-target {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px; height: 50px;
+            border: 1px dashed rgba(0, 255, 102, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .gps-target::before {
+            content: ''; position: absolute; width: 2px; height: 8px; background: rgba(0, 255, 102, 0.5); top: -4px;
+        }
+        .gps-target::after {
+            content: ''; position: absolute; width: 2px; height: 8px; background: rgba(0, 255, 102, 0.5); bottom: -4px;
+        }
+        .gps-target-h::before {
+            content: ''; position: absolute; height: 2px; width: 8px; background: rgba(0, 255, 102, 0.5); left: -4px; top: 50%; transform: translateY(-50%);
+        }
+        .gps-target-h::after {
+            content: ''; position: absolute; height: 2px; width: 8px; background: rgba(0, 255, 102, 0.5); right: -4px; top: 50%; transform: translateY(-50%);
+        }
+
+        .radar-ping {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 255, 102, 0.1);
+            border: 1px solid rgba(0, 255, 102, 0.4);
+            border-radius: 50%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: radar 2s infinite ease-out;
+        }
+
+        .radar-ping.delay {
+            animation-delay: 1s;
+        }
+
+        @keyframes radar {
+            0% { width: 10px; height: 10px; opacity: 1; }
+            100% { width: 80px; height: 80px; opacity: 0; }
+        }
+
+        .route-curve {
+            position: absolute;
+            width: 100%;
+            height: 50px;
+            top: 0;
+            left: 0;
+        }
+
+        .route-curve svg {
+            width: 100%;
+            height: 100%;
+            opacity: 0.6;
+        }
+
+        .path-animate {
+            stroke-dasharray: 6,4;
+            animation: path-move 10s linear infinite;
+        }
+
+        @keyframes path-move {
+            to { stroke-dashoffset: -100; }
+        }
+
+        .moving-plane {
+            position: absolute;
+            font-size: 24px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+            animation: move-package 5s ease-in-out infinite;
+            display: flex;
+        }
+
+        .delivery-check {
+            position: absolute;
+            right: -10px;
+            top: -10px;
+            font-size: 16px;
+            opacity: 0;
+            animation: show-check 5s ease-in-out infinite;
+            background: #fff;
+            border-radius: 50%;
+            width: 18px; height: 18px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        
+        @keyframes move-package {
+            0% { left: 5%; top: 30px; transform: scale(0.8); }
+            40% { left: 50%; top: -5px; transform: scale(1.2); }
+            80% { left: 85%; top: 30px; transform: scale(1); }
+            100% { left: 85%; top: 30px; transform: scale(1); }
+        }
+
+        @keyframes show-check {
+            0%, 75% { opacity: 0; transform: scale(0); }
+            80%, 95% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0; transform: scale(1); }
+        }
+
+        .location-nodes {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            position: absolute;
+            bottom: -5px;
+        }
+
+        .node {
+            font-size: 10px;
+            color: #aaa;
+            font-weight: 500;
+            background: rgba(0,0,0,0.6);
+            padding: 2px 6px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .screen2 h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        /* Custom Screen 3 Layout (70/30) */
+        .screen3 .onboarding-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen3 .illustration {
+            height: 50%;
+            margin-bottom: 0;
+            flex-shrink: 0;
+            position: relative;
+            background-color: #030816;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .screen3 .text-content {
+            height: 50%;
+            flex: none;
+            padding: 15px 30px;
+            justify-content: space-evenly;
+        }
+
+        .screen3 .bottom-nav {
+            display: none !important;
+        }
+        
+        .screen3 h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        /* Screens keep the original layout: image (onboarding1/2.png) in the
+           top half, animated content + text + dots + buttons below. */
+
+        /* Onboarding 3: full-bleed background image (dark scrim for legible text) */
+        .screen3 {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-image: linear-gradient(rgba(15,12,41,0.50), rgba(15,12,41,0.86)), url('im/onboarding3.png');
+        }
+
+        /* Screen 3 uses the background image; hide its inline decorations */
+        .money-container, .screen3-bg { display: none !important; }
+
+        /* Lay screen 3 text/buttons over the background image */
+        .screen3 .screen3-content {
+            height: 100%;
+            justify-content: flex-end;
+            padding-bottom: 12px;
+        }
+
         /* ============================================
            ONBOARDING SCREEN 1 - STYLES
            ============================================ */
@@ -102,7 +484,7 @@
 
         .illustration {
             width: 100%;
-            height: 50%;
+            height: 60%;
             margin-bottom: 0;
             position: relative;
             overflow: hidden;
@@ -131,7 +513,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 30px 30px 20px;
+            padding: 30px 30px 100px;
         }
 
         h1 {
@@ -476,7 +858,7 @@
            ACCOUNT TYPE SCREEN - STYLES
            ============================================ */
         .account-type-content {
-            padding: 30px 30px 20px;
+            padding: 30px 30px 100px;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -487,19 +869,22 @@
         .logo-container {
             margin-bottom: 20px;
             flex-shrink: 0;
+            display: flex;
+            justify-content: center;
         }
 
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
+        .logo-img {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
             border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
-            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 20px rgba(255, 107, 107, 0.2);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
         .header-text {
@@ -542,10 +927,15 @@
         }
 
         .account-card.selected {
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 230, 109, 0.2) 100%);
-            border-color: #FF6B6B;
-            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #00FF66;
+            box-shadow: 0 15px 35px rgba(0, 255, 102, 0.2), inset 0 0 15px rgba(0, 255, 102, 0.1);
             transform: translateY(-5px);
+        }
+
+        .account-card.unselected {
+            opacity: 0.4;
+            transform: scale(0.98);
         }
 
         .card-header {
@@ -637,8 +1027,9 @@
         }
 
         .account-card.selected .check-indicator {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-            border-color: #4CAF50;
+            background: linear-gradient(135deg, #00FF66 0%, #00cc52 100%);
+            border-color: #00FF66;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.5);
         }
 
         .check-indicator::before {
@@ -682,6 +1073,31 @@
         .screen3 .dot.active {
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             box-shadow: 0 2px 8px rgba(255, 215, 0, 0.6);
+        }
+
+
+        .global-bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 30px 20px;
+            background: rgba(15, 12, 41, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            transition: all 0.3s ease;
+        }
+        .global-bottom-nav .pagination {
+            margin-bottom: 15px;
+        }
+        .global-bottom-nav .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .bottom-nav {
@@ -756,11 +1172,14 @@
         .continue-btn.active {
             opacity: 1;
             pointer-events: auto;
+            background: linear-gradient(135deg, #00FF66 0%, #00cc52 100%);
+            box-shadow: 0 8px 25px rgba(0, 255, 102, 0.4);
+            color: #1a1a2e;
         }
 
         .continue-btn.active:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(255, 107, 107, 0.5);
+            box-shadow: 0 12px 28px rgba(0, 255, 102, 0.5);
         }
 
         .login-link {
@@ -828,7 +1247,7 @@
             }
 
             .illustration {
-                height: 45%;
+                height: 60%;
             }
 
             .map-container {
@@ -927,7 +1346,32 @@
             }
 
             /* Bottom navigation */
-            .bottom-nav {
+    
+        .global-bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 30px 20px;
+            background: rgba(15, 12, 41, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            transition: all 0.3s ease;
+        }
+        .global-bottom-nav .pagination {
+            margin-bottom: 15px;
+        }
+        .global-bottom-nav .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bottom-nav {
                 padding: 14px 25px 25px;
             }
 
@@ -944,7 +1388,7 @@
             }
 
             .illustration {
-                height: 48%;
+                height: 60%;
             }
 
             .map-container {
@@ -967,7 +1411,7 @@
             }
 
             .illustration {
-                height: 50%;
+                height: 60%;
             }
 
             .map-container {
@@ -1008,7 +1452,7 @@
             }
 
             .illustration {
-                height: 52%;
+                height: 60%;
             }
 
             .map-container {
@@ -1042,7 +1486,7 @@
         /* Landscape orientation adjustments */
         @media (max-height: 500px) and (orientation: landscape) {
             .illustration {
-                height: 40%;
+                height: 60%;
             }
 
             .text-content {
@@ -1098,7 +1542,32 @@
                 padding: 8px 0;
             }
 
-            .bottom-nav {
+    
+        .global-bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 30px 20px;
+            background: rgba(15, 12, 41, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            transition: all 0.3s ease;
+        }
+        .global-bottom-nav .pagination {
+            margin-bottom: 15px;
+        }
+        .global-bottom-nav .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bottom-nav {
                 padding: 12px 25px 20px;
             }
 
@@ -1145,7 +1614,32 @@
                 padding-right: max(20px, env(safe-area-inset-right));
             }
 
-            .bottom-nav {
+    
+        .global-bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 30px 20px;
+            background: rgba(15, 12, 41, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            transition: all 0.3s ease;
+        }
+        .global-bottom-nav .pagination {
+            margin-bottom: 15px;
+        }
+        .global-bottom-nav .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bottom-nav {
                 padding-bottom: max(30px, env(safe-area-inset-bottom));
             }
 
@@ -1171,33 +1665,33 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="theme.css">
+    <script src="ui.js"></script>
 </head>
-<body>
+<body class="ds">
     <div class="mobile-frame">
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <span class="time">9:41</span>
-            <div class="indicators">
-                <div class="signal"></div>
-                <div class="wifi"></div>
-                <div class="battery"></div>
-            </div>
-        </div>
-
         <!-- Screens Container -->
         <div class="screens-container">
             
             <!-- ============================================
+                 SCREEN 0 - Splash Screen
+                 ============================================ -->
+            <div class="screen screen0 active" style="background:#0b1a30; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                <div class="splash-logo-wrap">
+                    <img src="im/splash-logo.jpg" class="splash-logo" onload="scheduleSplashAdvance()" onerror="scheduleSplashAdvance()" alt="SEN GP">
+                    <div class="splash-shimmer"></div>
+                </div>
+            </div>
+
+            <!-- ============================================
                  SCREEN 1 - Onboarding 1
                  ============================================ -->
-            <div class="screen screen1 active">
+            <div class="screen screen1">
                 <div class="onboarding-content">
                     <div class="illustration">
-                        <img 
-                            src="im/im1.png" 
-                            alt="Transport international" 
-                            class="hero-image"
-                        />
+                        <video class="hero-image" autoplay loop muted playsinline>
+                            <source src="im/onboarding3.mp4" type="video/mp4">
+                        </video>
                         <div class="image-overlay"></div>
                     </div>
 
@@ -1210,18 +1704,7 @@
                             rapide et en toute sécurité
                         </h1>
          
-                        <div class="pagination">
-                            <div class="dot active"></div>
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                        </div>
                     </div>
-                </div>
-
-                <div class="bottom-nav">
-                    <button class="btn btn-skip" onclick="skipOnboarding()">Passer</button>
-                    <button class="btn btn-next" onclick="nextScreen()">Suivant</button>
                 </div>
             </div>
 
@@ -1231,83 +1714,10 @@
             <div class="screen screen2">
                 <div class="onboarding-content">
                     <div class="illustration">
-                        <img 
-                            src="im/suivi.png" 
-                            alt="Suivi de colis en temps réel" 
-                            class="hero-image"
-                        />
-                        <div class="image-overlay"></div>
-                    </div>
-
-                    <div class="text-content">
-                        <div class="map-container">
-                            <div class="map-grid"></div>
-                            
-                            <div class="route-path">
-                                <div class="path-line"></div>
-                            </div>
-                            
-                            <div class="marker marker-start">
-                                <div class="marker-icon">
-                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="white">
-                                        <path d="M10 0C6.13 0 3 3.13 3 7c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S8.62 4.5 10 4.5s2.5 1.12 2.5 2.5S11.38 9.5 10 9.5z"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            
-                            <div class="marker marker-end">
-                                <div class="marker-icon">
-                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="white">
-                                        <path d="M10 0C6.13 0 3 3.13 3 7c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S8.62 4.5 10 4.5s2.5 1.12 2.5 2.5S11.38 9.5 10 9.5z"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            
-                            <div class="moving-package">
-                                <div class="package-icon"></div>
-                            </div>
-                            
-                            <div class="status-labels">
-                                <div class="status-label active">En transit</div>
-                                <div class="status-label">2h restantes</div>
-                            </div>
-                        </div>
-
-                        <h1>
-                            Suivez votre colis en temps réel
-                        </h1>
-         
-                        <div class="pagination">
-                            <div class="dot"></div>
-                            <div class="dot active"></div>
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bottom-nav">
-                    <button class="btn btn-back" onclick="previousScreen()">Retour</button>
-                    <button class="btn btn-next" onclick="nextScreen()">Suivant</button>
-                </div>
-            </div>
-
-            <!-- ============================================
-                 SCREEN 3 - Onboarding 3 (Earnings)
-                 ============================================ -->
-            <div class="screen screen3">
-                <div class="screen3-bg"></div>
-                <div class="screen3-content">
-                    <div class="money-container">
-                        <div class="money">💵</div>
-                        <div class="money">💶</div>
-                        <div class="money">💴</div>
-                        <div class="money">💷</div>
-                        <div class="money">💸</div>
-                        
-                        <div class="wallet-center">
-                            <div class="wallet"></div>
-                        </div>
+                        <video class="hero-image" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover;">
+                            <source src="im/onboarding1.mp4" type="video/mp4">
+                        </video>
+                        <div class="image-overlay" style="z-index: 2;"></div>
                     </div>
 
                     <div class="text-content">
@@ -1315,47 +1725,63 @@
                             Gagnez de l'argent en<br>
                             transportant des colis sûrs et vérifiés
                         </h1>
-
-                        <div class="stats-container">
-                            <div class="stat-card">
-                                <div class="stat-icon">💰</div>
-                                <div class="stat-value">Plus de gains</div>
-                                <div class="stat-label">à avoir</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon">✈️</div>
-                                <div class="stat-value">Plus de colis</div>
-                                <div class="stat-label">à transporter</div>
-                            </div>
-                        </div>
-
-                        <div class="benefits-list">
-                            <div class="benefit-item">
-                                <div class="benefit-icon">✓</div>
-                                <div class="benefit-text">Revenus supplémentaires sans effort</div>
-                            </div>
-                            <div class="benefit-item">
-                                <div class="benefit-icon">🛡️</div>
-                                <div class="benefit-text">Assurance complète incluse</div>
-                            </div>
-                            <div class="benefit-item">
-                                <div class="benefit-icon">⚡</div>
-                                <div class="benefit-text">Paiement rapide après livraison</div>
-                            </div>
-                        </div>
-
-                        <div class="pagination">
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                            <div class="dot active"></div>
-                            <div class="dot"></div>
-                        </div>
+         
                     </div>
                 </div>
+            </div>
 
-                <div class="bottom-nav">
-                    <button class="btn btn-back" onclick="previousScreen()">Retour</button>
-                    <button class="btn btn-start" onclick="nextScreen()">Commencer</button>
+            <!-- ============================================
+                 SCREEN 3 - Onboarding 3 (Earnings)
+                 ============================================ -->
+            <div class="screen screen3">
+                <div class="onboarding-content">
+                    <div class="illustration">
+                        <video class="hero-image" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover;">
+                            <source src="im/onboarding2.mp4" type="video/mp4">
+                        </video>
+                        <div class="image-overlay" style="z-index: 2;"></div>
+                    </div>
+
+                    <div class="text-content">
+                        <h1>
+                            Suivez votre colis en temps réel
+                        </h1>
+                        
+                        <div class="live-tracking-card">
+                            <div class="live-header">
+                                <span class="live-dot pulse-green"></span>
+                                <span class="live-text">Localisation GPS en direct</span>
+                                <span class="live-time">Mise à jour: instant</span>
+                            </div>
+                            
+                            <div class="live-map-area">
+                                <!-- The MAP Background Grid -->
+                                <div class="world-map-bg"></div>
+                                
+                                <!-- GPS Crosshair / Radar -->
+                                <div class="gps-target">
+                                    <div class="gps-target-h"></div>
+                                    <div class="radar-ping"></div>
+                                    <div class="radar-ping delay"></div>
+                                </div>
+
+                                <div class="route-curve">
+                                    <svg viewBox="0 0 200 50" preserveAspectRatio="none">
+                                        <path d="M10 40 Q 100 -10, 190 40" fill="none" stroke="#00FF66" stroke-width="2" class="path-animate"/>
+                                    </svg>
+                                    <div class="moving-plane">
+                                        📦
+                                        <span class="delivery-check">✅</span>
+                                    </div>
+                                </div>
+                                <div class="location-nodes">
+                                    <div class="node origin">Départ</div>
+                                    <div class="node dest">Destination</div>
+                                </div>
+                            </div>
+                        </div>
+         
+                    </div>
                 </div>
             </div>
 
@@ -1365,7 +1791,7 @@
             <div class="screen screen4">
                 <div class="account-type-content">
                     <div class="logo-container">
-                        <div class="logo">📦</div>
+                        <img src="im/sengp-logo.jpg" class="logo-img" alt="SENGP Logo">
                     </div>
 
                     <div class="header-text">
@@ -1434,27 +1860,47 @@
                     <button class="continue-btn" id="continueBtn" onclick="continueToSignup()">
                         Continuer
                     </button>
-
-                    <div class="login-link">
-                        Vous avez déjà un compte ? <a href="#" onclick="goToLogin()">Se connecter</a>
-                    </div>
                 </div>
 
-                <div class="bottom-nav" style="display: none;">
-                    <button class="btn btn-back" onclick="previousScreen()">Retour</button>
-                    <button class="btn btn-next">Suivant</button>
-                </div>
+
 
                 
             </div>
 
         </div>
+
+        <!-- Global Fixed Navigation -->
+        <div class="global-bottom-nav" id="globalNav" style="display: none;">
+            <div class="pagination" id="globalPagination">
+                <div class="dot active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-skip" id="btnGlobalLeft" onclick="handleGlobalLeft()">Passer</button>
+                <button class="btn btn-next" id="btnGlobalRight" onclick="handleGlobalRight()">Suivant</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        let currentScreen = 1;
+        let currentScreen = 0;
         const totalScreens = 4;
         let selectedAccountType = null;
+
+        // Splash → onboarding handoff. The branded logo (with the glass shimmer)
+        // shows for 5s, then we advance to the first onboarding screen. Guarded so
+        // it only fires once (img onload/onerror + a hard fallback all funnel through
+        // here) and so a ?choice=1 deep-link to the account screen is never overridden.
+        let _splashAdvanced = false;
+        function scheduleSplashAdvance(delay) {
+            if (_splashAdvanced) return;
+            setTimeout(() => {
+                if (_splashAdvanced) return;
+                _splashAdvanced = true;
+                goToScreen(1);
+            }, delay === undefined ? 5000 : delay);
+        }
 
         // Text rotation for screen 1
         const texts = [
@@ -1503,6 +1949,61 @@
             }
         }
 
+        function handleGlobalLeft() {
+            if (currentScreen === 1) {
+                skipOnboarding();
+            } else {
+                previousScreen();
+            }
+        }
+
+        function handleGlobalRight() {
+            nextScreen();
+        }
+
+        function updateGlobalNav(screenNumber) {
+            const globalNav = document.getElementById('globalNav');
+            const btnLeft = document.getElementById('btnGlobalLeft');
+            const btnRight = document.getElementById('btnGlobalRight');
+            
+            if (screenNumber >= 1 && screenNumber <= 3) {
+                globalNav.style.display = 'flex';
+                
+                // Update Left Button
+                if (screenNumber === 1) {
+                    btnLeft.textContent = 'Passer';
+                    btnLeft.className = 'btn btn-skip';
+                } else {
+                    btnLeft.textContent = 'Retour';
+                    btnLeft.className = 'btn btn-back';
+                }
+                
+                // Update Right Button
+                if (screenNumber === 3) {
+                    btnRight.textContent = 'Commencer';
+                    btnRight.className = 'btn btn-start';
+                } else {
+                    btnRight.textContent = 'Suivant';
+                    btnRight.className = 'btn btn-next';
+                }
+                
+                // Update dots
+                const dots = document.getElementById('globalPagination').querySelectorAll('.dot');
+                dots.forEach((dot, idx) => {
+                    dot.classList.toggle('active', idx === screenNumber - 1);
+                    if (idx === 2 && screenNumber === 3) {
+                        dot.style.background = 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)';
+                        dot.style.boxShadow = '0 2px 8px rgba(255, 215, 0, 0.6)';
+                    } else {
+                        dot.style.background = '';
+                        dot.style.boxShadow = '';
+                    }
+                });
+            } else {
+                globalNav.style.display = 'none';
+            }
+        }
+
         function goToScreen(screenNumber) {
             const currentScreenEl = document.querySelector(`.screen${currentScreen}`);
             const nextScreenEl = document.querySelector(`.screen${screenNumber}`);
@@ -1526,6 +2027,7 @@
 
                 // Update pagination dots
                 updatePagination();
+                updateGlobalNav(screenNumber);
             }
         }
 
@@ -1550,9 +2052,11 @@
             // Remove selection from all cards
             document.querySelectorAll('.account-card').forEach(card => {
                 card.classList.remove('selected');
+                card.classList.add('unselected');
             });
 
             // Add selection to clicked card
+            element.classList.remove('unselected');
             element.classList.add('selected');
             
             // Store selected type
@@ -1570,8 +2074,8 @@
 
         function continueToSignup() {
             if (selectedAccountType) {
-                // Rediriger vers la page d'inscription avec le type de compte
-                window.location.href = `inscrire.html?type=${selectedAccountType}`;
+                // Rediriger vers la page de connexion avec le type de compte choisi
+                window.location.href = `connexion.html?type=${selectedAccountType}`;
             }
         }
 
@@ -1584,6 +2088,34 @@
         // Animation on load
         window.addEventListener('load', () => {
             updatePagination();
+
+            // Accès direct à l'écran de choix du compte (ex. après déconnexion).
+            const _p = new URLSearchParams(location.search);
+            if (_p.get('choice') === '1') {
+                _splashAdvanced = true; // ne pas laisser le splash écraser cet écran
+                goToScreen(4);
+            } else {
+                // Filet de sécurité : si onload/onerror de l'image ne se déclenchent
+                // pas (décodage lent, cache), on quitte quand même le splash.
+                scheduleSplashAdvance(6500);
+            }
+
+            // Swipe navigation between onboarding screens (left = next, right = previous)
+            const sc = document.querySelector('.screens-container');
+            if (sc) {
+                let startX = null;
+                sc.addEventListener('touchstart', (e) => {
+                    startX = e.changedTouches[0].clientX;
+                }, { passive: true });
+                sc.addEventListener('touchend', (e) => {
+                    if (startX === null) return;
+                    const dx = e.changedTouches[0].clientX - startX;
+                    if (Math.abs(dx) > 50) {
+                        if (dx < 0) { nextScreen(); } else { previousScreen(); }
+                    }
+                    startX = null;
+                }, { passive: true });
+            }
         });
     </script>
 </body>

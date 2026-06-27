@@ -17,6 +17,13 @@ ios/
 .env.local
 .env.production
 
+# Secrets / credentials — never commit
+*credential*
+*.pem
+*accessKey*
+rootkey.csv
+.aws/
+
 # Build files
 build/
 www/

@@ -354,86 +354,24 @@
         }
 
         /* Bottom Navigation */
-        .bottom-nav {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 65px;
-            background: linear-gradient(180deg, rgba(15, 12, 41, 0.95) 0%, rgba(26, 22, 48, 0.98) 100%);
-            backdrop-filter: blur(30px);
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            padding: 6px 10px;
-            border-radius: 12px;
-            flex: 1;
-            max-width: 70px;
-            position: relative;
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 230, 109, 0.15) 50%, rgba(78, 205, 196, 0.1) 100%);
-            border: 1px solid rgba(255, 107, 107, 0.3);
-            box-shadow: 0 8px 24px rgba(255, 107, 107, 0.25);
-            transform: translateY(-6px);
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            filter: grayscale(0.8) brightness(0.7);
-            transition: all 0.4s ease;
-        }
-
-        .nav-item.active .nav-icon {
-            filter: grayscale(0) brightness(1.2);
-            transform: scale(1.1);
-        }
-
-        .nav-label {
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .nav-item.active .nav-label {
-            background: linear-gradient(135deg, #FFE66D 0%, #FF6B6B 50%, #4ECDC4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-        }
-
-        .nav-badge {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            min-width: 18px;
-            height: 18px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FF4757 100%);
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            font-weight: 800;
-            color: white;
-            padding: 0 5px;
-            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.6);
-        }
+        .bottom-nav { position:absolute; bottom:0; left:0; right:0; background:rgba(18,16,36,.92);
+            backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-top:1px solid rgba(255,255,255,.07);
+            display:flex; justify-content:space-around; align-items:stretch;
+            padding:9px 6px calc(9px + env(safe-area-inset-bottom)); box-shadow:0 -8px 30px rgba(0,0,0,.35); }
+        .nav-item { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+            cursor:pointer; flex:1; position:relative; padding:6px 0; border-radius:14px; color:rgba(255,255,255,.5);
+            transition:color .25s ease; -webkit-tap-highlight-color:transparent; }
+        .nav-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; }
+        .nav-icon svg { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+        .nav-label { font-size:10px; font-weight:600; color:inherit; }
+        .nav-item.active { color:#FF6B6B; }
+        .nav-item.active::after { content:''; position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+            width:26px; height:3px; border-radius:0 0 3px 3px; background:linear-gradient(90deg,#FF6B6B,#FFE66D); }
+        .nav-item:not(.active):active { color:rgba(255,255,255,.85); }
+        .nav-badge { position:absolute; top:0; left:calc(50% + 5px); min-width:17px; height:17px; background:#FF4757;
+            border:1.5px solid #121024; border-radius:9px; display:flex; align-items:center; justify-content:center;
+            font-size:9px; font-weight:800; color:#fff; padding:0 4px; }
+        .nav-badge.hidden { display:none; }
 
         /* Modal */
         .modal-overlay {
@@ -525,19 +463,23 @@
             transform: translateY(-2px);
             box-shadow: 0 12px 28px rgba(255, 107, 107, 0.5);
         }
-    </style>
+        .pf-field { margin-bottom: 12px; }
+        .pf-field label { display:block; font-size:12px; color:rgba(255,255,255,.65); margin-bottom:6px; }
+        .pf-input { width:100%; padding:11px 13px; border-radius:10px; border:1px solid rgba(255,255,255,.2);
+            background:rgba(255,255,255,.07); color:#fff; font-size:14px; }
+        .pf-idbtn { width:100%; padding:11px; border:1px dashed rgba(255,255,255,.28); border-radius:10px;
+            background:rgba(255,255,255,.05); color:#4ECDC4; font-weight:600; cursor:pointer; font-size:13px; }
+        .pf-idprev img { width:100%; max-height:130px; object-fit:contain; border-radius:8px; margin-bottom:8px; background:rgba(255,255,255,.04); }
+            /* sengp-responsive-override */
+        .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
+        body{padding:0!important;}
+        </style>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="theme.css">
+    <script src="ui.js"></script>
 </head>
-<body>
+<body class="ds">
     <div class="mobile-frame">
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <span class="time">9:41</span>
-            <div class="indicators">
-                <div class="signal"></div>
-                <div class="wifi"></div>
-                <div class="battery"></div>
-            </div>
-        </div>
 
         <!-- Header -->
         <div class="header">
@@ -693,30 +635,27 @@
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
             <div class="nav-item" onclick="navigateTo('home')">
-                <div class="nav-icon">🏠</div>
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
                 <div class="nav-label">Accueil</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('reclamation')">
-                <div class="nav-icon">⚠️</div>
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10.3 4 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
                 <div class="nav-label">Réclamation</div>
-                <div class="nav-badge">1</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('tracking')">
-                <div class="nav-icon">📍</div>
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
                 <div class="nav-label">Suivi</div>
-                <div class="nav-badge">3</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('notifications')">
-                <div class="nav-icon">🔔</div>
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
                 <div class="nav-label">Notifications</div>
-                <div class="nav-badge">5</div>
             </div>
 
             <div class="nav-item active" onclick="navigateTo('profile')">
-                <div class="nav-icon">👤</div>
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
                 <div class="nav-label">Profil</div>
             </div>
         </div>
@@ -735,6 +674,48 @@
                 </div>
             </div>
         </div>
+
+        <!-- Edit Profile Modal -->
+        <div class="modal-overlay" id="editProfileModal">
+            <div class="modal" style="max-height:88vh;display:flex;flex-direction:column;">
+                <div class="modal-header"><h3 class="modal-title">Modifier le profil</h3></div>
+                <div style="overflow-y:auto;padding:4px 2px;">
+                    <div class="pf-field"><label>Prénom</label><input id="epFirst" class="pf-input"></div>
+                    <div class="pf-field"><label>Nom</label><input id="epLast" class="pf-input"></div>
+                    <div class="pf-field"><label>Téléphone</label><input id="epPhone" class="pf-input" type="tel" placeholder="+221 77 123 45 67"></div>
+                    <div class="pf-field"><label>Carte d'identité — Recto</label>
+                        <div id="epRectoPrev" class="pf-idprev"></div>
+                        <input type="file" accept="image/*" id="epRecto" style="display:none" onchange="previewId('recto')">
+                        <button type="button" class="pf-idbtn" onclick="document.getElementById('epRecto').click()">📷 Choisir / Prendre une photo (recto)</button>
+                    </div>
+                    <div class="pf-field"><label>Carte d'identité — Verso</label>
+                        <div id="epVersoPrev" class="pf-idprev"></div>
+                        <input type="file" accept="image/*" id="epVerso" style="display:none" onchange="previewId('verso')">
+                        <button type="button" class="pf-idbtn" onclick="document.getElementById('epVerso').click()">📷 Choisir / Prendre une photo (verso)</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-cancel" onclick="closeModal('editProfileModal')">Annuler</button>
+                    <button class="btn btn-confirm" id="epSave" onclick="saveProfile()">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Password Modal -->
+        <div class="modal-overlay" id="passwordModal">
+            <div class="modal">
+                <div class="modal-header"><h3 class="modal-title">Changer le mot de passe</h3></div>
+                <div style="padding:4px 2px;">
+                    <div class="pf-field"><input id="pwOld" class="pf-input" type="password" placeholder="Mot de passe actuel"></div>
+                    <div class="pf-field"><input id="pwNew" class="pf-input" type="password" placeholder="Nouveau (min. 8 caractères)"></div>
+                    <div class="pf-field"><input id="pwConf" class="pf-input" type="password" placeholder="Confirmer le nouveau"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-cancel" onclick="closeModal('passwordModal')">Annuler</button>
+                    <button class="btn btn-confirm" id="pwSave" onclick="savePassword()">Changer</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -746,7 +727,7 @@
             alert('Modifier la photo de profil\n\nSélectionnez une nouvelle photo depuis votre galerie.');
         }
 
-        const API_BASE_URL = 'http://localhost:5000/api/v1';
+        const API_BASE_URL = window.API_BASE_URL;
 
         function getAuthToken() {
             return localStorage.getItem('authToken');
@@ -757,105 +738,136 @@
             return userData ? JSON.parse(userData) : null;
         }
 
-        function loadUserProfile() {
-            const user = getUserData();
-            if (!user) {
-                window.location.href = 'connexion.html';
-                return;
-            }
+        let currentUser = null;
 
-            // Update profile display
-            document.getElementById('userName').textContent = user.full_name || 'Utilisateur';
-            document.getElementById('userEmail').textContent = user.email || '';
-            document.getElementById('userPhone').textContent = user.phone_number || '';
-
-            // Update initials
-            const initials = (user.full_name || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-            const avatarElements = document.querySelectorAll('.profile-avatar');
-            avatarElements.forEach(el => el.textContent = initials);
+        function fillDisplay(u) {
+            const name = ((u.first_name || '') + ' ' + (u.last_name || '')).trim() || 'Utilisateur';
+            document.getElementById('userName').textContent = name;
+            document.getElementById('userEmail').textContent = u.email || '';
+            document.getElementById('userPhone').textContent = u.phone || '';
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            const av = document.querySelector('.profile-avatar-large');
+            if (av) av.childNodes[0] && (av.childNodes[0].nodeValue = initials);
         }
 
+        async function loadUserProfile() {
+            const token = getAuthToken();
+            if (!token) { window.location.href = 'connexion.html'; return; }
+            currentUser = getUserData() || {};
+            fillDisplay(currentUser);
+            try {
+                const r = await fetch(`${API_BASE_URL}/users/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (r.ok) {
+                    currentUser = (await r.json()).data || currentUser;
+                    localStorage.setItem('userData', JSON.stringify(Object.assign(getUserData() || {}, currentUser)));
+                    fillDisplay(currentUser);
+                }
+            } catch (e) {}
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+        // --- Modifier le profil ---
+        let rectoFile = null, versoFile = null;
         function editProfile() {
-            const user = getUserData();
-            const newName = prompt('Modifier le nom', user.full_name || '');
-            const newPhone = prompt('Modifier le téléphone', user.phone_number || '');
-
-            if (newName && newName !== user.full_name) {
-                updateUserProfile({ full_name: newName });
-            }
-            if (newPhone && newPhone !== user.phone_number) {
-                updateUserProfile({ phone_number: newPhone });
-            }
+            const u = currentUser || {};
+            document.getElementById('epFirst').value = u.first_name || '';
+            document.getElementById('epLast').value = u.last_name || '';
+            document.getElementById('epPhone').value = u.phone || '';
+            rectoFile = null; versoFile = null;
+            document.getElementById('epRecto').value = '';
+            document.getElementById('epVerso').value = '';
+            document.getElementById('epRectoPrev').innerHTML = u.identity_document_url ? `<img src="${u.identity_document_url}">` : '';
+            document.getElementById('epVersoPrev').innerHTML = u.identity_document_url_back ? `<img src="${u.identity_document_url_back}">` : '';
+            document.getElementById('editProfileModal').classList.add('show');
         }
 
-        async function updateUserProfile(updates) {
-            const token = getAuthToken();
+        function previewId(side) {
+            const input = document.getElementById(side === 'recto' ? 'epRecto' : 'epVerso');
+            const prev = document.getElementById(side === 'recto' ? 'epRectoPrev' : 'epVersoPrev');
+            const f = input.files[0];
+            if (!f) return;
+            if (side === 'recto') rectoFile = f; else versoFile = f;
+            const url = URL.createObjectURL(f);
+            prev.innerHTML = `<img src="${url}">`;
+        }
 
+        async function uploadFile(file) {
+            const fd = new FormData();
+            fd.append('file', file, file.name || 'cni.jpg');
+            const r = await fetch(`${API_BASE_URL}/uploads`, {
+                method: 'POST', headers: { 'Authorization': `Bearer ${getAuthToken()}` }, body: fd
+            });
+            const j = await r.json();
+            if (!r.ok || !j.success) throw new Error(j.error || 'Upload échoué');
+            return j.data.key;
+        }
+
+        async function saveProfile() {
+            const btn = document.getElementById('epSave');
+            btn.disabled = true; btn.textContent = 'Enregistrement…';
             try {
-                const response = await fetch(`${API_BASE_URL}/users/profile`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updates)
-                });
+                const body = {
+                    first_name: document.getElementById('epFirst').value.trim(),
+                    last_name: document.getElementById('epLast').value.trim(),
+                    phone: document.getElementById('epPhone').value.trim()
+                };
+                if (rectoFile || versoFile) body.identity_document_type = 'cni';
+                if (rectoFile) body.identity_document_url = await uploadFile(rectoFile);
+                if (versoFile) body.identity_document_url_back = await uploadFile(versoFile);
 
-                if (response.ok) {
-                    const result = await response.json();
-                    localStorage.setItem('userData', JSON.stringify(result.data));
-                    alert('Profil mis à jour avec succès!');
-                    loadUserProfile();
+                const r = await fetch(`${API_BASE_URL}/users/me`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const j = await r.json();
+                if (r.ok && j.success) {
+                    currentUser = j.data;
+                    localStorage.setItem('userData', JSON.stringify(Object.assign(getUserData() || {}, currentUser)));
+                    fillDisplay(currentUser);
+                    closeModal('editProfileModal');
+                    alert('Profil mis à jour ✅');
                 } else {
-                    alert('Erreur lors de la mise à jour du profil');
+                    alert('Erreur: ' + (j.error || j.message || 'Mise à jour échouée'));
                 }
-            } catch (error) {
-                console.error('Error updating profile:', error);
-                alert('Erreur de connexion au serveur');
+            } catch (e) {
+                alert('Erreur: ' + e.message);
+            } finally {
+                btn.disabled = false; btn.textContent = 'Enregistrer';
             }
         }
 
+        // --- Mot de passe ---
         function changePassword() {
-            const currentPassword = prompt('Mot de passe actuel:');
-            if (!currentPassword) return;
-
-            const newPassword = prompt('Nouveau mot de passe:');
-            if (!newPassword) return;
-
-            const confirmPassword = prompt('Confirmer le nouveau mot de passe:');
-            if (newPassword !== confirmPassword) {
-                alert('Les mots de passe ne correspondent pas');
-                return;
-            }
-
-            updatePassword(currentPassword, newPassword);
+            document.getElementById('pwOld').value = '';
+            document.getElementById('pwNew').value = '';
+            document.getElementById('pwConf').value = '';
+            document.getElementById('passwordModal').classList.add('show');
         }
 
-        async function updatePassword(currentPassword, newPassword) {
-            const token = getAuthToken();
-
+        async function savePassword() {
+            const oldP = document.getElementById('pwOld').value;
+            const newP = document.getElementById('pwNew').value;
+            const conf = document.getElementById('pwConf').value;
+            if (!oldP || !newP) { alert('Remplissez tous les champs.'); return; }
+            if (newP.length < 8) { alert('Le nouveau mot de passe doit faire au moins 8 caractères.'); return; }
+            if (newP !== conf) { alert('Les mots de passe ne correspondent pas.'); return; }
+            const btn = document.getElementById('pwSave');
+            btn.disabled = true; btn.textContent = 'Changement…';
             try {
-                const response = await fetch(`${API_BASE_URL}/users/change-password`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        current_password: currentPassword,
-                        new_password: newPassword
-                    })
+                const r = await fetch(`${API_BASE_URL}/auth/change-password`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ oldPassword: oldP, newPassword: newP })
                 });
-
-                if (response.ok) {
-                    alert('Mot de passe modifié avec succès!');
-                } else {
-                    const error = await response.json();
-                    alert('Erreur: ' + (error.message || 'Impossible de changer le mot de passe'));
-                }
-            } catch (error) {
-                console.error('Error changing password:', error);
-                alert('Erreur de connexion au serveur');
+                const j = await r.json();
+                if (r.ok && j.success) { closeModal('passwordModal'); alert('Mot de passe modifié ✅'); }
+                else alert('Erreur: ' + (j.error || j.message || 'Échec'));
+            } catch (e) {
+                alert('Erreur de connexion.');
+            } finally {
+                btn.disabled = false; btn.textContent = 'Changer';
             }
         }
 
@@ -908,8 +920,8 @@
 
             alert('Déconnexion réussie!\n\nÀ bientôt sur SEN GP.');
 
-            // Redirection vers la page de connexion
-            window.location.href = 'connexion.html';
+            // Redirection vers la page de choix du type de compte (sans onboarding)
+            window.location.href = 'index.html?choice=1';
         }
 
         function navigateTo(section) {

@@ -111,14 +111,24 @@
             width: 48px;
             height: 48px;
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            background-size: cover;
+            background-position: center;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 16px;
+            font-weight: 800;
+            color: #1a1a2e;
             cursor: pointer;
             transition: transform 0.3s ease;
             box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.85);
+            overflow: hidden;
+        }
+
+        .profile-avatar.has-photo span {
+            display: none;
         }
 
         .profile-avatar:hover {
@@ -214,6 +224,27 @@
 
         .stat-change.info {
             color: #4ECDC4;
+        }
+
+        .stat-card[role="button"] { transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; }
+        .stat-card[role="button"]:active { transform: scale(0.98); }
+
+        .stat-eye {
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.55);
+            border-radius: 8px;
+            transition: color 0.2s ease, background 0.2s ease;
+        }
+        .stat-eye:hover { color: #FFD700; background: rgba(255, 255, 255, 0.08); }
+        .stat-eye svg {
+            width: 20px; height: 20px;
+            fill: none; stroke: currentColor;
+            stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
         }
 
         /* Full Width Stat Card */
@@ -533,16 +564,15 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 65px;
-            background: linear-gradient(180deg, rgba(15, 12, 41, 0.95) 0%, rgba(26, 22, 48, 0.98) 100%);
-            backdrop-filter: blur(30px);
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(18, 16, 36, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+            justify-content: space-around;
+            align-items: stretch;
+            padding: 9px 6px calc(9px + env(safe-area-inset-bottom));
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35);
         }
 
         .nav-item {
@@ -550,55 +580,75 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 4px;
             cursor: pointer;
-            transition: all 0.4s ease;
-            padding: 6px 10px;
-            border-radius: 12px;
             flex: 1;
-            max-width: 70px;
             position: relative;
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.15) 50%, rgba(78, 205, 196, 0.1) 100%);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            box-shadow: 0 8px 24px rgba(255, 215, 0, 0.25);
-            transform: translateY(-6px);
+            padding: 6px 0;
+            border-radius: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            transition: color 0.25s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .nav-icon {
-            font-size: 20px;
-            filter: grayscale(0.8) brightness(0.7);
-            transition: all 0.4s ease;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .nav-item.active .nav-icon {
-            filter: grayscale(0) brightness(1.2);
-            transform: scale(1.1);
+        .nav-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: transform 0.25s ease;
         }
 
         .nav-label {
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 700;
-            text-transform: uppercase;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            color: inherit;
         }
 
-        .nav-item.active .nav-label {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #4ECDC4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
+        .nav-item.active {
+            color: #FFC107;
+        }
+
+        .nav-item.active .nav-icon svg {
+            transform: translateY(-1px) scale(1.06);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            top: -9px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 26px;
+            height: 3px;
+            border-radius: 0 0 3px 3px;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+        }
+
+        .nav-item:not(.active):active {
+            color: rgba(255, 255, 255, 0.85);
         }
 
         .nav-badge {
             position: absolute;
             top: 0px;
-            right: 0px;
-            min-width: 18px;
-            height: 18px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FF4757 100%);
+            left: calc(50% + 5px);
+            min-width: 17px;
+            height: 17px;
+            background: #FF4757;
+            border: 1.5px solid #121024;
             border-radius: 9px;
             display: flex;
             align-items: center;
@@ -606,27 +656,172 @@
             font-size: 9px;
             font-weight: 800;
             color: white;
-            padding: 0 5px;
-            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.6);
+            padding: 0 4px;
         }
 
         .nav-badge.new {
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            box-shadow: 0 3px 10px rgba(255, 215, 0, 0.6);
+            color: #1a1a2e;
         }
-    </style>
+
+        .nav-badge.hidden {
+            display: none;
+        }
+
+        /* ============ Popup GPS obligatoire ============ */
+        .gps-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: radial-gradient(130% 120% at 50% 0%, rgba(20,18,46,0.86) 0%, rgba(8,8,18,0.93) 100%);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+
+        .gps-gate.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .gps-gate-card {
+            width: 100%;
+            max-width: 340px;
+            position: relative;
+            text-align: center;
+            padding: 62px 24px 26px;
+            border-radius: 26px;
+            background: linear-gradient(160deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.04) 100%);
+            border: 1px solid rgba(255,215,0,0.28);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.12);
+            transform: translateY(16px) scale(0.96);
+            transition: transform 0.45s cubic-bezier(0.22,1,0.36,1);
+        }
+
+        .gps-gate.show .gps-gate-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .gps-gate-logo {
+            position: absolute;
+            top: -38px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 76px;
+            height: 76px;
+            border-radius: 22px;
+            object-fit: cover;
+            background: #0b1a30;
+            border: 2px solid rgba(255,215,0,0.6);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.5), 0 0 22px rgba(255,215,0,0.28);
+        }
+
+        .gps-gate-radar {
+            width: 92px;
+            height: 92px;
+            margin: 2px auto 16px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gps-gate-radar .pin {
+            font-size: 40px;
+            z-index: 2;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
+        }
+
+        .gps-gate-radar::before,
+        .gps-gate-radar::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 2px solid rgba(78,205,196,0.5);
+            animation: gpsPing 2s ease-out infinite;
+        }
+
+        .gps-gate-radar::after { animation-delay: 1s; }
+
+        @keyframes gpsPing {
+            0%   { transform: scale(0.4); opacity: 0.9; }
+            100% { transform: scale(1.25); opacity: 0; }
+        }
+
+        .gps-gate-card h2 {
+            font-size: 21px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 55%, #4ECDC4 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gps-gate-card p {
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.78);
+            margin-bottom: 22px;
+        }
+
+        .gps-gate-card p b { color: #FFE08A; font-weight: 700; }
+
+        .gps-gate-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 800;
+            color: #1a1a2e;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            box-shadow: 0 12px 26px rgba(255,184,0,0.45);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .gps-gate-btn:active { transform: translateY(1px) scale(0.99); }
+        .gps-gate-btn:disabled { opacity: 0.65; cursor: default; }
+
+        .gps-gate-status {
+            margin-top: 14px;
+            min-height: 16px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #FF8E8E;
+        }
+
+        .gps-gate-status.ok { color: #4ECDC4; }
+
+        .gps-gate-hint {
+            margin-top: 8px;
+            font-size: 11.5px;
+            color: rgba(255,255,255,0.45);
+        }
+
+            /* sengp-responsive-override */
+        .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
+        body{padding:0!important;}
+        </style>
+    <script src="config.js"></script>
+    <script src="ui.js"></script>
+    <link rel="stylesheet" href="theme.css">
 </head>
-<body>
+<body class="ds">
     <div class="mobile-frame">
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <span class="time">9:41</span>
-            <div class="indicators">
-                <div class="signal"></div>
-                <div class="wifi"></div>
-                <div class="battery"></div>
-            </div>
-        </div>
 
         <!-- Content -->
         <div class="content">
@@ -637,8 +832,8 @@
                         <h1>Bonjour, GP 👋</h1>
                         <p>Prêt pour une nouvelle mission ?</p>
                     </div>
-                    <div class="profile-avatar" onclick="openProfile()">
-                        ✈️
+                    <div class="profile-avatar" id="profileAvatar" onclick="openProfile()">
+                        <span id="profileInitials">GP</span>
                     </div>
                 </div>
 
@@ -653,31 +848,31 @@
             <!-- Stats Section -->
             <div class="stats-section">
                 <div class="stats-grid">
-                    <div class="stat-card primary">
+                    <div class="stat-card primary" onclick="openMissionsModal('active')" role="button" tabindex="0" style="cursor:pointer;">
                         <div class="stat-header">
                             <span class="stat-label">Missions actives</span>
                             <span class="stat-icon">📦</span>
                         </div>
                         <div class="stat-value">--</div>
-                        <div class="stat-change">En cours</div>
+                        <div class="stat-change">En cours ›</div>
                     </div>
 
-                    <div class="stat-card">
+                    <div class="stat-card" onclick="openMissionsModal('completed')" role="button" tabindex="0" style="cursor:pointer;">
                         <div class="stat-header">
                             <span class="stat-label">Missions terminées</span>
                             <span class="stat-icon">✅</span>
                         </div>
                         <div class="stat-value">--</div>
-                        <div class="stat-change">--</div>
+                        <div class="stat-change">Voir ›</div>
                     </div>
 
-                    <div class="stat-card stat-card-full">
+                    <div class="stat-card stat-card-full" id="gainsCard" onclick="openGainsHistory()" role="button" tabindex="0" style="cursor:pointer;">
                         <div class="stat-header">
                             <span class="stat-label">Gains totaux</span>
-                            <span class="stat-icon">💰</span>
+                            <span class="stat-eye" id="gainsEye" onclick="toggleGainsVisibility(event)" role="button" tabindex="0" title="Afficher / Masquer le montant"></span>
                         </div>
-                        <div class="stat-value">-- FCFA</div>
-                        <div class="stat-change info">--</div>
+                        <div class="stat-value" id="gainsValue">•••••• FCFA</div>
+                        <div class="stat-change info">Voir l'historique ›</div>
                     </div>
                 </div>
             </div>
@@ -707,6 +902,26 @@
                     </div>
                     <div class="action-arrow">→</div>
                 </button>
+
+                <!-- Colis à livrer -->
+                <button class="action-button action-button-secondary" onclick="window.location.href='alivrer.html'">
+                    <div class="action-icon">📬</div>
+                    <div class="action-text">
+                        <div class="action-title">Colis à livrer</div>
+                        <div class="action-subtitle">Destinataires, appel et suivi de remise</div>
+                    </div>
+                    <div class="action-arrow">→</div>
+                </button>
+
+                <!-- Partager ma position (suivi live des colis en transit) -->
+                <button class="action-button action-button-secondary" id="locShareBtn" onclick="toggleLocationShare()">
+                    <div class="action-icon" id="locShareIcon">📍</div>
+                    <div class="action-text">
+                        <div class="action-title">Partager ma position</div>
+                        <div class="action-subtitle" id="locShareSub">Suivi live désactivé</div>
+                    </div>
+                    <div class="action-arrow" id="locShareState">○</div>
+                </button>
             </div>
 
             <!-- Info Message -->
@@ -728,45 +943,327 @@
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
             <div class="nav-item active" onclick="navigateTo('home')" tabindex="0" role="button" aria-label="Accueil">
-                <div class="nav-icon">🏠</div>
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
                 <div class="nav-label">Accueil</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('missions')" tabindex="0" role="button" aria-label="Missions">
-                <div class="nav-icon">🔍</div>
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
                 <div class="nav-label">Missions</div>
                 <div class="nav-badge new">5</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('trips')" tabindex="0" role="button" aria-label="Mes trajets">
-                <div class="nav-icon">✈️</div>
+                <div class="nav-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M22 16.21v-1.6l-8.5-5V4.5a1.5 1.5 0 0 0-3 0v5.11l-8.5 5v1.6l8.5-2.66v4.54l-2.5 1.4v1.5l4-1.18 4 1.18v-1.5l-2.5-1.4v-4.54z"/></svg></div>
                 <div class="nav-label">Trajets</div>
                 <div class="nav-badge">2</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('claims')" tabindex="0" role="button" aria-label="Réclamations">
-                <div class="nav-icon">📝</div>
-                <div class="nav-label">Réclamations</div>
+            <div class="nav-item" onclick="navigateTo('earnings')" tabindex="0" role="button" aria-label="Gains">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                <div class="nav-label">Gains</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil">
-                <div class="nav-icon">👤</div>
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
                 <div class="nav-label">Profil</div>
             </div>
         </div>
     </div>
 
+    <!-- Popup GPS obligatoire (s'impose au GP avant toute action) -->
+    <div class="gps-gate" id="gpsGate" role="dialog" aria-modal="true" aria-labelledby="gpsGateTitle">
+        <div class="gps-gate-card">
+            <img src="im/sengp-logo.jpg" class="gps-gate-logo" alt="SEN GP">
+            <div class="gps-gate-radar"><span class="pin">📍</span></div>
+            <h2 id="gpsGateTitle">Activez votre GPS</h2>
+            <p>Pour accepter et réaliser des missions, SEN GP doit <b>suivre votre position en temps réel</b> pendant tout le trajet, jusqu'à la livraison. Activez le GPS avant de continuer.</p>
+            <button class="gps-gate-btn" id="gpsGateBtn" onclick="gpsGateOk()">
+                <span>🛰️</span><span id="gpsGateBtnLabel">OK, activer le GPS</span>
+            </button>
+            <div class="gps-gate-status" id="gpsGateStatus"></div>
+            <div class="gps-gate-hint">Vous pourrez gérer cette autorisation dans les réglages de votre téléphone.</div>
+        </div>
+    </div>
+
     <script>
         // API Configuration
-        const API_BASE_URL = 'http://localhost:5000/api/v1';
+        const API_BASE_URL = window.API_BASE_URL;
         let currentUser = null;
         let authToken = null;
 
         // Check authentication on page load
         window.addEventListener('DOMContentLoaded', async () => {
             await checkAuthentication();
+            // Le popup GPS s'impose avant toute interaction avec le dashboard.
+            await enforceGpsGate();
             await loadDashboardData();
+            hideEmptyBadges();
+            renderGains();
         });
+
+        // ---------- Suivi live : partage de position GPS (Phase 1) ----------
+        const ACTIVE_STATUSES = ['accepted','picked_up','in_transit','in_customs','out_for_delivery'];
+        let locShareTimer = null;   // envoi périodique (filet de sécurité)
+        let locWatchId = null;      // suivi continu premier plan (watchPosition)
+        let bgWatcherId = null;     // suivi arrière-plan (service de premier plan)
+        let _lastPushTs = 0, _lastLat = null, _lastLng = null;
+
+        const IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+        // Plugin de géoloc en arrière-plan (Android foreground-service / iOS background).
+        const BG_GEO = (IS_NATIVE && window.Capacitor && window.Capacitor.registerPlugin)
+            ? window.Capacitor.registerPlugin('BackgroundGeolocation') : null;
+
+        function locShareUI(on, sub) {
+            document.getElementById('locShareIcon').textContent = on ? '🛰️' : '📍';
+            document.getElementById('locShareState').textContent = on ? '●' : '○';
+            document.getElementById('locShareSub').textContent = sub || (on ? 'Suivi live activé' : 'Suivi live désactivé');
+        }
+
+        // ---- Popup GPS obligatoire ----
+        function showGpsGate() { document.getElementById('gpsGate').classList.add('show'); }
+        function hideGpsGate() { document.getElementById('gpsGate').classList.remove('show'); }
+        function gpsGateStatus(msg, ok) {
+            const el = document.getElementById('gpsGateStatus');
+            el.textContent = msg || '';
+            el.classList.toggle('ok', !!ok);
+        }
+
+        // État de la permission de localisation (Capacitor natif ou Web/PWA).
+        async function gpsPermissionState() {
+            const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
+            if (Geo && Geo.checkPermissions) {
+                try {
+                    const p = await Geo.checkPermissions();
+                    return p.location || p.coarseLocation || 'prompt';
+                } catch (e) { /* ignore */ }
+            }
+            if (navigator.permissions && navigator.permissions.query) {
+                try { return (await navigator.permissions.query({ name: 'geolocation' })).state; }
+                catch (e) { /* ignore */ }
+            }
+            return 'prompt';
+        }
+
+        // S'impose au GP : si la permission n'est pas accordée (ou le suivi pas encore
+        // actif), on affiche le popup obligatoire ; sinon on relance le partage.
+        async function enforceGpsGate() {
+            locShareUI(false);
+            const st = await gpsPermissionState();
+            if (st === 'granted' && localStorage.getItem('gpLiveShare') === '1') {
+                startLocationShare();
+                return;
+            }
+            showGpsGate();
+        }
+
+        // Clic sur « OK, activer le GPS » : demande la permission puis démarre le suivi.
+        async function gpsGateOk() {
+            const btn = document.getElementById('gpsGateBtn');
+            btn.disabled = true;
+            gpsGateStatus('Activation du GPS…', true);
+            try {
+                const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
+                if (Geo && Geo.requestPermissions) {
+                    const p = await Geo.requestPermissions();
+                    const s = p.location || p.coarseLocation;
+                    if (s !== 'granted') {
+                        gpsGateStatus('Autorisation refusée. Activez la localisation dans les réglages, puis réessayez.', false);
+                        document.getElementById('gpsGateBtnLabel').textContent = 'Réessayer';
+                        btn.disabled = false;
+                        return;
+                    }
+                }
+                // Déclenche un vrai relevé (et, sur Android, l'invite à activer la
+                // localisation du téléphone si elle est éteinte).
+                await getPosition();
+                gpsGateStatus('GPS activé ✓', true);
+                await startLocationShare();
+                setTimeout(hideGpsGate, 500);
+            } catch (e) {
+                const msg = (e && e.message) ? e.message : 'GPS indisponible';
+                gpsGateStatus('Activez la localisation de votre téléphone, puis réessayez. (' + msg + ')', false);
+                document.getElementById('gpsGateBtnLabel').textContent = 'Réessayer';
+                btn.disabled = false;
+            }
+        }
+
+        function toggleLocationShare() {
+            if (localStorage.getItem('gpLiveShare') === '1') stopLocationShare();
+            else startLocationShare();
+        }
+
+        function stopLocationShare() {
+            localStorage.removeItem('gpLiveShare');
+            if (locShareTimer) { clearInterval(locShareTimer); locShareTimer = null; }
+            stopLocationWatch();
+            locShareUI(false);
+        }
+
+        async function startLocationShare() {
+            localStorage.setItem('gpLiveShare', '1');
+            locShareUI(true, 'Activation…');
+            await sendLocationOnce();
+            if (locShareTimer) clearInterval(locShareTimer);
+            // Filet : un envoi périodique même si watchPosition ne déclenche pas.
+            locShareTimer = setInterval(sendLocationOnce, 120000);
+            // Suivi continu temps réel pendant tout le trajet.
+            startLocationWatch();
+        }
+
+        // ---- Suivi continu (watchPosition) ----
+        function _haversine(la1, lo1, la2, lo2) {
+            const R = 6371000, t = x => x * Math.PI / 180;
+            const dLa = t(la2 - la1), dLo = t(lo2 - lo1);
+            const a = Math.sin(dLa/2)**2 + Math.cos(t(la1)) * Math.cos(t(la2)) * Math.sin(dLo/2)**2;
+            return 2 * R * Math.asin(Math.sqrt(a));
+        }
+
+        function _onWatchPos(lat, lng) {
+            const now = Date.now();
+            const moved = (_lastLat == null) ? Infinity : _haversine(_lastLat, _lastLng, lat, lng);
+            // Throttle : au plus un envoi / 45 s, sauf déplacement > 120 m.
+            if (now - _lastPushTs < 45000 && moved < 120) return;
+            _lastPushTs = now; _lastLat = lat; _lastLng = lng;
+            pushLocationToActiveMissions(lat, lng);
+        }
+
+        async function startLocationWatch() {
+            stopLocationWatch();
+            // 1) Suivi en ARRIÈRE-PLAN : continue même app fermée / écran verrouillé.
+            //    Android : service de premier plan (notification persistante). iOS : background.
+            if (BG_GEO) {
+                try {
+                    bgWatcherId = await BG_GEO.addWatcher({
+                        backgroundTitle: 'SEN GP — suivi de livraison',
+                        backgroundMessage: 'Partage de votre position pendant le trajet.',
+                        requestPermissions: true,
+                        stale: false,
+                        distanceFilter: 50
+                    }, (location, error) => {
+                        if (error) {
+                            if (error.code === 'NOT_AUTHORIZED') {
+                                locShareUI(true, 'Autorisez « Toujours » la localisation');
+                            }
+                            console.warn('background geolocation', error);
+                            return;
+                        }
+                        if (location) _onWatchPos(location.latitude, location.longitude);
+                    });
+                    return;
+                } catch (e) { console.warn('background geolocation indisponible, fallback', e); }
+            }
+            // 2) Fallback PREMIER PLAN : watchPosition (Capacitor Geolocation ou Web/PWA).
+            const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
+            try {
+                if (Geo && Geo.watchPosition) {
+                    locWatchId = await Geo.watchPosition(
+                        { enableHighAccuracy: true, timeout: 30000, maximumAge: 10000 },
+                        (pos) => { if (pos && pos.coords) _onWatchPos(pos.coords.latitude, pos.coords.longitude); }
+                    );
+                } else if (navigator.geolocation && navigator.geolocation.watchPosition) {
+                    locWatchId = navigator.geolocation.watchPosition(
+                        (p) => _onWatchPos(p.coords.latitude, p.coords.longitude),
+                        (err) => console.warn('watch error', err),
+                        { enableHighAccuracy: true, timeout: 30000, maximumAge: 10000 }
+                    );
+                }
+            } catch (e) { console.warn('startLocationWatch', e); }
+        }
+
+        function stopLocationWatch() {
+            if (bgWatcherId != null && BG_GEO) {
+                try { BG_GEO.removeWatcher({ id: bgWatcherId }); } catch (e) { /* ignore */ }
+                bgWatcherId = null;
+            }
+            if (locWatchId == null) return;
+            const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
+            try {
+                if (Geo && Geo.clearWatch) Geo.clearWatch({ id: locWatchId });
+                else if (navigator.geolocation && navigator.geolocation.clearWatch) navigator.geolocation.clearWatch(locWatchId);
+            } catch (e) { /* ignore */ }
+            locWatchId = null;
+        }
+
+        async function getPosition() {
+            const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
+            if (Geo) {
+                // Vérifier / demander la permission de localisation.
+                try {
+                    let perm = await Geo.checkPermissions();
+                    const granted = p => p && (p.location === 'granted' || p.coarseLocation === 'granted');
+                    if (!granted(perm) && Geo.requestPermissions) perm = await Geo.requestPermissions();
+                    if (!granted(perm)) throw new Error('Autorisez la localisation dans les réglages.');
+                } catch (e) {
+                    if (e && /Autorisez/.test(e.message)) throw e;
+                    // checkPermissions peut ne pas exister sur certaines versions : on continue.
+                }
+                // D'abord rapide (réseau), sinon haute précision (GPS).
+                try {
+                    const p = await Geo.getCurrentPosition({ enableHighAccuracy: false, timeout: 20000, maximumAge: 60000 });
+                    return { lat: p.coords.latitude, lng: p.coords.longitude };
+                } catch (e1) {
+                    const p = await Geo.getCurrentPosition({ enableHighAccuracy: true, timeout: 25000 });
+                    return { lat: p.coords.latitude, lng: p.coords.longitude };
+                }
+            }
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) return reject(new Error('Géolocalisation indisponible'));
+                navigator.geolocation.getCurrentPosition(
+                    pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                    err => reject(new Error(err && err.message ? err.message : 'GPS indisponible')),
+                    { enableHighAccuracy: false, timeout: 20000, maximumAge: 60000 }
+                );
+            });
+        }
+
+        // Envoie une position (lat/lng) à toutes les missions en transit du GP.
+        async function pushLocationToActiveMissions(lat, lng) {
+            if (localStorage.getItem('gpLiveShare') !== '1') return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/missions/my-missions?limit=100`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const data = res.ok ? ((await res.json()).data || []) : [];
+                const active = data.filter(m => ACTIVE_STATUSES.includes(String(m.status || '').toLowerCase()));
+                if (active.length === 0) { locShareUI(true, 'Aucune mission en transit'); return; }
+
+                let sent = 0;
+                await Promise.all(active.map(m =>
+                    fetch(`${API_BASE_URL}/missions/${m.id}/location`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ lat, lng })
+                    }).then(r => { if (r.ok) sent++; }).catch(() => {})
+                ));
+                const t = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                locShareUI(true, `Position partagée (${sent}) · ${t}`);
+            } catch (e) {
+                console.warn('push location error', e);
+                locShareUI(true, 'Position indisponible : ' + (e && e.message ? e.message : 'GPS'));
+            }
+        }
+
+        // Un relevé GPS ponctuel (utilisé au démarrage et par le filet périodique).
+        async function sendLocationOnce() {
+            if (localStorage.getItem('gpLiveShare') !== '1') return;
+            try {
+                const pos = await getPosition();
+                _lastPushTs = Date.now(); _lastLat = pos.lat; _lastLng = pos.lng;
+                await pushLocationToActiveMissions(pos.lat, pos.lng);
+            } catch (e) {
+                console.warn('Location share error', e);
+                locShareUI(true, 'Position indisponible : ' + (e && e.message ? e.message : 'GPS'));
+            }
+        }
+
+        // Masque les pastilles dont la valeur est 0 ou vide (évite un « 0 » disgracieux).
+        function hideEmptyBadges() {
+            document.querySelectorAll('.nav-badge').forEach((b) => {
+                const n = parseInt((b.textContent || '').trim(), 10);
+                b.classList.toggle('hidden', !n);
+            });
+        }
 
         async function checkAuthentication() {
             authToken = localStorage.getItem('authToken');
@@ -800,6 +1297,20 @@
             const greetingName = document.querySelector('.greeting h1');
             const firstName = currentUser.first_name || 'GP';
             greetingName.textContent = `Bonjour, ${firstName} 👋`;
+
+            // Avatar : photo de profil Google si disponible, sinon initiales.
+            const avatar = document.getElementById('profileAvatar');
+            const initialsEl = document.getElementById('profileInitials');
+            const photo = currentUser.profile_photo_url;
+            if (photo) {
+                avatar.style.backgroundImage = `url("${photo}")`;
+                avatar.classList.add('has-photo');
+            } else {
+                const a = (currentUser.first_name || '').charAt(0);
+                const b = (currentUser.last_name || '').charAt(0);
+                initialsEl.textContent = (a + b).toUpperCase() || 'GP';
+                avatar.classList.remove('has-photo');
+            }
         }
 
         async function loadDashboardData() {
@@ -853,12 +1364,83 @@
                 // Update UI
                 document.querySelectorAll('.stat-value')[0].textContent = activeMissions;
                 document.querySelectorAll('.stat-value')[1].textContent = completedMissions;
-                document.querySelectorAll('.stat-value')[2].textContent =
-                    `${totalEarnings.toLocaleString('fr-FR')} FCFA`;
+                window._gpTotalEarnings = totalEarnings;
+                renderGains();
 
             } catch (error) {
                 console.error('Error loading stats:', error);
             }
+        }
+
+        // ---- Cartes statistiques interactives ----
+        const EYE_OPEN = '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+        const EYE_OFF  = '<svg viewBox="0 0 24 24"><path d="m3 3 18 18"/><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.4 0 10 7 10 7a18.4 18.4 0 0 1-2.6 3.5"/><path d="M6.6 6.6C3.9 8.3 2 12 2 12s3.6 7 10 7a10.5 10.5 0 0 0 4.1-.8"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+
+        function renderGains() {
+            const hidden = localStorage.getItem('gpGainsHidden') === '1';
+            const v = document.getElementById('gainsValue');
+            const eye = document.getElementById('gainsEye');
+            if (v) v.textContent = hidden ? '•••••• FCFA'
+                : ((window._gpTotalEarnings || 0).toLocaleString('fr-FR') + ' FCFA');
+            if (eye) eye.innerHTML = hidden ? EYE_OFF : EYE_OPEN;
+        }
+
+        function toggleGainsVisibility(ev) {
+            if (ev) ev.stopPropagation();   // ne pas déclencher le clic de la carte
+            if (localStorage.getItem('gpGainsHidden') === '1') localStorage.removeItem('gpGainsHidden');
+            else localStorage.setItem('gpGainsHidden', '1');
+            renderGains();
+        }
+
+        function openGainsHistory() {
+            window.location.href = 'gains.html';
+        }
+
+        // Popup (design unifié) listant les missions actives ou terminées.
+        async function openMissionsModal(kind) {
+            let missions = [];
+            try {
+                const r = await fetch(`${API_BASE_URL}/missions/my-missions?limit=1000`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                missions = r.ok ? ((await r.json()).data || []) : [];
+            } catch (e) { /* réseau */ }
+
+            const ACTIVE = ['accepted', 'in_transit', 'picked_up', 'in_customs', 'out_for_delivery'];
+            const list = missions.filter(m => {
+                const s = String(m.status || '').toLowerCase();
+                return kind === 'active' ? ACTIVE.includes(s) : s === 'delivered';
+            });
+
+            const rows = list.map(m => {
+                const price = parseFloat(m.price || 0).toLocaleString('fr-FR');
+                const info = getStatusInfo(m.status);
+                return `<div class="sengp-list-item" onclick="window.location.href='detailmissiongp.html?id=${m.id}'">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:700;color:#fff;font-size:13px;">
+                            ${getCountryFlag(m.departure_country)} ${m.departure_city || '?'} → ${getCountryFlag(m.arrival_country)} ${m.arrival_city || '?'}
+                        </div>
+                        <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:3px;">${formatDate(m.departure_date)}</div>
+                    </div>
+                    <div style="text-align:right;flex-shrink:0;">
+                        <div style="color:#FFD700;font-weight:800;font-size:13px;">${price} FCFA</div>
+                        <span class="mission-status ${info.class}" style="display:inline-block;margin-top:4px;">${info.label}</span>
+                    </div>
+                </div>`;
+            }).join('');
+
+            const body = `<div class="sengp-list">${rows ||
+                '<div class="sengp-list-empty">Aucune mission dans cette catégorie pour le moment.</div>'}</div>`;
+            const title = (kind === 'active' ? 'Missions actives' : 'Missions terminées') + ` (${list.length})`;
+
+            sengpModal({
+                title: title,
+                bodyHTML: body,
+                actions: [
+                    { label: 'Fermer', value: false },
+                    { label: 'Voir tout', primary: true, value: true }
+                ]
+            }).then(v => { if (v) window.location.href = 'trajets.html'; });
         }
 
         async function loadNewMissions() {
@@ -1082,11 +1664,22 @@
             window.location.href = 'creetrajet.html';
         }
 
-        function searchMissions() {
-            // Check if user has created a trip first
-            // For now, show alert - will be replaced with actual check
-            alert('Veuillez créer un trajet d\'abord pour voir les missions disponibles.');
-            // window.location.href = 'missions.html';
+        async function searchMissions() {
+            // Le GP doit avoir au moins un trajet pour voir/accepter des missions.
+            try {
+                const res = await fetch(`${API_BASE_URL}/trips/my-trips?limit=1`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const data = res.ok ? ((await res.json()).data || []) : [];
+                if (data.length > 0) {
+                    window.location.href = 'missions.html';
+                } else {
+                    alert('Veuillez créer un trajet d\'abord pour voir les missions disponibles.');
+                }
+            } catch (e) {
+                // En cas d'erreur réseau, ne pas bloquer.
+                window.location.href = 'missions.html';
+            }
         }
 
         function viewAllMissions() {
@@ -1116,7 +1709,7 @@
                 'home': 'dashgp.html',
                 'missions': 'missions.html',
                 'trips': 'trajets.html',
-                'claims': 'reclamationgp.html',
+                'earnings': 'gains.html',
                 'profile': 'profilegp.html'
             };
 

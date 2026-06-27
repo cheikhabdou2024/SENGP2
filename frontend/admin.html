@@ -3,880 +3,490 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEN GP - Admin Dashboard</title>
+    <title>SEN GP - Administration</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            min-height: 100vh;
-            padding: 0;
+            background: #0f0c29;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff; min-height: 100vh;
         }
+        a { color: #4ECDC4; }
+        button { font-family: inherit; cursor: pointer; }
 
-        /* Top Bar */
-        .top-bar {
-            background: rgba(255, 255, 255, 0.05);
+        /* Login gate */
+        #login { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-card {
+            width: 100%; max-width: 380px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 32px;
+        }
+        .login-card h1 { font-size: 22px; margin-bottom: 6px; }
+        .login-card p { color: rgba(255,255,255,0.6); font-size: 13px; margin-bottom: 20px; }
+        .field { margin-bottom: 14px; }
+        .field label { display:block; font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 6px; }
+        .field input {
+            width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15);
+            background: #fff; color: #1a1a2e; font-size: 14px;
+        }
+        .btn-primary {
+            width: 100%; padding: 13px; border: none; border-radius: 12px; font-weight: 700; font-size: 15px;
+            background: linear-gradient(135deg,#FF6B6B,#FFE66D); color:#1a1a2e;
+        }
+        .btn-primary:disabled { opacity:.6; }
+
+        /* App shell */
+        #app { display: none; }
+        .topbar {
+            display:flex; align-items:center; justify-content:space-between; gap:12px;
+            padding: 14px 20px; background: rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.1); position: sticky; top:0; z-index:5;
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 16px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .topbar h1 { font-size: 18px; }
+        .topbar .who { font-size: 12px; color: rgba(255,255,255,0.6); }
+        .btn-logout {
+            padding: 8px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.08); color:#fff; font-size: 13px;
         }
-
-        .logo {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .logo-text h1 {
-            font-size: 20px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .logo-text p {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .admin-actions {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .notification-btn {
-            position: relative;
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .notification-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #FF6B6B;
-            color: white;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 10px;
-        }
-
-        .admin-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .admin-profile:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .admin-avatar {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .admin-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #ffffff;
-        }
-
-        /* Main Container */
-        .main-container {
-            display: flex;
-            height: calc(100vh - 73px);
-        }
-
-        /* Sidebar */
+        .layout { display: flex; min-height: calc(100vh - 57px); }
         .sidebar {
-            width: 260px;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 20px 0;
-            overflow-y: auto;
+            width: 190px; flex-shrink: 0; padding: 14px 10px; border-right: 1px solid rgba(255,255,255,0.08);
+        }
+        .nav-link {
+            display:flex; align-items:center; gap:10px; padding: 11px 14px; border-radius: 10px;
+            color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 600; margin-bottom: 4px;
+        }
+        .nav-link.active { background: rgba(255,215,0,0.15); color: #FFD700; }
+        .main { flex: 1; padding: 20px; overflow-x: auto; }
+
+        /* Stats cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap: 12px; margin-bottom: 8px; }
+        .stat {
+            background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 16px;
+        }
+        .stat .label { font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
+        .stat .value { font-size: 24px; font-weight: 800; }
+        .stat .sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+        .section-title { font-size: 16px; font-weight: 700; margin: 18px 0 12px; }
+
+        /* Toolbar */
+        .toolbar { display:flex; gap:10px; margin-bottom: 12px; flex-wrap: wrap; }
+        .toolbar input, .toolbar select {
+            padding: 9px 12px; border-radius: 10px; border:1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.08); color:#fff; font-size: 13px;
+        }
+        .toolbar input { min-width: 200px; }
+        .toolbar button {
+            padding: 9px 14px; border-radius: 10px; border:none; background:#4ECDC4; color:#06302c; font-weight:700; font-size:13px;
         }
 
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
+        /* Table */
+        .table-wrap { overflow-x: auto; border:1px solid rgba(255,255,255,0.08); border-radius: 12px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 640px; }
+        th, td { text-align: left; padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.06); white-space: nowrap; }
+        th { color: rgba(255,255,255,0.55); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; }
+        tr:hover td { background: rgba(255,255,255,0.03); }
+        .badge { padding: 3px 9px; border-radius: 8px; font-size: 11px; font-weight: 700; }
+        .b-green { background: rgba(76,175,80,.2); color:#7ee081; }
+        .b-yellow { background: rgba(255,215,0,.18); color:#FFD700; }
+        .b-red { background: rgba(255,107,107,.2); color:#ff8f8f; }
+        .b-blue { background: rgba(78,205,196,.2); color:#4ECDC4; }
+        .b-gray { background: rgba(255,255,255,.12); color:#ccc; }
+        .row-actions { display:flex; gap:6px; }
+        .act {
+            padding: 6px 10px; border-radius: 8px; border:none; font-size: 12px; font-weight: 600;
         }
+        .act-edit { background: rgba(78,205,196,.2); color:#4ECDC4; }
+        .act-del { background: rgba(255,107,107,.2); color:#ff8f8f; }
+        .act-ok { background: rgba(76,175,80,.25); color:#7ee081; }
+        .empty, .loading { text-align:center; padding: 40px; color: rgba(255,255,255,0.5); }
+        .pager { display:flex; gap:8px; align-items:center; justify-content:flex-end; margin-top:12px; font-size:13px; }
+        .pager button { padding:7px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:#fff; }
+        .pager button:disabled { opacity:.4; }
 
-        .sidebar::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-
-        .nav-section {
-            margin-bottom: 24px;
-        }
-
-        .nav-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.5);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 0 20px;
-            margin-bottom: 10px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: #ffffff;
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 230, 109, 0.15) 100%);
-            color: #ffffff;
-            border-left: 3px solid #FF6B6B;
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            width: 24px;
-            text-align: center;
-        }
-
-        .nav-text {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .nav-badge {
-            margin-left: auto;
-            background: #FF6B6B;
-            color: white;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-
-        /* Content Area */
-        .content-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 30px;
-        }
-
-        .content-area::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .content-area::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .content-area::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-
-        /* Page Header */
-        .page-header {
-            margin-bottom: 30px;
-        }
-
-        .page-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 8px;
-        }
-
-        .page-subtitle {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
-        }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-        }
-
-        .stat-info h3 {
-            font-size: 13px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .stat-icon.blue {
-            background: linear-gradient(135deg, rgba(78, 205, 196, 0.3) 0%, rgba(78, 205, 196, 0.2) 100%);
-        }
-
-        .stat-icon.orange {
-            background: linear-gradient(135deg, rgba(255, 165, 0, 0.3) 0%, rgba(255, 165, 0, 0.2) 100%);
-        }
-
-        .stat-icon.green {
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.3) 0%, rgba(76, 175, 80, 0.2) 100%);
-        }
-
-        .stat-icon.red {
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.3) 0%, rgba(255, 107, 107, 0.2) 100%);
-        }
-
-        .stat-footer {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-        }
-
-        .stat-change {
-            font-weight: 600;
-        }
-
-        .stat-change.positive {
-            color: #4CAF50;
-        }
-
-        .stat-change.negative {
-            color: #FF6B6B;
-        }
-
-        .stat-period {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        /* Quick Actions */
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 30px;
-        }
-
-        .action-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .action-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            transform: translateX(4px);
-        }
-
-        .action-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .action-text {
-            font-size: 14px;
-            font-weight: 600;
-            color: #ffffff;
-        }
-
-        /* Recent Activity */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .view-all-btn {
-            font-size: 13px;
-            color: #FFE66D;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .view-all-btn:hover {
-            color: #FF6B6B;
-        }
-
-        .activity-list {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            overflow: hidden;
-        }
-
-        .activity-item {
-            padding: 16px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-
-        .activity-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .activity-content {
-            flex: 1;
-        }
-
-        .activity-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .activity-description {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .activity-time {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
-            white-space: nowrap;
-        }
-
-        /* Two Column Layout */
-        .two-column {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 30px;
-            margin-top: 30px;
-        }
-
-        @media (max-width: 1200px) {
-            .two-column {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Alerts */
-        .alerts-section {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 20px;
-        }
-
-        .alert-item {
-            padding: 12px;
-            background: rgba(255, 107, 107, 0.15);
-            border: 1px solid rgba(255, 107, 107, 0.3);
-            border-radius: 10px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .alert-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .alert-item.warning {
-            background: rgba(255, 230, 109, 0.15);
-            border-color: rgba(255, 230, 109, 0.3);
-        }
-
-        .alert-item.info {
-            background: rgba(78, 205, 196, 0.15);
-            border-color: rgba(78, 205, 196, 0.3);
-        }
-
-        .alert-icon {
-            font-size: 20px;
-        }
-
-        .alert-content {
-            flex: 1;
-        }
-
-        .alert-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .alert-text {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
+        @media (max-width: 720px) {
+            .sidebar { width: 64px; }
+            .nav-link span { display:none; }
+            .nav-link { justify-content:center; }
         }
     </style>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="theme.css">
+    <script src="ui.js"></script>
 </head>
-<body>
-    <!-- Top Bar -->
-    <div class="top-bar">
-        <div class="logo-section">
-            <div class="logo">📦</div>
-            <div class="logo-text">
-                <h1>SEN GP Admin</h1>
-                <p>Tableau de bord administrateur</p>
-            </div>
-        </div>
-
-        <div class="admin-actions">
-            <button class="notification-btn" onclick="openNotifications()">
-                🔔
-                <span class="notification-badge">12</span>
-            </button>
-
-            <div class="admin-profile" onclick="openAdminProfile()">
-                <div class="admin-avatar">👨‍💼</div>
-                <div class="admin-name">Admin</div>
-            </div>
+<body class="ds">
+    <!-- LOGIN -->
+    <div id="login">
+        <div class="login-card">
+            <h1>Administration SEN GP</h1>
+            <p>Accès réservé aux administrateurs.</p>
+            <form id="loginForm">
+                <div class="field">
+                    <label>Email</label>
+                    <input type="email" id="email" required placeholder="admin@email.com">
+                </div>
+                <div class="field">
+                    <label>Mot de passe</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <button class="btn-primary" type="submit" id="loginBtn">Se connecter</button>
+                <p id="loginErr" style="color:#ff8f8f; margin-top:12px; display:none;"></p>
+            </form>
         </div>
     </div>
 
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="nav-section">
-                <div class="nav-title">Menu Principal</div>
-                <div class="nav-item active" onclick="navigateTo('dashboard')">
-                    <span class="nav-icon">📊</span>
-                    <span class="nav-text">Dashboard</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('users')">
-                    <span class="nav-icon">👥</span>
-                    <span class="nav-text">Utilisateurs</span>
-                    <span class="nav-badge">248</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('missions')">
-                    <span class="nav-icon">📦</span>
-                    <span class="nav-text">Missions</span>
-                    <span class="nav-badge">45</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('payments')">
-                    <span class="nav-icon">💰</span>
-                    <span class="nav-text">Paiements</span>
-                </div>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-title">Gestion</div>
-                <div class="nav-item" onclick="navigateTo('claims')">
-                    <span class="nav-icon">⚠️</span>
-                    <span class="nav-text">Réclamations</span>
-                    <span class="nav-badge">8</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('verification')">
-                    <span class="nav-icon">✓</span>
-                    <span class="nav-text">Vérifications</span>
-                    <span class="nav-badge">15</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('reports')">
-                    <span class="nav-icon">📈</span>
-                    <span class="nav-text">Rapports</span>
-                </div>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-title">Configuration</div>
-                <div class="nav-item" onclick="navigateTo('settings')">
-                    <span class="nav-icon">⚙️</span>
-                    <span class="nav-text">Paramètres</span>
-                </div>
-                <div class="nav-item" onclick="navigateTo('security')">
-                    <span class="nav-icon">🔒</span>
-                    <span class="nav-text">Sécurité</span>
-                </div>
-                <div class="nav-item" onclick="logout()">
-                    <span class="nav-icon">🚪</span>
-                    <span class="nav-text">Déconnexion</span>
-                </div>
+    <!-- APP -->
+    <div id="app">
+        <div class="topbar">
+            <h1>🛠️ Administration</h1>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <span class="who" id="who"></span>
+                <button class="btn-logout" onclick="logout()">Déconnexion</button>
             </div>
         </div>
-
-        <!-- Content Area -->
-        <div class="content-area">
-            <!-- Page Header -->
-            <div class="page-header">
-                <h1 class="page-title">Dashboard Administrateur</h1>
-                <p class="page-subtitle">Vue d'ensemble de la plateforme SEN GP</p>
+        <div class="layout">
+            <div class="sidebar">
+                <div class="nav-link active" data-view="overview" onclick="switchView('overview',this)">📊 <span>Vue globale</span></div>
+                <div class="nav-link" data-view="users" onclick="switchView('users',this)">👥 <span>Utilisateurs</span></div>
+                <div class="nav-link" data-view="missions" onclick="switchView('missions',this)">📦 <span>Missions</span></div>
+                <div class="nav-link" data-view="trips" onclick="switchView('trips',this)">✈️ <span>Trajets</span></div>
+                <div class="nav-link" data-view="payments" onclick="switchView('payments',this)">💳 <span>Paiements</span></div>
+                <div class="nav-link" data-view="withdrawals" onclick="switchView('withdrawals',this)">💸 <span>Retraits</span></div>
+                <div class="nav-link" data-view="claims" onclick="switchView('claims',this)">📝 <span>Réclamations</span></div>
             </div>
-
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-info">
-                            <h3>Utilisateurs Totaux</h3>
-                            <div class="stat-value">1,248</div>
-                        </div>
-                        <div class="stat-icon blue">👥</div>
-                    </div>
-                    <div class="stat-footer">
-                        <span class="stat-change positive">+12.5%</span>
-                        <span class="stat-period">vs mois dernier</span>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-info">
-                            <h3>Missions Actives</h3>
-                            <div class="stat-value">45</div>
-                        </div>
-                        <div class="stat-icon orange">📦</div>
-                    </div>
-                    <div class="stat-footer">
-                        <span class="stat-change positive">+8.3%</span>
-                        <span class="stat-period">cette semaine</span>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-info">
-                            <h3>Revenus Totaux</h3>
-                            <div class="stat-value">28.5M</div>
-                        </div>
-                        <div class="stat-icon green">💰</div>
-                    </div>
-                    <div class="stat-footer">
-                        <span class="stat-change positive">+15.2%</span>
-                        <span class="stat-period">ce mois</span>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-info">
-                            <h3>Réclamations</h3>
-                            <div class="stat-value">8</div>
-                        </div>
-                        <div class="stat-icon red">⚠️</div>
-                    </div>
-                    <div class="stat-footer">
-                        <span class="stat-change negative">-3.2%</span>
-                        <span class="stat-period">en traitement</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <div class="action-btn" onclick="navigateTo('users')">
-                    <div class="action-icon">➕</div>
-                    <div class="action-text">Nouvel utilisateur</div>
-                </div>
-                <div class="action-btn" onclick="navigateTo('verification')">
-                    <div class="action-icon">✓</div>
-                    <div class="action-text">Vérifier compte</div>
-                </div>
-                <div class="action-btn" onclick="navigateTo('reports')">
-                    <div class="action-icon">📊</div>
-                    <div class="action-text">Générer rapport</div>
-                </div>
-                <div class="action-btn" onclick="navigateTo('settings')">
-                    <div class="action-icon">⚙️</div>
-                    <div class="action-text">Configuration</div>
-                </div>
-            </div>
-
-            <!-- Two Column Layout -->
-            <div class="two-column">
-                <!-- Recent Activity -->
-                <div>
-                    <div class="section-header">
-                        <h2 class="section-title">Activité Récente</h2>
-                        <a href="#" class="view-all-btn" onclick="viewAllActivity()">Voir tout</a>
-                    </div>
-
-                    <div class="activity-list">
-                        <div class="activity-item" onclick="viewActivity('ACT-001')">
-                            <div class="activity-icon blue">👤</div>
-                            <div class="activity-content">
-                                <div class="activity-title">Nouvel utilisateur inscrit</div>
-                                <div class="activity-description">Moussa Diallo s'est inscrit comme expéditeur</div>
-                            </div>
-                            <div class="activity-time">Il y a 5 min</div>
-                        </div>
-
-                        <div class="activity-item" onclick="viewActivity('ACT-002')">
-                            <div class="activity-icon green">✓</div>
-                            <div class="activity-content">
-                                <div class="activity-title">Mission terminée</div>
-                                <div class="activity-description">TRJ-2025-001 livré avec succès à Paris</div>
-                            </div>
-                            <div class="activity-time">Il y a 12 min</div>
-                        </div>
-
-                        <div class="activity-item" onclick="viewActivity('ACT-003')">
-                            <div class="activity-icon orange">💰</div>
-                            <div class="activity-content">
-                                <div class="activity-title">Paiement reçu</div>
-                                <div class="activity-description">120,000 FCFA pour mission MIS-001</div>
-                            </div>
-                            <div class="activity-time">Il y a 25 min</div>
-                        </div>
-
-                        <div class="activity-item" onclick="viewActivity('ACT-004')">
-                            <div class="activity-icon red">⚠️</div>
-                            <div class="activity-content">
-                                <div class="activity-title">Nouvelle réclamation</div>
-                                <div class="activity-description">Colis endommagé - REC-045</div>
-                            </div>
-                            <div class="activity-time">Il y a 1h</div>
-                        </div>
-
-                        <div class="activity-item" onclick="viewActivity('ACT-005')">
-                            <div class="activity-icon blue">✈️</div>
-                            <div class="activity-content">
-                                <div class="activity-title">Nouveau trajet déclaré</div>
-                                <div class="activity-description">Amadou D. : Dakar → Madrid</div>
-                            </div>
-                            <div class="activity-time">Il y a 2h</div>
-                        </div>
-
-                        <div class="activity-item" onclick="viewActivity('ACT-006')">
-                            <div class="activity-icon green">✓</div>
-                            <div class="activity-content">
-                                <div class="activity-title">Compte vérifié</div>
-                                <div class="activity-description">Fatou S. - Documents approuvés</div>
-                            </div>
-                            <div class="activity-time">Il y a 3h</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Alerts -->
-                <div>
-                    <div class="section-header">
-                        <h2 class="section-title">Alertes</h2>
-                    </div>
-
-                    <div class="alerts-section">
-                        <div class="alert-item">
-                            <span class="alert-icon">🚨</span>
-                            <div class="alert-content">
-                                <div class="alert-title">Réclamation urgente</div>
-                                <div class="alert-text">3 réclamations en attente depuis plus de 24h</div>
-                            </div>
-                        </div>
-
-                        <div class="alert-item warning">
-                            <span class="alert-icon">⚠️</span>
-                            <div class="alert-content">
-                                <div class="alert-title">Vérifications en attente</div>
-                                <div class="alert-text">15 comptes GP à vérifier</div>
-                            </div>
-                        </div>
-
-                        <div class="alert-item info">
-                            <span class="alert-icon">💰</span>
-                            <div class="alert-content">
-                                <div class="alert-title">Retraits en attente</div>
-                                <div class="alert-text">8 demandes de retrait à traiter</div>
-                            </div>
-                        </div>
-
-                        <div class="alert-item warning">
-                            <span class="alert-icon">📦</span>
-                            <div class="alert-content">
-                                <div class="alert-title">Mission bloquée</div>
-                                <div class="alert-text">2 missions en attente de validation</div>
-                            </div>
-                        </div>
-
-                        <div class="alert-item info">
-                            <span class="alert-icon">📊</span>
-                            <div class="alert-content">
-                                <div class="alert-title">Rapport mensuel</div>
-                                <div class="alert-text">Rapport d'octobre prêt à être généré</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="main" id="main"></div>
         </div>
     </div>
 
     <script>
-        function navigateTo(page) {
-            const pages = {
-                'dashboard': 'admin.html',
-                'users': 'admin-users.html',
-                'missions': 'admin-missions.html',
-                'payments': 'admin-payments.html',
-                'claims': 'admin-claims.html',
-                'verification': 'admin-verification.html',
-                'reports': 'admin-reports.html',
-                'settings': 'admin-settings.html',
-                'security': 'admin-security.html'
-            };
+        // Admin is a web tool used against production. When opened as a local file
+        // (file://) or on localhost, talk to the deployed API directly; otherwise
+        // use the runtime-resolved base (same-origin when served by the backend).
+        const PROD_API = 'https://2txjgdd3cj.us-east-1.awsapprunner.com/api/v1';
+        const _h = location.hostname;
+        const API = (location.protocol === 'file:' || _h === 'localhost' || _h === '127.0.0.1' || _h === '')
+            ? PROD_API
+            : (window.API_BASE_URL || '/api/v1');
+        let token = localStorage.getItem('authToken');
+        let me = null;
+        try { me = JSON.parse(localStorage.getItem('userData') || 'null'); } catch (e) {}
 
-            // Remove active class from all nav items
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
+        const state = { view: 'overview', page: 1, search: '', status: '' };
+
+        function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function fcfa(n){ return (Number(n)||0).toLocaleString('fr-FR') + ' FCFA'; }
+        function dt(d){ return d ? new Date(d).toLocaleDateString('fr-FR') : '—'; }
+        function api(path, opts){
+            opts = opts || {};
+            opts.headers = Object.assign({ 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, opts.headers || {});
+            return fetch(API + path, opts).then(async r => {
+                const j = await r.json().catch(() => ({}));
+                if (r.status === 401 || r.status === 403) { logout(); throw new Error(j.error || 'Accès refusé'); }
+                return { ok: r.ok, json: j };
             });
+        }
 
-            // Add active class to clicked item
-            if (event && event.currentTarget) {
-                event.currentTarget.classList.add('active');
+        function badgeFor(status){
+            const s = String(status||'').toLowerCase();
+            if (['completed','delivered','approved','verified','active','resolved'].includes(s)) return 'b-green';
+            if (['pending','processing','open','published','accepted','in_transit','investigating'].includes(s)) return 'b-yellow';
+            if (['failed','cancelled','rejected','suspended','closed'].includes(s)) return 'b-red';
+            return 'b-gray';
+        }
+
+        // ---------- Auth ----------
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const err = document.getElementById('loginErr');
+            err.style.display = 'none';
+            btn.disabled = true; btn.textContent = 'Connexion…';
+            try {
+                const res = await fetch(API + '/auth/login', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
+                });
+                const j = await res.json();
+                if (!res.ok || !j.success) throw new Error(j.error || j.message || 'Connexion échouée');
+                if (j.data.user.user_type !== 'admin') throw new Error('Ce compte n\'est pas administrateur.');
+                token = j.data.token; me = j.data.user;
+                localStorage.setItem('authToken', token);
+                localStorage.setItem('userData', JSON.stringify(me));
+                showApp();
+            } catch (e2) {
+                err.textContent = e2.message; err.style.display = 'block';
+            } finally { btn.disabled = false; btn.textContent = 'Se connecter'; }
+        });
+
+        function logout(){
+            localStorage.removeItem('authToken'); localStorage.removeItem('userData');
+            token = null; me = null;
+            document.getElementById('app').style.display = 'none';
+            document.getElementById('login').style.display = 'flex';
+        }
+
+        function showApp(){
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            document.getElementById('who').textContent = me ? (me.first_name + ' ' + me.last_name + ' · ' + me.email) : '';
+            switchView('overview', document.querySelector('.nav-link'));
+        }
+
+        function switchView(view, el){
+            state.view = view; state.page = 1; state.search = ''; state.status = '';
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            if (el) el.classList.add('active');
+            render();
+        }
+
+        // ---------- Views ----------
+        async function render(){
+            const main = document.getElementById('main');
+            if (state.view === 'overview') return renderOverview(main);
+            main.innerHTML = `
+                <div class="toolbar">
+                    <input id="search" placeholder="Rechercher…" value="${esc(state.search)}">
+                    ${statusFilter()}
+                    <button onclick="applyFilters()">Filtrer</button>
+                </div>
+                <div id="tableArea"><div class="loading">Chargement…</div></div>
+                <div class="pager" id="pager"></div>`;
+            document.getElementById('search').addEventListener('keydown', e => { if (e.key === 'Enter') applyFilters(); });
+            loadList();
+        }
+
+        function statusFilter(){
+            const opts = {
+                users: ['', 'pending','verified','suspended'],
+                missions: ['', 'pending','accepted','in_transit','delivered','cancelled'],
+                trips: ['', 'draft','published','active','completed','cancelled'],
+                payments: ['', 'pending','completed','failed'],
+                withdrawals: ['', 'pending','approved','rejected','completed'],
+                claims: ['', 'open','investigating','resolved','closed']
+            }[state.view];
+            if (!opts) return '';
+            return `<select id="status">${opts.map(o => `<option value="${o}"${o===state.status?' selected':''}>${o||'Tous les statuts'}</option>`).join('')}</select>`;
+        }
+
+        function applyFilters(){
+            state.search = (document.getElementById('search')||{}).value || '';
+            const sEl = document.getElementById('status');
+            state.status = sEl ? sEl.value : '';
+            state.page = 1;
+            loadList();
+        }
+
+        async function renderOverview(main){
+            main.innerHTML = '<div class="loading">Chargement des statistiques…</div>';
+            try {
+                const { ok, json } = await api('/admin/stats');
+                if (!ok) throw new Error(json.error || 'Erreur');
+                const s = json.data;
+                main.innerHTML = `
+                    <div class="section-title">Utilisateurs</div>
+                    <div class="stats-grid">
+                        ${card('Total', s.users.total)}
+                        ${card('Expéditeurs', s.users.expediteurs)}
+                        ${card('Gros Porteurs', s.users.gps)}
+                        ${card('Admins', s.users.admins)}
+                        ${card('Suspendus', s.users.suspended)}
+                    </div>
+                    <div class="section-title">Missions</div>
+                    <div class="stats-grid">
+                        ${card('Total', s.missions.total)}
+                        ${card('En attente', s.missions.pending)}
+                        ${card('Acceptées', s.missions.accepted)}
+                        ${card('En transit', s.missions.in_transit)}
+                        ${card('Livrées', s.missions.delivered)}
+                        ${card('Annulées', s.missions.cancelled)}
+                    </div>
+                    <div class="section-title">Finances</div>
+                    <div class="stats-grid">
+                        ${card('Volume (payé)', fcfa(s.payments.gross_volume))}
+                        ${card('Commissions', fcfa(s.payments.commission_total))}
+                        ${card('Paiements OK', s.payments.completed_count)}
+                        ${card('Retraits en attente', s.withdrawals.pending, fcfa(s.withdrawals.pending_amount))}
+                        ${card('Trajets', s.trips.total)}
+                        ${card('Réclamations ouvertes', s.claims.open)}
+                    </div>`;
+            } catch (e) {
+                main.innerHTML = `<div class="empty">Erreur: ${esc(e.message)}</div>`;
             }
+        }
+        function card(label, value, sub){
+            return `<div class="stat"><div class="label">${label}</div><div class="value">${esc(value)}</div>${sub?`<div class="sub">${esc(sub)}</div>`:''}</div>`;
+        }
 
-            if (pages[page]) {
-                window.location.href = pages[page];
+        async function loadList(){
+            const area = document.getElementById('tableArea');
+            area.innerHTML = '<div class="loading">Chargement…</div>';
+            const q = `?page=${state.page}&limit=20`
+                + (state.search ? `&search=${encodeURIComponent(state.search)}` : '')
+                + (state.status ? `&status=${encodeURIComponent(state.status)}` : '');
+            try {
+                const { ok, json } = await api('/admin/' + state.view + q);
+                if (!ok) throw new Error(json.error || 'Erreur');
+                const rows = json.data || [];
+                area.innerHTML = renderTable(state.view, rows);
+                renderPager(json.meta || json.pagination);
+            } catch (e) {
+                area.innerHTML = `<div class="empty">Erreur: ${esc(e.message)}</div>`;
             }
         }
 
-        function openNotifications() {
-            alert('Notifications\n\n12 notifications non lues:\n- 3 nouvelles inscriptions\n- 5 missions terminées\n- 2 réclamations\n- 2 demandes de vérification');
+        function renderPager(p){
+            const pager = document.getElementById('pager');
+            if (!p) { pager.innerHTML=''; return; }
+            const totalPages = p.totalPages || 1;
+            pager.innerHTML = `
+                <span>Page ${p.page||state.page} / ${totalPages} · ${p.total||0} éléments</span>
+                <button ${(p.page||1)<=1?'disabled':''} onclick="goPage(${(p.page||1)-1})">←</button>
+                <button ${(p.page||1)>=totalPages?'disabled':''} onclick="goPage(${(p.page||1)+1})">→</button>`;
+        }
+        function goPage(n){ state.page = n; loadList(); }
+
+        function renderTable(view, rows){
+            if (!rows.length) return '<div class="empty">Aucun élément.</div>';
+            const defs = {
+                users: {
+                    head: ['Nom','Email','Type','Statut','Ville','Inscrit','Actions'],
+                    row: u => [
+                        esc(u.first_name+' '+u.last_name), esc(u.email),
+                        `<span class="badge b-blue">${esc(u.user_type)}</span>`,
+                        `<span class="badge ${badgeFor(u.status)}">${esc(u.status)}</span>`,
+                        esc(u.city||'—'), dt(u.created_at),
+                        actions([
+                            ['act-edit','Éditer',`editUser('${u.id}')`],
+                            ['act-del','Suppr.',`delUser('${u.id}','${esc(u.email)}')`]
+                        ])
+                    ]
+                },
+                missions: {
+                    head: ['Code','Trajet','Prix','Statut','Expéditeur','GP','Actions'],
+                    row: m => [
+                        esc(m.mission_code), esc((m.departure_city||'?')+' → '+(m.arrival_city||'?')),
+                        fcfa(m.price), `<span class="badge ${badgeFor(m.status)}">${esc(m.status)}</span>`,
+                        esc(m.expediteur_name||'—'), esc(m.gp_name||'—'),
+                        actions([
+                            ['act-edit','Statut',`editMission('${m.id}','${esc(m.status)}')`],
+                            ['act-del','Suppr.',`delMission('${m.id}','${esc(m.mission_code)}')`]
+                        ])
+                    ]
+                },
+                trips: {
+                    head: ['Code','Trajet','GP','Départ','Statut','Colis','Actions'],
+                    row: t => [
+                        esc(t.trip_code), esc((t.departure_city||'?')+' → '+(t.arrival_city||'?')),
+                        esc(t.gp_name||'—'), dt(t.departure_date),
+                        `<span class="badge ${badgeFor(t.status)}">${esc(t.status)}</span>`,
+                        `${t.current_packages||0}/${t.max_packages||0}`,
+                        actions([['act-del','Suppr.',`delTrip('${t.id}','${esc(t.trip_code)}')`]])
+                    ]
+                },
+                payments: {
+                    head: ['Code','Montant','Commission','Net','Méthode','Statut','Payeur','Bénéf.','Date'],
+                    row: p => [
+                        esc(p.payment_code), fcfa(p.amount), fcfa(p.commission), fcfa(p.net_amount),
+                        esc(p.payment_method), `<span class="badge ${badgeFor(p.status)}">${esc(p.status)}</span>`,
+                        esc(p.payer_name||'—'), esc(p.payee_name||'—'), dt(p.created_at)
+                    ]
+                },
+                withdrawals: {
+                    head: ['Code','GP','Montant','Méthode','Compte','Statut','Actions'],
+                    row: w => [
+                        esc(w.withdrawal_code), esc(w.gp_name||w.gp_id||'—'), fcfa(w.amount),
+                        esc(w.withdrawal_method), esc(w.account_number||'—'),
+                        `<span class="badge ${badgeFor(w.status)}">${esc(w.status)}</span>`,
+                        w.status==='pending' ? actions([
+                            ['act-ok','Approuver',`approveW('${w.id}')`],
+                            ['act-del','Rejeter',`rejectW('${w.id}')`]
+                        ]) : '—'
+                    ]
+                },
+                claims: {
+                    head: ['Code','Type','Priorité','Statut','Demandeur','Message','Actions'],
+                    row: c => {
+                        const ev = (c.evidence_urls || []).filter(Boolean);
+                        const audio = ev.length ? `<button class="act act-ok" onclick="playEvidence('${encodeURIComponent(ev[0])}')">🔊 Vocal</button>` : '';
+                        const msg = `<div style="max-width:240px;white-space:normal;">${esc(c.description||'—')}</div>${audio}`;
+                        return [
+                            esc(c.claim_code), esc(c.claim_type),
+                            `<span class="badge ${badgeFor(c.priority)}">${esc(c.priority)}</span>`,
+                            `<span class="badge ${badgeFor(c.status)}">${esc(c.status)}</span>`,
+                            esc(c.claimant_name||'—'),
+                            msg,
+                            actions([['act-edit','Traiter',`editClaim('${c.id}','${esc(c.status)}')`]])
+                        ];
+                    }
+                }
+            };
+            const d = defs[view];
+            const body = rows.map(r => `<tr>${d.row(r).map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
+            return `<div class="table-wrap"><table><thead><tr>${d.head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table></div>`;
+        }
+        function actions(list){
+            return `<div class="row-actions">${list.map(([cls,label,fn])=>`<button class="act ${cls}" onclick="${fn}">${label}</button>`).join('')}</div>`;
         }
 
-        function openAdminProfile() {
-            alert('Profil Administrateur\n\nNom: Administrateur SEN GP\nEmail: admin@sengp.com\nRôle: Super Admin\nDernière connexion: Aujourd\'hui à 09:41');
+        // ---------- Actions ----------
+        async function editUser(id){
+            const status = prompt('Nouveau statut (pending / verified / suspended) — laisser vide pour ignorer:');
+            const type = prompt('Nouveau type (expediteur / gp / admin) — laisser vide pour ignorer:');
+            const body = {};
+            if (status) body.status = status.trim();
+            if (type) body.user_type = type.trim();
+            if (!Object.keys(body).length) return;
+            const { ok, json } = await api('/admin/users/'+id, { method:'PUT', body: JSON.stringify(body) });
+            alert(ok ? 'Utilisateur mis à jour' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+        }
+        async function delUser(id, email){
+            if (!confirm('Supprimer (désactiver) '+email+' ?')) return;
+            const { ok, json } = await api('/admin/users/'+id, { method:'DELETE' });
+            alert(ok ? 'Utilisateur supprimé' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+        }
+        async function editMission(id, cur){
+            const status = prompt('Nouveau statut mission (pending, accepted, in_transit, delivered, cancelled):', cur);
+            if (!status) return;
+            const { ok, json } = await api('/admin/missions/'+id, { method:'PUT', body: JSON.stringify({ status: status.trim() }) });
+            alert(ok ? 'Mission mise à jour' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+        }
+        async function delMission(id, code){
+            if (!confirm('Supprimer définitivement la mission '+code+' ?')) return;
+            const { ok, json } = await api('/admin/missions/'+id, { method:'DELETE' });
+            alert(ok ? 'Mission supprimée' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+        }
+        async function delTrip(id, code){
+            if (!confirm('Supprimer le trajet '+code+' ?')) return;
+            const { ok, json } = await api('/admin/trips/'+id, { method:'DELETE' });
+            alert(ok ? 'Trajet supprimé' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+        }
+        async function approveW(id){
+            if (!confirm('Approuver ce retrait ? (paiement à effectuer manuellement)')) return;
+            const { ok, json } = await api('/admin/withdrawals/'+id+'/approve', { method:'PUT' });
+            alert(ok ? 'Retrait approuvé' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+        }
+        async function rejectW(id){
+            const reason = prompt('Raison du rejet:'); if (reason===null) return;
+            const { ok, json } = await api('/admin/withdrawals/'+id+'/reject', { method:'PUT', body: JSON.stringify({ reason }) });
+            alert(ok ? 'Retrait rejeté (solde recrédité)' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+        }
+        function playEvidence(u){
+            try { window.open(decodeURIComponent(u), '_blank'); } catch (e) { alert('Impossible de lire le fichier.'); }
         }
 
-        function viewAllActivity() {
-            event.preventDefault();
-            alert('Historique complet des activités\n\nAffichage de toutes les activités de la plateforme avec filtres par:\n- Type d\'activité\n- Date\n- Utilisateur\n- Mission');
+        async function editClaim(id, cur){
+            const status = prompt('Statut réclamation (open, investigating, resolved, closed):', cur);
+            if (!status) return;
+            const resolution = prompt('Résolution / note (optionnel):') || undefined;
+            const body = { status: status.trim() };
+            if (resolution) body.resolution = resolution;
+            const { ok, json } = await api('/admin/claims/'+id, { method:'PUT', body: JSON.stringify(body) });
+            alert(ok ? 'Réclamation mise à jour' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
         }
 
-        function viewActivity(activityId) {
-            alert(`Détails de l\'activité ${activityId}\n\nInformations complètes de l\'activité sélectionnée.`);
-        }
-
-        function logout() {
-            const confirmed = confirm('Êtes-vous sûr de vouloir vous déconnecter ?');
-            if (confirmed) {
-                alert('Déconnexion réussie');
-                window.location.href = 'connexion.html';
-            }
-        }
+        // ---------- Boot ----------
+        if (token && me && me.user_type === 'admin') showApp();
     </script>
 </body>
 </html>

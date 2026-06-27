@@ -5,7 +5,7 @@
   "author": "SEN GP Team",
   "license": "MIT",
   "scripts": {
-    "build": "mkdir -p www && cp *.html www/ && cp -r im www/ 2>/dev/null || true",
+    "build": "mkdir -p www && cp *.html *.js *.css www/ && cp -r im www/",
     "build:all": "npm run build && cd backend && npm install && npm run build",
     "ionic:build": "npm run build",
     "ionic:serve": "npx http-server www -p 8100",
@@ -18,10 +18,13 @@
     "heroku-postbuild": "cd backend && npm install && npm run build"
   },
   "dependencies": {
+    "@capacitor-community/background-geolocation": "^1.2.0",
+    "@codetrix-studio/capacitor-google-auth": "3.4.0-rc.4",
     "@capacitor/android": "^6.1.2",
     "@capacitor/core": "^6.1.2",
     "@capacitor/ios": "^6.1.2",
     "@capacitor/app": "^6.0.1",
+    "@capacitor/browser": "^6.0.0",
     "@capacitor/haptics": "^6.0.1",
     "@capacitor/keyboard": "^6.0.2",
     "@capacitor/status-bar": "^6.0.1",

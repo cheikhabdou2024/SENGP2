@@ -361,68 +361,33 @@
             position: relative;
         }
 
-        .nav-item.active {
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 230, 109, 0.15) 50%, rgba(78, 205, 196, 0.1) 100%);
-            border: 1px solid rgba(255, 107, 107, 0.3);
-            box-shadow: 0 8px 24px rgba(255, 107, 107, 0.25);
-            transform: translateY(-6px);
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            filter: grayscale(0.8) brightness(0.7);
-            transition: all 0.4s ease;
-        }
-
-        .nav-item.active .nav-icon {
-            filter: grayscale(0) brightness(1.2);
-            transform: scale(1.1);
-        }
-
-        .nav-label {
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .nav-item.active .nav-label {
-            background: linear-gradient(135deg, #FFE66D 0%, #FF6B6B 50%, #4ECDC4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-        }
-
+        .nav-item.active { color:#FF6B6B; }
+        .nav-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; }
+        .nav-icon svg { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+        .nav-item.active::after { content:''; position:absolute; top:-9px; left:50%; transform:translateX(-50%); width:26px; height:3px; border-radius:0 0 3px 3px; background:linear-gradient(90deg,#FF6B6B,#FFE66D); }
+        .nav-label { font-size:10px; font-weight:600; color:inherit; }
         .nav-badge {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            min-width: 18px;
-            height: 18px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FF4757 100%);
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            font-weight: 800;
-            color: white;
-            padding: 0 5px;
-            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.6);
+            position:absolute; top:0px; left:calc(50% + 5px); min-width:17px; height:17px;
+            background:#FF4757; border:1.5px solid #121024; border-radius:9px;
+            display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; color:#fff; padding:0 4px;
         }
-    </style>
+        .nav-badge.hidden { display:none; }
+        /* notif extras */
+        .notif-card { position:relative; }
+        .notif-del { position:absolute; top:10px; right:10px; background:rgba(255,107,107,.15); color:#ff8f8f; border:none;
+            border-radius:8px; width:28px; height:28px; font-size:13px; cursor:pointer; }
+        .notif-empty { text-align:center; padding:50px 20px; color:rgba(255,255,255,.5); }
+        .notif-empty .ic { font-size:46px; margin-bottom:10px; }
+            /* sengp-responsive-override */
+        .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
+        body{padding:0!important;}
+        </style>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="theme.css">
+    <script src="ui.js"></script>
 </head>
-<body>
+<body class="ds">
     <div class="mobile-frame">
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <span class="time">9:41</span>
-            <div class="indicators">
-                <div class="signal"></div>
-                <div class="wifi"></div>
-                <div class="battery"></div>
-            </div>
-        </div>
 
         <!-- Header -->
         <div class="header">
@@ -440,50 +405,22 @@
         <div class="content">
             <!-- Tabs -->
             <div class="tabs">
-                <button class="tab active" onclick="switchTab('all')">Toutes (8)</button>
-                <button class="tab" onclick="switchTab('unread')">Non lues (5)</button>
+                <button class="tab active" id="tab-all" onclick="switchTab('all',this)">Toutes (0)</button>
+                <button class="tab" id="tab-unread" onclick="switchTab('unread',this)">Non lues (0)</button>
             </div>
 
-            <!-- Today's Notifications -->
-            <div class="notif-section" id="allNotifications">
-                <!-- Les notifications seront chargées dynamiquement -->
-            </div>
-
-            <!-- Unread Notifications (hidden by default) -->
-            <div class="notif-section" id="unreadNotifications" style="display: none;">
-                <!-- Les notifications non lues seront chargées dynamiquement -->
+            <div class="notif-section" id="notifList">
+                <div class="notif-empty">Chargement…</div>
             </div>
         </div>
 
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
-            <div class="nav-item" onclick="navigateTo('home')">
-                <div class="nav-icon">🏠</div>
-                <div class="nav-label">Accueil</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('reclamation')">
-                <div class="nav-icon">⚠️</div>
-                <div class="nav-label">Réclamation</div>
-                <div class="nav-badge">1</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('tracking')">
-                <div class="nav-icon">📍</div>
-                <div class="nav-label">Suivi</div>
-                <div class="nav-badge">3</div>
-            </div>
-
-            <div class="nav-item active" onclick="navigateTo('notifications')">
-                <div class="nav-icon">🔔</div>
-                <div class="nav-label">Notifications</div>
-                <div class="nav-badge">5</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('profile')">
-                <div class="nav-icon">👤</div>
-                <div class="nav-label">Profil</div>
-            </div>
+            <div class="nav-item" onclick="navigateTo('home')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div><div class="nav-label">Accueil</div></div>
+            <div class="nav-item" onclick="navigateTo('reclamation')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10.3 4 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div><div class="nav-label">Réclamation</div></div>
+            <div class="nav-item" onclick="navigateTo('tracking')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="nav-label">Suivi</div></div>
+            <div class="nav-item active" onclick="navigateTo('notifications')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><div class="nav-label">Notifications</div><div class="nav-badge hidden" id="notifNavBadge">0</div></div>
+            <div class="nav-item" onclick="navigateTo('profile')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div><div class="nav-label">Profil</div></div>
         </div>
     </div>
 
@@ -492,185 +429,134 @@
             window.location.href = 'dashexpediteur.html';
         }
 
-        function switchTab(tab) {
-            // Update tab buttons
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+        const API_BASE_URL = window.API_BASE_URL;
+        function getAuthToken() { return localStorage.getItem('authToken'); }
 
-            // Show/hide notification lists
-            if (tab === 'all') {
-                document.getElementById('allNotifications').style.display = 'block';
-                document.getElementById('unreadNotifications').style.display = 'none';
-            } else {
-                document.getElementById('allNotifications').style.display = 'none';
-                document.getElementById('unreadNotifications').style.display = 'block';
-            }
-        }
-
-        const API_BASE_URL = 'http://localhost:5000/api/v1';
-
-        function getAuthToken() {
-            return localStorage.getItem('authToken');
-        }
+        let allNotifs = [];
+        let currentTab = 'all';
+        const ICONS = { delivery:'📦', tracking:'📍', payment:'💰', support:'💬', promo:'🎁', feedback:'⭐' };
+        const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
         async function loadUserNotifications() {
             const token = getAuthToken();
-            if (!token) {
-                window.location.href = 'connexion.html';
+            if (!token) { window.location.href = 'connexion.html'; return; }
+            try {
+                const response = await fetch(`${API_BASE_URL}/notifications/my-notifications?limit=100`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('load');
+                allNotifs = (await response.json()).data || [];
+                updateCounts();
+                render();
+            } catch (e) {
+                document.getElementById('notifList').innerHTML = '<div class="notif-empty">Erreur de chargement.</div>';
+            }
+        }
+
+        function updateCounts() {
+            const unread = allNotifs.filter(n => !n.is_read).length;
+            document.querySelector('.header-title p').textContent = unread + ' non lue' + (unread > 1 ? 's' : '');
+            document.getElementById('tab-all').textContent = 'Toutes (' + allNotifs.length + ')';
+            document.getElementById('tab-unread').textContent = 'Non lues (' + unread + ')';
+            const nav = document.getElementById('notifNavBadge');
+            if (unread > 0) { nav.textContent = unread; nav.classList.remove('hidden'); }
+            else { nav.classList.add('hidden'); }
+        }
+
+        function switchTab(tab, el) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            if (el) el.classList.add('active');
+            render();
+        }
+
+        function render() {
+            const list = currentTab === 'unread' ? allNotifs.filter(n => !n.is_read) : allNotifs;
+            const box = document.getElementById('notifList');
+            if (!list.length) {
+                box.innerHTML = '<div class="notif-empty"><div class="ic">🔔</div>' +
+                    (currentTab === 'unread' ? 'Aucune notification non lue.' : 'Aucune notification pour le moment.') + '</div>';
                 return;
             }
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/notifications/my-notifications`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    displayNotifications(result.data || []);
-                } else {
-                    console.error('Failed to load notifications');
-                }
-            } catch (error) {
-                console.error('Error loading notifications:', error);
-            }
+            box.innerHTML = list.map(card).join('');
         }
 
-        function displayNotifications(notifications) {
-            const unreadCount = notifications.filter(n => !n.is_read).length;
-            document.querySelector('.header-title p').textContent = `${unreadCount} non lues`;
-
-            const badge = document.querySelector('.nav-item[onclick*="notifications"] .nav-badge');
-            if (badge) {
-                if (unreadCount > 0) {
-                    badge.textContent = unreadCount;
-                    badge.style.display = 'flex';
-                } else {
-                    badge.style.display = 'none';
-                }
-            }
-
-            // Group by date and render
-            const allContainer = document.getElementById('allNotifications');
-            const unreadContainer = document.getElementById('unreadNotifications');
-
-            if (allContainer && notifications.length > 0) {
-                allContainer.innerHTML = notifications.map(n => createNotificationCard(n)).join('');
-            }
-
-            if (unreadContainer) {
-                const unread = notifications.filter(n => !n.is_read);
-                if (unread.length > 0) {
-                    unreadContainer.innerHTML = unread.map(n => createNotificationCard(n)).join('');
-                } else {
-                    unreadContainer.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5);padding:40px;">Aucune notification non lue</p>';
-                }
-            }
-        }
-
-        function createNotificationCard(notif) {
-            const icons = {
-                delivery: '📦',
-                tracking: '📍',
-                payment: '💰',
-                support: '💬',
-                promo: '🎁',
-                feedback: '⭐'
-            };
-
-            return `
-                <div class="notif-card ${!notif.is_read ? 'unread' : ''}" onclick="viewNotification('${notif.notification_id}')">
-                    <div class="notif-icon">${icons[notif.type] || '🔔'}</div>
-                    <div class="notif-content">
-                        <div class="notif-title">${notif.title}</div>
-                        <div class="notif-message">${notif.message}</div>
-                        <div class="notif-time">${formatTime(notif.created_at)}</div>
-                    </div>
-                    ${!notif.is_read ? '<div class="unread-dot"></div>' : ''}
-                </div>
-            `;
+        function card(n) {
+            return '<div class="notif-card ' + (!n.is_read ? 'unread' : '') + '" onclick="viewNotif(\'' + n.notification_id + '\')">'
+                + '<div class="notif-icon">' + (ICONS[n.type] || '🔔') + '</div>'
+                + '<div class="notif-content">'
+                + '<div class="notif-title">' + esc(n.title) + '</div>'
+                + '<div class="notif-message">' + esc(n.message) + '</div>'
+                + '<div class="notif-time">' + formatTime(n.created_at) + '</div>'
+                + '</div>'
+                + (!n.is_read ? '<div class="unread-dot"></div>' : '')
+                + '<button class="notif-del" onclick="delNotif(event,\'' + n.notification_id + '\')">🗑️</button>'
+                + '</div>';
         }
 
         function formatTime(dateString) {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diffMs = now - date;
-            const diffMins = Math.floor(diffMs / 60000);
-            const diffHours = Math.floor(diffMs / 3600000);
-            const diffDays = Math.floor(diffMs / 86400000);
-
-            if (diffMins < 1) return 'À l\'instant';
-            if (diffMins < 60) return `Il y a ${diffMins} min`;
-            if (diffHours < 24) return `Il y a ${diffHours}h`;
-            if (diffDays < 7) return `Il y a ${diffDays}j`;
+            const date = new Date(dateString), now = new Date();
+            const m = Math.floor((now - date) / 60000), h = Math.floor((now - date) / 3600000), d = Math.floor((now - date) / 86400000);
+            if (m < 1) return "À l'instant";
+            if (m < 60) return 'Il y a ' + m + ' min';
+            if (h < 24) return 'Il y a ' + h + ' h';
+            if (d < 7) return 'Il y a ' + d + ' j';
             return date.toLocaleDateString('fr-FR');
+        }
+
+        async function viewNotif(id) {
+            const n = allNotifs.find(x => String(x.notification_id) === String(id));
+            const token = getAuthToken();
+            try {
+                await fetch(`${API_BASE_URL}/notifications/${id}/read`, {
+                    method: 'PUT', headers: { 'Authorization': `Bearer ${token}` }
+                });
+            } catch (e) {}
+            if (n) n.is_read = true;
+            updateCounts();
+            // Redirige vers l'élément concerné si la notification a une cible.
+            const url = n && n.action_url;
+            if (url) {
+                if (/^https?:\/\//i.test(url)) window.open(url, '_blank');
+                else window.location.href = url;
+                return;
+            }
+            render();
+        }
+
+        async function delNotif(ev, id) {
+            ev.stopPropagation();
+            const token = getAuthToken();
+            try {
+                await fetch(`${API_BASE_URL}/notifications/${id}`, {
+                    method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }
+                });
+                allNotifs = allNotifs.filter(x => String(x.notification_id) !== String(id));
+                updateCounts();
+                render();
+            } catch (e) { alert('Suppression impossible.'); }
         }
 
         async function markAllAsRead() {
             const token = getAuthToken();
-
             try {
-                const response = await fetch(`${API_BASE_URL}/notifications/mark-all-read`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                const r = await fetch(`${API_BASE_URL}/notifications/mark-all-read`, {
+                    method: 'PUT', headers: { 'Authorization': `Bearer ${token}` }
                 });
-
-                if (response.ok) {
-                    alert('Toutes les notifications ont été marquées comme lues.');
-                    loadUserNotifications();
-                } else {
-                    alert('Erreur lors de la mise à jour');
-                }
-            } catch (error) {
-                console.error('Error marking all as read:', error);
-            }
+                if (r.ok) { allNotifs.forEach(n => n.is_read = true); updateCounts(); render(); }
+                else alert('Erreur lors de la mise à jour');
+            } catch (e) { console.error(e); }
         }
-
-        async function viewNotification(id) {
-            const token = getAuthToken();
-
-            try {
-                await fetch(`${API_BASE_URL}/notifications/${id}/read`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                // Mark as read locally
-                event.currentTarget.classList.remove('unread');
-
-                // Update count
-                const unreadCount = document.querySelectorAll('.notif-card.unread').length;
-                document.querySelector('.header-title p').textContent = `${unreadCount} non lues`;
-            } catch (error) {
-                console.error('Error marking notification as read:', error);
-            }
-        }
-
-        // Load notifications on page load
-        window.addEventListener('load', () => {
-            loadUserNotifications();
-        });
 
         function navigateTo(section) {
-            const pages = {
-                'home': 'dashexpediteur.html',
-                'reclamation': 'reclamation.html',
-                'tracking': 'suivi.html',
-                'notifications': 'notifications.html',
-                'profile': 'profile.html'
-            };
-
-            if (pages[section]) {
-                window.location.href = pages[section];
-            }
+            const pages = { home:'dashexpediteur.html', reclamation:'reclamation.html', tracking:'suivi.html', notifications:'notifications.html', profile:'profile.html' };
+            if (pages[section]) window.location.href = pages[section];
         }
+
+        window.onPullRefresh = async () => { await loadUserNotifications(); return true; };
+        window.addEventListener('load', loadUserNotifications);
+        setInterval(() => { if (!document.hidden) loadUserNotifications(); }, 60000);
     </script>
+    <script src="ptr.js"></script>
 </body>
 </html>

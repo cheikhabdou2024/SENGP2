@@ -353,87 +353,61 @@
             box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
         }
 
-        /* Bottom Navigation */
+        /* Bottom Navigation (unified GP nav) */
         .bottom-nav {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 65px;
-            background: linear-gradient(180deg, rgba(15, 12, 41, 0.95) 0%, rgba(26, 22, 48, 0.98) 100%);
-            backdrop-filter: blur(30px);
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(18, 16, 36, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
+            justify-content: space-around;
+            align-items: stretch;
+            padding: 9px 6px calc(9px + env(safe-area-inset-bottom));
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35);
         }
-
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 4px;
             cursor: pointer;
-            transition: all 0.4s ease;
-            padding: 6px 10px;
-            border-radius: 12px;
             flex: 1;
-            max-width: 70px;
             position: relative;
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, rgba(78, 205, 196, 0.2) 0%, rgba(68, 160, 141, 0.15) 50%, rgba(78, 205, 196, 0.1) 100%);
-            border: 1px solid rgba(78, 205, 196, 0.3);
-            box-shadow: 0 8px 24px rgba(78, 205, 196, 0.25);
-            transform: translateY(-6px);
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            filter: grayscale(0.8) brightness(0.7);
-            transition: all 0.4s ease;
-        }
-
-        .nav-item.active .nav-icon {
-            filter: grayscale(0) brightness(1.2);
-            transform: scale(1.1);
-        }
-
-        .nav-label {
-            font-size: 9px;
+            padding: 6px 0;
+            border-radius: 14px;
             color: rgba(255, 255, 255, 0.5);
-            font-weight: 700;
-            text-transform: uppercase;
+            transition: color 0.25s ease;
+            -webkit-tap-highlight-color: transparent;
         }
-
-        .nav-item.active .nav-label {
-            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 50%, #4ECDC4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
+        .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+        .nav-icon svg {
+            width: 24px; height: 24px; fill: none; stroke: currentColor;
+            stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+            transition: transform 0.25s ease;
         }
-
+        .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
+        .nav-item.active { color: #FFC107; }
+        .nav-item.active .nav-icon svg { transform: translateY(-1px) scale(1.06); }
+        .nav-item.active::after {
+            content: ''; position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+            width: 26px; height: 3px; border-radius: 0 0 3px 3px;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+        }
+        .nav-item:not(.active):active { color: rgba(255, 255, 255, 0.85); }
         .nav-badge {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            min-width: 18px;
-            height: 18px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FF4757 100%);
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            font-weight: 800;
-            color: white;
-            padding: 0 5px;
-            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.6);
+            position: absolute; top: 0px; left: calc(50% + 5px);
+            min-width: 17px; height: 17px; background: #FF4757;
+            border: 1.5px solid #121024; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 800; color: white; padding: 0 4px;
         }
+        .nav-badge.new { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #1a1a2e; }
+        .nav-badge.hidden { display: none; }
 
         /* Modal */
         .modal-overlay {
@@ -525,19 +499,16 @@
             transform: translateY(-2px);
             box-shadow: 0 12px 28px rgba(255, 107, 107, 0.5);
         }
-    </style>
+            /* sengp-responsive-override */
+        .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
+        body{padding:0!important;}
+        </style>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="theme.css">
+    <script src="ui.js"></script>
 </head>
-<body>
+<body class="ds">
     <div class="mobile-frame">
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <span class="time">9:41</span>
-            <div class="indicators">
-                <div class="signal"></div>
-                <div class="wifi"></div>
-                <div class="battery"></div>
-            </div>
-        </div>
 
         <!-- Header -->
         <div class="header">
@@ -617,6 +588,15 @@
                     <div class="menu-content">
                         <div class="menu-title">Mes gains</div>
                         <div class="menu-subtitle">Historique et revenus</div>
+                    </div>
+                    <div class="menu-arrow">→</div>
+                </div>
+
+                <div class="menu-item" onclick="viewClaims()">
+                    <div class="menu-icon">📝</div>
+                    <div class="menu-content">
+                        <div class="menu-title">Réclamations</div>
+                        <div class="menu-subtitle">Litiges et signalements</div>
                     </div>
                     <div class="menu-arrow">→</div>
                 </div>
@@ -701,28 +681,28 @@
 
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
-            <div class="nav-item" onclick="navigateTo('home')">
-                <div class="nav-icon">🏠</div>
+            <div class="nav-item" onclick="navigateTo('home')" tabindex="0" role="button" aria-label="Accueil">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
                 <div class="nav-label">Accueil</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('missions')">
-                <div class="nav-icon">📦</div>
+            <div class="nav-item" onclick="navigateTo('missions')" tabindex="0" role="button" aria-label="Missions">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
                 <div class="nav-label">Missions</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('trips')">
-                <div class="nav-icon">✈️</div>
+            <div class="nav-item" onclick="navigateTo('trips')" tabindex="0" role="button" aria-label="Trajets">
+                <div class="nav-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M22 16.21v-1.6l-8.5-5V4.5a1.5 1.5 0 0 0-3 0v5.11l-8.5 5v1.6l8.5-2.66v4.54l-2.5 1.4v1.5l4-1.18 4 1.18v-1.5l-2.5-1.4v-4.54z"/></svg></div>
                 <div class="nav-label">Trajets</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('claims')">
-                <div class="nav-icon">📝</div>
-                <div class="nav-label">Réclamations</div>
+            <div class="nav-item" onclick="navigateTo('earnings')" tabindex="0" role="button" aria-label="Gains">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                <div class="nav-label">Gains</div>
             </div>
 
-            <div class="nav-item active" onclick="navigateTo('profile')">
-                <div class="nav-icon">👤</div>
+            <div class="nav-item active" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil">
+                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
                 <div class="nav-label">Profil</div>
             </div>
         </div>
@@ -744,7 +724,7 @@
     </div>
 
     <script>
-        const API_BASE_URL = 'http://localhost:5000/api/v1';
+        const API_BASE_URL = window.API_BASE_URL;
 
         function goBack() {
             window.location.href = 'dashgp.html';
@@ -908,7 +888,11 @@
         }
 
         function viewEarnings() {
-            alert('Mes gains\n\nConsultez l\'historique de vos gains et revenus générés en tant que GP.\n\n(Fonctionnalité à venir)');
+            window.location.href = 'gains.html';
+        }
+
+        function viewClaims() {
+            window.location.href = 'reclamationgp.html';
         }
 
         // Load profile on page load
@@ -956,8 +940,8 @@
 
             alert('Déconnexion réussie!\n\nÀ bientôt sur SEN GP.');
 
-            // Redirection vers la page de connexion
-            window.location.href = 'connexion.html';
+            // Redirection vers la page de choix du type de compte (sans onboarding)
+            window.location.href = 'index.html?choice=1';
         }
 
         function navigateTo(section) {
@@ -965,7 +949,7 @@
                 'home': 'dashgp.html',
                 'missions': 'missions.html',
                 'trips': 'trajets.html',
-                'claims': 'reclamationgp.html',
+                'earnings': 'gains.html',
                 'profile': 'profilegp.html'
             };
 

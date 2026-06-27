@@ -8,9 +8,9 @@
   },
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 2000,
+      "launchShowDuration": 0,
       "launchAutoHide": true,
-      "backgroundColor": "#2563eb",
+      "backgroundColor": "#1a1a2e",
       "androidSplashResourceName": "splash",
       "androidScaleType": "CENTER_CROP",
       "showSpinner": false,
@@ -31,6 +31,11 @@
     },
     "PushNotifications": {
       "presentationOptions": ["badge", "sound", "alert"]
+    },
+    "GoogleAuth": {
+      "scopes": ["profile", "email"],
+      "serverClientId": "1022151111172-re1mqoru6lo5fvgbnkrjqfk7vtoj1rco.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": false
     }
   }
 }

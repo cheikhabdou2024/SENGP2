@@ -82,23 +82,19 @@
             }
         }
 
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
+        .logo-img {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
             border-radius: 20px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 20px rgba(255, 107, 107, 0.2);
             margin-bottom: 16px;
-            animation: float 3s ease-in-out infinite;
+            animation: float 4s ease-in-out infinite;
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-8px); }
         }
 
         .welcome-text h1 {
@@ -367,25 +363,45 @@
                 height: 100vh;
             }
         }
-    </style>
+        .back-to-choice {
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            z-index: 10;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.85);
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .back-to-choice:hover { background: rgba(255, 255, 255, 0.16); transform: translateX(-2px); }
+            /* sengp-responsive-override */
+        .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
+        body{padding:0!important;}
+        </style>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="theme.css">
+    <script src="ui.js"></script>
 </head>
-<body>
+<body class="ds">
     <div class="mobile-frame">
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <span class="time">9:41</span>
-            <div class="indicators">
-                <div class="signal"></div>
-                <div class="wifi"></div>
-                <div class="battery"></div>
-            </div>
-        </div>
+
+        <!-- Back to account-type choice -->
+        <button class="back-to-choice" onclick="window.location.href='index.html'" aria-label="Retour au choix du compte">←</button>
 
         <!-- Content -->
         <div class="content">
             <!-- Logo -->
             <div class="logo-container">
-                <div class="logo">📦</div>
+                <img src="im/sengp-logo.jpg" class="logo-img" alt="SENGP Logo">
                 <div class="welcome-text">
                     <h1>Bon retour !</h1>
                     <p>Connectez-vous à votre compte</p>
@@ -405,12 +421,6 @@
                                 <path d="M10 3.88c1.85 0 3.1.8 3.81 1.47l2.8-2.73C14.96.88 12.7 0 10 0 6.08 0 2.61 2.09 1.1 5.17l3.29 2.59c.79-2.39 3-4.13 5.61-4.13z" fill="#EB4335"/>
                             </svg>
                             <span>Continuer avec Google</span>
-                        </button>
-                        <button type="button" class="social-btn social-btn-facebook" onclick="socialLogin('facebook')">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="#1877F2">
-                                <path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.563V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z"/>
-                            </svg>
-                            <span>Continuer avec Facebook</span>
                         </button>
                     </div>
 
@@ -498,16 +508,102 @@
 
         function goToSignup() {
             event.preventDefault();
-            // Rediriger vers la page de choix du type de compte
-            window.location.href = 'index.html';
+            const t = new URLSearchParams(window.location.search).get('type');
+            window.location.href = t ? `inscrire.html?type=${t}` : 'inscrire.html';
         }
 
-        function socialLogin(provider) {
-            alert(`Connexion avec ${provider}`);
-            // Simuler une connexion réussie après connexion sociale
-            setTimeout(() => {
-                window.location.href = 'dashexpediteur.html';
-            }, 1500);
+        // Account type chosen on the onboarding screen (carrier = GP, sender = Expéditeur).
+        const EXPECTED_TYPE = (() => {
+            const t = new URLSearchParams(window.location.search).get('type');
+            if (t === 'carrier' || t === 'gp') return 'gp';
+            if (t === 'sender' || t === 'expediteur') return 'expediteur';
+            return null;
+        })();
+        function typeLabel(t) { return t === 'gp' ? 'Gros Porteur' : 'Expéditeur'; }
+        function enforceAccountType(user) {
+            if (EXPECTED_TYPE && user && user.user_type !== EXPECTED_TYPE) {
+                alert(`Ce compte est un compte « ${typeLabel(user.user_type)} ». Vous avez choisi « ${typeLabel(EXPECTED_TYPE)} ». Connectez-vous avec le profil correspondant.`);
+                return false;
+            }
+            return true;
+        }
+
+        let googleAuthReady = false;
+        async function ensureGoogleAuth(GoogleAuth) {
+            if (googleAuthReady) return;
+            // Sans initialize(), le plugin natif Android lève une exception qui
+            // fait planter (fermer) l'application. On l'initialise donc une fois.
+            try {
+                if (typeof GoogleAuth.initialize === 'function') {
+                    await GoogleAuth.initialize({
+                        clientId: '1022151111172-re1mqoru6lo5fvgbnkrjqfk7vtoj1rco.apps.googleusercontent.com',
+                        scopes: ['profile', 'email'],
+                        grantOfflineAccess: false
+                    });
+                }
+                googleAuthReady = true;
+            } catch (e) {
+                console.warn('GoogleAuth.initialize a échoué (on continue):', e);
+            }
+        }
+
+        async function socialLogin(provider) {
+            if (provider !== 'google') return;
+            try {
+                const GoogleAuth = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth;
+                if (!GoogleAuth) {
+                    alert('La connexion Google est disponible dans l\'application mobile.');
+                    return;
+                }
+                await ensureGoogleAuth(GoogleAuth);
+                // Déconnecter la session Google précédente pour TOUJOURS afficher le
+                // sélecteur de compte (ne pas reprendre automatiquement le dernier compte).
+                try { await GoogleAuth.signOut(); } catch (_) {}
+                const result = await GoogleAuth.signIn();
+                // L'emplacement de l'idToken varie selon la version du plugin / Capacitor.
+                const idToken =
+                    (result && result.authentication && (result.authentication.idToken || result.authentication.id_token)) ||
+                    (result && (result.idToken || result.id_token)) ||
+                    (result && result.authentication && result.authentication.accessToken);
+                if (!idToken) {
+                    alert('Réponse Google inattendue (pas d\'idToken).\n\nReçu:\n' + JSON.stringify(result).slice(0, 500));
+                    throw new Error('Token Google manquant');
+                }
+
+                const response = await fetch(`${window.API_BASE_URL}/auth/google`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_token: idToken, ...(EXPECTED_TYPE ? { expected_type: EXPECTED_TYPE } : {}) })
+                });
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    if (!enforceAccountType(data.data.user)) return;
+                    localStorage.setItem('authToken', data.data.token);
+                    localStorage.setItem('userData', JSON.stringify(data.data.user));
+                    const ut = data.data.user.user_type;
+                    window.location.href = ut === 'gp' ? 'dashgp.html' : 'dashexpediteur.html';
+                } else {
+                    alert('Erreur Google: ' + (data.error || 'Connexion échouée'));
+                }
+            } catch (e) {
+                console.error('Google sign-in error', e);
+                // Dump complet de l'erreur pour diagnostic (code, message, et toutes les propriétés).
+                let parts = [];
+                if (e) {
+                    if (e.message) parts.push('message: ' + e.message);
+                    if (e.code !== undefined) parts.push('code: ' + e.code);
+                    if (e.errorMessage) parts.push('errorMessage: ' + e.errorMessage);
+                    try {
+                        const all = {};
+                        Object.getOwnPropertyNames(e).forEach(k => { try { all[k] = e[k]; } catch (_) {} });
+                        const json = JSON.stringify(all);
+                        if (json && json !== '{}') parts.push('raw: ' + json);
+                    } catch (_) {}
+                    if (parts.length === 0) parts.push(String(e));
+                }
+                alert('Connexion Google échouée.\n\n' + (parts.join('\n') || '(aucun détail)'));
+            }
         }
 
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
@@ -525,14 +621,15 @@
                     submitButton.disabled = true;
 
                     // Appeler l'API de connexion
-                    const response = await fetch('http://localhost:5000/api/v1/auth/login', {
+                    const response = await fetch(`${window.API_BASE_URL}/auth/login`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
                             email: identifier,
-                            password: password
+                            password: password,
+                            ...(EXPECTED_TYPE ? { expected_type: EXPECTED_TYPE } : {})
                         })
                     });
 
@@ -547,6 +644,12 @@
                         // Sauvegarder le token et les données utilisateur
                         const token = result.data.token;
                         const user = result.data.user;
+
+                        if (!enforceAccountType(user)) {
+                            submitButton.textContent = originalText;
+                            submitButton.disabled = false;
+                            return;
+                        }
 
                         console.log('Token to save:', token);
                         console.log('User data to save:', user);
@@ -573,8 +676,8 @@
                         // Rediriger immédiatement après l'alerte
                         window.location.href = dashboardUrl;
                     } else {
-                        // Afficher l'erreur
-                        alert('Erreur de connexion:\n\n' + (result.message || 'Email ou mot de passe incorrect'));
+                        // Afficher l'erreur (inclut le refus de type de compte côté serveur)
+                        alert('Erreur de connexion:\n\n' + (result.error || result.message || 'Email ou mot de passe incorrect'));
                         submitButton.textContent = originalText;
                         submitButton.disabled = false;
                     }
