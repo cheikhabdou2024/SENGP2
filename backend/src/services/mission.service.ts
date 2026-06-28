@@ -377,12 +377,61 @@ export class MissionService {
   static async updateStatus(
     id: string,
     status: MissionStatus,
-    userId: string
+    userId: string,
+    opts: { internal?: boolean } = {}
   ): Promise<Mission> {
     const client = await pool.connect();
 
     try {
       await client.query('BEGIN');
+
+      // Load current state for authorization + transition validation.
+      const cur = await client.query(
+        `SELECT status, gp_id, expediteur_id FROM missions WHERE id = $1`,
+        [id]
+      );
+      if (cur.rows.length === 0) {
+        throw new Error('Mission not found');
+      }
+      const current = String(cur.rows[0].status || '').toLowerCase();
+      const gpId = cur.rows[0].gp_id;
+      const expediteurId = cur.rows[0].expediteur_id;
+
+      // Trusted internal calls (e.g. recipient QR confirmation) skip these checks;
+      // they perform their own validation before calling.
+      if (!opts.internal) {
+        // 1) Authorization: only the mission's GP or its expéditeur may change status.
+        let role: 'gp' | 'expediteur' | null = null;
+        if (gpId && userId === gpId) role = 'gp';
+        else if (userId === expediteurId) role = 'expediteur';
+        if (!role) {
+          throw new Error("Vous n'êtes pas autorisé à modifier cette mission");
+        }
+
+        // 2) Terminal states are final.
+        if (current === 'delivered' || current === 'cancelled') {
+          throw new Error(`La mission est déjà ${current === 'delivered' ? 'livrée' : 'annulée'}`);
+        }
+
+        // 3) Allowed transitions per role.
+        //    GP drives the delivery workflow; the expéditeur may only cancel
+        //    while the mission has not been accepted yet.
+        const GP_FLOW: Record<string, string[]> = {
+          accepted: ['picked_up', 'delivered', 'cancelled'],
+          picked_up: ['in_transit', 'out_for_delivery', 'delivered'],
+          in_transit: ['in_customs', 'out_for_delivery', 'delivered'],
+          in_customs: ['out_for_delivery', 'delivered'],
+          out_for_delivery: ['delivered'],
+        };
+        const EXP_FLOW: Record<string, string[]> = {
+          pending: ['cancelled'],
+          matched: ['cancelled'],
+        };
+        const allowed = (role === 'gp' ? GP_FLOW : EXP_FLOW)[current] || [];
+        if (status !== current && !allowed.includes(status)) {
+          throw new Error(`Transition de statut non autorisée : ${current} → ${status}`);
+        }
+      }
 
       const result = await client.query(
         `UPDATE missions SET status = $1 WHERE id = $2 RETURNING *`,
@@ -593,8 +642,9 @@ export class MissionService {
     }
 
     const actor = m.gp_id || m.expediteur_id;
-    // Full delivered transition (credits GP wallet, etc.)
-    await this.updateStatus(m.id, MissionStatus.DELIVERED, actor);
+    // Full delivered transition (credits GP wallet, etc.). Trusted internal call:
+    // the recipient already proved delivery (token + geofence) above.
+    await this.updateStatus(m.id, MissionStatus.DELIVERED, actor, { internal: true });
     // Proof-of-delivery tracking entry (with the recipient's GPS if shared)
     await pool.query(
       `INSERT INTO mission_tracking (mission_id, status, latitude, longitude, description, created_by)
