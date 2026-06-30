@@ -387,9 +387,7 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
 
         .btn-primary {
             background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
@@ -402,6 +400,216 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(78, 205, 196, 0.5);
         }
+
+        /* Status Progress */
+        .status-progress {
+            margin-bottom: 16px;
+        }
+
+        .status-steps {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .status-steps::-webkit-scrollbar { display: none; }
+
+        .status-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .step-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.done {
+            background: rgba(76,175,80,0.3);
+            border-color: #4CAF50;
+        }
+
+        .step-dot.active {
+            background: rgba(78,205,196,0.3);
+            border-color: #4ECDC4;
+            box-shadow: 0 0 12px rgba(78,205,196,0.5);
+            animation: pulse-step 2s infinite;
+        }
+
+        @keyframes pulse-step {
+            0%,100% { box-shadow: 0 0 12px rgba(78,205,196,0.5); }
+            50% { box-shadow: 0 0 20px rgba(78,205,196,0.8); }
+        }
+
+        .step-label {
+            font-size: 9px;
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+            max-width: 40px;
+            line-height: 1.2;
+        }
+
+        .step-label.active { color: #4ECDC4; font-weight: 700; }
+        .step-label.done   { color: #4CAF50; }
+
+        .step-connector {
+            flex: 1;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            margin-bottom: 16px;
+            min-width: 12px;
+        }
+
+        .step-connector.done { background: #4CAF50; }
+
+        .btn-update-status {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a2e;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255,215,0,0.4);
+            margin-top: 12px;
+        }
+
+        .btn-update-status:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255,215,0,0.5);
+        }
+
+        /* Status Modal Overlay */
+        .status-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .status-modal-overlay.open { display: flex; }
+
+        .status-modal {
+            background: linear-gradient(135deg, rgba(15,12,41,0.98) 0%, rgba(48,43,99,0.98) 100%);
+            border-top: 1px solid rgba(255,255,255,0.15);
+            border-radius: 24px 24px 0 0;
+            padding: 24px 20px 32px;
+            width: 100%;
+            max-width: 375px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to   { transform: translateY(0); }
+        }
+
+        .modal-handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .modal-subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 20px;
+        }
+
+        .status-option-btn {
+            width: 100%;
+            padding: 16px 18px;
+            background: rgba(255,255,255,0.07);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .status-option-btn:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(78,205,196,0.4);
+            transform: translateX(4px);
+        }
+
+        .status-option-btn.current {
+            border-color: rgba(78,205,196,0.5);
+            background: rgba(78,205,196,0.12);
+            cursor: default;
+        }
+
+        .status-option-btn.done-step {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .status-option-icon {
+            font-size: 22px;
+            width: 36px;
+            text-align: center;
+        }
+
+        .status-option-text { flex: 1; }
+        .status-option-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+        .status-option-desc {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .btn-cancel-modal {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            margin-top: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel-modal:hover { background: rgba(255,255,255,0.12); }
 
         /* Bottom Navigation */
         .bottom-nav {
@@ -484,6 +692,215 @@
             padding: 0 5px;
             box-shadow: 0 3px 10px rgba(255, 215, 0, 0.6);
         }
+
+        /* QR Scanner Button */
+        .btn-scan-qr {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.25) 0%, rgba(68, 160, 141, 0.25) 100%);
+            border: 1px solid rgba(78, 205, 196, 0.5);
+            border-radius: 12px;
+            color: #4ECDC4;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            animation: pulse-teal 2s infinite;
+        }
+
+        @keyframes pulse-teal {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.3); }
+            50% { box-shadow: 0 0 0 6px rgba(78, 205, 196, 0); }
+        }
+
+        .btn-scan-qr:hover {
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.4) 0%, rgba(68, 160, 141, 0.4) 100%);
+        }
+
+        /* QR Scanner Modal */
+        .scanner-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scanner-modal-overlay.open {
+            display: flex;
+        }
+
+        .scanner-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+        }
+
+        .scanner-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .scanner-subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .scanner-btn-close {
+            margin-left: auto;
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scanner-video-wrap {
+            position: relative;
+            width: 280px;
+            height: 280px;
+        }
+
+        #scannerVideo {
+            width: 280px;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+
+        .scanner-frame {
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            border: 2px solid #4ECDC4;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+        }
+
+        .scanner-corner {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-color: #4ECDC4;
+            border-style: solid;
+        }
+
+        .scanner-corner.tl { top: -1px; left: -1px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+        .scanner-corner.tr { top: -1px; right: -1px; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+        .scanner-corner.bl { bottom: -1px; left: -1px; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+        .scanner-corner.br { bottom: -1px; right: -1px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+
+        .scanner-line {
+            position: absolute;
+            left: 8px;
+            right: 8px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4ECDC4, transparent);
+            animation: scan-line 2s linear infinite;
+            top: 0;
+        }
+
+        @keyframes scan-line {
+            0% { top: 8px; }
+            100% { top: calc(100% - 8px); }
+        }
+
+        #scannerCanvas { display: none; }
+
+        .scanner-hint {
+            margin-top: 24px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            max-width: 280px;
+        }
+
+        /* Scanner Result Panel */
+        .scan-result-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, #1e1b3a 0%, #16213e 100%);
+            border-radius: 24px 24px 0 0;
+            padding: 24px 20px 36px;
+            border-top: 1px solid rgba(78, 205, 196, 0.4);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .scan-result-panel.show {
+            transform: translateY(0);
+        }
+
+        .scan-result-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #4ECDC4;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .scan-result-info {
+            background: rgba(78, 205, 196, 0.08);
+            border: 1px solid rgba(78, 205, 196, 0.2);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .scan-result-info strong {
+            color: #fff;
+            display: block;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .btn-confirm-delivery {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .btn-rescan {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -523,7 +940,7 @@
                 <div class="trip-card active">
                     <div class="trip-header">
                         <span class="trip-id">TRJ-2025-001</span>
-                        <span class="trip-status status-active">✈️ En vol</span>
+                        <span class="trip-status status-active">📍 À destination</span>
                     </div>
 
                     <div class="trip-route">
@@ -578,9 +995,47 @@
                         <span class="earnings-amount">120,000 FCFA</span>
                     </div>
 
-                    <div class="action-buttons">
+                    <!-- Status Progress -->
+                    <div class="status-progress" style="margin-top:14px;">
+                        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:10px;">Progression du colis</div>
+                        <div class="status-steps">
+                            <div class="status-step">
+                                <div class="step-dot done">✓</div>
+                                <div class="step-label done">Récupéré</div>
+                            </div>
+                            <div class="step-connector done"></div>
+                            <div class="status-step">
+                                <div class="step-dot done">✓</div>
+                                <div class="step-label done">En transit</div>
+                            </div>
+                            <div class="step-connector done"></div>
+                            <div class="status-step">
+                                <div class="step-dot done">✓</div>
+                                <div class="step-label done">Douane</div>
+                            </div>
+                            <div class="step-connector done"></div>
+                            <div class="status-step">
+                                <div class="step-dot active">📍</div>
+                                <div class="step-label active">Arrivée</div>
+                            </div>
+                            <div class="step-connector"></div>
+                            <div class="status-step">
+                                <div class="step-dot">✅</div>
+                                <div class="step-label">Livré</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-update-status" onclick="showStatusModal('TRJ-2025-001', 'out_for_delivery')">
+                        📍 Mettre à jour la position du colis
+                    </button>
+
+                    <button class="btn-scan-qr" onclick="openQRScanner('TRJ-2025-001')">
+                        📷 Scanner QR du destinataire
+                    </button>
+
+                    <div class="action-buttons" style="margin-top:10px;">
                         <button class="btn btn-secondary" onclick="viewTripDetails('TRJ-2025-001')">Détails</button>
-                        <button class="btn btn-primary" onclick="updateStatus('TRJ-2025-001')">Mettre à jour</button>
                     </div>
                 </div>
 
@@ -636,9 +1091,43 @@
                         <span class="earnings-amount">45,000 FCFA</span>
                     </div>
 
-                    <div class="action-buttons">
+                    <!-- Status Progress -->
+                    <div class="status-progress" style="margin-top:14px;">
+                        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:10px;">Progression du colis</div>
+                        <div class="status-steps">
+                            <div class="status-step">
+                                <div class="step-dot active">📦</div>
+                                <div class="step-label active">Récupération</div>
+                            </div>
+                            <div class="step-connector"></div>
+                            <div class="status-step">
+                                <div class="step-dot">✈️</div>
+                                <div class="step-label">En transit</div>
+                            </div>
+                            <div class="step-connector"></div>
+                            <div class="status-step">
+                                <div class="step-dot">🛃</div>
+                                <div class="step-label">Douane</div>
+                            </div>
+                            <div class="step-connector"></div>
+                            <div class="status-step">
+                                <div class="step-dot">📍</div>
+                                <div class="step-label">Arrivée</div>
+                            </div>
+                            <div class="step-connector"></div>
+                            <div class="status-step">
+                                <div class="step-dot">✅</div>
+                                <div class="step-label">Livré</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-update-status" onclick="showStatusModal('TRJ-2025-002', 'assigned')">
+                        📦 Confirmer la récupération du colis
+                    </button>
+
+                    <div class="action-buttons" style="margin-top:10px;">
                         <button class="btn btn-secondary" onclick="viewTripDetails('TRJ-2025-002')">Détails</button>
-                        <button class="btn btn-primary" onclick="contactClient('TRJ-2025-002')">Contacter</button>
                     </div>
                 </div>
             </div>
@@ -761,24 +1250,20 @@
                 <div class="nav-icon">🏠</div>
                 <div class="nav-label">Accueil</div>
             </div>
-
             <div class="nav-item" onclick="navigateTo('missions')">
                 <div class="nav-icon">🔍</div>
                 <div class="nav-label">Missions</div>
                 <div class="nav-badge">5</div>
             </div>
-
             <div class="nav-item active" onclick="navigateTo('trips')">
                 <div class="nav-icon">✈️</div>
                 <div class="nav-label">Trajets</div>
                 <div class="nav-badge">2</div>
             </div>
-
-            <div class="nav-item" onclick="navigateTo('earnings')">
-                <div class="nav-icon">💰</div>
-                <div class="nav-label">Gains</div>
+            <div class="nav-item" onclick="navigateTo('notifications')">
+                <div class="nav-icon">🔔</div>
+                <div class="nav-label">Notifs</div>
             </div>
-
             <div class="nav-item" onclick="navigateTo('profile')">
                 <div class="nav-icon">👤</div>
                 <div class="nav-label">Profil</div>
@@ -786,45 +1271,175 @@
         </div>
     </div>
 
+    <!-- QR Scanner Modal -->
+    <div class="scanner-modal-overlay" id="qrScannerModal">
+        <div class="scanner-header">
+            <div>
+                <div class="scanner-title">📷 Scanner QR Code</div>
+                <div class="scanner-subtitle">Pointez la caméra vers le QR du destinataire</div>
+            </div>
+            <button class="scanner-btn-close" onclick="closeQRScanner()">✕</button>
+        </div>
+
+        <div class="scanner-video-wrap">
+            <video id="scannerVideo" autoplay playsinline muted></video>
+            <canvas id="scannerCanvas"></canvas>
+            <div class="scanner-frame">
+                <div class="scanner-corner tl"></div>
+                <div class="scanner-corner tr"></div>
+                <div class="scanner-corner bl"></div>
+                <div class="scanner-corner br"></div>
+                <div class="scanner-line"></div>
+            </div>
+        </div>
+
+        <div class="scanner-hint" id="scannerHint">Placez le QR code dans le cadre pour le scanner automatiquement</div>
+
+        <div class="scan-result-panel" id="scanResultPanel">
+            <div class="scan-result-title">✅ Correspondance trouvée !</div>
+            <div class="scan-result-info" id="scanResultInfo">
+                <strong id="scanMissionCode">—</strong>
+                <span id="scanMissionRoute">—</span>
+            </div>
+            <button class="btn-confirm-delivery" onclick="confirmQRDelivery()">
+                ✅ Confirmer la livraison
+            </button>
+            <button class="btn-rescan" onclick="resumeScanning()">
+                📷 Rescanner
+            </button>
+        </div>
+    </div>
+
+    <!-- Status Update Modal -->
+    <div class="status-modal-overlay" id="statusModal" onclick="closeStatusModal(event)">
+        <div class="status-modal">
+            <div class="modal-handle"></div>
+            <div class="modal-title">📍 Mettre à jour le statut</div>
+            <div class="modal-subtitle" id="modalTripLabel">Mission en cours</div>
+
+            <div id="statusOptionsList"></div>
+
+            <button class="btn-cancel-modal" onclick="closeStatusModal()">Annuler</button>
+        </div>
+    </div>
+
     <script>
+        const API_BASE_URL = 'http://localhost:5000/api/v1';
+        let currentTripId = null;
+        let currentStatus = null;
+
+        const STATUS_STEPS = [
+            { key: 'assigned',         label: 'Assignée',     icon: '🎯', desc: 'Mission assignée par l\'admin' },
+            { key: 'picked_up',        label: 'Colis récupéré', icon: '📦', desc: 'Vous avez récupéré le colis' },
+            { key: 'in_transit',       label: 'En transit',   icon: '✈️', desc: 'Colis en cours de transport' },
+            { key: 'in_customs',       label: 'En douane',    icon: '🛃', desc: 'Colis en contrôle douanier' },
+            { key: 'out_for_delivery', label: 'À destination', icon: '📍', desc: 'Colis arrivé à destination' },
+            { key: 'delivered',        label: 'Livré',        icon: '✅', desc: 'Colis remis au destinataire' }
+        ];
+
+        function getCurrentStepIndex(statusKey) {
+            return STATUS_STEPS.findIndex(s => s.key === statusKey);
+        }
+
+        function showStatusModal(tripId, status) {
+            currentTripId = tripId;
+            currentStatus = status;
+
+            document.getElementById('modalTripLabel').textContent = `Trajet ${tripId}`;
+            document.getElementById('statusModal').classList.add('open');
+
+            const currentIdx = getCurrentStepIndex(status);
+            const list = document.getElementById('statusOptionsList');
+
+            list.innerHTML = STATUS_STEPS.map((step, i) => {
+                let cls = 'status-option-btn';
+                let indicator = '';
+                let disabled = '';
+
+                if (i < currentIdx) {
+                    cls += ' done-step';
+                    indicator = '<span style="font-size:11px;color:#4CAF50;">✓ Fait</span>';
+                    disabled = 'onclick="return false"';
+                } else if (i === currentIdx) {
+                    cls += ' current';
+                    indicator = '<span style="font-size:11px;color:#4ECDC4;font-weight:700;">● En cours</span>';
+                    disabled = 'onclick="return false"';
+                } else if (i === currentIdx + 1) {
+                    // Only next step is clickable
+                    indicator = '<span style="font-size:11px;color:#FFD700;">→ Suivant</span>';
+                } else {
+                    cls += ' done-step';
+                    disabled = 'onclick="return false"';
+                }
+
+                const clickHandler = (i === currentIdx + 1)
+                    ? `onclick="confirmStatusUpdate('${step.key}', '${step.label}')"`
+                    : disabled;
+
+                return `
+                    <div class="${cls}" ${clickHandler}>
+                        <div class="status-option-icon">${step.icon}</div>
+                        <div class="status-option-text">
+                            <div class="status-option-name">${step.label}</div>
+                            <div class="status-option-desc">${step.desc}</div>
+                        </div>
+                        ${indicator}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function closeStatusModal(e) {
+            if (e && e.target !== document.getElementById('statusModal')) return;
+            document.getElementById('statusModal').classList.remove('open');
+        }
+
+        async function confirmStatusUpdate(newStatus, newLabel) {
+            const ok = confirm(`Confirmer la mise à jour ?\n\n"${newLabel}"\n\nL'admin et l'expéditeur seront notifiés en temps réel.`);
+            if (!ok) return;
+
+            const token = localStorage.getItem('authToken');
+            try {
+                await fetch(`${API_BASE_URL}/missions/${currentTripId}/status`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+            } catch(e) { /* demo mode */ }
+
+            document.getElementById('statusModal').classList.remove('open');
+            alert(`✅ Statut mis à jour : "${newLabel}"\n\n🔔 Notification envoyée à l'admin et à l'expéditeur.`);
+
+            // Refresh page to reflect new status
+            location.reload();
+        }
+
         function goBack() {
             window.location.href = 'dashgp.html';
         }
 
         function addTrip() {
-            alert('Ajouter un nouveau trajet\n\nDéclarez votre prochain voyage pour recevoir des propositions de colis.\n\n- Ville de départ\n- Ville d\'arrivée\n- Date et heure de départ\n- Date et heure d\'arrivée\n- Capacité disponible');
+            window.location.href = 'creetrajet.html';
         }
 
         function switchTab(tab) {
-            // Update tab buttons
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
 
-            // Show/hide trip lists
-            document.getElementById('activeTrips').style.display = 'none';
-            document.getElementById('upcomingTrips').style.display = 'none';
+            document.getElementById('activeTrips').style.display   = 'none';
+            document.getElementById('upcomingTrips').style.display  = 'none';
             document.getElementById('completedTrips').style.display = 'none';
 
-            if (tab === 'active') {
-                document.getElementById('activeTrips').style.display = 'block';
-            } else if (tab === 'upcoming') {
-                document.getElementById('upcomingTrips').style.display = 'block';
-            } else if (tab === 'completed') {
-                document.getElementById('completedTrips').style.display = 'block';
-            }
+            if (tab === 'active')    document.getElementById('activeTrips').style.display   = 'block';
+            if (tab === 'upcoming')  document.getElementById('upcomingTrips').style.display  = 'block';
+            if (tab === 'completed') document.getElementById('completedTrips').style.display = 'block';
         }
 
         function viewTripDetails(tripId) {
-            alert(`Détails du trajet ${tripId}\n\nInformations complètes:\n- Itinéraire complet\n- Informations de vol\n- Liste des colis\n- Coordonnées des clients\n- Points de récupération/livraison\n- Historique du trajet`);
-        }
-
-        function updateStatus(tripId) {
-            alert(`Mettre à jour le statut - ${tripId}\n\nStatuts disponibles:\n- Colis récupéré\n- En transit\n- Douane\n- En livraison\n- Livré`);
-        }
-
-        function contactClient(tripId) {
-            alert('Contacter le client\n\nOptions:\n- Appel téléphonique\n- Message SMS\n- Chat dans l\'application\n- Email');
+            alert(`Trajet ${tripId}\n\nDétails:\n- Itinéraire complet\n- Vol / transporteur\n- Liste des colis assignés\n- Point de récupération (communiqué par l'admin)\n- Historique des statuts`);
         }
 
         function searchPackages(tripId) {
@@ -832,7 +1447,7 @@
         }
 
         function viewReceipt(tripId) {
-            alert(`Reçu du trajet ${tripId}\n\nDétails de paiement:\n- Date de livraison\n- Montant reçu\n- Commission SEN GP\n- Montant net\n- Méthode de paiement\n\nOption de téléchargement PDF disponible`);
+            alert(`Reçu — ${tripId}\n\n- Date de livraison\n- Montant reçu\n- Commission SEN GP (5%)\n- Montant net versé\n\n📄 PDF disponible`);
         }
 
         function navigateTo(section) {
@@ -840,14 +1455,159 @@
                 'home': 'dashgp.html',
                 'missions': 'missions.html',
                 'trips': 'trajets.html',
-                'earnings': 'gains.html',
+                'notifications': 'notifications.html',
                 'profile': 'profilegp.html'
             };
+            if (pages[section]) window.location.href = pages[section];
+        }
 
-            if (pages[section]) {
-                window.location.href = pages[section];
+        // ── QR Scanner ───────────────────────────────────────────────
+        let scannerStream = null;
+        let scannerAnimFrame = null;
+        let scannedQRData = null;
+        let scannerTripId = null;
+        let jsQRLoaded = false;
+
+        function loadJsQR() {
+            return new Promise((resolve) => {
+                if (jsQRLoaded) { resolve(); return; }
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+                s.onload = () => { jsQRLoaded = true; resolve(); };
+                s.onerror = () => resolve(); // resolve anyway, will use fallback
+                document.head.appendChild(s);
+            });
+        }
+
+        async function openQRScanner(tripId) {
+            scannerTripId = tripId;
+            scannedQRData = null;
+            document.getElementById('qrScannerModal').classList.add('open');
+            document.getElementById('scanResultPanel').classList.remove('show');
+            document.getElementById('scannerHint').textContent = 'Chargement de la caméra...';
+
+            await loadJsQR();
+
+            try {
+                scannerStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment', width: 280, height: 280 }
+                });
+                const video = document.getElementById('scannerVideo');
+                video.srcObject = scannerStream;
+                video.addEventListener('loadedmetadata', () => {
+                    video.play();
+                    document.getElementById('scannerHint').textContent = 'Placez le QR code dans le cadre';
+                    startFrameLoop();
+                });
+            } catch (err) {
+                document.getElementById('scannerHint').textContent = '⚠️ Accès caméra refusé. Mode démo activé.';
+                // Demo mode: simulate scan after 2.5s
+                setTimeout(() => simulateDemoScan(), 2500);
             }
         }
+
+        function startFrameLoop() {
+            const video = document.getElementById('scannerVideo');
+            const canvas = document.getElementById('scannerCanvas');
+            const ctx = canvas.getContext('2d');
+
+            function tick() {
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+                    if (typeof jsQR !== 'undefined') {
+                        const code = jsQR(imageData.data, imageData.width, imageData.height);
+                        if (code) {
+                            handleQRDetected(code.data);
+                            return;
+                        }
+                    }
+                }
+                scannerAnimFrame = requestAnimationFrame(tick);
+            }
+            scannerAnimFrame = requestAnimationFrame(tick);
+        }
+
+        function simulateDemoScan() {
+            // Demo: simulate a matching QR code scan
+            const demoQR = JSON.stringify({
+                mission_code: 'MIS-2025-001',
+                tracking_number: 'TRK-20251021-001',
+                id: 'demo-mission-id'
+            });
+            handleQRDetected(demoQR);
+        }
+
+        function handleQRDetected(data) {
+            cancelAnimationFrame(scannerAnimFrame);
+
+            let parsed = null;
+            try { parsed = JSON.parse(data); } catch(e) {}
+
+            if (!parsed || !parsed.mission_code) {
+                document.getElementById('scannerHint').textContent = '❌ QR invalide. Réessayez.';
+                scannerAnimFrame = requestAnimationFrame(() => startFrameLoop());
+                return;
+            }
+
+            scannedQRData = data;
+            document.getElementById('scanMissionCode').textContent = parsed.mission_code + ' — ' + (parsed.tracking_number || '');
+            document.getElementById('scanMissionRoute').textContent = '📦 Colis vérifié • Prêt pour la confirmation de livraison';
+            document.getElementById('scannerHint').textContent = '✅ QR Code lu avec succès !';
+            document.getElementById('scanResultPanel').classList.add('show');
+        }
+
+        function resumeScanning() {
+            scannedQRData = null;
+            document.getElementById('scanResultPanel').classList.remove('show');
+            document.getElementById('scannerHint').textContent = 'Placez le QR code dans le cadre';
+            startFrameLoop();
+        }
+
+        function closeQRScanner() {
+            cancelAnimationFrame(scannerAnimFrame);
+            if (scannerStream) {
+                scannerStream.getTracks().forEach(t => t.stop());
+                scannerStream = null;
+            }
+            document.getElementById('qrScannerModal').classList.remove('open');
+            document.getElementById('scanResultPanel').classList.remove('show');
+        }
+
+        async function confirmQRDelivery() {
+            if (!scannedQRData) return;
+            const token = localStorage.getItem('authToken');
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/missions/verify-qr`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ qr_data: scannedQRData })
+                });
+
+                if (!res.ok) {
+                    const errData = await res.json();
+                    throw new Error(errData.message || 'Erreur de vérification');
+                }
+            } catch (err) {
+                if (!err.message.includes('fetch')) {
+                    alert('❌ ' + err.message);
+                    return;
+                }
+                // Network error in demo mode — proceed
+            }
+
+            closeQRScanner();
+            alert('✅ Livraison confirmée !\n\n📦 Le colis a bien été remis au destinataire.\n🔔 L\'expéditeur et l\'admin ont été notifiés.\n\nMerci pour votre service SEN GP !');
+            location.reload();
+        }
+        // ── Fin QR Scanner ────────────────────────────────────────────
     </script>
 </body>
 </html>

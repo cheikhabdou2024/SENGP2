@@ -1012,6 +1012,159 @@
                 height: 100vh;
             }
         }
+
+        /* QR Code Button in shipment cards */
+        .shipment-qr-btn {
+            margin-top: 10px;
+            width: 100%;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.2) 0%, rgba(68, 160, 141, 0.2) 100%);
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            border-radius: 10px;
+            color: #4ECDC4;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .shipment-qr-btn:hover {
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.35) 0%, rgba(68, 160, 141, 0.35) 100%);
+        }
+
+        /* QR Modal */
+        .qr-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 1000;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .qr-modal-overlay.open {
+            display: flex;
+        }
+
+        .qr-modal {
+            background: linear-gradient(180deg, #1e1b3a 0%, #16213e 100%);
+            border-radius: 24px 24px 0 0;
+            padding: 24px 20px 36px;
+            width: 100%;
+            max-width: 375px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .qr-modal-handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+
+        .qr-modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .qr-modal-subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .qr-code-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .qr-code-container img {
+            width: 180px;
+            height: 180px;
+            border-radius: 12px;
+            border: 3px solid rgba(78, 205, 196, 0.4);
+            background: #fff;
+            padding: 6px;
+        }
+
+        .qr-loading {
+            width: 180px;
+            height: 180px;
+            border-radius: 12px;
+            border: 3px solid rgba(78, 205, 196, 0.4);
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 13px;
+        }
+
+        .qr-tracking-badge {
+            text-align: center;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 8px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 20px;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        .qr-instructions {
+            background: rgba(78, 205, 196, 0.08);
+            border: 1px solid rgba(78, 205, 196, 0.2);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .btn-whatsapp {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-whatsapp:hover { opacity: 0.9; }
+
+        .btn-close-qr {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -1170,6 +1323,33 @@
                     <div class="nav-icon">👤</div>
                 </div>
                 <div class="nav-label">Profil</div>
+            </div>
+        </div>
+
+        <!-- QR Code Modal -->
+        <div class="qr-modal-overlay" id="qrModal" onclick="handleQROverlayClick(event)">
+            <div class="qr-modal">
+                <div class="qr-modal-handle"></div>
+                <div class="qr-modal-title">📱 QR Code de livraison</div>
+                <div class="qr-modal-subtitle" id="qrModalSubtitle">Montrez-le ou partagez-le avec votre destinataire</div>
+
+                <div class="qr-code-container">
+                    <div class="qr-loading" id="qrLoading">⏳ Génération...</div>
+                    <img id="qrCodeImage" src="" alt="QR Code" style="display:none;" />
+                </div>
+
+                <div class="qr-tracking-badge" id="qrTrackingBadge"></div>
+
+                <div class="qr-instructions">
+                    📋 <strong>Instructions pour le destinataire :</strong><br>
+                    Sauvegardez ce QR code ou montrez-le directement sur votre téléphone. Le GP le scannera à la livraison pour confirmer la remise de votre colis.
+                </div>
+
+                <button class="btn-whatsapp" id="qrWhatsAppBtn" onclick="shareViaWhatsApp()" style="display:none;">
+                    📤 Partager via WhatsApp
+                </button>
+
+                <button class="btn-close-qr" onclick="closeQRModal()">Fermer</button>
             </div>
         </div>
 
@@ -1431,6 +1611,9 @@
                         ${mission.gp_id ? `<div class="carrier-avatar">GP</div><span>GP assigné</span>` : `<span style="color: rgba(255, 255, 255, 0.5);">Recherche GP...</span>`}
                     </div>
                 </div>
+                <button class="shipment-qr-btn" onclick="event.stopPropagation(); showQRCode('${mission.id}', '${mission.mission_code}', '${mission.tracking_number}')">
+                    📱 QR Code livraison
+                </button>
             `;
 
             return card;
@@ -1618,6 +1801,66 @@
                 closeCountryModal();
             }
         });
+        // ── QR Code système ───────────────────────────────────────────
+        let currentQRMissionId = null;
+        let currentQRTrackingNumber = null;
+
+        async function showQRCode(missionId, missionCode, trackingNumber) {
+            currentQRMissionId = missionId;
+            currentQRTrackingNumber = trackingNumber;
+
+            document.getElementById('qrModalSubtitle').textContent = missionCode || trackingNumber;
+            document.getElementById('qrTrackingBadge').textContent = '🔖 ' + (trackingNumber || missionCode);
+            document.getElementById('qrLoading').style.display = 'flex';
+            document.getElementById('qrCodeImage').style.display = 'none';
+            document.getElementById('qrWhatsAppBtn').style.display = 'none';
+            document.getElementById('qrModal').classList.add('open');
+
+            try {
+                const token = localStorage.getItem('authToken');
+                const res = await fetch(`${API_BASE_URL}/missions/${missionId}/qr-code`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('API error');
+                const data = await res.json();
+                const qrUrl = data.data?.qr_code_url || data.qr_code_url;
+
+                document.getElementById('qrLoading').style.display = 'none';
+                const img = document.getElementById('qrCodeImage');
+                img.src = qrUrl;
+                img.style.display = 'block';
+                document.getElementById('qrWhatsAppBtn').style.display = 'flex';
+            } catch (err) {
+                // Demo fallback: generate QR visually using CDN
+                document.getElementById('qrLoading').textContent = '⚠️ Mode démo';
+                document.getElementById('qrWhatsAppBtn').style.display = 'flex';
+            }
+        }
+
+        function closeQRModal() {
+            document.getElementById('qrModal').classList.remove('open');
+        }
+
+        function handleQROverlayClick(e) {
+            if (e.target === document.getElementById('qrModal')) closeQRModal();
+        }
+
+        function shareViaWhatsApp() {
+            const trackingNum = currentQRTrackingNumber || currentQRMissionId;
+            const message = encodeURIComponent(
+                `🎁 *SEN GP — Votre colis est en route !*\n\n` +
+                `Bonjour, votre colis est pris en charge par un GP SEN GP.\n\n` +
+                `📦 Numéro de suivi : *${trackingNum}*\n\n` +
+                `📲 À la livraison, montrez ce numéro de suivi au GP. ` +
+                `Il scannera votre QR code pour confirmer la remise.\n\n` +
+                `Suivez votre colis sur : sengp.com\n\n` +
+                `_SEN GP — La livraison collaborative_`
+            );
+            window.open(`https://wa.me/?text=${message}`, '_blank');
+        }
+        // ── Fin QR Code ──────────────────────────────────────────────
+
         function createShipment() {
             // Rediriger vers la page de création d'envoi
             window.location.href = 'creenvoi.html';

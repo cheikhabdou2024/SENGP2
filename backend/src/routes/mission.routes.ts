@@ -50,6 +50,13 @@ router.post(
   MissionController.updateStatus
 );
 
+// Verify QR code delivery (must be before /:id routes)
+router.post(
+  '/verify-qr',
+  AuthMiddleware.requireRole(UserType.GP),
+  MissionController.verifyDelivery
+);
+
 // Generate QR code
 router.post('/:id/qr-code', MissionController.generateQRCode);
 

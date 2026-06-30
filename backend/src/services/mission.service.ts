@@ -377,6 +377,66 @@ export class MissionService {
   }
 
   /**
+   * Verify QR code at delivery and mark mission as delivered
+   */
+  static async verifyDeliveryByQR(qrData: string, gpId: string): Promise<Mission> {
+    let parsedData: any;
+    try {
+      parsedData = JSON.parse(qrData);
+    } catch {
+      throw new Error('Format QR code invalide');
+    }
+
+    const missionId = parsedData.id;
+    if (!missionId) throw new Error('Données QR code invalides');
+
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      const missionResult = await client.query(
+        'SELECT * FROM missions WHERE id = $1',
+        [missionId]
+      );
+
+      if (missionResult.rows.length === 0) throw new Error('Mission introuvable');
+      const mission = missionResult.rows[0];
+
+      if (mission.gp_id !== gpId) throw new Error('Ce colis ne fait pas partie de votre mission');
+      if (mission.status === 'delivered') throw new Error('Ce colis a déjà été livré');
+
+      const updateResult = await client.query(
+        `UPDATE missions
+         SET status = 'delivered', completed_at = CURRENT_TIMESTAMP, actual_delivery_date = CURRENT_TIMESTAMP
+         WHERE id = $1 RETURNING *`,
+        [missionId]
+      );
+
+      await client.query(
+        `INSERT INTO mission_tracking (mission_id, status, description, created_by)
+         VALUES ($1, 'delivered', 'Colis livré via scan QR code destinataire', $2)`,
+        [missionId, gpId]
+      );
+
+      await client.query(
+        `UPDATE gp_profiles
+         SET total_missions_completed = total_missions_completed + 1
+         WHERE user_id = $1`,
+        [gpId]
+      );
+
+      await client.query('COMMIT');
+      logger.info(`Mission ${missionId} delivered via QR scan by GP ${gpId}`);
+      return updateResult.rows[0];
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
    * Get mission tracking history
    */
   static async getTrackingHistory(missionId: string) {

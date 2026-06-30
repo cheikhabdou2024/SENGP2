@@ -553,8 +553,8 @@
             <div class="header-top">
                 <button class="back-btn" onclick="goBack()">←</button>
                 <div class="header-title">
-                    <h1>Recherche de missions</h1>
-                    <p>12 missions disponibles</p>
+                    <h1>Missions disponibles</h1>
+                    <p id="missionsCount">Chargement...</p>
                 </div>
             </div>
 
@@ -570,13 +570,19 @@
 
         <!-- Content -->
         <div class="content">
+            <!-- Info banner -->
+            <div style="background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.3);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+                <span style="font-size:20px;">📌</span>
+                <span style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.5;">Les missions vous sont <strong style="color:#4ECDC4">assignées par notre équipe admin</strong>. Consultez vos <strong style="color:#FFD700">Notifications</strong> pour voir vos missions assignées.</span>
+            </div>
+
             <!-- Filter Tags -->
             <div class="filter-tags">
                 <div class="filter-tag active" onclick="filterMissions('all', this)">Toutes</div>
-                <div class="filter-tag" onclick="filterMissions('high-pay', this)">💰 Bien payées</div>
-                <div class="filter-tag" onclick="filterMissions('urgent', this)">⚡ Urgentes</div>
-                <div class="filter-tag" onclick="filterMissions('verified', this)">✓ Vérifiées</div>
-                <div class="filter-tag" onclick="filterMissions('light', this)">📦 Légères</div>
+                <div class="filter-tag" onclick="filterMissions('today', this)">📅 Aujourd'hui</div>
+                <div class="filter-tag" onclick="filterMissions('week', this)">🗓️ Cette semaine</div>
+                <div class="filter-tag" onclick="filterMissions('europe', this)">🇪🇺 Europe</div>
+                <div class="filter-tag" onclick="filterMissions('america', this)">🌎 Amérique</div>
             </div>
 
             <!-- Section Header -->
@@ -627,16 +633,11 @@
                     </div>
                 </div>
                 <div class="mission-footer">
-                    <div class="mission-client">
-                        <div class="client-avatar">MD</div>
-                        <span class="client-name">Moussa D.</span>
-                        <span class="client-rating">⭐ 4.8</span>
-                    </div>
                     <span class="mission-date">Publié il y a 2h</span>
+                    <span style="font-size:11px;color:rgba(255,255,255,0.4);">Client ⭐ 4.8</span>
                 </div>
                 <div class="action-buttons">
-                    <button class="btn btn-details" onclick="viewDetails('MIS-001')">Détails</button>
-                    <button class="btn btn-accept" onclick="acceptMission('MIS-001')">Accepter</button>
+                    <button class="btn btn-details" onclick="viewDetails('MIS-001')" style="flex:1;">Voir les détails</button>
                 </div>
             </div>
 
@@ -681,16 +682,11 @@
                     </div>
                 </div>
                 <div class="mission-footer">
-                    <div class="mission-client">
-                        <div class="client-avatar">AS</div>
-                        <span class="client-name">Aissatou S.</span>
-                        <span class="client-rating">⭐ 5.0</span>
-                    </div>
                     <span class="mission-date">Publié il y a 5h</span>
+                    <span style="font-size:11px;color:rgba(255,255,255,0.4);">Client ⭐ 5.0</span>
                 </div>
                 <div class="action-buttons">
-                    <button class="btn btn-details" onclick="viewDetails('MIS-002')">Détails</button>
-                    <button class="btn btn-accept" onclick="acceptMission('MIS-002')">Accepter</button>
+                    <button class="btn btn-details" onclick="viewDetails('MIS-002')" style="flex:1;">Voir les détails</button>
                 </div>
             </div>
 
@@ -735,16 +731,11 @@
                     </div>
                 </div>
                 <div class="mission-footer">
-                    <div class="mission-client">
-                        <div class="client-avatar">FS</div>
-                        <span class="client-name">Fatou S.</span>
-                        <span class="client-rating">⭐ 4.9</span>
-                    </div>
                     <span class="mission-date">Publié il y a 1 jour</span>
+                    <span style="font-size:11px;color:rgba(255,255,255,0.4);">Client ⭐ 4.9</span>
                 </div>
                 <div class="action-buttons">
-                    <button class="btn btn-details" onclick="viewDetails('MIS-003')">Détails</button>
-                    <button class="btn btn-accept" onclick="acceptMission('MIS-003')">Accepter</button>
+                    <button class="btn btn-details" onclick="viewDetails('MIS-003')" style="flex:1;">Voir les détails</button>
                 </div>
             </div>
 
@@ -789,16 +780,11 @@
                     </div>
                 </div>
                 <div class="mission-footer">
-                    <div class="mission-client">
-                        <div class="client-avatar">IB</div>
-                        <span class="client-name">Ibrahima B.</span>
-                        <span class="client-rating">⭐ 4.7</span>
-                    </div>
                     <span class="mission-date">Publié il y a 2 jours</span>
+                    <span style="font-size:11px;color:rgba(255,255,255,0.4);">Client ⭐ 4.7</span>
                 </div>
                 <div class="action-buttons">
-                    <button class="btn btn-details" onclick="viewDetails('MIS-004')">Détails</button>
-                    <button class="btn btn-accept" onclick="acceptMission('MIS-004')">Accepter</button>
+                    <button class="btn btn-details" onclick="viewDetails('MIS-004')" style="flex:1;">Voir les détails</button>
                 </div>
             </div>
         </div>
@@ -835,40 +821,61 @@
     </div>
 
     <script>
+        const API_BASE_URL = 'http://localhost:5000/api/v1';
+        const DESTINATION_ZONES = {
+            europe: ['France', 'Paris', 'Londres', 'Madrid', 'Italie', 'Espagne', 'UK', 'Germany', 'Allemagne'],
+            america: ['USA', 'États-Unis', 'New York', 'Canada', 'Montréal', 'Toronto']
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.mission-card');
+            document.getElementById('missionsCount').textContent = `${cards.length} missions disponibles`;
+        });
+
         function goBack() {
             window.location.href = 'dashgp.html';
         }
 
         function openFilters() {
-            alert('Filtres avancés\n\nOptions:\n- Destination\n- Prix minimum/maximum\n- Poids maximum\n- Date de départ\n- Type de client (vérifié, nouveau)\n- Distance');
+            alert('Filtres de missions\n\nOptions disponibles:\n- Destination (pays/ville)\n- Date de départ\n- Poids du colis\n- Distance');
         }
 
         function filterMissions(type, element) {
-            // Remove active class from all tags
-            document.querySelectorAll('.filter-tag').forEach(tag => {
-                tag.classList.remove('active');
-            });
-
-            // Add active class to clicked tag
+            document.querySelectorAll('.filter-tag').forEach(tag => tag.classList.remove('active'));
             element.classList.add('active');
 
-            alert(`Filtrer par: ${type}\n\nAffichage des missions correspondantes...`);
+            const cards = document.querySelectorAll('.mission-card');
+            const today = new Date();
+            const weekEnd = new Date(); weekEnd.setDate(today.getDate() + 7);
+
+            cards.forEach(card => {
+                let show = true;
+                if (type === 'today') {
+                    const dateEl = card.querySelector('.mission-date');
+                    show = dateEl && dateEl.textContent.includes("aujourd'hui");
+                } else if (type === 'week') {
+                    const dateEl = card.querySelector('.detail-item span:last-child');
+                    show = true; // filter by date data if available
+                } else if (type === 'europe') {
+                    const route = card.querySelector('.mission-route')?.textContent || '';
+                    show = DESTINATION_ZONES.europe.some(d => route.includes(d));
+                } else if (type === 'america') {
+                    const route = card.querySelector('.mission-route')?.textContent || '';
+                    show = DESTINATION_ZONES.america.some(d => route.includes(d));
+                }
+                card.style.display = show ? 'block' : 'none';
+            });
+
+            const visible = [...cards].filter(c => c.style.display !== 'none').length;
+            document.getElementById('missionsCount').textContent = `${visible} missions disponibles`;
         }
 
         function sortMissions() {
-            alert('Trier les missions\n\nOptions:\n- Prix (croissant/décroissant)\n- Date de départ\n- Poids\n- Distance\n- Note du client');
+            alert('Trier les missions\n\nOptions:\n- Date de départ (proche → loin)\n- Poids (léger → lourd)\n- Destination (A → Z)');
         }
 
         function viewDetails(missionId) {
-            alert(`Détails de la mission ${missionId}\n\nInformations complètes:\n- Description du colis\n- Photos\n- Itinéraire détaillé\n- Profil du client\n- Conditions de transport\n- Assurance\n- Modalités de paiement`);
-        }
-
-        function acceptMission(missionId) {
-            const confirmed = confirm(`Accepter la mission ${missionId}?\n\nEn acceptant, vous vous engagez à transporter ce colis selon les conditions établies.`);
-
-            if (confirmed) {
-                alert(`Mission ${missionId} acceptée ✓\n\nLe client sera notifié.\n\nVous recevrez les détails de récupération par email et notification.`);
-            }
+            alert(`Mission ${missionId}\n\nInformations disponibles:\n- Description et type du colis\n- Poids et dimensions\n- Itinéraire (départ → destination)\n- Dates de départ et d\'arrivée\n\n📌 Pour cette mission, contactez l\'admin ou attendez une notification d\'assignation.`);
         }
 
         function navigateTo(section) {
@@ -879,10 +886,7 @@
                 'earnings': 'gains.html',
                 'profile': 'profilegp.html'
             };
-
-            if (pages[section]) {
-                window.location.href = pages[section];
-            }
+            if (pages[section]) window.location.href = pages[section];
         }
     </script>
 </body>

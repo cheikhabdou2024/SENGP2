@@ -586,6 +586,15 @@
 
             <div class="nav-section">
                 <div class="nav-title">Gestion</div>
+                <div class="nav-item" onclick="showSection('assign')">
+                    <span class="nav-icon">🎯</span>
+                    <span class="nav-text">Affecter missions</span>
+                    <span class="nav-badge" style="background:#FFD700;color:#1a1a2e;">3</span>
+                </div>
+                <div class="nav-item" onclick="showSection('gp-categories')">
+                    <span class="nav-icon">✈️</span>
+                    <span class="nav-text">GPs par catégorie</span>
+                </div>
                 <div class="nav-item" onclick="navigateTo('claims')">
                     <span class="nav-icon">⚠️</span>
                     <span class="nav-text">Réclamations</span>
@@ -688,6 +697,14 @@
 
             <!-- Quick Actions -->
             <div class="quick-actions">
+                <div class="action-btn" onclick="showSection('assign')" style="border-color:rgba(255,215,0,0.4);background:rgba(255,215,0,0.08);">
+                    <div class="action-icon" style="background:linear-gradient(135deg,#FFD700,#FFA500);">🎯</div>
+                    <div class="action-text" style="color:#FFD700;">Affecter une mission</div>
+                </div>
+                <div class="action-btn" onclick="showSection('gp-categories')">
+                    <div class="action-icon">✈️</div>
+                    <div class="action-text">GPs par catégorie</div>
+                </div>
                 <div class="action-btn" onclick="navigateTo('users')">
                     <div class="action-icon">➕</div>
                     <div class="action-text">Nouvel utilisateur</div>
@@ -703,6 +720,206 @@
                 <div class="action-btn" onclick="navigateTo('settings')">
                     <div class="action-icon">⚙️</div>
                     <div class="action-text">Configuration</div>
+                </div>
+            </div>
+
+            <!-- GP Categories Section (hidden by default) -->
+            <div id="section-gp-categories" style="display:none;margin-bottom:30px;">
+                <div class="section-header">
+                    <h2 class="section-title">✈️ GPs par catégorie</h2>
+                    <button onclick="showSection('dashboard')" style="background:rgba(255,255,255,0.1);border:none;color:rgba(255,255,255,0.7);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;">← Retour</button>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;">
+                    <!-- Europe -->
+                    <div style="background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.3);border-radius:16px;padding:20px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                            <span style="font-size:28px;">🇪🇺</span>
+                            <div>
+                                <div style="font-size:16px;font-weight:700;color:#fff;">GPs Europe</div>
+                                <div style="font-size:12px;color:rgba(255,255,255,0.5);">France · UK · Espagne · Italie</div>
+                            </div>
+                            <span style="margin-left:auto;background:#4ECDC4;color:#1a1a2e;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;">12 GPs</span>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:8px;" id="gps-europe">
+                            <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+                                <span style="font-size:13px;color:#fff;">Amadou D.</span>
+                                <span style="font-size:11px;color:#4CAF50;background:rgba(76,175,80,0.15);padding:3px 8px;border-radius:6px;">Disponible</span>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+                                <span style="font-size:13px;color:#fff;">Fatou S.</span>
+                                <span style="font-size:11px;color:#FFD700;background:rgba(255,215,0,0.15);padding:3px 8px;border-radius:6px;">En mission</span>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+                                <span style="font-size:13px;color:#fff;">Ibrahima B.</span>
+                                <span style="font-size:11px;color:#4CAF50;background:rgba(76,175,80,0.15);padding:3px 8px;border-radius:6px;">Disponible</span>
+                            </div>
+                        </div>
+                        <button onclick="showSection('assign')" style="margin-top:14px;width:100%;padding:10px;background:linear-gradient(135deg,#4ECDC4,#44A08D);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;font-size:13px;">Affecter une mission →</button>
+                    </div>
+                    <!-- Amérique -->
+                    <div style="background:rgba(255,165,0,0.1);border:1px solid rgba(255,165,0,0.3);border-radius:16px;padding:20px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                            <span style="font-size:28px;">🌎</span>
+                            <div>
+                                <div style="font-size:16px;font-weight:700;color:#fff;">GPs Amérique</div>
+                                <div style="font-size:12px;color:rgba(255,255,255,0.5);">USA · Canada</div>
+                            </div>
+                            <span style="margin-left:auto;background:#FFA500;color:#1a1a2e;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;">7 GPs</span>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:8px;">
+                            <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+                                <span style="font-size:13px;color:#fff;">Moussa D.</span>
+                                <span style="font-size:11px;color:#4CAF50;background:rgba(76,175,80,0.15);padding:3px 8px;border-radius:6px;">Disponible</span>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+                                <span style="font-size:13px;color:#fff;">Aissatou S.</span>
+                                <span style="font-size:11px;color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.08);padding:3px 8px;border-radius:6px;">Inactif</span>
+                            </div>
+                        </div>
+                        <button onclick="showSection('assign')" style="margin-top:14px;width:100%;padding:10px;background:linear-gradient(135deg,#FFA500,#FF8C00);border:none;border-radius:10px;color:#1a1a2e;font-weight:700;cursor:pointer;font-size:13px;">Affecter une mission →</button>
+                    </div>
+                    <!-- Afrique -->
+                    <div style="background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.3);border-radius:16px;padding:20px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                            <span style="font-size:28px;">🌍</span>
+                            <div>
+                                <div style="font-size:16px;font-weight:700;color:#fff;">GPs Afrique</div>
+                                <div style="font-size:12px;color:rgba(255,255,255,0.5);">Mali · Côte d'Ivoire · Maroc...</div>
+                            </div>
+                            <span style="margin-left:auto;background:#FF6B6B;color:#fff;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;">9 GPs</span>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:8px;">
+                            <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+                                <span style="font-size:13px;color:#fff;">Oumar K.</span>
+                                <span style="font-size:11px;color:#4CAF50;background:rgba(76,175,80,0.15);padding:3px 8px;border-radius:6px;">Disponible</span>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+                                <span style="font-size:13px;color:#fff;">Mariama B.</span>
+                                <span style="font-size:11px;color:#FFD700;background:rgba(255,215,0,0.15);padding:3px 8px;border-radius:6px;">En mission</span>
+                            </div>
+                        </div>
+                        <button onclick="showSection('assign')" style="margin-top:14px;width:100%;padding:10px;background:linear-gradient(135deg,#FF6B6B,#FF4757);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;font-size:13px;">Affecter une mission →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Affecter mission Section (hidden by default) -->
+            <div id="section-assign" style="display:none;margin-bottom:30px;">
+                <div class="section-header">
+                    <h2 class="section-title">🎯 Affecter une mission à un GP</h2>
+                    <button onclick="showSection('dashboard')" style="background:rgba(255,255,255,0.1);border:none;color:rgba(255,255,255,0.7);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;">← Retour</button>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+                    <!-- Missions en attente -->
+                    <div>
+                        <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.5px;">1. Sélectionner une mission</div>
+                        <div style="display:flex;flex-direction:column;gap:10px;" id="pendingMissionsList">
+                            <div class="assign-mission-card" onclick="selectMission(this,'MIS-005')" style="background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;cursor:pointer;transition:all 0.3s;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                                    <span style="font-size:13px;font-weight:700;color:#FFD700;">MIS-005</span>
+                                    <span style="font-size:11px;background:rgba(255,215,0,0.2);color:#FFD700;border:1px solid rgba(255,215,0,0.3);padding:3px 8px;border-radius:6px;">En attente</span>
+                                </div>
+                                <div style="font-size:13px;color:#fff;margin-bottom:6px;">🇸🇳 Dakar → 🇫🇷 Paris</div>
+                                <div style="font-size:12px;color:rgba(255,255,255,0.5);">📦 2.5 kg · 📅 05 Jul 2026</div>
+                            </div>
+                            <div class="assign-mission-card" onclick="selectMission(this,'MIS-006')" style="background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;cursor:pointer;transition:all 0.3s;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                                    <span style="font-size:13px;font-weight:700;color:#FFD700;">MIS-006</span>
+                                    <span style="font-size:11px;background:rgba(255,215,0,0.2);color:#FFD700;border:1px solid rgba(255,215,0,0.3);padding:3px 8px;border-radius:6px;">En attente</span>
+                                </div>
+                                <div style="font-size:13px;color:#fff;margin-bottom:6px;">🇸🇳 Dakar → 🇺🇸 New York</div>
+                                <div style="font-size:12px;color:rgba(255,255,255,0.5);">📦 4 kg · 📅 10 Jul 2026</div>
+                            </div>
+                            <div class="assign-mission-card" onclick="selectMission(this,'MIS-007')" style="background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;cursor:pointer;transition:all 0.3s;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                                    <span style="font-size:13px;font-weight:700;color:#FFD700;">MIS-007</span>
+                                    <span style="font-size:11px;background:rgba(255,107,107,0.2);color:#FF6B6B;border:1px solid rgba(255,107,107,0.3);padding:3px 8px;border-radius:6px;">⚡ Urgent</span>
+                                </div>
+                                <div style="font-size:13px;color:#fff;margin-bottom:6px;">🇸🇳 Dakar → 🇬🇧 Londres</div>
+                                <div style="font-size:12px;color:rgba(255,255,255,0.5);">📦 1.8 kg · 📅 02 Jul 2026</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- GPs disponibles -->
+                    <div>
+                        <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.5px;">2. Choisir un GP</div>
+                        <div style="margin-bottom:12px;">
+                            <select onchange="filterGPsByCategory(this.value)" style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:#fff;font-size:13px;cursor:pointer;">
+                                <option value="all">Toutes les catégories</option>
+                                <option value="europe">🇪🇺 GPs Europe</option>
+                                <option value="america">🌎 GPs Amérique</option>
+                                <option value="africa">🌍 GPs Afrique</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:10px;" id="gpListForAssign">
+                            <div class="assign-gp-card" onclick="selectGP(this,'GP-001','Amadou D.')" style="background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.1);border-radius:14px;padding:14px;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;gap:12px;" data-category="europe">
+                                <div style="width:40px;height:40px;background:linear-gradient(135deg,#4ECDC4,#44A08D);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">✈️</div>
+                                <div style="flex:1;">
+                                    <div style="font-size:13px;font-weight:700;color:#fff;">Amadou D.</div>
+                                    <div style="font-size:11px;color:rgba(255,255,255,0.5);">🇪🇺 Europe · ⭐ 4.9</div>
+                                </div>
+                                <span style="font-size:11px;color:#4CAF50;background:rgba(76,175,80,0.15);padding:3px 8px;border-radius:6px;">Disponible</span>
+                            </div>
+                            <div class="assign-gp-card" onclick="selectGP(this,'GP-002','Ibrahima B.')" style="background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.1);border-radius:14px;padding:14px;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;gap:12px;" data-category="europe">
+                                <div style="width:40px;height:40px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">✈️</div>
+                                <div style="flex:1;">
+                                    <div style="font-size:13px;font-weight:700;color:#fff;">Ibrahima B.</div>
+                                    <div style="font-size:11px;color:rgba(255,255,255,0.5);">🇪🇺 Europe · ⭐ 4.7</div>
+                                </div>
+                                <span style="font-size:11px;color:#4CAF50;background:rgba(76,175,80,0.15);padding:3px 8px;border-radius:6px;">Disponible</span>
+                            </div>
+                            <div class="assign-gp-card" onclick="selectGP(this,'GP-003','Moussa D.')" style="background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.1);border-radius:14px;padding:14px;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;gap:12px;" data-category="america">
+                                <div style="width:40px;height:40px;background:linear-gradient(135deg,#FFA500,#FF8C00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">✈️</div>
+                                <div style="flex:1;">
+                                    <div style="font-size:13px;font-weight:700;color:#fff;">Moussa D.</div>
+                                    <div style="font-size:11px;color:rgba(255,255,255,0.5);">🌎 Amérique · ⭐ 4.8</div>
+                                </div>
+                                <span style="font-size:11px;color:#4CAF50;background:rgba(76,175,80,0.15);padding:3px 8px;border-radius:6px;">Disponible</span>
+                            </div>
+                        </div>
+                        <!-- Confirm Assignment -->
+                        <div id="assignConfirmBox" style="display:none;margin-top:16px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-radius:14px;padding:16px;">
+                            <div style="font-size:13px;color:rgba(255,255,255,0.8);margin-bottom:4px;">Mission sélectionnée : <strong id="selectedMissionLabel" style="color:#FFD700;">—</strong></div>
+                            <div style="font-size:13px;color:rgba(255,255,255,0.8);margin-bottom:14px;">GP sélectionné : <strong id="selectedGPLabel" style="color:#4ECDC4;">—</strong></div>
+                            <button onclick="confirmAssignment()" style="width:100%;padding:12px;background:linear-gradient(135deg,#FFD700,#FFA500);border:none;border-radius:10px;font-weight:700;font-size:14px;color:#1a1a2e;cursor:pointer;">
+                                🎯 Confirmer l'affectation & Envoyer notification
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Missions déclinées — en attente de ré-affectation -->
+                <div style="margin-top:30px;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                        <h3 style="font-size:17px;font-weight:700;color:#fff;">⚠️ Missions déclinées — à ré-assigner</h3>
+                        <span style="background:rgba(255,107,107,0.2);color:#FF6B6B;border:1px solid rgba(255,107,107,0.3);padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;">2 en attente</span>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;" id="declinedMissionsList">
+                        <div style="background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.3);border-radius:14px;padding:16px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                <span style="font-size:14px;font-weight:700;color:#FF6B6B;">MIS-007</span>
+                                <span style="font-size:11px;background:rgba(255,107,107,0.2);color:#FF6B6B;border:1px solid rgba(255,107,107,0.3);padding:3px 8px;border-radius:6px;">⚡ Urgent · Déclinée</span>
+                            </div>
+                            <div style="font-size:14px;color:#fff;margin-bottom:8px;">🇸🇳 Dakar → 🇬🇧 Londres</div>
+                            <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:6px;">📦 1.8 kg · 📅 02 Jul 2026 · 💰 28 000 FCFA</div>
+                            <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:12px;">Catégorie GP : 🇪🇺 Europe</div>
+                            <button onclick="reassignMission('MIS-007','europe')" style="width:100%;padding:10px;background:linear-gradient(135deg,rgba(255,107,107,0.3),rgba(255,69,69,0.2));border:1px solid rgba(255,107,107,0.4);border-radius:10px;color:#FF6B6B;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.3s;">
+                                🔄 Ré-assigner à un GP Europe
+                            </button>
+                        </div>
+                        <div style="background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.3);border-radius:14px;padding:16px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                <span style="font-size:14px;font-weight:700;color:#FF6B6B;">MIS-009</span>
+                                <span style="font-size:11px;background:rgba(255,107,107,0.2);color:#FF6B6B;border:1px solid rgba(255,107,107,0.3);padding:3px 8px;border-radius:6px;">Déclinée</span>
+                            </div>
+                            <div style="font-size:14px;color:#fff;margin-bottom:8px;">🇸🇳 Dakar → 🇺🇸 New York</div>
+                            <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:6px;">📦 3.2 kg · 📅 10 Jul 2026 · 💰 52 000 FCFA</div>
+                            <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:12px;">Catégorie GP : 🌎 Amérique</div>
+                            <button onclick="reassignMission('MIS-009','america')" style="width:100%;padding:10px;background:linear-gradient(135deg,rgba(255,107,107,0.3),rgba(255,69,69,0.2));border:1px solid rgba(255,107,107,0.4);border-radius:10px;color:#FF6B6B;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.3s;">
+                                🔄 Ré-assigner à un GP Amérique
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -825,6 +1042,93 @@
     </div>
 
     <script>
+        let selectedMissionId = null;
+        let selectedGPId = null;
+        let selectedGPName = null;
+
+        function showSection(section) {
+            // Hide all dynamic sections
+            document.getElementById('section-gp-categories').style.display = 'none';
+            document.getElementById('section-assign').style.display = 'none';
+
+            // Update sidebar active state
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+
+            if (section === 'gp-categories') {
+                document.getElementById('section-gp-categories').style.display = 'block';
+            } else if (section === 'assign') {
+                document.getElementById('section-assign').style.display = 'block';
+                selectedMissionId = null; selectedGPId = null;
+                document.getElementById('assignConfirmBox').style.display = 'none';
+                document.querySelectorAll('.assign-mission-card').forEach(c => c.style.borderColor = 'rgba(255,255,255,0.1)');
+                document.querySelectorAll('.assign-gp-card').forEach(c => c.style.borderColor = 'rgba(255,255,255,0.1)');
+            }
+        }
+
+        function selectMission(el, id) {
+            document.querySelectorAll('.assign-mission-card').forEach(c => c.style.borderColor = 'rgba(255,255,255,0.1)');
+            el.style.borderColor = '#FFD700';
+            selectedMissionId = id;
+            document.getElementById('selectedMissionLabel').textContent = id;
+            updateAssignBox();
+        }
+
+        function selectGP(el, id, name) {
+            document.querySelectorAll('.assign-gp-card').forEach(c => c.style.borderColor = 'rgba(255,255,255,0.1)');
+            el.style.borderColor = '#4ECDC4';
+            selectedGPId = id;
+            selectedGPName = name;
+            document.getElementById('selectedGPLabel').textContent = name;
+            updateAssignBox();
+        }
+
+        function updateAssignBox() {
+            const box = document.getElementById('assignConfirmBox');
+            if (selectedMissionId && selectedGPId) {
+                box.style.display = 'block';
+            }
+        }
+
+        function filterGPsByCategory(category) {
+            document.querySelectorAll('.assign-gp-card').forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function confirmAssignment() {
+            if (!selectedMissionId || !selectedGPId) return;
+            const confirmed = confirm(`Confirmer l'affectation ?\n\nMission: ${selectedMissionId}\nGP: ${selectedGPName}\n\nUne notification sera envoyée automatiquement au GP avec tous les détails (route, date, poids, rémunération).`);
+            if (confirmed) {
+                alert(`✅ Mission ${selectedMissionId} affectée à ${selectedGPName} !\n\n🔔 Notification envoyée.\n\nLe GP verra la notification avec les boutons Accepter / Décliner dans son onglet Notifications.`);
+                document.getElementById('section-assign').style.display = 'none';
+                selectedMissionId = null; selectedGPId = null;
+            }
+        }
+
+        function reassignMission(missionId, category) {
+            const categoryLabel = { europe: '🇪🇺 Europe', america: '🌎 Amérique', africa: '🌍 Afrique' }[category] || category;
+            const confirmed = confirm(`Ré-assigner la mission ${missionId} ?\n\nCatégorie : ${categoryLabel}\n\nVous serez redirigé vers le panneau d'affectation pour choisir un autre GP disponible dans cette catégorie.`);
+            if (confirmed) {
+                showSection('assign');
+                // Pre-select the declined mission
+                setTimeout(() => {
+                    const cards = document.querySelectorAll('.assign-mission-card');
+                    cards.forEach(c => {
+                        if (c.getAttribute('onclick') && c.getAttribute('onclick').includes(missionId)) {
+                            c.click();
+                        }
+                    });
+                    // Filter GPs to the right category
+                    const select = document.querySelector('#section-assign select');
+                    if (select) { select.value = category; filterGPsByCategory(category); }
+                }, 100);
+            }
+        }
+
         function navigateTo(page) {
             const pages = {
                 'dashboard': 'admin.html',

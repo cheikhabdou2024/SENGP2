@@ -698,12 +698,12 @@
                     <div class="action-arrow">→</div>
                 </button>
 
-                <!-- Rechercher missions Button (disabled until trip created) -->
-                <button class="action-button action-button-secondary" onclick="searchMissions()" id="searchMissionsBtn">
-                    <div class="action-icon">🔍</div>
+                <!-- Voir missions disponibles -->
+                <button class="action-button action-button-secondary" onclick="viewAvailableMissions()" id="viewMissionsBtn" style="opacity:1;cursor:pointer;">
+                    <div class="action-icon">📋</div>
                     <div class="action-text">
-                        <div class="action-title">Rechercher des missions</div>
-                        <div class="action-subtitle">Créez un trajet d'abord</div>
+                        <div class="action-title">Missions disponibles</div>
+                        <div class="action-subtitle" id="missionsAvailableSubtitle">Consultez les missions par destination</div>
                     </div>
                     <div class="action-arrow">→</div>
                 </button>
@@ -717,8 +717,9 @@
                         <h3>Comment ça marche ?</h3>
                         <ol>
                             <li>Créez un trajet en ajoutant votre billet d'avion et les détails de votre voyage</li>
-                            <li>Notre système vous proposera automatiquement des missions correspondant à votre trajet</li>
-                            <li>Acceptez les missions qui vous conviennent et gagnez de l'argent en voyageant</li>
+                            <li>Consultez les missions disponibles selon votre destination et vos dates</li>
+                            <li>Notre équipe admin vous assigne une mission adaptée à votre trajet</li>
+                            <li>Vous recevez une notification dans l'onglet <strong style="color:#FFD700">Notifications</strong> avec tous les détails de la mission</li>
                         </ol>
                     </div>
                 </div>
@@ -744,9 +745,10 @@
                 <div class="nav-badge">2</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('claims')" tabindex="0" role="button" aria-label="Réclamations">
-                <div class="nav-icon">📝</div>
-                <div class="nav-label">Réclamations</div>
+            <div class="nav-item" onclick="navigateTo('notifications')" tabindex="0" role="button" aria-label="Notifications" id="notifNavItem">
+                <div class="nav-icon">🔔</div>
+                <div class="nav-label">Notifs</div>
+                <div class="nav-badge new" id="notifNavBadge" style="display:none;">0</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil">
@@ -804,20 +806,35 @@
 
         async function loadDashboardData() {
             try {
-                // Show loading state
-                console.log('Loading dashboard data...');
-
-                // Load all data in parallel
                 await Promise.all([
                     loadStats(),
                     loadNewMissions(),
-                    loadMyMissions()
+                    loadMyMissions(),
+                    loadUnreadNotifCount()
                 ]);
-
-                console.log('Dashboard data loaded successfully');
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
             }
+        }
+
+        async function loadUnreadNotifCount() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/notifications/my-notifications`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                if (!response.ok) return;
+                const result = await response.json();
+                const unread = (result.data || []).filter(n => !n.is_read).length;
+                const badge = document.getElementById('notifNavBadge');
+                if (badge) {
+                    if (unread > 0) {
+                        badge.textContent = unread;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            } catch (e) {}
         }
 
         async function loadStats() {
@@ -1018,8 +1035,7 @@
                 <div class="mission-footer">
                     <span class="mission-date">${formatDate(mission.departure_date)}</span>
                     <div class="mission-client">
-                        <div class="client-avatar">${getInitials(mission.expediteur_name)}</div>
-                        <span>${mission.expediteur_name || 'Client'}</span>
+                        <span style="font-size:12px;color:rgba(255,255,255,0.5);">⭐ ${mission.client_rating || '--'}</span>
                     </div>
                 </div>
             `;
@@ -1082,11 +1098,8 @@
             window.location.href = 'creetrajet.html';
         }
 
-        function searchMissions() {
-            // Check if user has created a trip first
-            // For now, show alert - will be replaced with actual check
-            alert('Veuillez créer un trajet d\'abord pour voir les missions disponibles.');
-            // window.location.href = 'missions.html';
+        function viewAvailableMissions() {
+            window.location.href = 'missions.html';
         }
 
         function viewAllMissions() {
@@ -1116,7 +1129,7 @@
                 'home': 'dashgp.html',
                 'missions': 'missions.html',
                 'trips': 'trajets.html',
-                'claims': 'reclamationgp.html',
+                'notifications': 'notifications.html',
                 'profile': 'profilegp.html'
             };
 

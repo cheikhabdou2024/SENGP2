@@ -148,6 +148,124 @@
             border-radius: 4px;
         }
 
+        /* Mission Assignment Card */
+        .mission-assign-card {
+            border-color: rgba(255, 215, 0, 0.5) !important;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 165, 0, 0.07) 100%) !important;
+        }
+
+        .mission-assign-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        .mission-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mission-info-item {
+            background: rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
+        .mission-info-label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 3px;
+        }
+
+        .mission-info-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .mission-route-display {
+            background: rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .mission-action-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn-accept-mission {
+            flex: 1;
+            padding: 12px;
+            background: linear-gradient(135deg, #4CAF50 0%, #43A047 100%);
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(76,175,80,0.4);
+        }
+
+        .btn-accept-mission:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(76,175,80,0.5); }
+
+        .btn-decline-mission {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255,107,107,0.1);
+            border: 2px solid rgba(255,107,107,0.4);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #FF6B6B;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-decline-mission:hover { background: rgba(255,107,107,0.2); }
+
+        .mission-accepted-state {
+            background: rgba(76,175,80,0.15);
+            border: 1px solid rgba(76,175,80,0.4);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        .mission-declined-state {
+            background: rgba(255,107,107,0.1);
+            border: 1px solid rgba(255,107,107,0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #FF6B6B;
+            font-weight: 600;
+        }
+
         /* Tabs */
         .tabs {
             display: flex;
@@ -455,41 +573,41 @@
             </div>
         </div>
 
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <div class="nav-item" onclick="navigateTo('home')">
-                <div class="nav-icon">🏠</div>
-                <div class="nav-label">Accueil</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('reclamation')">
-                <div class="nav-icon">⚠️</div>
-                <div class="nav-label">Réclamation</div>
-                <div class="nav-badge">1</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('tracking')">
-                <div class="nav-icon">📍</div>
-                <div class="nav-label">Suivi</div>
-                <div class="nav-badge">3</div>
-            </div>
-
-            <div class="nav-item active" onclick="navigateTo('notifications')">
-                <div class="nav-icon">🔔</div>
-                <div class="nav-label">Notifications</div>
-                <div class="nav-badge">5</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('profile')">
-                <div class="nav-icon">👤</div>
-                <div class="nav-label">Profil</div>
-            </div>
-        </div>
+        <!-- Bottom Navigation — rendered by JS based on user type -->
+        <div class="bottom-nav" id="bottomNav"></div>
     </div>
 
     <script>
+        let userType = 'expediteur';
+
+        function detectUserAndBuildNav() {
+            try {
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                userType = userData.user_type || 'expediteur';
+            } catch(e) {}
+
+            const navEl = document.getElementById('bottomNav');
+            if (userType === 'gp') {
+                navEl.innerHTML = `
+                    <div class="nav-item" onclick="navigateTo('home')"><div class="nav-icon">🏠</div><div class="nav-label">Accueil</div></div>
+                    <div class="nav-item" onclick="navigateTo('missions')"><div class="nav-icon">🔍</div><div class="nav-label">Missions</div></div>
+                    <div class="nav-item" onclick="navigateTo('trips')"><div class="nav-icon">✈️</div><div class="nav-label">Trajets</div></div>
+                    <div class="nav-item active" onclick="navigateTo('notifications')"><div class="nav-icon">🔔</div><div class="nav-label">Notifs</div></div>
+                    <div class="nav-item" onclick="navigateTo('profile')"><div class="nav-icon">👤</div><div class="nav-label">Profil</div></div>
+                `;
+            } else {
+                navEl.innerHTML = `
+                    <div class="nav-item" onclick="navigateTo('home')"><div class="nav-icon">🏠</div><div class="nav-label">Accueil</div></div>
+                    <div class="nav-item" onclick="navigateTo('reclamation')"><div class="nav-icon">⚠️</div><div class="nav-label">Réclamation</div><div class="nav-badge">1</div></div>
+                    <div class="nav-item" onclick="navigateTo('tracking')"><div class="nav-icon">📍</div><div class="nav-label">Suivi</div><div class="nav-badge">3</div></div>
+                    <div class="nav-item active" onclick="navigateTo('notifications')"><div class="nav-icon">🔔</div><div class="nav-label">Notifs</div><div class="nav-badge">5</div></div>
+                    <div class="nav-item" onclick="navigateTo('profile')"><div class="nav-icon">👤</div><div class="nav-label">Profil</div></div>
+                `;
+            }
+        }
+
         function goBack() {
-            window.location.href = 'dashexpediteur.html';
+            window.location.href = userType === 'gp' ? 'dashgp.html' : 'dashexpediteur.html';
         }
 
         function switchTab(tab) {
@@ -571,27 +689,139 @@
             }
         }
 
+        // Track mission response state locally (keyed by notif id)
+        const missionStates = {};
+
         function createNotificationCard(notif) {
             const icons = {
-                delivery: '📦',
-                tracking: '📍',
-                payment: '💰',
-                support: '💬',
-                promo: '🎁',
-                feedback: '⭐'
+                delivery: '📦', tracking: '📍', payment: '💰', support: '💬',
+                promo: '🎁', feedback: '⭐', mission_accepted: '✅',
+                mission_pickup: '📦', mission_transit: '✈️', mission_delivered: '🎉',
+                payment_received: '💰', account_verified: '✓', system_alert: '🔔'
             };
+
+            const isMissionAssigned = notif.type === 'mission_assigned' || notif.type === 'mission_matched';
+
+            if (isMissionAssigned) {
+                // Extract mission data from notif.data or use defaults for demo
+                const d = notif.data || {};
+                const missionId   = d.mission_id   || notif.notification_id || 'MIS-XXX';
+                const route       = d.route        || (notif.title && notif.title.replace('Mission assignée : ', '')) || '🇸🇳 Dakar → 🇫🇷 Paris';
+                const dateDepart  = d.date_depart  || '05 Jul 2026 · 14h30';
+                const poids       = d.poids        || '2.5 kg';
+                const prix        = d.prix         || '35 000 FCFA';
+                const typeColis   = d.type_colis   || 'Colis personnel';
+                const state       = missionStates[notif.notification_id];
+
+                let actionHTML = '';
+                if (!state) {
+                    actionHTML = `
+                        <div class="mission-action-btns">
+                            <button class="btn-accept-mission" onclick="handleMissionResponse('${notif.notification_id}','${missionId}','accept');event.stopPropagation();">✅ Accepter</button>
+                            <button class="btn-decline-mission" onclick="handleMissionResponse('${notif.notification_id}','${missionId}','decline');event.stopPropagation();">❌ Décliner</button>
+                        </div>`;
+                } else if (state === 'accepted') {
+                    actionHTML = `<div class="mission-accepted-state">✅ Mission acceptée — Notre équipe vous contactera sous 24h pour la remise du colis.</div>`;
+                } else if (state === 'declined') {
+                    actionHTML = `<div class="mission-declined-state">❌ Mission déclinée — Elle sera ré-assignée à un autre GP de votre catégorie.</div>`;
+                }
+
+                return `
+                    <div class="notif-card mission-assign-card ${!notif.is_read ? 'unread' : ''}" id="notif-card-${notif.notification_id}">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                            <div style="width:44px;height:44px;background:linear-gradient(135deg,rgba(255,215,0,0.3),rgba(255,165,0,0.2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🎯</div>
+                            <div>
+                                <div class="mission-assign-title">Mission assignée — ${missionId}</div>
+                                <div style="font-size:11px;color:rgba(255,255,255,0.5);">${formatTime(notif.created_at)} · <span style="color:#FFD700;">PAR L'ADMIN</span></div>
+                            </div>
+                        </div>
+
+                        <div class="mission-route-display">
+                            ${route}
+                        </div>
+
+                        <div class="mission-info-grid">
+                            <div class="mission-info-item">
+                                <div class="mission-info-label">📅 Date départ</div>
+                                <div class="mission-info-value">${dateDepart}</div>
+                            </div>
+                            <div class="mission-info-item">
+                                <div class="mission-info-label">⚖️ Poids colis</div>
+                                <div class="mission-info-value">${poids}</div>
+                            </div>
+                            <div class="mission-info-item">
+                                <div class="mission-info-label">📦 Type</div>
+                                <div class="mission-info-value">${typeColis}</div>
+                            </div>
+                            <div class="mission-info-item">
+                                <div class="mission-info-label">💰 Rémunération</div>
+                                <div class="mission-info-value" style="color:#FFD700;">${prix}</div>
+                            </div>
+                        </div>
+
+                        ${actionHTML}
+                    </div>
+                `;
+            }
 
             return `
                 <div class="notif-card ${!notif.is_read ? 'unread' : ''}" onclick="viewNotification('${notif.notification_id}')">
-                    <div class="notif-icon">${icons[notif.type] || '🔔'}</div>
-                    <div class="notif-content">
-                        <div class="notif-title">${notif.title}</div>
-                        <div class="notif-message">${notif.message}</div>
-                        <div class="notif-time">${formatTime(notif.created_at)}</div>
+                    <div class="notif-header">
+                        <div class="notif-icon info">${icons[notif.type] || '🔔'}</div>
+                        <div class="notif-content">
+                            <div class="notif-title">${notif.title}</div>
+                            <div class="notif-message">${notif.message}</div>
+                            <div class="notif-footer">
+                                <span class="notif-time">${formatTime(notif.created_at)}</span>
+                                <span class="notif-category">${notif.type || 'INFO'}</span>
+                            </div>
+                        </div>
                     </div>
-                    ${!notif.is_read ? '<div class="unread-dot"></div>' : ''}
                 </div>
             `;
+        }
+
+        async function handleMissionResponse(notifId, missionId, action) {
+            const token = getAuthToken();
+
+            if (action === 'decline') {
+                const ok = confirm(`Décliner la mission ${missionId} ?\n\nElle sera ré-assignée à un autre GP de votre catégorie.`);
+                if (!ok) return;
+            }
+
+            try {
+                if (action === 'accept') {
+                    await fetch(`${API_BASE_URL}/missions/${missionId}/accept`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+                    });
+                } else {
+                    await fetch(`${API_BASE_URL}/missions/${missionId}/status`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'pending', reason: 'declined_by_gp' })
+                    });
+                }
+            } catch (e) {
+                // Continue even if API fails (demo mode)
+            }
+
+            // Update local state and re-render the card
+            missionStates[notifId] = action === 'accept' ? 'accepted' : 'declined';
+            const cardEl = document.getElementById(`notif-card-${notifId}`);
+            if (cardEl) {
+                const actionBtns = cardEl.querySelector('.mission-action-btns');
+                if (actionBtns) {
+                    if (action === 'accept') {
+                        actionBtns.outerHTML = `<div class="mission-accepted-state">✅ Mission acceptée — Notre équipe vous contactera sous 24h pour la remise du colis.</div>`;
+                    } else {
+                        actionBtns.outerHTML = `<div class="mission-declined-state">❌ Mission déclinée — Elle sera ré-assignée à un autre GP de votre catégorie.</div>`;
+                    }
+                }
+            }
+
+            // Mark notification as read
+            await viewNotification(notifId);
         }
 
         function formatTime(dateString) {
@@ -655,21 +885,27 @@
 
         // Load notifications on page load
         window.addEventListener('load', () => {
+            detectUserAndBuildNav();
             loadUserNotifications();
         });
 
         function navigateTo(section) {
-            const pages = {
+            const gpPages = {
+                'home': 'dashgp.html',
+                'missions': 'missions.html',
+                'trips': 'trajets.html',
+                'notifications': 'notifications.html',
+                'profile': 'profilegp.html'
+            };
+            const expediteurPages = {
                 'home': 'dashexpediteur.html',
                 'reclamation': 'reclamation.html',
                 'tracking': 'suivi.html',
                 'notifications': 'notifications.html',
                 'profile': 'profile.html'
             };
-
-            if (pages[section]) {
-                window.location.href = pages[section];
-            }
+            const pages = userType === 'gp' ? gpPages : expediteurPages;
+            if (pages[section]) window.location.href = pages[section];
         }
     </script>
 </body>
