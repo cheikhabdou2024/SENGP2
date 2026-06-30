@@ -533,7 +533,7 @@
             <div class="header-top">
                 <button class="back-btn" onclick="goBack()">←</button>
                 <div class="header-title">
-                    <h1>Recherche de missions</h1>
+                    <h1>Missions disponibles</h1>
                     <p id="missionsCount">Chargement…</p>
                 </div>
             </div>
@@ -550,6 +550,11 @@
 
         <!-- Content -->
         <div class="content">
+            <!-- Info: missions matching the GP's trip; assignment is by the admin -->
+            <div style="background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.3);border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;">
+                <span style="font-size:18px;line-height:1.3;">📌</span>
+                <span style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.5;">Voici les missions correspondant à votre trajet (destination &amp; dates). L'affectation est faite par l'<strong style="color:#4ECDC4">administration</strong> : surveillez vos <strong style="color:#FFD700">Notifications</strong> pour les missions qui vous sont assignées.</span>
+            </div>
             <!-- Filter Tags -->
             <div class="filter-tags">
                 <div class="filter-tag active" onclick="filterMissions('all', this)">Toutes</div>
@@ -612,7 +617,7 @@
         const authToken = localStorage.getItem('authToken');
 
         let allMissions = [];     // missions réelles chargées depuis l'API
-        let myTripId = null;      // 1er trajet du GP (pour l'acceptation)
+        let myTrips = [];         // trajets actifs du GP (filtrage destination/dates)
         let activeFilter = 'all';
         let searchTerm = '';
         let priceSortAsc = false;
@@ -681,6 +686,32 @@
             window.location.href = 'dashgp.html';
         }
 
+        function setEmptyText(html) {
+            const empty = document.getElementById('missionsEmpty');
+            const t = empty && empty.querySelector('.state-text');
+            if (t) t.innerHTML = html;
+        }
+
+        const _norm = s => String(s == null ? '' : s).trim().toLowerCase();
+        function _samePlace(a, b) { return !!a && !!b && _norm(a) === _norm(b); }
+        // Mission date within ±N days of the trip's departure (lenient if a date is missing).
+        function _dateWithin(missionDate, tripDate, days) {
+            if (!missionDate || !tripDate) return true;
+            const md = new Date(missionDate), td = new Date(tripDate);
+            if (isNaN(md) || isNaN(td)) return true;
+            return Math.abs(md - td) / 86400000 <= (days || 7);
+        }
+        // A mission is visible to the GP only if one of their trips covers the same
+        // route (arrival city OR country, and departure country) within the date window.
+        function missionMatchesTrips(m) {
+            return myTrips.some(t => {
+                const arr = _samePlace(m.arrival_city, t.arrival_city) || _samePlace(m.arrival_country, t.arrival_country);
+                const dep = _samePlace(m.departure_city, t.departure_city) || _samePlace(m.departure_country, t.departure_country);
+                if (!arr || !dep) return false;
+                return _dateWithin(m.departure_date || m.desired_departure_date, t.departure_date, 7);
+            });
+        }
+
         async function loadMissions() {
             if (!authToken) {
                 alert('Vous devez vous connecter pour accéder à cette page');
@@ -688,27 +719,36 @@
                 return;
             }
             try {
-                // Trajet du GP (utilisé à l'acceptation), best-effort.
+                // Le GP voit les missions disponibles UNIQUEMENT en fonction de ses
+                // trajets (destination & dates). Il ne peut pas les accepter ici :
+                // l'affectation est faite par l'admin (puis confirmée via Notifications).
+                myTrips = [];
                 try {
-                    const tripsRes = await fetch(`${API_BASE_URL}/trips/my-trips?limit=1`, {
+                    const tripsRes = await fetch(`${API_BASE_URL}/trips/my-trips?limit=50`, {
                         headers: { 'Authorization': `Bearer ${authToken}` }
                     });
-                    if (tripsRes.ok) {
-                        const tripsJson = await tripsRes.json();
-                        const trips = tripsJson.data || [];
-                        if (trips.length) myTripId = trips[0].id;
-                    }
+                    if (tripsRes.ok) myTrips = ((await tripsRes.json()).data || [])
+                        .filter(t => t.status !== 'cancelled' && t.status !== 'completed');
                 } catch (e) { /* ignore */ }
 
-                // Missions en attente (disponibles à l'acceptation).
-                const res = await fetch(`${API_BASE_URL}/missions?status=pending&limit=50`, {
+                document.getElementById('missionsLoading').style.display = 'none';
+
+                // Sans trajet, aucune mission n'est visible — il faut d'abord en créer un.
+                if (!myTrips.length) {
+                    allMissions = [];
+                    setEmptyText('Créez d\'abord un trajet pour voir les missions correspondant à votre destination et à vos dates.');
+                    renderMissions();
+                    return;
+                }
+
+                // Missions en attente, puis filtrées sur les trajets du GP.
+                const res = await fetch(`${API_BASE_URL}/missions?status=pending&limit=100`, {
                     headers: { 'Authorization': `Bearer ${authToken}` }
                 });
                 if (!res.ok) throw new Error('Échec du chargement');
                 const json = await res.json();
-                allMissions = json.data || [];
-
-                document.getElementById('missionsLoading').style.display = 'none';
+                allMissions = (json.data || []).filter(missionMatchesTrips);
+                setEmptyText('Aucune mission ne correspond à votre trajet pour le moment.<br>Revenez plus tard ou ajoutez un trajet.');
                 renderMissions();
             } catch (error) {
                 console.error('Erreur chargement missions:', error);
@@ -806,15 +846,10 @@
                         <div class="detail-item"><span>🎯</span><span>Arrivée: ${formatDate(m.desired_arrival_date)}</span></div>
                     </div>
                     <div class="mission-footer">
-                        <div class="mission-client">
-                            <div class="client-avatar">${esc(initials(m.expediteur_name))}</div>
-                            <span class="client-name">${esc(shortName(m.expediteur_name))}</span>
-                        </div>
-                        <span class="mission-date">${timeAgo(m.created_at)}</span>
+                        <span class="mission-date">Publiée ${timeAgo(m.created_at)}</span>
                     </div>
                     <div class="action-buttons">
-                        <button class="btn btn-details" onclick="viewDetails('${m.id}')">Détails</button>
-                        <button class="btn btn-accept" onclick="acceptMission('${m.id}')">Accepter</button>
+                        <button class="btn btn-details" onclick="viewDetails('${m.id}')" style="flex:1;">Voir les détails</button>
                     </div>
                 </div>`;
             }).join('');
@@ -842,44 +877,16 @@
             const m = allMissions.find(x => String(x.id) === String(missionId));
             if (!m) return;
             const desc = m.package_description ? `\nColis: ${m.package_description}` : '';
+            // Aucune information sur l'expéditeur n'est exposée au GP : l'affectation
+            // passe par l'admin, et le contact se fait via l'équipe SEN GP.
             alert(
                 `Mission ${m.mission_code || ''}\n\n` +
                 `${m.departure_city || m.departure_country} → ${m.arrival_city || m.arrival_country}\n` +
                 `Prix: ${formatPrice(m.price)} (${m.is_price_negotiable ? 'négociable' : 'fixe'})\n` +
                 `Poids: ${parseFloat(m.weight) || 0} kg${desc}\n` +
-                `Départ: ${formatDate(m.departure_date)} — Arrivée: ${formatDate(m.desired_arrival_date)}\n` +
-                `Expéditeur: ${m.expediteur_name || '—'}`
+                `Départ: ${formatDate(m.departure_date)} — Arrivée: ${formatDate(m.desired_arrival_date)}\n\n` +
+                `ℹ️ Cette mission peut vous être assignée par l'administration. Vous serez notifié(e) dans l'onglet Notifications.`
             );
-        }
-
-        async function acceptMission(missionId) {
-            const m = allMissions.find(x => String(x.id) === String(missionId));
-            const label = m ? `${m.departure_city || ''} → ${m.arrival_city || ''}` : missionId;
-            if (!confirm(`Accepter la mission ${label} ?\n\nVous vous engagez à transporter ce colis selon les conditions établies.`)) {
-                return;
-            }
-            try {
-                const res = await fetch(`${API_BASE_URL}/missions/${missionId}/accept`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(myTripId ? { trip_id: myTripId } : {})
-                });
-                const json = await res.json();
-                if (res.ok && json.success) {
-                    alert('Mission acceptée ✓\n\nL\'expéditeur sera notifié.');
-                    // Retirer la mission acceptée de la liste et rafraîchir.
-                    allMissions = allMissions.filter(x => String(x.id) !== String(missionId));
-                    renderMissions();
-                } else {
-                    alert('Impossible d\'accepter la mission:\n\n' + (json.error || json.message || 'Erreur inconnue'));
-                }
-            } catch (error) {
-                console.error('Erreur acceptation:', error);
-                alert('Erreur de connexion au serveur. Veuillez réessayer.');
-            }
         }
 
         function navigateTo(section) {

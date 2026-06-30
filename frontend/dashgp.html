@@ -1650,10 +1650,7 @@
                 </div>
                 <div class="mission-footer">
                     <span class="mission-date">${formatDate(mission.departure_date)}</span>
-                    <div class="mission-client">
-                        <div class="client-avatar">${getInitials(mission.expediteur_name)}</div>
-                        <span>${mission.expediteur_name || 'Client'}</span>
-                    </div>
+                    <span style="font-size:12px;color:rgba(255,255,255,0.45);">Assignée par l'admin</span>
                 </div>
             `;
 
@@ -1744,7 +1741,9 @@
         }
 
         function viewMissionDetails(missionId) {
-            alert(`Détails de la mission\n\nID: ${missionId}\n\nVous pouvez accepter cette mission depuis la page Missions.\n\nFonctionnalités à venir:\n- Voir tous les détails\n- Accepter/Refuser la mission\n- Communiquer avec l'expéditeur`);
+            // Le GP n'accepte pas les missions lui-même : l'admin les assigne, puis
+            // le GP confirme depuis l'onglet Notifications. Pas de contact expéditeur.
+            window.location.href = 'detailmissiongp.html?id=' + encodeURIComponent(missionId);
         }
 
         function navigateTo(section) {

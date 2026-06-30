@@ -258,14 +258,13 @@ export class MissionService {
         throw new Error('Mission not found');
       }
 
-      // Two paths into acceptance:
-      //  - the GP claims a still-unassigned ('pending') mission, or
-      //  - the GP confirms a mission the admin assigned to them ('matched').
+      // GPs do not claim missions directly — the admin assigns them. Acceptance is
+      // only allowed to CONFIRM a mission the admin assigned to THIS GP ('matched'
+      // with this gp_id). Any other case is rejected.
       const current = checkResult.rows[0];
-      const isPendingClaim = current.status === 'pending';
       const isAssignedConfirm = current.status === 'matched' && current.gp_id === gpId;
-      if (!isPendingClaim && !isAssignedConfirm) {
-        throw new Error('Mission is no longer available');
+      if (!isAssignedConfirm) {
+        throw new Error('Cette mission ne vous a pas été assignée');
       }
 
       // Update mission

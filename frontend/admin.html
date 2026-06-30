@@ -471,9 +471,22 @@
             if (!ok) { alert('Erreur chargement des GPs: '+(json.error||json.message)); return; }
             const gps = (json.data || []).filter(g => g.status !== 'suspended');
             if (!gps.length) { alert('Aucun GP disponible à affecter.'); return; }
-            const opts = gps.map(g =>
-                `<option value="${g.id}">${esc(g.first_name+' '+g.last_name)} · ${esc(g.city||g.country||'—')}`
-                + `${g.average_rating ? ' · ⭐'+g.average_rating : ''}</option>`).join('');
+            // GPs are organised by category (destination region) in the picker.
+            const region = (country) => {
+                const c = String(country||'').toLowerCase();
+                if (/france|espagne|spain|itali|allemagne|german|belg|portugal|royaume|angleterre|england|uk|pays-bas|suisse|europe/.test(c)) return '🇪🇺 Europe';
+                if (/usa|état|etats|united states|canada|amériq|ameriq|brés|bres|mexi/.test(c)) return '🌎 Amérique';
+                if (/sénégal|senegal|mali|côte|cote|ivoire|maroc|moroc|tunis|algér|alger|guin|afriq|gambie|mauritanie|bénin|benin|togo|burkina|niger|cameroun/.test(c)) return '🌍 Afrique';
+                return '🌐 Autres';
+            };
+            const groups = {};
+            gps.forEach(g => { const r = region(g.country); (groups[r] = groups[r] || []).push(g); });
+            const opt = g => `<option value="${g.id}">${esc(g.first_name+' '+g.last_name)} · ${esc(g.city||g.country||'—')}`
+                + `${g.average_rating ? ' · ⭐'+g.average_rating : ''}</option>`;
+            const opts = ['🇪🇺 Europe','🌎 Amérique','🌍 Afrique','🌐 Autres']
+                .filter(r => groups[r])
+                .map(r => `<optgroup label="${r}">${groups[r].map(opt).join('')}</optgroup>`)
+                .join('');
             const old = document.getElementById('assignModal'); if (old) old.remove();
             const ov = document.createElement('div');
             ov.id = 'assignModal';
