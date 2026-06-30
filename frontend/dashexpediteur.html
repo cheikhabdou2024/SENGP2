@@ -1159,7 +1159,7 @@
                 </div>
 
                 <button class="btn-whatsapp" id="qrWhatsAppBtn" onclick="shareViaWhatsApp()" style="display:none;">
-                    📤 Partager via WhatsApp
+                    📤 Envoyer le QR au destinataire (WhatsApp)
                 </button>
 
                 <button class="btn-close-qr" onclick="closeQRModal()">Fermer</button>
@@ -1680,18 +1680,49 @@
             if (e.target === document.getElementById('qrModal')) closeQRModal();
         }
 
-        function shareViaWhatsApp() {
+        async function shareViaWhatsApp() {
             const trackingNum = currentQRTrackingNumber || currentQRMissionId;
-            const message = encodeURIComponent(
-                `🎁 *SEN GP — Votre colis est en route !*\n\n` +
-                `Bonjour, votre colis est pris en charge par un GP SEN GP.\n\n` +
-                `📦 Numéro de suivi : *${trackingNum}*\n\n` +
-                `📲 À la livraison, montrez ce numéro de suivi au GP. ` +
-                `Il scannera votre QR code pour confirmer la remise.\n\n` +
-                `Suivez votre colis sur : sengp.com\n\n` +
-                `_SEN GP — La livraison collaborative_`
-            );
-            window.open(`https://wa.me/?text=${message}`, '_blank');
+            const caption =
+                `🎁 SEN GP — Votre colis est en route !\n\n` +
+                `📦 Numéro de suivi : ${trackingNum}\n\n` +
+                `À la livraison, montrez CE QR code au livreur (GP) SEN GP. ` +
+                `Il le scannera pour confirmer la remise de votre colis.\n\n` +
+                `SEN GP — La livraison collaborative`;
+
+            // Build a PNG File from the QR data URL so it can be attached as an image.
+            const img = document.getElementById('qrCodeImage');
+            const dataUrl = img && img.src;
+            let file = null;
+            if (dataUrl && dataUrl.indexOf('data:') === 0) {
+                try {
+                    const blob = await (await fetch(dataUrl)).blob();
+                    file = new File([blob], `sengp-qr-${trackingNum}.png`, { type: 'image/png' });
+                } catch (e) { /* fall back below */ }
+            }
+
+            // 1) Native share sheet WITH the QR image → it lands as a real, scannable
+            //    image in WhatsApp (Web Share API Level 2).
+            if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({ files: [file], text: caption, title: 'QR de livraison SEN GP' });
+                    return;
+                } catch (e) {
+                    if (e && e.name === 'AbortError') return; // user dismissed the share sheet
+                }
+            }
+
+            // 2) Fallback (no file-share support): save the QR image locally, then open
+            //    WhatsApp with the caption so the expéditeur can attach the saved image.
+            if (dataUrl) {
+                try {
+                    const a = document.createElement('a');
+                    a.href = dataUrl;
+                    a.download = `sengp-qr-${trackingNum}.png`;
+                    document.body.appendChild(a); a.click(); a.remove();
+                } catch (e) { /* ignore */ }
+            }
+            const msg = encodeURIComponent(caption + `\n\n(QR code enregistré dans vos images — joignez-le à ce message.)`);
+            window.open(`https://wa.me/?text=${msg}`, '_blank');
         }
         // ── Fin QR Code ──────────────────────────────────────────────
 
