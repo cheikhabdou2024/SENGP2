@@ -568,11 +568,17 @@ export class MissionService {
 
     const qrCodeUrl = await QRCode.toDataURL(qrData);
 
-    // Update mission with QR code
-    await pool.query(
-      'UPDATE missions SET qr_code_url = $1, qr_code_data = $2 WHERE id = $3',
-      [qrCodeUrl, qrData, missionId]
-    );
+    // Cache the QR on the mission. Best-effort: a write failure (e.g. a legacy
+    // VARCHAR(500) qr_code_url column, before the TEXT patch) must NOT block
+    // returning the generated QR to the expéditeur.
+    try {
+      await pool.query(
+        'UPDATE missions SET qr_code_url = $1, qr_code_data = $2 WHERE id = $3',
+        [qrCodeUrl, qrData, missionId]
+      );
+    } catch (e: any) {
+      logger.warn(`Could not persist QR for mission ${missionId}: ${e.message}`);
+    }
 
     return qrCodeUrl;
   }
