@@ -732,50 +732,56 @@ export class MissionService {
     const missionId = parsedData.id;
     if (!missionId) throw new Error('Données QR code invalides');
 
-    const client = await pool.connect();
+    // The scan must correspond to one of THIS GP's packages, not yet delivered.
+    const mr = await pool.query(
+      'SELECT id, gp_id, status, mission_code, expediteur_id, recipient_name FROM missions WHERE id = $1',
+      [missionId]
+    );
+    if (mr.rows.length === 0) throw new Error('Mission introuvable');
+    const mission = mr.rows[0];
+    if (mission.gp_id !== gpId) throw new Error('Ce colis ne fait pas partie de vos missions');
+    if (mission.status === 'delivered') throw new Error('Ce colis a déjà été livré');
+    if (mission.status === 'cancelled') throw new Error('Cette mission a été annulée');
+
+    // Canonical delivered transition: credits the GP wallet from the upfront
+    // payment, increments stats, sets the completion date and notifies the GP
+    // of their earnings. Trusted internal call (the QR match is the proof).
+    await this.updateStatus(missionId, MissionStatus.DELIVERED, gpId, { internal: true });
+
+    // Proof-of-delivery tracking entry (recipient's QR scanned by the GP).
+    await pool.query(
+      `INSERT INTO mission_tracking (mission_id, status, description, created_by)
+       VALUES ($1, 'delivered', 'Colis livré — QR du destinataire scanné par le GP', $2)`,
+      [missionId, gpId]
+    );
+
+    // Notify the expéditeur AND the admin(s) that the package reached the recipient.
     try {
-      await client.query('BEGIN');
-
-      const missionResult = await client.query(
-        'SELECT * FROM missions WHERE id = $1',
-        [missionId]
+      await NotificationService.create({
+        user_id: mission.expediteur_id,
+        notification_type: NotificationType.MISSION_DELIVERED,
+        title: 'Colis livré ✅',
+        message: `Votre colis ${mission.mission_code} a été remis${mission.recipient_name ? ' à ' + mission.recipient_name : ' au destinataire'} (QR confirmé).`,
+        action_url: 'suivi.html',
+        metadata: { mission_id: missionId, mission_code: mission.mission_code },
+      });
+      const admins = await pool.query(
+        `SELECT id FROM users WHERE user_type = 'admin' AND deleted_at IS NULL`
       );
-
-      if (missionResult.rows.length === 0) throw new Error('Mission introuvable');
-      const mission = missionResult.rows[0];
-
-      if (mission.gp_id !== gpId) throw new Error('Ce colis ne fait pas partie de votre mission');
-      if (mission.status === 'delivered') throw new Error('Ce colis a déjà été livré');
-
-      const updateResult = await client.query(
-        `UPDATE missions
-         SET status = 'delivered', completed_at = CURRENT_TIMESTAMP, actual_delivery_date = CURRENT_TIMESTAMP
-         WHERE id = $1 RETURNING *`,
-        [missionId]
-      );
-
-      await client.query(
-        `INSERT INTO mission_tracking (mission_id, status, description, created_by)
-         VALUES ($1, 'delivered', 'Colis livré via scan QR code destinataire', $2)`,
-        [missionId, gpId]
-      );
-
-      await client.query(
-        `UPDATE gp_profiles
-         SET total_missions_completed = total_missions_completed + 1
-         WHERE user_id = $1`,
-        [gpId]
-      );
-
-      await client.query('COMMIT');
-      logger.info(`Mission ${missionId} delivered via QR scan by GP ${gpId}`);
-      return updateResult.rows[0];
-    } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-    } finally {
-      client.release();
+      for (const a of admins.rows) {
+        await NotificationService.create({
+          user_id: a.id,
+          notification_type: NotificationType.MISSION_DELIVERED,
+          title: 'Livraison confirmée',
+          message: `Le colis ${mission.mission_code} a été livré au destinataire (QR scanné par le GP).`,
+          metadata: { mission_id: missionId, mission_code: mission.mission_code },
+        });
+      }
+    } catch (e: any) {
+      logger.warn('Delivery notification (expéditeur/admin) failed:', e.message);
     }
+
+    return (await this.getById(missionId)) as Mission;
   }
 
   /**

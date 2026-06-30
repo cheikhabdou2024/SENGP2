@@ -50,6 +50,7 @@ jobs:
           s = open(p, encoding='utf-8').read()
           # Permissions inserted right after the opening <manifest ...> tag.
           perms = [
+              'android.permission.CAMERA',
               'android.permission.RECORD_AUDIO',
               'android.permission.ACCESS_FINE_LOCATION',
               'android.permission.ACCESS_COARSE_LOCATION',

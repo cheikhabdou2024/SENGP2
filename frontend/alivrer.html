@@ -31,6 +31,16 @@
         .note { font-size:12px; color:rgba(255,255,255,.55); margin-top:10px; }
         .loading,.empty { text-align:center; padding:50px 20px; color:rgba(255,255,255,.55); }
         .empty .ic{font-size:44px;margin-bottom:10px;}
+        .scan-cta { width:100%; padding:15px; border:none; border-radius:14px; font-size:15px; font-weight:800; cursor:pointer;
+            background:linear-gradient(135deg,#4ECDC4,#44A08D); color:#06231f; margin-bottom:16px; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 6px 18px rgba(78,205,196,.35); }
+        .scan-overlay { display:none; position:fixed; inset:0; background:rgba(8,6,20,.96); z-index:1000; flex-direction:column; align-items:center; justify-content:center; padding:20px; gap:18px; }
+        .scan-box { position:relative; width:min(86vw,320px); aspect-ratio:1; border-radius:18px; overflow:hidden; background:#000; }
+        .scan-box video { width:100%; height:100%; object-fit:cover; }
+        .scan-frame { position:absolute; inset:14%; border:3px solid #4ECDC4; border-radius:14px; box-shadow:0 0 0 100vmax rgba(0,0,0,.4); pointer-events:none; }
+        .scan-status { font-size:14px; text-align:center; color:#fff; max-width:320px; line-height:1.5; min-height:20px; }
+        .scan-actions { display:flex; gap:10px; }
+        .scan-btn { padding:12px 22px; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; background:linear-gradient(135deg,#FFD700,#FFA500); color:#1a1a2e; }
+        .scan-btn.ghost { background:rgba(255,255,255,.12); color:#fff; }
     </style>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
@@ -42,7 +52,26 @@
             <button class="back-btn" onclick="location.href='dashgp.html'">←</button>
             <h1>📬 Colis à livrer</h1>
         </div>
-        <div class="content"><div id="list"><div class="loading">Chargement…</div></div></div>
+        <div class="content">
+            <button class="scan-cta" onclick="openScanner()">
+                <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg>
+                Scanner le QR du destinataire
+            </button>
+            <div id="list"><div class="loading">Chargement…</div></div>
+        </div>
+    </div>
+
+    <!-- QR scanner overlay -->
+    <div id="scanOverlay" class="scan-overlay">
+        <div class="scan-box">
+            <video id="scanVideo" playsinline muted></video>
+            <div class="scan-frame"></div>
+        </div>
+        <div id="scanStatus" class="scan-status">Initialisation de la caméra…</div>
+        <div class="scan-actions">
+            <button id="scanRetry" class="scan-btn" style="display:none;" onclick="retryScan()">Rescanner</button>
+            <button class="scan-btn ghost" onclick="closeScanner()">Fermer</button>
+        </div>
     </div>
 
     <script>
@@ -88,7 +117,7 @@
                     +(phone?'<a class="btn btn-call" href="tel:'+esc(phone)+'">📞 Appeler</a>':'')
                     +(nxt?'<button class="btn btn-next" onclick="advance(\''+m.id+'\',\''+nxt[0]+'\')">'+nxt[1]+'</button>':'')
                     +'</div>'
-                    +(st==='out_for_delivery'?'<div class="note">En attente de la confirmation du destinataire (scan du QR à la réception).</div>':'')
+                    +(st==='out_for_delivery'?'<div class="note">À la remise, scannez le QR code du destinataire (bouton ci-dessus) pour confirmer la livraison.</div>':'')
                     +'</div>';
             }).join('');
         }
@@ -101,6 +130,107 @@
                 if(res.ok&&j.success){ load(); } else alert('Erreur: '+(j.error||j.message||''));
             }catch(e){ alert('Erreur de connexion.'); }
         }
+
+        // ───────── QR scanner (GP scans the recipient's QR to confirm delivery) ─────────
+        let scanStream = null, scanRAF = null, scanning = false, barcodeDetector = null;
+
+        function openScanner(){
+            document.getElementById('scanRetry').style.display = 'none';
+            document.getElementById('scanOverlay').style.display = 'flex';
+            startScan();
+        }
+        function closeScanner(){
+            scanning = false;
+            if (scanRAF) cancelAnimationFrame(scanRAF);
+            if (scanStream){ scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
+            document.getElementById('scanOverlay').style.display = 'none';
+        }
+        function setScanStatus(t){ document.getElementById('scanStatus').textContent = t; }
+
+        // Native BarcodeDetector when available; otherwise load jsQR from CDN.
+        function ensureJsQR(){
+            if (window.jsQR) return Promise.resolve(true);
+            return new Promise(resolve => {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+                s.onload = () => resolve(true);
+                s.onerror = () => resolve(false);
+                document.head.appendChild(s);
+            });
+        }
+
+        async function startScan(){
+            document.getElementById('scanRetry').style.display = 'none';
+            setScanStatus('Initialisation de la caméra…');
+            const video = document.getElementById('scanVideo');
+            try {
+                scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                video.srcObject = scanStream;
+                await video.play();
+            } catch (e){
+                setScanStatus('Caméra indisponible. Autorisez l’accès à la caméra dans les réglages.');
+                return;
+            }
+            setScanStatus('Visez le QR code du destinataire…');
+            scanning = true;
+
+            if ('BarcodeDetector' in window){
+                try { barcodeDetector = new window.BarcodeDetector({ formats: ['qr_code'] }); } catch (e){ barcodeDetector = null; }
+            }
+            if (!barcodeDetector){ await ensureJsQR(); }
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+            async function tick(){
+                if (!scanning) return;
+                if (video.readyState === video.HAVE_ENOUGH_DATA){
+                    let code = null;
+                    if (barcodeDetector){
+                        try { const found = await barcodeDetector.detect(video); if (found && found.length) code = found[0].rawValue; } catch (e){}
+                    } else if (window.jsQR){
+                        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const r = window.jsQR(img.data, img.width, img.height);
+                        if (r) code = r.data;
+                    }
+                    if (code){ scanning = false; onScanned(code); return; }
+                }
+                scanRAF = requestAnimationFrame(tick);
+            }
+            tick();
+        }
+
+        async function onScanned(qrText){
+            if (scanStream){ scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
+            setScanStatus('Vérification du colis…');
+            try {
+                const res = await fetch(`${API}/missions/verify-qr`, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ qr_data: qrText })
+                });
+                const j = await res.json().catch(() => ({}));
+                if (res.ok && j.success){
+                    const m = (j.data && j.data.mission) || {};
+                    closeScanner();
+                    await window.sengpAlert(
+                        '✅ Colis ' + (m.mission_code || '') + ' livré' + (m.recipient_name ? ' à ' + m.recipient_name : '') +
+                        ' !\n\nL’expéditeur et l’administration ont été notifiés.',
+                        'Livraison confirmée'
+                    );
+                    load();
+                } else {
+                    setScanStatus('❌ ' + (j.error || j.message || 'QR non reconnu.'));
+                    document.getElementById('scanRetry').style.display = 'inline-block';
+                }
+            } catch (e){
+                setScanStatus('❌ Erreur réseau. Réessayez.');
+                document.getElementById('scanRetry').style.display = 'inline-block';
+            }
+        }
+        function retryScan(){ startScan(); }
 
         window.onPullRefresh = async () => { await load(); return true; };
         load();
