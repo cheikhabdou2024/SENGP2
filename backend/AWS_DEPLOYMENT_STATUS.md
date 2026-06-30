@@ -125,7 +125,7 @@ RDS_HOSTNAME = <rds-endpoint>
 RDS_PORT = 5432
 RDS_DB_NAME = ebdb
 RDS_USERNAME = sengpadmin
-RDS_PASSWORD = SengP2024SecureDB!
+RDS_PASSWORD = <REDACTED — was leaked in git history; ROTATE>
 ```
 
 ### 6. Test Locally with Docker
@@ -159,12 +159,12 @@ curl http://localhost:5000
 NODE_ENV=production
 PORT=5000
 API_VERSION=v1
-JWT_SECRET=sengp-production-jwt-secret-2024-secure-key
-JWT_REFRESH_SECRET=sengp-production-refresh-secret-2024-secure-key
+JWT_SECRET=<REDACTED — was leaked in git history; ROTATE>
+JWT_REFRESH_SECRET=<REDACTED — was leaked in git history; ROTATE>
 JWT_EXPIRES_IN=24h
 JWT_REFRESH_EXPIRES_IN=7d
-AWS_ACCESS_KEY_ID=AKIA2LIP2D4UMLIMBD6G
-AWS_SECRET_ACCESS_KEY=PphIWu9OpwljYGKilb3XVvHdqurpOtFsmTkp6qEa
+AWS_ACCESS_KEY_ID=<REDACTED — was leaked in git history; DELETE this key in IAM>
+AWS_SECRET_ACCESS_KEY=<REDACTED — was leaked in git history; DELETE this key in IAM>
 AWS_REGION=us-east-1
 AWS_S3_BUCKET=sengp-storage
 BCRYPT_ROUNDS=12
@@ -231,7 +231,7 @@ Current resources cost approximately:
 1. Rotate your AWS access keys:
    - Go to AWS IAM Console
    - Navigate to Security Credentials
-   - Delete the old access key: `AKIA2LIP2D4UMLIMBD6G`
+   - Delete the old access key (the one previously committed here — `AKIA2…` redacted)
    - Create a new access key
    - Update your local AWS configuration: `aws configure`
 
