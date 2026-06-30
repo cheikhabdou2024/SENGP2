@@ -549,15 +549,18 @@
             const date = md.departure_date
                 ? new Date(md.departure_date).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' })
                 : '—';
+            const time = (md.departure_has_time && md.departure_date)
+                ? new Date(md.departure_date).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' })
+                : '—';
             const weight = (md.package_weight != null) ? md.package_weight + ' kg' : '—';
             const price = (md.price != null) ? formatFCFA(md.price) : '—';
             const state = missionStates[n.notification_id];
 
             let action;
             if (state === 'accepted') {
-                action = '<div class="ma-state ok">✅ Mission acceptée — préparez la prise en charge du colis.</div>';
+                action = '<div class="ma-state ok">✅ Mission acceptée — l\'équipe SEN GP vous contactera pour confirmer et organiser la remise du colis.</div>';
             } else if (state === 'declined') {
-                action = '<div class="ma-state no">❌ Mission déclinée — elle sera ré-assignée à un autre GP.</div>';
+                action = '<div class="ma-state no">❌ Mission déclinée — elle sera ré-assignée à un autre GP de la même catégorie.</div>';
             } else if (!missionId) {
                 action = '<div class="ma-state no">⚠️ Détails de mission indisponibles.</div>';
             } else {
@@ -576,9 +579,9 @@
                 + '</div>'
                 + '<div class="ma-route">' + esc(route) + '</div>'
                 + '<div class="ma-grid">'
-                + '<div class="ma-cell"><div class="ma-label">📅 Départ</div><div class="ma-value">' + esc(date) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">📅 Date</div><div class="ma-value">' + esc(date) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">🕐 Heure</div><div class="ma-value">' + esc(time) + '</div></div>'
                 + '<div class="ma-cell"><div class="ma-label">⚖️ Poids</div><div class="ma-value">' + esc(weight) + '</div></div>'
-                + '<div class="ma-cell"><div class="ma-label">📦 Code</div><div class="ma-value">' + (code ? esc(code) : '—') + '</div></div>'
                 + '<div class="ma-cell"><div class="ma-label">💰 Rémunération</div><div class="ma-value" style="color:#FFD700;">' + esc(price) + '</div></div>'
                 + '</div>'
                 + action
@@ -620,8 +623,8 @@
             updateCounts();
             render();
             window.sengpAlert(action === 'accept'
-                ? '✅ Mission acceptée ! Préparez la prise en charge du colis.'
-                : 'Mission déclinée. Elle sera ré-assignée à un autre GP.');
+                ? '✅ Mission acceptée ! L\'équipe SEN GP vous contactera pour confirmer et organiser la remise du colis.'
+                : 'Mission déclinée. Elle sera ré-assignée à un autre GP de la même catégorie.');
         }
 
         function formatTime(dateString) {

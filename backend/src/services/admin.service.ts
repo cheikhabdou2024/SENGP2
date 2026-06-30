@@ -179,8 +179,8 @@ export class AdminService {
       `UPDATE missions
        SET gp_id = $1, status = 'matched', updated_at = CURRENT_TIMESTAMP
        WHERE id = $2 AND status = 'pending'
-       RETURNING id, mission_code, departure_city, arrival_city, package_weight,
-                 offered_price, final_price, desired_departure_date`,
+       RETURNING id, mission_code, departure_city, arrival_city, arrival_country,
+                 package_weight, offered_price, final_price, desired_departure_date`,
       [gpId, missionId]
     );
     if (upd.rows.length === 0) {
@@ -193,6 +193,24 @@ export class AdminService {
     const m = upd.rows[0];
     const route = `${m.departure_city} → ${m.arrival_city}`;
     const price = m.final_price ?? m.offered_price;
+
+    // The mission only stores a DATE (no time). The meaningful date+time for the
+    // GP is their matching trip's departure (trips.departure_date is a TIMESTAMP).
+    let departureDate: any = m.desired_departure_date;
+    let departureHasTime = false;
+    try {
+      const trip = await pool.query(
+        `SELECT departure_date FROM trips
+         WHERE gp_id = $1 AND status NOT IN ('cancelled','completed')
+           AND (LOWER(arrival_city) = LOWER($2) OR LOWER(arrival_country) = LOWER($3))
+         ORDER BY departure_date ASC LIMIT 1`,
+        [gpId, m.arrival_city, m.arrival_country || '']
+      );
+      if (trip.rows[0]?.departure_date) {
+        departureDate = trip.rows[0].departure_date; // full timestamp (with time)
+        departureHasTime = true;
+      }
+    } catch (e) { /* fall back to the mission date */ }
 
     // Notify the GP with the mission details so the notifications page can
     // render the accept/decline card from real data.
@@ -209,7 +227,8 @@ export class AdminService {
           route,
           departure_city: m.departure_city,
           arrival_city: m.arrival_city,
-          departure_date: m.desired_departure_date,
+          departure_date: departureDate,
+          departure_has_time: departureHasTime,
           package_weight: m.package_weight,
           price,
         },
