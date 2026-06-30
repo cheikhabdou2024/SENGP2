@@ -82,6 +82,15 @@ export class AdminController {
       ResponseUtil.badRequest(res, e.message || 'Delete failed');
     }
   }
+  static async assignMission(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const m = await AdminService.assignMission(req.params.id, req.body.gp_id);
+      ResponseUtil.success(res, m, 'Mission assigned and GP notified');
+    } catch (e: any) {
+      if (e.message === 'Mission not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Assignment failed');
+    }
+  }
 
   // Trips
   static async listTrips(req: AuthRequest, res: Response): Promise<void> {

@@ -171,6 +171,28 @@ export class MissionController {
   }
 
   /**
+   * A GP declines a mission the admin assigned to them.
+   * POST /api/v1/missions/:id/decline  (GP only)
+   */
+  static async decline(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        ResponseUtil.unauthorized(res);
+        return;
+      }
+      if (req.user.user_type !== UserType.GP) {
+        ResponseUtil.forbidden(res, 'Only GPs can decline missions');
+        return;
+      }
+      const mission = await MissionService.declineAssignment(req.params.id, req.user.id);
+      ResponseUtil.success(res, mission, 'Mission declined');
+    } catch (error: any) {
+      logger.error('Decline mission error:', error);
+      ResponseUtil.badRequest(res, error.message || 'Decline failed');
+    }
+  }
+
+  /**
    * Generate (or fetch) the proof-of-delivery QR for a mission.
    * POST /api/v1/missions/:id/delivery-qr  (expediteur owner, assigned GP, or admin)
    */

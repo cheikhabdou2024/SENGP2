@@ -364,15 +364,21 @@
                 },
                 missions: {
                     head: ['Code','Trajet','Prix','Statut','Expéditeur','GP','Actions'],
-                    row: m => [
-                        esc(m.mission_code), esc((m.departure_city||'?')+' → '+(m.arrival_city||'?')),
-                        fcfa(m.price), `<span class="badge ${badgeFor(m.status)}">${esc(m.status)}</span>`,
-                        esc(m.expediteur_name||'—'), esc(m.gp_name||'—'),
-                        actions([
-                            ['act-edit','Statut',`editMission('${m.id}','${esc(m.status)}')`],
-                            ['act-del','Suppr.',`delMission('${m.id}','${esc(m.mission_code)}')`]
-                        ])
-                    ]
+                    row: m => {
+                        const acts = [];
+                        // Only unassigned, still-pending missions can be assigned to a GP.
+                        if (m.status === 'pending' && !m.gp_name) {
+                            acts.push(['act-ok','Affecter',`assignMission('${m.id}','${esc(m.mission_code)}')`]);
+                        }
+                        acts.push(['act-edit','Statut',`editMission('${m.id}','${esc(m.status)}')`]);
+                        acts.push(['act-del','Suppr.',`delMission('${m.id}','${esc(m.mission_code)}')`]);
+                        return [
+                            esc(m.mission_code), esc((m.departure_city||'?')+' → '+(m.arrival_city||'?')),
+                            fcfa(m.price), `<span class="badge ${badgeFor(m.status)}">${esc(m.status)}</span>`,
+                            esc(m.expediteur_name||'—'), esc(m.gp_name||'—'),
+                            actions(acts)
+                        ];
+                    }
                 },
                 trips: {
                     head: ['Code','Trajet','GP','Départ','Statut','Colis','Actions'],
@@ -455,6 +461,44 @@
             if (!confirm('Supprimer définitivement la mission '+code+' ?')) return;
             const { ok, json } = await api('/admin/missions/'+id, { method:'DELETE' });
             alert(ok ? 'Mission supprimée' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+        }
+
+        // Assign a pending mission to a GP. The GP is notified and confirms via
+        // their notifications page (accept → mission becomes 'accepted'; decline →
+        // released back to 'pending'). Backed by POST /admin/missions/:id/assign.
+        async function assignMission(id, code){
+            let { ok, json } = await api('/admin/users?user_type=gp&limit=200');
+            if (!ok) { alert('Erreur chargement des GPs: '+(json.error||json.message)); return; }
+            const gps = (json.data || []).filter(g => g.status !== 'suspended');
+            if (!gps.length) { alert('Aucun GP disponible à affecter.'); return; }
+            const opts = gps.map(g =>
+                `<option value="${g.id}">${esc(g.first_name+' '+g.last_name)} · ${esc(g.city||g.country||'—')}`
+                + `${g.average_rating ? ' · ⭐'+g.average_rating : ''}</option>`).join('');
+            const old = document.getElementById('assignModal'); if (old) old.remove();
+            const ov = document.createElement('div');
+            ov.id = 'assignModal';
+            ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            ov.innerHTML =
+                '<div style="background:#1b1838;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:24px;width:90%;max-width:420px;">'
+              + '<div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:6px;">🎯 Affecter la mission ' + esc(code) + '</div>'
+              + '<div style="font-size:13px;color:rgba(255,255,255,.55);margin-bottom:16px;">Sélectionnez un GP. Il recevra une notification avec les détails et pourra l\'accepter ou la décliner.</div>'
+              + '<select id="assignGpSelect" style="width:100%;padding:11px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:14px;margin-bottom:18px;">' + opts + '</select>'
+              + '<div style="display:flex;gap:10px;">'
+              + '<button onclick="document.getElementById(\'assignModal\').remove()" style="flex:1;padding:11px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:rgba(255,255,255,.8);font-weight:600;cursor:pointer;">Annuler</button>'
+              + '<button id="assignConfirmBtn" onclick="confirmAssign(\'' + id + '\')" style="flex:1;padding:11px;background:linear-gradient(135deg,#FFD700,#FFA500);border:none;border-radius:10px;color:#1a1a2e;font-weight:700;cursor:pointer;">Affecter &amp; notifier</button>'
+              + '</div></div>';
+            document.body.appendChild(ov);
+        }
+        async function confirmAssign(missionId){
+            const sel = document.getElementById('assignGpSelect');
+            const gpId = sel && sel.value;
+            if (!gpId) return;
+            const btn = document.getElementById('assignConfirmBtn');
+            if (btn){ btn.disabled = true; btn.textContent = 'Affectation…'; }
+            const { ok, json } = await api('/admin/missions/'+missionId+'/assign', { method:'POST', body: JSON.stringify({ gp_id: gpId }) });
+            const modal = document.getElementById('assignModal'); if (modal) modal.remove();
+            alert(ok ? '✅ Mission affectée — le GP a été notifié.' : 'Erreur: '+(json.error||json.message));
+            if (ok) loadList();
         }
         async function delTrip(id, code){
             if (!confirm('Supprimer le trajet '+code+' ?')) return;

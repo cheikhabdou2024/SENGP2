@@ -250,7 +250,7 @@ export class MissionService {
 
       // Check if mission is still available
       const checkResult = await client.query(
-        'SELECT status FROM missions WHERE id = $1',
+        'SELECT status, gp_id FROM missions WHERE id = $1',
         [missionId]
       );
 
@@ -258,7 +258,13 @@ export class MissionService {
         throw new Error('Mission not found');
       }
 
-      if (checkResult.rows[0].status !== 'pending') {
+      // Two paths into acceptance:
+      //  - the GP claims a still-unassigned ('pending') mission, or
+      //  - the GP confirms a mission the admin assigned to them ('matched').
+      const current = checkResult.rows[0];
+      const isPendingClaim = current.status === 'pending';
+      const isAssignedConfirm = current.status === 'matched' && current.gp_id === gpId;
+      if (!isPendingClaim && !isAssignedConfirm) {
         throw new Error('Mission is no longer available');
       }
 
@@ -294,6 +300,26 @@ export class MissionService {
     } finally {
       client.release();
     }
+  }
+
+  /**
+   * A GP declines a mission the admin assigned to them. The mission is released
+   * back to the pool ('pending', gp_id cleared) so the admin can re-assign it.
+   * Only the currently-assigned GP, on a still-'matched' mission, may decline.
+   */
+  static async declineAssignment(missionId: string, gpId: string): Promise<Mission> {
+    const result = await pool.query(
+      `UPDATE missions
+       SET status = 'pending', gp_id = NULL, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $1 AND gp_id = $2 AND status = 'matched'
+       RETURNING *`,
+      [missionId, gpId]
+    );
+    if (result.rows.length === 0) {
+      throw new Error('Mission not found or not awaiting your response');
+    }
+    logger.info(`Mission ${missionId} declined by GP ${gpId} — released to pool`);
+    return result.rows[0];
   }
 
   /**

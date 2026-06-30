@@ -10,6 +10,7 @@ export const createNotificationValidator = [
   body('notification_type')
     .isIn([
       'mission_matched',
+      'mission_assigned',
       'mission_accepted',
       'mission_pickup',
       'mission_transit',

@@ -223,6 +223,7 @@ export interface Claim {
 // Notification Types
 export enum NotificationType {
   MISSION_MATCHED = 'mission_matched',
+  MISSION_ASSIGNED = 'mission_assigned',
   MISSION_ACCEPTED = 'mission_accepted',
   MISSION_PICKUP = 'mission_pickup',
   MISSION_TRANSIT = 'mission_transit',

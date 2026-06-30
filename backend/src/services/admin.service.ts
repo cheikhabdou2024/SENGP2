@@ -2,6 +2,9 @@ import pool from '../config/database';
 import bcrypt from 'bcryptjs';
 import { Helpers } from '../utils/helpers';
 import { resolveEvidenceUrl } from '../utils/s3';
+import { NotificationService } from './notification.service';
+import { NotificationType } from '../types';
+import logger from '../utils/logger';
 
 /**
  * Admin service: read-only global overview + full CRUD over the main entities.
@@ -152,6 +155,70 @@ export class AdminService {
     const result = await pool.query(`UPDATE missions SET ${sets.join(', ')} WHERE id = $${i} RETURNING *`, args);
     if (result.rows.length === 0) throw new Error('Mission not found');
     return result.rows[0];
+  }
+
+  /**
+   * Assign a still-unassigned ('pending') mission to a GP and notify them.
+   * The GP then confirms via POST /missions/:id/accept or releases it via
+   * /missions/:id/decline. The `status = 'pending'` guard makes this safe against
+   * double-assignment. The GP notification is best-effort (assignment is the
+   * source of truth and must not roll back if the notification insert fails).
+   */
+  static async assignMission(missionId: string, gpId: string) {
+    if (!gpId) throw new Error('gp_id is required');
+
+    // The GP must exist and actually be a GP.
+    const gp = await pool.query(
+      `SELECT id FROM users WHERE id = $1 AND user_type = 'gp' AND deleted_at IS NULL`,
+      [gpId]
+    );
+    if (gp.rows.length === 0) throw new Error('GP not found');
+
+    // Atomically claim the mission only if it is still pending.
+    const upd = await pool.query(
+      `UPDATE missions
+       SET gp_id = $1, status = 'matched', updated_at = CURRENT_TIMESTAMP
+       WHERE id = $2 AND status = 'pending'
+       RETURNING id, mission_code, departure_city, arrival_city, package_weight,
+                 offered_price, final_price, desired_departure_date`,
+      [gpId, missionId]
+    );
+    if (upd.rows.length === 0) {
+      const exists = await pool.query('SELECT 1 FROM missions WHERE id = $1', [missionId]);
+      throw new Error(
+        exists.rows.length === 0 ? 'Mission not found' : 'Mission is not available for assignment'
+      );
+    }
+
+    const m = upd.rows[0];
+    const route = `${m.departure_city} → ${m.arrival_city}`;
+    const price = m.final_price ?? m.offered_price;
+
+    // Notify the GP with the mission details so the notifications page can
+    // render the accept/decline card from real data.
+    try {
+      await NotificationService.create({
+        user_id: gpId,
+        notification_type: NotificationType.MISSION_ASSIGNED,
+        title: `Mission assignée : ${route}`,
+        message: `Une nouvelle mission (${m.mission_code}) vous a été assignée. Acceptez ou déclinez depuis vos notifications.`,
+        action_url: 'notifications.html',
+        metadata: {
+          mission_id: m.id,
+          mission_code: m.mission_code,
+          route,
+          departure_city: m.departure_city,
+          arrival_city: m.arrival_city,
+          departure_date: m.desired_departure_date,
+          package_weight: m.package_weight,
+          price,
+        },
+      });
+    } catch (e) {
+      logger.warn(`Mission ${missionId} assigned to GP ${gpId} but notification failed`);
+    }
+
+    return m;
   }
 
   /** Hard-delete a mission and all its dependents (admin cleanup), in a transaction. */

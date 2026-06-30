@@ -43,6 +43,13 @@ router.post(
   MissionController.accept
 );
 
+// Decline an admin-assigned mission (GP only) — releases it back to the pool
+router.post(
+  '/:id/decline',
+  AuthMiddleware.requireRole(UserType.GP),
+  MissionController.decline
+);
+
 // Record live GPS position (assigned GP only)
 router.post(
   '/:id/location',

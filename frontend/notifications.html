@@ -378,6 +378,26 @@
             border-radius:8px; width:28px; height:28px; font-size:13px; cursor:pointer; }
         .notif-empty { text-align:center; padding:50px 20px; color:rgba(255,255,255,.5); }
         .notif-empty .ic { font-size:46px; margin-bottom:10px; }
+        /* Mission-assignment card (admin → GP) */
+        .mission-assign-card { display:block; padding:16px; border:1px solid rgba(255,215,0,.45);
+            background:linear-gradient(135deg,rgba(255,215,0,.10),rgba(255,165,0,.06)); border-radius:16px; margin-bottom:12px; }
+        .ma-head { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+        .ma-badge { width:42px; height:42px; border-radius:12px; flex-shrink:0; font-size:21px;
+            background:linear-gradient(135deg,rgba(255,215,0,.3),rgba(255,165,0,.2)); display:flex; align-items:center; justify-content:center; }
+        .ma-title { font-size:14px; font-weight:800; color:#FFD700; }
+        .ma-sub { font-size:11px; color:rgba(255,255,255,.5); }
+        .ma-route { background:rgba(255,255,255,.06); border-radius:10px; padding:10px 12px; margin-bottom:8px; font-size:14px; font-weight:700; color:#fff; }
+        .ma-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+        .ma-cell { background:rgba(255,255,255,.06); border-radius:10px; padding:9px 12px; }
+        .ma-label { font-size:10px; color:rgba(255,255,255,.5); text-transform:uppercase; letter-spacing:.3px; margin-bottom:3px; }
+        .ma-value { font-size:13px; font-weight:700; color:#fff; }
+        .ma-actions { display:flex; gap:10px; }
+        .ma-btn { flex:1; padding:12px; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; border:none; transition:all .2s ease; }
+        .ma-accept { background:linear-gradient(135deg,#4CAF50,#43A047); color:#fff; box-shadow:0 4px 12px rgba(76,175,80,.4); }
+        .ma-decline { background:rgba(255,107,107,.1); border:2px solid rgba(255,107,107,.4); color:#FF6B6B; }
+        .ma-state { border-radius:12px; padding:12px 14px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; }
+        .ma-state.ok { background:rgba(76,175,80,.15); border:1px solid rgba(76,175,80,.4); color:#4CAF50; }
+        .ma-state.no { background:rgba(255,107,107,.1); border:1px solid rgba(255,107,107,.3); color:#FF6B6B; }
             /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
@@ -414,8 +434,8 @@
             </div>
         </div>
 
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
+        <!-- Bottom Navigation (expediteur default; replaced for GP in JS) -->
+        <div class="bottom-nav" id="bottomNav">
             <div class="nav-item" onclick="navigateTo('home')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div><div class="nav-label">Accueil</div></div>
             <div class="nav-item" onclick="navigateTo('reclamation')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10.3 4 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div><div class="nav-label">Réclamation</div></div>
             <div class="nav-item" onclick="navigateTo('tracking')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="nav-label">Suivi</div></div>
@@ -425,16 +445,34 @@
     </div>
 
     <script>
-        function goBack() {
-            window.location.href = 'dashexpediteur.html';
-        }
-
         const API_BASE_URL = window.API_BASE_URL;
         function getAuthToken() { return localStorage.getItem('authToken'); }
 
+        // Detect whether the signed-in user is a GP or an expéditeur so the nav,
+        // back button and routing match the rest of their app.
+        let userType = 'expediteur';
+        try { userType = (JSON.parse(localStorage.getItem('userData') || '{}').user_type) || 'expediteur'; } catch (e) {}
+
+        function goBack() {
+            window.location.href = userType === 'gp' ? 'dashgp.html' : 'dashexpediteur.html';
+        }
+
+        function buildNav() {
+            if (userType !== 'gp') return; // expéditeur nav is the static default in the HTML
+            document.getElementById('bottomNav').innerHTML =
+                '<div class="nav-item" onclick="navigateTo(\'home\')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div><div class="nav-label">Accueil</div></div>'
+              + '<div class="nav-item" onclick="navigateTo(\'missions\')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div><div class="nav-label">Missions</div></div>'
+              + '<div class="nav-item" onclick="navigateTo(\'trips\')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M2 16 22 6 12 22l-2-7-8-2z"/></svg></div><div class="nav-label">Trajets</div></div>'
+              + '<div class="nav-item active" onclick="navigateTo(\'notifications\')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><div class="nav-label">Notifs</div><div class="nav-badge hidden" id="notifNavBadge">0</div></div>'
+              + '<div class="nav-item" onclick="navigateTo(\'profile\')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div><div class="nav-label">Profil</div></div>';
+        }
+
         let allNotifs = [];
         let currentTab = 'all';
-        const ICONS = { delivery:'📦', tracking:'📍', payment:'💰', support:'💬', promo:'🎁', feedback:'⭐' };
+        // Local response state for assigned missions, keyed by notification id.
+        const missionStates = {};
+        const ICONS = { delivery:'📦', tracking:'📍', payment:'💰', support:'💬', promo:'🎁', feedback:'⭐',
+            mission_assigned:'🎯', mission_matched:'🎯', mission_accepted:'✅', mission_delivered:'🎉' };
         const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
         async function loadUserNotifications() {
@@ -482,8 +520,11 @@
         }
 
         function card(n) {
+            if (n.notification_type === 'mission_assigned' || n.notification_type === 'mission_matched') {
+                return missionCard(n);
+            }
             return '<div class="notif-card ' + (!n.is_read ? 'unread' : '') + '" onclick="viewNotif(\'' + n.notification_id + '\')">'
-                + '<div class="notif-icon">' + (ICONS[n.type] || '🔔') + '</div>'
+                + '<div class="notif-icon">' + (ICONS[n.type] || ICONS[n.notification_type] || '🔔') + '</div>'
                 + '<div class="notif-content">'
                 + '<div class="notif-title">' + esc(n.title) + '</div>'
                 + '<div class="notif-message">' + esc(n.message) + '</div>'
@@ -492,6 +533,95 @@
                 + (!n.is_read ? '<div class="unread-dot"></div>' : '')
                 + '<button class="notif-del" onclick="delNotif(event,\'' + n.notification_id + '\')">🗑️</button>'
                 + '</div>';
+        }
+
+        function formatFCFA(v) {
+            const num = Number(v);
+            return isFinite(num) ? num.toLocaleString('fr-FR') + ' FCFA' : String(v);
+        }
+
+        // Rich card for a mission the admin assigned to this GP, with Accept/Decline.
+        function missionCard(n) {
+            const md = n.metadata || {};
+            const missionId = md.mission_id || '';
+            const code = md.mission_code || '';
+            const route = md.route || (md.departure_city && md.arrival_city ? md.departure_city + ' → ' + md.arrival_city : n.title);
+            const date = md.departure_date
+                ? new Date(md.departure_date).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' })
+                : '—';
+            const weight = (md.package_weight != null) ? md.package_weight + ' kg' : '—';
+            const price = (md.price != null) ? formatFCFA(md.price) : '—';
+            const state = missionStates[n.notification_id];
+
+            let action;
+            if (state === 'accepted') {
+                action = '<div class="ma-state ok">✅ Mission acceptée — préparez la prise en charge du colis.</div>';
+            } else if (state === 'declined') {
+                action = '<div class="ma-state no">❌ Mission déclinée — elle sera ré-assignée à un autre GP.</div>';
+            } else if (!missionId) {
+                action = '<div class="ma-state no">⚠️ Détails de mission indisponibles.</div>';
+            } else {
+                action = '<div class="ma-actions">'
+                    + '<button class="ma-btn ma-accept" onclick="handleMissionResponse(\'' + n.notification_id + '\',\'' + missionId + '\',\'accept\')">✅ Accepter</button>'
+                    + '<button class="ma-btn ma-decline" onclick="handleMissionResponse(\'' + n.notification_id + '\',\'' + missionId + '\',\'decline\')">❌ Décliner</button>'
+                    + '</div>';
+            }
+
+            return '<div class="notif-card mission-assign-card ' + (!n.is_read ? 'unread' : '') + '" id="notif-card-' + n.notification_id + '">'
+                + '<div class="ma-head">'
+                + '<div class="ma-badge">🎯</div>'
+                + '<div style="flex:1;"><div class="ma-title">Mission assignée' + (code ? ' — ' + esc(code) : '') + '</div>'
+                + '<div class="ma-sub">' + formatTime(n.created_at) + ' · <span style="color:#FFD700;">PAR L\'ADMIN</span></div></div>'
+                + '<button class="notif-del" style="position:static;" onclick="delNotif(event,\'' + n.notification_id + '\')">🗑️</button>'
+                + '</div>'
+                + '<div class="ma-route">' + esc(route) + '</div>'
+                + '<div class="ma-grid">'
+                + '<div class="ma-cell"><div class="ma-label">📅 Départ</div><div class="ma-value">' + esc(date) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">⚖️ Poids</div><div class="ma-value">' + esc(weight) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">📦 Code</div><div class="ma-value">' + (code ? esc(code) : '—') + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">💰 Rémunération</div><div class="ma-value" style="color:#FFD700;">' + esc(price) + '</div></div>'
+                + '</div>'
+                + action
+                + '</div>';
+        }
+
+        async function handleMissionResponse(notifId, missionId, action) {
+            const token = getAuthToken();
+            if (action === 'decline') {
+                const ok = await window.sengpConfirm(
+                    'Décliner cette mission ? Elle sera ré-assignée à un autre GP de votre catégorie.',
+                    { okLabel: 'Décliner', cancelLabel: 'Annuler' }
+                );
+                if (!ok) return;
+            }
+            try {
+                const url = `${API_BASE_URL}/missions/${missionId}/${action === 'accept' ? 'accept' : 'decline'}`;
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: '{}'
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.message || 'Action impossible');
+                }
+            } catch (e) {
+                window.sengpAlert(e.message || 'Action impossible. Réessayez.');
+                return;
+            }
+            missionStates[notifId] = action === 'accept' ? 'accepted' : 'declined';
+            try {
+                await fetch(`${API_BASE_URL}/notifications/${notifId}/read`, {
+                    method: 'PUT', headers: { 'Authorization': `Bearer ${token}` }
+                });
+            } catch (e) {}
+            const n = allNotifs.find(x => String(x.notification_id) === String(notifId));
+            if (n) n.is_read = true;
+            updateCounts();
+            render();
+            window.sengpAlert(action === 'accept'
+                ? '✅ Mission acceptée ! Préparez la prise en charge du colis.'
+                : 'Mission déclinée. Elle sera ré-assignée à un autre GP.');
         }
 
         function formatTime(dateString) {
@@ -549,12 +679,14 @@
         }
 
         function navigateTo(section) {
-            const pages = { home:'dashexpediteur.html', reclamation:'reclamation.html', tracking:'suivi.html', notifications:'notifications.html', profile:'profile.html' };
+            const gp = { home:'dashgp.html', missions:'missions.html', trips:'trajets.html', notifications:'notifications.html', profile:'profilegp.html' };
+            const exp = { home:'dashexpediteur.html', reclamation:'reclamation.html', tracking:'suivi.html', notifications:'notifications.html', profile:'profile.html' };
+            const pages = userType === 'gp' ? gp : exp;
             if (pages[section]) window.location.href = pages[section];
         }
 
         window.onPullRefresh = async () => { await loadUserNotifications(); return true; };
-        window.addEventListener('load', loadUserNotifications);
+        window.addEventListener('load', () => { buildNav(); loadUserNotifications(); });
         setInterval(() => { if (!document.hidden) loadUserNotifications(); }, 60000);
     </script>
     <script src="ptr.js"></script>

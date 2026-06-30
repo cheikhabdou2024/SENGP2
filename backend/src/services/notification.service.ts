@@ -9,6 +9,7 @@ import logger from '../utils/logger';
  */
 const TYPE_ICON_MAP: Record<string, string> = {
   mission_matched: 'tracking',
+  mission_assigned: 'tracking',
   mission_accepted: 'tracking',
   mission_pickup: 'tracking',
   mission_transit: 'tracking',

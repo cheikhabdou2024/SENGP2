@@ -45,7 +45,9 @@ export async function initDatabase(): Promise<void> {
     await pool.query('ALTER TABLE missions ADD COLUMN IF NOT EXISTS recipient_phone VARCHAR(30)');
     // National ID card back side (recto = existing identity_document_url).
     await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS identity_document_url_back VARCHAR(500)');
-    logger.info('✅ Schema patches applied (phone/password nullable, delivery_token, recipient)');
+    // Admin → GP mission assignment notifications (new enum value; PG12+).
+    await pool.query("ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'mission_assigned'");
+    logger.info('✅ Schema patches applied (phone/password nullable, delivery_token, recipient, mission_assigned)');
   } catch (error) {
     logger.error('❌ Error initializing database:', error);
 

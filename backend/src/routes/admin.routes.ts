@@ -20,6 +20,7 @@ router.delete('/users/:id', AdminController.deleteUser);
 
 router.get('/missions', AdminController.listMissions);
 router.put('/missions/:id', AdminController.updateMission);
+router.post('/missions/:id/assign', AdminController.assignMission);
 router.delete('/missions/:id', AdminController.deleteMission);
 
 router.get('/trips', AdminController.listTrips);
