@@ -295,6 +295,37 @@ export class MissionController {
   }
 
   /**
+   * Verify QR code and confirm delivery
+   * POST /api/v1/missions/verify-qr
+   */
+  static async verifyDelivery(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        ResponseUtil.unauthorized(res);
+        return;
+      }
+
+      if (req.user.user_type !== UserType.GP) {
+        ResponseUtil.forbidden(res, 'Only GPs can verify delivery');
+        return;
+      }
+
+      const { qr_data } = req.body;
+      if (!qr_data) {
+        ResponseUtil.badRequest(res, 'QR code data is required');
+        return;
+      }
+
+      const mission = await MissionService.verifyDeliveryByQR(qr_data, req.user.id);
+
+      ResponseUtil.success(res, { mission }, 'Livraison confirmée avec succès');
+    } catch (error: any) {
+      logger.error('Verify delivery error:', error);
+      ResponseUtil.badRequest(res, error.message || 'Verification failed');
+    }
+  }
+
+  /**
    * Get tracking history
    * GET /api/v1/missions/:id/tracking
    */
