@@ -506,7 +506,7 @@
                             onkeyup="validatePassword()"
                             required
                         />
-                        <button type="button" class="password-toggle" onclick="togglePassword('password')">👁️</button>
+                        <button type="button" class="password-toggle" onclick="togglePassword('password')"><svg class="ic" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
                     </div>
                     <div class="password-strength">
                         <div class="strength-bar">
@@ -528,7 +528,7 @@
                             onkeyup="validateConfirmPassword()"
                             required
                         />
-                        <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">👁️</button>
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')"><svg class="ic" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
                         <span class="validation-icon" id="confirmPasswordIcon"></span>
                     </div>
                     <div class="validation-message" id="confirmPasswordMessage"></div>
@@ -578,9 +578,9 @@
             } else if (value.length < 3) {
                 input.classList.remove('valid');
                 input.classList.add('invalid');
-                icon.innerHTML = '❌';
+                icon.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
                 icon.classList.add('show');
-                message.innerHTML = '<span class="icon">⚠️</span> Le nom doit contenir au moins 3 caractères';
+                message.innerHTML = '<span class="icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> Le nom doit contenir au moins 3 caractères';
                 message.classList.add('show', 'error');
                 message.classList.remove('success');
                 validations.fullname = false;
@@ -613,9 +613,9 @@
             } else if (!emailRegex.test(value)) {
                 input.classList.remove('valid');
                 input.classList.add('invalid');
-                icon.innerHTML = '❌';
+                icon.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
                 icon.classList.add('show');
-                message.innerHTML = '<span class="icon">⚠️</span> Email invalide';
+                message.innerHTML = '<span class="icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> Email invalide';
                 message.classList.add('show', 'error');
                 message.classList.remove('success');
                 validations.email = false;
@@ -648,9 +648,9 @@
             } else if (!phoneRegex.test(value)) {
                 input.classList.remove('valid');
                 input.classList.add('invalid');
-                icon.innerHTML = '❌';
+                icon.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
                 icon.classList.add('show');
-                message.innerHTML = '<span class="icon">⚠️</span> Numéro de téléphone invalide';
+                message.innerHTML = '<span class="icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> Numéro de téléphone invalide';
                 message.classList.add('show', 'error');
                 message.classList.remove('success');
                 validations.phone = false;
@@ -725,9 +725,9 @@
             } else if (value !== password) {
                 input.classList.remove('valid');
                 input.classList.add('invalid');
-                icon.innerHTML = '❌';
+                icon.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
                 icon.classList.add('show');
-                message.innerHTML = '<span class="icon">⚠️</span> Les mots de passe ne correspondent pas';
+                message.innerHTML = '<span class="icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> Les mots de passe ne correspondent pas';
                 message.classList.add('show', 'error');
                 message.classList.remove('success');
                 validations.confirmPassword = false;
@@ -751,10 +751,10 @@
             
             if (input.type === 'password') {
                 input.type = 'text';
-                button.textContent = '👁️‍🗨️';
+                button.textContent = '<svg class="ic" viewBox="0 0 24 24"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>';
             } else {
                 input.type = 'password';
-                button.textContent = '👁️';
+                button.textContent = '<svg class="ic" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
             }
         }
 

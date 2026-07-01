@@ -529,7 +529,7 @@
 
             <!-- New Claim Button -->
             <button class="new-claim-btn" onclick="openNewClaimModal()">
-                <div class="btn-icon">⚠️</div>
+                <div class="btn-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
                 <div class="btn-text">
                     <div class="btn-title">Nouvelle réclamation</div>
                     <div class="btn-subtitle">Signalez un problème</div>
@@ -608,7 +608,7 @@
                             <label class="form-label">Votre message</label>
                             <div class="chat-compose">
                                 <input type="text" class="form-input" id="claimDescription" placeholder="Écrivez votre message…" style="flex:1;">
-                                <button type="button" id="voiceBtn" class="voice-btn" onclick="toggleVoice()" title="Message vocal">🎤</button>
+                                <button type="button" id="voiceBtn" class="voice-btn" onclick="toggleVoice()" title="Message vocal"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></button>
                             </div>
                             <div id="voicePreview" style="display:none;margin-top:10px;">
                                 <audio id="voiceAudio" controls style="width:100%;"></audio>
@@ -693,7 +693,7 @@
                     const blob = new Blob(voiceChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
                     voiceBlob = blob;
                     stream.getTracks().forEach(function(t){ t.stop(); });
-                    btn.classList.remove('recording'); btn.textContent = '🎤';
+                    btn.classList.remove('recording'); btn.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>';
                     const reader = new FileReader();
                     reader.onload = function(){
                         voiceDataUrl = reader.result;

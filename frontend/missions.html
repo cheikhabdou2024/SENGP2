@@ -541,10 +541,10 @@
             <!-- Search & Filters -->
             <div class="search-section">
                 <div class="search-bar">
-                    <span class="search-icon">🔍</span>
+                    <span class="search-icon"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
                     <input type="text" class="search-input" placeholder="Rechercher une destination...">
                 </div>
-                <button class="filter-btn" onclick="openFilters()">⚙️</button>
+                <button class="filter-btn" onclick="openFilters()"><svg class="ic" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></button>
             </div>
         </div>
 
@@ -552,16 +552,16 @@
         <div class="content">
             <!-- Info: missions matching the GP's trip; assignment is by the admin -->
             <div style="background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.3);border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;">
-                <span style="font-size:18px;line-height:1.3;">📌</span>
+                <span style="font-size:18px;line-height:1.3;"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
                 <span style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.5;">Voici les missions correspondant à votre trajet (destination &amp; dates). L'affectation est faite par l'<strong style="color:#4ECDC4">administration</strong> : surveillez vos <strong style="color:#FFD700">Notifications</strong> pour les missions qui vous sont assignées.</span>
             </div>
             <!-- Filter Tags -->
             <div class="filter-tags">
                 <div class="filter-tag active" onclick="filterMissions('all', this)">Toutes</div>
-                <div class="filter-tag" onclick="filterMissions('high-pay', this)">💰 Bien payées</div>
-                <div class="filter-tag" onclick="filterMissions('urgent', this)">⚡ Urgentes</div>
-                <div class="filter-tag" onclick="filterMissions('verified', this)">✓ Vérifiées</div>
-                <div class="filter-tag" onclick="filterMissions('light', this)">📦 Légères</div>
+                <div class="filter-tag" onclick="filterMissions('high-pay', this)"><svg class="ic" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Bien payées</div>
+                <div class="filter-tag" onclick="filterMissions('urgent', this)"><svg class="ic" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Urgentes</div>
+                <div class="filter-tag" onclick="filterMissions('verified', this)"><svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Vérifiées</div>
+                <div class="filter-tag" onclick="filterMissions('light', this)"><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg> Légères</div>
             </div>
 
             <!-- Section Header -->
@@ -576,7 +576,7 @@
                 <div class="state-text">Chargement des missions…</div>
             </div>
             <div id="missionsEmpty" class="missions-state" style="display: none;">
-                <div class="state-icon">📭</div>
+                <div class="state-icon"><svg class="ic" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div>
                 <div class="state-text">Aucune mission disponible pour le moment.<br>Revenez plus tard.</div>
             </div>
             <div id="missionsList"></div>
@@ -811,9 +811,9 @@
             container.innerHTML = list.map((m, idx) => {
                 const featured = idx === 0 ? ' featured' : '';
                 const badges = [];
-                if (isNewMission(m.created_at)) badges.push('<span class="badge badge-new">🔥 Nouveau</span>');
-                if (isUrgent(m)) badges.push('<span class="badge badge-urgent">⚡ Urgent</span>');
-                if (m.is_insured) badges.push('<span class="badge badge-verified">✓ Assuré</span>');
+                if (isNewMission(m.created_at)) badges.push('<span class="badge badge-new"><svg class="ic" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Nouveau</span>');
+                if (isUrgent(m)) badges.push('<span class="badge badge-urgent"><svg class="ic" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Urgent</span>');
+                if (m.is_insured) badges.push('<span class="badge badge-verified"><svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Assuré</span>');
 
                 const priceType = m.is_price_negotiable ? 'Prix négociable' : 'Prix fixe';
                 const dims = (m.dimensions && m.dimensions !== 'xx') ? m.dimensions : 'N/C';
@@ -840,10 +840,10 @@
                         </div>
                     </div>
                     <div class="mission-details">
-                        <div class="detail-item"><span>📦</span><span>${weight} kg</span></div>
-                        <div class="detail-item"><span>📏</span><span>${esc(dims)} cm</span></div>
-                        <div class="detail-item"><span>📅</span><span>Départ: ${formatDate(m.departure_date)}</span></div>
-                        <div class="detail-item"><span>🎯</span><span>Arrivée: ${formatDate(m.desired_arrival_date)}</span></div>
+                        <div class="detail-item"><span><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span><span>${weight} kg</span></div>
+                        <div class="detail-item"><span><svg class="ic" viewBox="0 0 24 24"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg></span><span>${esc(dims)} cm</span></div>
+                        <div class="detail-item"><span><svg class="ic" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg></span><span>Départ: ${formatDate(m.departure_date)}</span></div>
+                        <div class="detail-item"><span><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span>Arrivée: ${formatDate(m.desired_arrival_date)}</span></div>
                     </div>
                     <div class="mission-footer">
                         <span class="mission-date">Publiée ${timeAgo(m.created_at)}</span>

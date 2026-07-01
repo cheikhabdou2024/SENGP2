@@ -586,7 +586,7 @@
 
             <!-- New Claim Button -->
             <button class="new-claim-btn" onclick="openNewClaimModal()">
-                <div class="btn-icon">⚠️</div>
+                <div class="btn-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
                 <div class="btn-text">
                     <div class="btn-title">Nouvelle réclamation</div>
                     <div class="btn-subtitle">Signalez un problème</div>
@@ -608,27 +608,27 @@
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
             <div class="nav-item" onclick="navigateTo('home')">
-                <div class="nav-icon">🏠</div>
+                <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
                 <div class="nav-label">Accueil</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('missions')">
-                <div class="nav-icon">📦</div>
+                <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></div>
                 <div class="nav-label">Missions</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('trips')">
-                <div class="nav-icon">✈️</div>
+                <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
                 <div class="nav-label">Trajets</div>
             </div>
 
             <div class="nav-item active" onclick="navigateTo('claims')">
-                <div class="nav-icon">📝</div>
+                <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8M8 9h2"/></svg></div>
                 <div class="nav-label">Réclamations</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('profile')">
-                <div class="nav-icon">👤</div>
+                <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
                 <div class="nav-label">Profil</div>
             </div>
         </div>
@@ -750,7 +750,7 @@
             if (activeClaims.length === 0) {
                 activeContainer.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-icon">📝</div>
+                        <div class="empty-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8M8 9h2"/></svg></div>
                         <div class="empty-title">Aucune réclamation active</div>
                         <div class="empty-description">Vous n'avez aucune réclamation en cours. Si vous rencontrez un problème, n'hésitez pas à le signaler.</div>
                     </div>
@@ -764,7 +764,7 @@
             if (resolvedClaims.length === 0) {
                 resolvedContainer.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-icon">✅</div>
+                        <div class="empty-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg></div>
                         <div class="empty-title">Aucune réclamation résolue</div>
                         <div class="empty-description">Vos réclamations résolues apparaîtront ici.</div>
                     </div>
@@ -790,18 +790,18 @@
             };
 
             const typeIcons = {
-                payment_issue: '💰',
-                sender_issue: '👤',
-                package_issue: '📦',
-                delivery_issue: '🚚',
-                other: '⚠️'
+                payment_issue: '<svg class="ic" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+                sender_issue: '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+                package_issue: '<svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>',
+                delivery_issue: '<svg class="ic" viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h1"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>',
+                other: '<svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>'
             };
 
             return `
                 <div class="claim-card" onclick="viewClaimDetails('${claim.id}')">
                     <div class="claim-header">
                         <div class="claim-type">
-                            <div class="claim-icon">${typeIcons[claim.claim_type] || '⚠️'}</div>
+                            <div class="claim-icon">${typeIcons[claim.claim_type] || '<svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>'}</div>
                             <div class="claim-info">
                                 <h3>${claim.claim_type ? claim.claim_type.replace(/_/g, ' ') : 'Réclamation'}</h3>
                                 <div class="claim-id">#${claim.id || 'N/A'}</div>

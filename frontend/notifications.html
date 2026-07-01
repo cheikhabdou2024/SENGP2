@@ -471,8 +471,19 @@
         let currentTab = 'all';
         // Local response state for assigned missions, keyed by notification id.
         const missionStates = {};
-        const ICONS = { delivery:'📦', tracking:'📍', payment:'💰', support:'💬', promo:'🎁', feedback:'⭐',
-            mission_assigned:'🎯', mission_matched:'🎯', mission_accepted:'✅', mission_delivered:'🎉' };
+        const IC = (p) => '<svg class="ic" viewBox="0 0 24 24">' + p + '</svg>';
+        const ICONS = {
+            delivery: IC('<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/>'),
+            tracking: IC('<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>'),
+            payment: IC('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'),
+            support: IC('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'),
+            promo: IC('<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>'),
+            feedback: IC('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'),
+            mission_assigned: IC('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'),
+            mission_matched: IC('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'),
+            mission_accepted: IC('<path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/>'),
+            mission_delivered: IC('<path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/>')
+        };
         const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
         async function loadUserNotifications() {
@@ -512,7 +523,7 @@
             const list = currentTab === 'unread' ? allNotifs.filter(n => !n.is_read) : allNotifs;
             const box = document.getElementById('notifList');
             if (!list.length) {
-                box.innerHTML = '<div class="notif-empty"><div class="ic">🔔</div>' +
+                box.innerHTML = '<div class="notif-empty"><div class="ic">' + IC('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>') + '</div>' +
                     (currentTab === 'unread' ? 'Aucune notification non lue.' : 'Aucune notification pour le moment.') + '</div>';
                 return;
             }
@@ -524,14 +535,14 @@
                 return missionCard(n);
             }
             return '<div class="notif-card ' + (!n.is_read ? 'unread' : '') + '" onclick="viewNotif(\'' + n.notification_id + '\')">'
-                + '<div class="notif-icon">' + (ICONS[n.type] || ICONS[n.notification_type] || '🔔') + '</div>'
+                + '<div class="notif-icon">' + (ICONS[n.type] || ICONS[n.notification_type] || IC('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>')) + '</div>'
                 + '<div class="notif-content">'
                 + '<div class="notif-title">' + esc(n.title) + '</div>'
                 + '<div class="notif-message">' + esc(n.message) + '</div>'
                 + '<div class="notif-time">' + formatTime(n.created_at) + '</div>'
                 + '</div>'
                 + (!n.is_read ? '<div class="unread-dot"></div>' : '')
-                + '<button class="notif-del" onclick="delNotif(event,\'' + n.notification_id + '\')">🗑️</button>'
+                + '<button class="notif-del" onclick="delNotif(event,\'' + n.notification_id + '\')">' + IC('<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>') + '</button>'
                 + '</div>';
         }
 
@@ -565,24 +576,24 @@
                 action = '<div class="ma-state no">⚠️ Détails de mission indisponibles.</div>';
             } else {
                 action = '<div class="ma-actions">'
-                    + '<button class="ma-btn ma-accept" onclick="handleMissionResponse(\'' + n.notification_id + '\',\'' + missionId + '\',\'accept\')">✅ Accepter</button>'
-                    + '<button class="ma-btn ma-decline" onclick="handleMissionResponse(\'' + n.notification_id + '\',\'' + missionId + '\',\'decline\')">❌ Décliner</button>'
+                    + '<button class="ma-btn ma-accept" onclick="handleMissionResponse(\'' + n.notification_id + '\',\'' + missionId + '\',\'accept\')">' + IC('<polyline points="20 6 9 17 4 12"/>') + ' Accepter</button>'
+                    + '<button class="ma-btn ma-decline" onclick="handleMissionResponse(\'' + n.notification_id + '\',\'' + missionId + '\',\'decline\')">' + IC('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>') + ' Décliner</button>'
                     + '</div>';
             }
 
             return '<div class="notif-card mission-assign-card ' + (!n.is_read ? 'unread' : '') + '" id="notif-card-' + n.notification_id + '">'
                 + '<div class="ma-head">'
-                + '<div class="ma-badge">🎯</div>'
+                + '<div class="ma-badge">' + IC('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>') + '</div>'
                 + '<div style="flex:1;"><div class="ma-title">Mission assignée' + (code ? ' — ' + esc(code) : '') + '</div>'
                 + '<div class="ma-sub">' + formatTime(n.created_at) + ' · <span style="color:#FFD700;">PAR L\'ADMIN</span></div></div>'
-                + '<button class="notif-del" style="position:static;" onclick="delNotif(event,\'' + n.notification_id + '\')">🗑️</button>'
+                + '<button class="notif-del" style="position:static;" onclick="delNotif(event,\'' + n.notification_id + '\')">' + IC('<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>') + '</button>'
                 + '</div>'
                 + '<div class="ma-route">' + esc(route) + '</div>'
                 + '<div class="ma-grid">'
-                + '<div class="ma-cell"><div class="ma-label">📅 Date</div><div class="ma-value">' + esc(date) + '</div></div>'
-                + '<div class="ma-cell"><div class="ma-label">🕐 Heure</div><div class="ma-value">' + esc(time) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">' + IC('<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/>') + ' Date</div><div class="ma-value">' + esc(date) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">' + IC('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>') + ' Heure</div><div class="ma-value">' + esc(time) + '</div></div>'
                 + '<div class="ma-cell"><div class="ma-label">⚖️ Poids</div><div class="ma-value">' + esc(weight) + '</div></div>'
-                + '<div class="ma-cell"><div class="ma-label">💰 Rémunération</div><div class="ma-value" style="color:#FFD700;">' + esc(price) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">' + IC('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>') + ' Rémunération</div><div class="ma-value" style="color:#FFD700;">' + esc(price) + '</div></div>'
                 + '</div>'
                 + action
                 + '</div>';
