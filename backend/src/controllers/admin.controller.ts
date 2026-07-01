@@ -91,6 +91,15 @@ export class AdminController {
       ResponseUtil.badRequest(res, e.message || 'Assignment failed');
     }
   }
+  static async confirmArrival(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const m = await AdminService.confirmArrival(req.params.id);
+      ResponseUtil.success(res, m, 'Arrivée confirmée — le GP peut livrer');
+    } catch (e: any) {
+      if (e.message === 'Mission not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Confirmation failed');
+    }
+  }
 
   // Trips
   static async listTrips(req: AuthRequest, res: Response): Promise<void> {

@@ -128,7 +128,7 @@ export class AdminService {
     const count = await pool.query(`SELECT COUNT(*) FROM missions m ${where}`, args);
     const total = parseInt(count.rows[0].count);
     const rows = await pool.query(
-      `SELECT m.id, m.mission_code, m.status, m.departure_city, m.arrival_city,
+      `SELECT m.id, m.mission_code, m.status, m.arrival_confirmed, m.departure_city, m.arrival_city,
               m.offered_price AS price, m.package_weight AS weight, m.tracking_number, m.created_at,
               e.first_name || ' ' || e.last_name AS expediteur_name,
               g.first_name || ' ' || g.last_name AS gp_name
@@ -237,6 +237,41 @@ export class AdminService {
       logger.warn(`Mission ${missionId} assigned to GP ${gpId} but notification failed`);
     }
 
+    return m;
+  }
+
+  /**
+   * Confirm the GP's arrival at destination (after the admin's WhatsApp call).
+   * Unlocks delivery: the GP can now scan the recipient's QR. Notifies the GP.
+   */
+  static async confirmArrival(missionId: string) {
+    const upd = await pool.query(
+      `UPDATE missions SET arrival_confirmed = TRUE, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $1 AND status = 'out_for_delivery'
+       RETURNING id, mission_code, gp_id`,
+      [missionId]
+    );
+    if (upd.rows.length === 0) {
+      const exists = await pool.query('SELECT 1 FROM missions WHERE id = $1', [missionId]);
+      throw new Error(
+        exists.rows.length === 0 ? 'Mission not found' : "La mission n'est pas en attente de confirmation d'arrivée"
+      );
+    }
+    const m = upd.rows[0];
+    if (m.gp_id) {
+      try {
+        await NotificationService.create({
+          user_id: m.gp_id,
+          notification_type: NotificationType.MISSION_TRANSIT,
+          title: 'Arrivée confirmée',
+          message: `Arrivée confirmée pour ${m.mission_code}. Vous pouvez maintenant scanner le QR du destinataire pour livrer.`,
+          action_url: 'alivrer.html',
+          metadata: { mission_id: m.id, mission_code: m.mission_code },
+        });
+      } catch (e: any) {
+        logger.warn(`Arrival confirmed for ${missionId} but GP notification failed`);
+      }
+    }
     return m;
   }
 

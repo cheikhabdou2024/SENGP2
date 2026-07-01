@@ -541,6 +541,37 @@ export class MissionService {
         }
       }
 
+      // Arrived at destination: reset the admin-confirmation gate and notify the
+      // expéditeur + admin(s). The admin confirms arrival (by WhatsApp call) before
+      // the GP is allowed to scan the recipient's QR.
+      if (status === MissionStatus.OUT_FOR_DELIVERY) {
+        try {
+          await pool.query('UPDATE missions SET arrival_confirmed = FALSE WHERE id = $1', [id]);
+          if (expediteurId) {
+            await NotificationService.create({
+              user_id: expediteurId,
+              notification_type: NotificationType.MISSION_TRANSIT,
+              title: 'GP arrivé à destination',
+              message: `Le GP est arrivé à destination pour la mission ${mission.mission_code}. La remise du colis est imminente.`,
+              action_url: 'suivi.html',
+              metadata: { mission_id: id, mission_code: mission.mission_code },
+            });
+          }
+          const admins = await pool.query(`SELECT id FROM users WHERE user_type = 'admin' AND deleted_at IS NULL`);
+          for (const a of admins.rows) {
+            await NotificationService.create({
+              user_id: a.id,
+              notification_type: NotificationType.MISSION_TRANSIT,
+              title: 'Arrivée à confirmer',
+              message: `Le GP indique être arrivé à destination pour ${mission.mission_code}. Confirmez l'arrivée (appel WhatsApp) pour autoriser la remise.`,
+              metadata: { mission_id: id, mission_code: mission.mission_code },
+            });
+          }
+        } catch (e: any) {
+          logger.warn('Arrival notification failed:', e.message);
+        }
+      }
+
       return mission;
     } catch (error) {
       await client.query('ROLLBACK');
@@ -740,7 +771,9 @@ export class MissionService {
 
     // The scan must correspond to one of THIS GP's packages, not yet delivered.
     const mr = await pool.query(
-      'SELECT id, gp_id, status, mission_code, expediteur_id, recipient_name FROM missions WHERE id = $1',
+      `SELECT id, gp_id, status, mission_code, expediteur_id, recipient_name,
+              arrival_confirmed, offered_price, final_price
+       FROM missions WHERE id = $1`,
       [missionId]
     );
     if (mr.rows.length === 0) throw new Error('Mission introuvable');
@@ -748,6 +781,10 @@ export class MissionService {
     if (mission.gp_id !== gpId) throw new Error('Ce colis ne fait pas partie de vos missions');
     if (mission.status === 'delivered') throw new Error('Ce colis a déjà été livré');
     if (mission.status === 'cancelled') throw new Error('Cette mission a été annulée');
+    // Delivery is only allowed once the admin has confirmed the GP's arrival.
+    if (!mission.arrival_confirmed) {
+      throw new Error("En attente de la confirmation d'arrivée par l'administration.");
+    }
 
     // Canonical delivered transition: credits the GP wallet from the upfront
     // payment, increments stats, sets the completion date and notifies the GP
@@ -771,6 +808,16 @@ export class MissionService {
         action_url: 'suivi.html',
         metadata: { mission_id: missionId, mission_code: mission.mission_code },
       });
+      // Amount for this mission + running total now owed to the GP (wallet).
+      const amount = Number(mission.final_price ?? mission.offered_price) || 0;
+      let gpTotal = 0;
+      try {
+        const w = await pool.query(
+          'SELECT available_balance FROM wallet_balances WHERE user_id = $1',
+          [gpId]
+        );
+        gpTotal = Number(w.rows[0]?.available_balance) || 0;
+      } catch (e) { /* ignore */ }
       const admins = await pool.query(
         `SELECT id FROM users WHERE user_type = 'admin' AND deleted_at IS NULL`
       );
@@ -779,8 +826,9 @@ export class MissionService {
           user_id: a.id,
           notification_type: NotificationType.MISSION_DELIVERED,
           title: 'Livraison confirmée',
-          message: `Le colis ${mission.mission_code} a été livré au destinataire (QR scanné par le GP).`,
-          metadata: { mission_id: missionId, mission_code: mission.mission_code },
+          message: `Le colis ${mission.mission_code} a été livré (${Helpers.formatCurrency(amount)}). ` +
+            `Total dû au GP : ${Helpers.formatCurrency(gpTotal)}.`,
+          metadata: { mission_id: missionId, mission_code: mission.mission_code, amount, gp_total_due: gpTotal },
         });
       }
     } catch (e: any) {

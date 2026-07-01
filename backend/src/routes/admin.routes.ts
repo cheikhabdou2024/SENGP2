@@ -21,6 +21,7 @@ router.delete('/users/:id', AdminController.deleteUser);
 router.get('/missions', AdminController.listMissions);
 router.put('/missions/:id', AdminController.updateMission);
 router.post('/missions/:id/assign', AdminController.assignMission);
+router.post('/missions/:id/confirm-arrival', AdminController.confirmArrival);
 router.delete('/missions/:id', AdminController.deleteMission);
 
 router.get('/trips', AdminController.listTrips);

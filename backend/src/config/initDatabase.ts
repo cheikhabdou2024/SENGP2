@@ -49,6 +49,9 @@ export async function initDatabase(): Promise<void> {
     await pool.query("ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'mission_assigned'");
     // A QR data URL (base64 PNG) is ~3KB — too long for the original VARCHAR(500).
     await pool.query('ALTER TABLE missions ALTER COLUMN qr_code_url TYPE TEXT');
+    // Admin confirms the GP's arrival at destination (by WhatsApp call) before the
+    // GP is allowed to scan the recipient's QR and deliver.
+    await pool.query('ALTER TABLE missions ADD COLUMN IF NOT EXISTS arrival_confirmed BOOLEAN DEFAULT FALSE');
     logger.info('✅ Schema patches applied (phone/password nullable, delivery_token, recipient, mission_assigned, qr_code_url TEXT)');
   } catch (error) {
     logger.error('❌ Error initializing database:', error);

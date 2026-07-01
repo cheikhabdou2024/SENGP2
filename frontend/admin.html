@@ -370,6 +370,10 @@
                         if (m.status === 'pending' && !m.gp_name) {
                             acts.push(['act-ok','Affecter',`assignMission('${m.id}','${esc(m.mission_code)}')`]);
                         }
+                        // GP arrived at destination, awaiting the admin's confirmation.
+                        if (m.status === 'out_for_delivery' && !m.arrival_confirmed) {
+                            acts.push(['act-ok','Confirmer arrivée',`confirmArrival('${m.id}','${esc(m.mission_code)}')`]);
+                        }
                         acts.push(['act-edit','Statut',`editMission('${m.id}','${esc(m.status)}')`]);
                         acts.push(['act-del','Suppr.',`delMission('${m.id}','${esc(m.mission_code)}')`]);
                         return [
@@ -501,6 +505,12 @@
               + '<button id="assignConfirmBtn" onclick="confirmAssign(\'' + id + '\')" style="flex:1;padding:11px;background:linear-gradient(135deg,#FFD700,#FFA500);border:none;border-radius:10px;color:#1a1a2e;font-weight:700;cursor:pointer;">Affecter &amp; notifier</button>'
               + '</div></div>';
             document.body.appendChild(ov);
+        }
+        async function confirmArrival(id, code){
+            if (!confirm('Confirmer l\'arrivée du GP à destination pour '+code+' ?\n\n(À faire après l\'appel WhatsApp de vérification.) Le GP pourra alors scanner le QR du destinataire.')) return;
+            const { ok, json } = await api('/admin/missions/'+id+'/confirm-arrival', { method:'POST' });
+            alert(ok ? '✅ Arrivée confirmée — le GP peut livrer.' : 'Erreur: '+(json.error||json.message));
+            if (ok) loadList();
         }
         async function confirmAssign(missionId){
             const sel = document.getElementById('assignGpSelect');

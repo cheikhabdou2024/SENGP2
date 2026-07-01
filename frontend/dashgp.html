@@ -839,6 +839,23 @@
             /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
+        /* ---- Journey guided popup ---- */
+        .jm-greeting { font-size:13.5px; line-height:1.6; color:rgba(255,255,255,.82); margin-bottom:14px; }
+        .jm-list { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+        .jm-item { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:10px 12px; text-align:left; }
+        .jm-route { font-size:14px; font-weight:700; color:#fff; }
+        .jm-code { font-size:11px; color:rgba(255,255,255,.5); }
+        .jm-steps { display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:18px; }
+        .jm-step { font-size:11px; font-weight:700; color:rgba(255,255,255,.45); padding:7px 10px; border-radius:10px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); white-space:nowrap; }
+        .jm-step.done { color:#06231f; background:linear-gradient(135deg,#4ECDC4,#44A08D); border-color:transparent; }
+        .jm-step.current { color:#1a1a2e; background:linear-gradient(135deg,#FFD700,#FFA500); border-color:transparent; box-shadow:0 6px 16px rgba(255,184,0,.4); }
+        .jm-sep { width:14px; height:2px; background:rgba(255,255,255,.15); }
+        .jm-btn { width:100%; padding:16px; border:none; border-radius:16px; font-size:16px; font-weight:800; cursor:pointer; color:#1a1a2e; background:linear-gradient(135deg,#FFD700,#FFA500); box-shadow:0 12px 26px rgba(255,184,0,.42); display:flex; align-items:center; justify-content:center; gap:10px; }
+        .jm-btn:active { transform:translateY(1px) scale(.99); }
+        .jm-btn svg { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+        .jm-btn.jm-scan { background:linear-gradient(135deg,#4ECDC4,#44A08D); color:#06231f; box-shadow:0 12px 26px rgba(78,205,196,.42); }
+        .jm-wait { font-size:13.5px; line-height:1.6; color:#FFD27A; background:rgba(255,215,0,.1); border:1px solid rgba(255,215,0,.3); border-radius:14px; padding:14px; display:flex; align-items:center; gap:10px; text-align:left; }
+        .jm-wait svg { width:22px; height:22px; flex-shrink:0; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
         </style>
     <script src="config.js"></script>
     <script src="ui.js"></script>
@@ -1028,7 +1045,108 @@
             await loadDashboardData();
             hideEmptyBadges();
             renderGains();
+            await initJourney();
         });
+
+        // ---------- Journey mode: persistent guided popup for the confirmed trip ----------
+        const JOURNEY_ORDER = ['accepted','picked_up','in_transit','out_for_delivery'];
+        const JOURNEY_BTN = {
+            accepted:   { to:'picked_up',        label:'Colis récupéré',       ic:'<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/>' },
+            picked_up:  { to:'in_transit',       label:'Démarrer le transit',  ic:'<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>' },
+            in_transit: { to:'out_for_delivery', label:'Arrivé à destination',  ic:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>' }
+        };
+        let journey = { open:false, card:null, close:null, missions:[], poll:null };
+
+        function jEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+        async function fetchJourneyMissions(){
+            try {
+                const r = await fetch(`${API_BASE_URL}/missions/my-missions?limit=200`, { headers:{ 'Authorization':'Bearer '+authToken } });
+                if (!r.ok) return [];
+                return ((await r.json()).data || []).filter(m => JOURNEY_ORDER.includes(String(m.status||'').toLowerCase()));
+            } catch(e){ return []; }
+        }
+        function journeyStage(missions){
+            for (const s of JOURNEY_ORDER) if (missions.some(m => String(m.status).toLowerCase() === s)) return s;
+            return null;
+        }
+        async function initJourney(){
+            const missions = await fetchJourneyMissions();
+            if (!missions.length){ if (journey.open) closeJourney(); return; }
+            journey.missions = missions;
+            if (!journey.open){
+                journey.open = true;
+                window.sengpModal({
+                    title: 'Votre voyage',
+                    bodyHTML: '<div id="journeyBody"></div>',
+                    actions: [],
+                    onMount: (card) => { journey.card = card; renderJourney(); }
+                });
+            } else { renderJourney(); }
+            if (!journey.poll) journey.poll = setInterval(refreshJourney, 15000);
+        }
+        function closeJourney(){
+            journey.open = false;
+            if (journey.poll){ clearInterval(journey.poll); journey.poll = null; }
+            const ov = journey.card && journey.card.closest('.sengp-modal-overlay');
+            if (ov){ ov.classList.remove('show'); setTimeout(() => ov.remove(), 300); }
+            journey.card = null;
+        }
+        async function refreshJourney(){
+            if (!journey.open) return;
+            const missions = await fetchJourneyMissions();
+            if (!missions.length){ closeJourney(); return; }
+            journey.missions = missions;
+            renderJourney();
+        }
+        function renderJourney(){
+            const body = journey.card && journey.card.querySelector('#journeyBody');
+            if (!body) return;
+            const missions = journey.missions;
+            let name = 'GP';
+            try { name = JSON.parse(localStorage.getItem('userData')||'{}').first_name || 'GP'; } catch(e){}
+            const stage = journeyStage(missions);
+            const stageIdx = JOURNEY_ORDER.indexOf(stage);
+            const list = missions.map(m => '<div class="jm-item"><div class="jm-route">'
+                + jEsc((m.departure_city||'')+' → '+(m.arrival_city||''))+'</div><div class="jm-code">'
+                + jEsc(m.mission_code||m.tracking_number||'')+'</div></div>').join('');
+            const steps = [['picked_up','Récupéré'],['in_transit','En Transit'],['out_for_delivery','À Destination']];
+            const stepsHTML = steps.map(([k,lbl]) => {
+                const si = JOURNEY_ORDER.indexOf(k);
+                const cls = si < stageIdx ? 'done' : (si === stageIdx ? 'current' : '');
+                return '<div class="jm-step '+cls+'">'+lbl+'</div>';
+            }).join('<div class="jm-sep"></div>');
+            let action = '';
+            if (JOURNEY_BTN[stage]){
+                const b = JOURNEY_BTN[stage];
+                action = '<button class="jm-btn" onclick="journeyAdvance(\''+stage+'\',\''+b.to+'\')"><svg viewBox="0 0 24 24">'+b.ic+'</svg>'+b.label+'</button>';
+            } else if (stage === 'out_for_delivery'){
+                if (missions.every(m => m.arrival_confirmed)){
+                    action = '<button class="jm-btn jm-scan" onclick="window.location.href=\'alivrer.html\'"><svg viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg>Scanner le QR du destinataire</button>';
+                } else {
+                    action = '<div class="jm-wait"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>En attente de la confirmation de votre arrivée par l\'administration (appel WhatsApp)…</div>';
+                }
+            }
+            const greeting = 'Bonjour GP <b>'+jEsc(name)+'</b>, vous êtes sur le point d\'expédier '
+                + (missions.length>1 ? '<b>'+missions.length+' missions confirmées</b>' : '<b>votre mission confirmée</b>')
+                + '. Gardez votre GPS allumé et appuyez sur le bouton ci-dessous correspondant à chaque étape de votre voyage.';
+            body.innerHTML = '<div class="jm-greeting">'+greeting+'</div><div class="jm-list">'+list
+                + '</div><div class="jm-steps">'+stepsHTML+'</div><div class="jm-action">'+action+'</div>';
+        }
+        async function journeyAdvance(fromStatus, toStatus){
+            const targets = journey.missions.filter(m => String(m.status).toLowerCase() === fromStatus);
+            const body = journey.card && journey.card.querySelector('#journeyBody .jm-action');
+            if (body) body.innerHTML = '<div class="jm-wait">Enregistrement…</div>';
+            for (const m of targets){
+                try {
+                    await fetch(`${API_BASE_URL}/missions/${m.id}/status`, {
+                        method:'POST', headers:{ 'Authorization':'Bearer '+authToken, 'Content-Type':'application/json' },
+                        body: JSON.stringify({ status: toStatus })
+                    });
+                } catch(e){}
+            }
+            await refreshJourney();
+        }
 
         // ---------- Suivi live : partage de position GPS (Phase 1) ----------
         const ACTIVE_STATUSES = ['accepted','picked_up','in_transit','in_customs','out_for_delivery'];
