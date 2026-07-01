@@ -78,6 +78,10 @@
         const API = window.API_BASE_URL;
         const token = localStorage.getItem('authToken');
         let items = [];
+        // Opened from a mission card (?mission=<id>): scope the scanner to that one
+        // colis — show only it and accept only its QR.
+        const focusMissionId = new URLSearchParams(location.search).get('mission');
+        let scannerAutoOpened = false;
 
         const FLAGS={'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱'};
         const flag=c=>FLAGS[c]||'🌍';
@@ -95,7 +99,10 @@
                 if(!res.ok) throw new Error('Chargement impossible');
                 const data=(await res.json()).data||[];
                 items=data.filter(m=>ACTIVE.includes(String(m.status||'').toLowerCase()));
+                if (focusMissionId) items = items.filter(m => String(m.id) === String(focusMissionId));
                 render();
+                // Guided flow: auto-open the camera on the targeted colis.
+                if (focusMissionId && items.length && !scannerAutoOpened){ scannerAutoOpened = true; openScanner(); }
             }catch(e){ document.getElementById('list').innerHTML='<div class="empty">Erreur: '+esc(e.message)+'</div>'; }
         }
 
@@ -203,6 +210,17 @@
         }
 
         async function onScanned(qrText){
+            // Scoped scan: only the targeted mission's QR is accepted here.
+            if (focusMissionId){
+                let scannedId = null;
+                try { scannedId = JSON.parse(qrText).id; } catch(e){}
+                if (String(scannedId) !== String(focusMissionId)){
+                    if (scanStream){ scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
+                    setScanStatus('❌ Ce QR ne correspond pas à ce colis. Scannez le bon destinataire.');
+                    document.getElementById('scanRetry').style.display = 'inline-block';
+                    return;
+                }
+            }
             if (scanStream){ scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
             setScanStatus('Vérification du colis…');
             try {

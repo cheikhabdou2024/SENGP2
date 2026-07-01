@@ -1123,7 +1123,7 @@
                 action = '<button class="jm-btn" onclick="journeyAdvanceOne(\''+m.id+'\',\''+b.to+'\')"><svg viewBox="0 0 24 24">'+b.ic+'</svg>'+b.label+'</button>';
             } else if (st === 'out_for_delivery'){
                 if (m.arrival_confirmed){
-                    action = '<button class="jm-btn jm-scan" onclick="window.location.href=\'alivrer.html\'"><svg viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg>Scanner le QR du destinataire</button>';
+                    action = '<button class="jm-btn jm-scan" onclick="window.location.href=\'alivrer.html?mission='+encodeURIComponent(m.id)+'\'"><svg viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg>Scanner le QR du destinataire</button>';
                 } else {
                     action = '<div class="jm-wait"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>En attente de la confirmation de votre arrivée par l\'administration (appel WhatsApp)…</div>';
                 }
