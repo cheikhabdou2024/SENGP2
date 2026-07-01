@@ -194,8 +194,7 @@
 
                 ${isActive ? `<div class="card">
                     <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>Preuve de livraison (QR)</div>
-                    <div id="qrBox"><button class="btn" style="background:rgba(255,215,0,.15);color:#FFD700;border:1px solid rgba(255,215,0,.3);" onclick="loadDeliveryQR()">Générer l'étiquette QR du colis</button></div>
-                    <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:8px;">Imprimez / collez l'étiquette sur le colis. Le destinataire scanne ce QR à la réception.</div>
+                    <div id="qrBox"><div style="text-align:center;color:rgba(255,255,255,.5);padding:16px;">Chargement du QR…</div></div>
                 </div>` : ''}
 
                 <div class="card">
@@ -228,6 +227,9 @@
 
                 ${canCancel?`<button class="btn btn-cancel" onclick="cancelShipment()">Annuler l'envoi</button>`:''}
             `;
+
+            // The package QR is generated automatically (once) and stays visible.
+            if (isActive) loadPackageQR();
         }
 
         function publicTrackUrl(){
@@ -235,32 +237,64 @@
             const token = (mission && (mission.tracking_number || mission.mission_code)) || '';
             return origin + '/t/' + encodeURIComponent(token);
         }
-        async function loadDeliveryQR(){
+        // Load the UNIQUE package QR (same {mission_code, tracking_number, id}
+        // payload the GP scanner verifies) and show it persistently, with the
+        // WhatsApp image-share button right below it.
+        async function loadPackageQR(){
             const box = document.getElementById('qrBox');
-            box.innerHTML = 'Génération…';
+            if (!box) return;
             try {
-                const res = await fetch(`${API}/missions/${missionId}/delivery-qr`, {
-                    method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' }
+                const res = await fetch(`${API}/missions/${missionId}/qr-code`, {
+                    method:'POST', headers:{ 'Authorization':'Bearer '+token }
                 });
                 const j = await res.json();
-                if (res.ok && j.success) {
-                    const m = mission || {};
-                    const recip = m.recipient_name ? esc(m.recipient_name) : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#d9480f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> <span style="color:#d9480f">Destinataire non renseigné</span>';
-                    const code = esc(m.tracking_number || m.mission_code || '');
-                    // Étiquette à imprimer/coller : identité lisible + QR de confirmation.
-                    box.innerHTML = `
-                        <div style="background:#fff;color:#1a1a2e;border-radius:12px;padding:16px;text-align:center;">
-                            <div style="font-weight:800;font-size:15px;letter-spacing:1px;">SEN GP</div>
-                            <div style="font-size:15px;margin-top:6px;">Pour : <b>${recip}</b></div>
-                            <div style="font-size:12px;color:#555;margin-top:2px;">${esc(m.departure_city||'')} → ${esc(m.arrival_city||'')}</div>
-                            <img src="${j.data.qr_code_url}" alt="QR de livraison" style="width:200px;height:200px;display:block;margin:10px auto;">
-                            <div style="font-weight:800;letter-spacing:1.5px;font-size:15px;">${code}</div>
-                        </div>
-                        <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:8px;text-align:center;">À imprimer / coller sur le colis (capture d'écran possible).</div>`;
-                } else {
-                    box.innerHTML = 'Erreur: ' + (j.error || j.message || 'génération échouée');
-                }
-            } catch (e) { box.innerHTML = 'Erreur de connexion.'; }
+                const qrUrl = (j.data && j.data.qr_code_url) || j.qr_code_url;
+                if (!res.ok || !qrUrl) throw new Error(j.error || j.message || 'QR indisponible');
+                const m = mission || {};
+                const recip = m.recipient_name ? esc(m.recipient_name) : 'Destinataire';
+                const code = esc(m.tracking_number || m.mission_code || '');
+                box.innerHTML = `
+                    <div style="background:#fff;color:#1a1a2e;border-radius:12px;padding:16px;text-align:center;">
+                        <div style="font-weight:800;font-size:15px;letter-spacing:1px;">SEN GP</div>
+                        <div style="font-size:14px;margin-top:6px;">Pour : <b>${recip}</b></div>
+                        <div style="font-size:12px;color:#555;margin-top:2px;">${esc(m.departure_city||'')} → ${esc(m.arrival_city||'')}</div>
+                        <img id="qrImg" src="${qrUrl}" alt="QR du colis" style="width:210px;height:210px;display:block;margin:10px auto;">
+                        <div style="font-weight:800;letter-spacing:1.5px;font-size:15px;">${code}</div>
+                    </div>
+                    <button class="btn" style="width:100%;margin-top:12px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;" onclick="shareQrWhatsApp()">
+                        <svg class="ico" viewBox="0 0 24 24" style="display:inline-block;vertical-align:-4px;margin-right:6px;"><path d="M4 4h16v16H4z" fill="none"/><path d="M12 2a10 10 0 0 0-8.94 14.46L2 22l5.7-1.49A10 10 0 1 0 12 2z"/></svg>
+                        Envoyer le QR au destinataire (WhatsApp)
+                    </button>
+                    <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:8px;text-align:center;">Le destinataire montre ce QR au livreur (GP) à la réception.</div>`;
+            } catch (e) {
+                box.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.6);padding:12px;">QR indisponible pour le moment.' +
+                    ' <button class="btn" style="margin-top:8px;background:rgba(255,215,0,.15);color:#FFD700;border:1px solid rgba(255,215,0,.3);" onclick="loadPackageQR()">Réessayer</button></div>';
+            }
+        }
+
+        // Send the actual QR IMAGE via WhatsApp (Web Share API); falls back to
+        // saving the image + opening WhatsApp with the caption.
+        async function shareQrWhatsApp(){
+            const m = mission || {};
+            const trackingNum = m.tracking_number || m.mission_code || '';
+            const caption =
+                `🎁 SEN GP — Votre colis est en route !\n\n` +
+                `📦 Numéro de suivi : ${trackingNum}\n\n` +
+                `À la livraison, montrez CE QR code au livreur (GP) SEN GP. ` +
+                `Il le scannera pour confirmer la remise de votre colis.\n\n` +
+                `SEN GP — La livraison collaborative`;
+            const img = document.getElementById('qrImg');
+            const dataUrl = img && img.src;
+            let file = null;
+            if (dataUrl && dataUrl.indexOf('data:') === 0){
+                try { const blob = await (await fetch(dataUrl)).blob(); file = new File([blob], `sengp-qr-${trackingNum}.png`, { type:'image/png' }); } catch(e){}
+            }
+            if (file && navigator.canShare && navigator.canShare({ files:[file] })){
+                try { await navigator.share({ files:[file], text: caption, title:'QR de livraison SEN GP' }); return; }
+                catch(e){ if (e && e.name === 'AbortError') return; }
+            }
+            if (dataUrl){ try { const a=document.createElement('a'); a.href=dataUrl; a.download=`sengp-qr-${trackingNum}.png`; document.body.appendChild(a); a.click(); a.remove(); } catch(e){} }
+            window.open('https://wa.me/?text=' + encodeURIComponent(caption + `\n\n(QR code enregistré dans vos images — joignez-le à ce message.)`), '_blank');
         }
 
         async function editRecipient(){

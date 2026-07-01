@@ -1139,33 +1139,6 @@
             </div>
         </div>
 
-        <!-- QR Code Modal -->
-        <div class="qr-modal-overlay" id="qrModal" onclick="handleQROverlayClick(event)">
-            <div class="qr-modal">
-                <div class="qr-modal-handle"></div>
-                <div class="qr-modal-title">📱 QR Code de livraison</div>
-                <div class="qr-modal-subtitle" id="qrModalSubtitle">Montrez-le ou partagez-le avec votre destinataire</div>
-
-                <div class="qr-code-container">
-                    <div class="qr-loading" id="qrLoading">⏳ Génération...</div>
-                    <img id="qrCodeImage" src="" alt="QR Code" style="display:none;" />
-                </div>
-
-                <div class="qr-tracking-badge" id="qrTrackingBadge"></div>
-
-                <div class="qr-instructions">
-                    📋 <strong>Instructions pour le destinataire :</strong><br>
-                    Sauvegardez ce QR code ou montrez-le directement sur votre téléphone. Le GP le scannera à la livraison pour confirmer la remise de votre colis.
-                </div>
-
-                <button class="btn-whatsapp" id="qrWhatsAppBtn" onclick="shareViaWhatsApp()" style="display:none;">
-                    📤 Envoyer le QR au destinataire (WhatsApp)
-                </button>
-
-                <button class="btn-close-qr" onclick="closeQRModal()">Fermer</button>
-            </div>
-        </div>
-
         <!-- Country Selection Modal -->
         <div class="modal-overlay" id="countryModal">
             <div class="country-modal">
@@ -1445,9 +1418,6 @@
                         ${mission.gp_id ? `<div class="carrier-avatar">GP</div><span>GP assigné</span>` : `<span style="color: rgba(255, 255, 255, 0.5);">Recherche GP...</span>`}
                     </div>
                 </div>
-                <button class="shipment-qr-btn" onclick="event.stopPropagation(); showQRCode('${mission.id}', '${mission.mission_code}', '${mission.tracking_number}')">
-                    📱 QR Code livraison
-                </button>
             `;
 
             return card;
@@ -1635,97 +1605,6 @@
                 closeCountryModal();
             }
         });
-        // ── QR Code système ───────────────────────────────────────────
-        let currentQRMissionId = null;
-        let currentQRTrackingNumber = null;
-
-        async function showQRCode(missionId, missionCode, trackingNumber) {
-            currentQRMissionId = missionId;
-            currentQRTrackingNumber = trackingNumber;
-
-            document.getElementById('qrModalSubtitle').textContent = missionCode || trackingNumber;
-            document.getElementById('qrTrackingBadge').textContent = '🔖 ' + (trackingNumber || missionCode);
-            document.getElementById('qrLoading').style.display = 'flex';
-            document.getElementById('qrCodeImage').style.display = 'none';
-            document.getElementById('qrWhatsAppBtn').style.display = 'none';
-            document.getElementById('qrModal').classList.add('open');
-
-            try {
-                const token = localStorage.getItem('authToken');
-                const res = await fetch(`${API_BASE_URL}/missions/${missionId}/qr-code`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (!res.ok) throw new Error('API error');
-                const data = await res.json();
-                const qrUrl = data.data?.qr_code_url || data.qr_code_url;
-
-                document.getElementById('qrLoading').style.display = 'none';
-                const img = document.getElementById('qrCodeImage');
-                img.src = qrUrl;
-                img.style.display = 'block';
-                document.getElementById('qrWhatsAppBtn').style.display = 'flex';
-            } catch (err) {
-                // Demo fallback: generate QR visually using CDN
-                document.getElementById('qrLoading').textContent = '⚠️ Mode démo';
-                document.getElementById('qrWhatsAppBtn').style.display = 'flex';
-            }
-        }
-
-        function closeQRModal() {
-            document.getElementById('qrModal').classList.remove('open');
-        }
-
-        function handleQROverlayClick(e) {
-            if (e.target === document.getElementById('qrModal')) closeQRModal();
-        }
-
-        async function shareViaWhatsApp() {
-            const trackingNum = currentQRTrackingNumber || currentQRMissionId;
-            const caption =
-                `🎁 SEN GP — Votre colis est en route !\n\n` +
-                `📦 Numéro de suivi : ${trackingNum}\n\n` +
-                `À la livraison, montrez CE QR code au livreur (GP) SEN GP. ` +
-                `Il le scannera pour confirmer la remise de votre colis.\n\n` +
-                `SEN GP — La livraison collaborative`;
-
-            // Build a PNG File from the QR data URL so it can be attached as an image.
-            const img = document.getElementById('qrCodeImage');
-            const dataUrl = img && img.src;
-            let file = null;
-            if (dataUrl && dataUrl.indexOf('data:') === 0) {
-                try {
-                    const blob = await (await fetch(dataUrl)).blob();
-                    file = new File([blob], `sengp-qr-${trackingNum}.png`, { type: 'image/png' });
-                } catch (e) { /* fall back below */ }
-            }
-
-            // 1) Native share sheet WITH the QR image → it lands as a real, scannable
-            //    image in WhatsApp (Web Share API Level 2).
-            if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({ files: [file], text: caption, title: 'QR de livraison SEN GP' });
-                    return;
-                } catch (e) {
-                    if (e && e.name === 'AbortError') return; // user dismissed the share sheet
-                }
-            }
-
-            // 2) Fallback (no file-share support): save the QR image locally, then open
-            //    WhatsApp with the caption so the expéditeur can attach the saved image.
-            if (dataUrl) {
-                try {
-                    const a = document.createElement('a');
-                    a.href = dataUrl;
-                    a.download = `sengp-qr-${trackingNum}.png`;
-                    document.body.appendChild(a); a.click(); a.remove();
-                } catch (e) { /* ignore */ }
-            }
-            const msg = encodeURIComponent(caption + `\n\n(QR code enregistré dans vos images — joignez-le à ce message.)`);
-            window.open(`https://wa.me/?text=${msg}`, '_blank');
-        }
-        // ── Fin QR Code ──────────────────────────────────────────────
-
         function createShipment() {
             // Rediriger vers la page de création d'envoi
             window.location.href = 'creenvoi.html';
