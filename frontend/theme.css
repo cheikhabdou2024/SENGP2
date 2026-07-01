@@ -135,3 +135,36 @@
 
 /* ---- Empty / loading states ---- */
 .ds .empty, .ds .loading, .ds .notif-empty, .ds .missions-state { color: var(--muted); }
+
+/* ---- Unified bottom navigation (structure + icons) ----
+   Standardises every bottom-nav app-wide: layout, icon size/stroke, label.
+   The ACTIVE accent colour stays per app (expéditeur coral / GP gold) via each
+   page's own `.nav-item.active` rule, so `:not(.active)` is used here to avoid
+   overriding it. */
+.ds .bottom-nav {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(18, 16, 36, 0.92);
+    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex; justify-content: space-around; align-items: stretch;
+    padding: 9px 6px calc(9px + env(safe-area-inset-bottom));
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35);
+    height: auto;
+}
+.ds .bottom-nav .nav-item {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; cursor: pointer; flex: 1; position: relative; padding: 6px 0;
+    border-radius: 14px; transition: color 0.25s ease; -webkit-tap-highlight-color: transparent;
+    max-width: none;
+}
+.ds .bottom-nav .nav-item:not(.active) { color: rgba(255, 255, 255, 0.5); }
+.ds .bottom-nav .nav-icon-wrapper { position: relative; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; }
+.ds .bottom-nav .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.ds .bottom-nav .nav-icon svg {
+    width: 24px; height: 24px; fill: none; stroke: currentColor;
+    stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+    transition: transform 0.25s ease;
+}
+.ds .bottom-nav .nav-item.active .nav-icon svg { transform: translateY(-1px) scale(1.06); }
+.ds .bottom-nav .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
+@media (min-width: 768px) { .ds .bottom-nav .nav-label { font-size: 11px; } }
