@@ -843,6 +843,9 @@
         .jm-greeting { font-size:13.5px; line-height:1.6; color:rgba(255,255,255,.82); margin-bottom:14px; }
         .jm-list { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
         .jm-item { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:10px 12px; text-align:left; }
+        .jm-mission { background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:14px; margin-bottom:12px; text-align:left; }
+        .jm-mission .jm-steps { margin:10px 0 12px; }
+        .jm-mission .jm-btn { padding:14px; font-size:15px; }
         .jm-route { font-size:14px; font-weight:700; color:#fff; }
         .jm-code { font-size:11px; color:rgba(255,255,255,.5); }
         .jm-steps { display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:18px; }
@@ -1099,52 +1102,57 @@
             journey.missions = missions;
             renderJourney();
         }
+        function jStepsHTML(st){
+            const stageIdx = JOURNEY_ORDER.indexOf(st);
+            const steps = [['picked_up','Récupéré'],['in_transit','En Transit'],['out_for_delivery','À Destination']];
+            return steps.map(([k,lbl]) => {
+                const si = JOURNEY_ORDER.indexOf(k);
+                const cls = si < stageIdx ? 'done' : (si === stageIdx ? 'current' : '');
+                return '<div class="jm-step '+cls+'">'+lbl+'</div>';
+            }).join('<div class="jm-sep"></div>');
+        }
+        // Each mission advances independently, with its own step button / scan.
+        function jMissionCard(m){
+            const st = String(m.status||'').toLowerCase();
+            const route = jEsc((m.departure_city||'')+' → '+(m.arrival_city||''));
+            const code = jEsc(m.mission_code||m.tracking_number||'');
+            const recip = m.recipient_name ? ' · '+jEsc(m.recipient_name) : '';
+            let action = '';
+            if (JOURNEY_BTN[st]){
+                const b = JOURNEY_BTN[st];
+                action = '<button class="jm-btn" onclick="journeyAdvanceOne(\''+m.id+'\',\''+b.to+'\')"><svg viewBox="0 0 24 24">'+b.ic+'</svg>'+b.label+'</button>';
+            } else if (st === 'out_for_delivery'){
+                if (m.arrival_confirmed){
+                    action = '<button class="jm-btn jm-scan" onclick="window.location.href=\'alivrer.html\'"><svg viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg>Scanner le QR du destinataire</button>';
+                } else {
+                    action = '<div class="jm-wait"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>En attente de la confirmation de votre arrivée par l\'administration (appel WhatsApp)…</div>';
+                }
+            }
+            return '<div class="jm-mission"><div class="jm-route">'+route+'</div>'
+                + '<div class="jm-code">'+code+recip+'</div>'
+                + '<div class="jm-steps">'+jStepsHTML(st)+'</div>'
+                + '<div class="jm-action">'+action+'</div></div>';
+        }
         function renderJourney(){
             const body = journey.card && journey.card.querySelector('#journeyBody');
             if (!body) return;
             const missions = journey.missions;
             let name = 'GP';
             try { name = JSON.parse(localStorage.getItem('userData')||'{}').first_name || 'GP'; } catch(e){}
-            const stage = journeyStage(missions);
-            const stageIdx = JOURNEY_ORDER.indexOf(stage);
-            const list = missions.map(m => '<div class="jm-item"><div class="jm-route">'
-                + jEsc((m.departure_city||'')+' → '+(m.arrival_city||''))+'</div><div class="jm-code">'
-                + jEsc(m.mission_code||m.tracking_number||'')+'</div></div>').join('');
-            const steps = [['picked_up','Récupéré'],['in_transit','En Transit'],['out_for_delivery','À Destination']];
-            const stepsHTML = steps.map(([k,lbl]) => {
-                const si = JOURNEY_ORDER.indexOf(k);
-                const cls = si < stageIdx ? 'done' : (si === stageIdx ? 'current' : '');
-                return '<div class="jm-step '+cls+'">'+lbl+'</div>';
-            }).join('<div class="jm-sep"></div>');
-            let action = '';
-            if (JOURNEY_BTN[stage]){
-                const b = JOURNEY_BTN[stage];
-                action = '<button class="jm-btn" onclick="journeyAdvance(\''+stage+'\',\''+b.to+'\')"><svg viewBox="0 0 24 24">'+b.ic+'</svg>'+b.label+'</button>';
-            } else if (stage === 'out_for_delivery'){
-                if (missions.every(m => m.arrival_confirmed)){
-                    action = '<button class="jm-btn jm-scan" onclick="window.location.href=\'alivrer.html\'"><svg viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg>Scanner le QR du destinataire</button>';
-                } else {
-                    action = '<div class="jm-wait"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>En attente de la confirmation de votre arrivée par l\'administration (appel WhatsApp)…</div>';
-                }
-            }
             const greeting = 'Bonjour GP <b>'+jEsc(name)+'</b>, vous êtes sur le point d\'expédier '
                 + (missions.length>1 ? '<b>'+missions.length+' missions confirmées</b>' : '<b>votre mission confirmée</b>')
-                + '. Gardez votre GPS allumé et appuyez sur le bouton ci-dessous correspondant à chaque étape de votre voyage.';
-            body.innerHTML = '<div class="jm-greeting">'+greeting+'</div><div class="jm-list">'+list
-                + '</div><div class="jm-steps">'+stepsHTML+'</div><div class="jm-action">'+action+'</div>';
+                + '. Gardez votre GPS allumé et validez chaque étape ci-dessous, mission par mission.';
+            body.innerHTML = '<div class="jm-greeting">'+greeting+'</div><div class="jm-list">'
+                + missions.map(jMissionCard).join('') + '</div>';
         }
-        async function journeyAdvance(fromStatus, toStatus){
-            const targets = journey.missions.filter(m => String(m.status).toLowerCase() === fromStatus);
-            const body = journey.card && journey.card.querySelector('#journeyBody .jm-action');
-            if (body) body.innerHTML = '<div class="jm-wait">Enregistrement…</div>';
-            for (const m of targets){
-                try {
-                    await fetch(`${API_BASE_URL}/missions/${m.id}/status`, {
-                        method:'POST', headers:{ 'Authorization':'Bearer '+authToken, 'Content-Type':'application/json' },
-                        body: JSON.stringify({ status: toStatus })
-                    });
-                } catch(e){}
-            }
+        async function journeyAdvanceOne(id, toStatus){
+            const card = journey.card && journey.card.querySelector('#journeyBody');
+            try {
+                await fetch(`${API_BASE_URL}/missions/${id}/status`, {
+                    method:'POST', headers:{ 'Authorization':'Bearer '+authToken, 'Content-Type':'application/json' },
+                    body: JSON.stringify({ status: toStatus })
+                });
+            } catch(e){}
             await refreshJourney();
         }
 
