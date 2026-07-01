@@ -168,3 +168,13 @@
 .ds .bottom-nav .nav-item.active .nav-icon svg { transform: translateY(-1px) scale(1.06); }
 .ds .bottom-nav .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
 @media (min-width: 768px) { .ds .bottom-nav .nav-label { font-size: 11px; } }
+
+/* ---- Inline icon helper (replaces emoji icons with outlined Lucide SVGs) ----
+   Sizes to the container's font-size (1em) and inherits its colour, so an
+   emoji like <span class="stat-icon">📦</span> becomes
+   <span class="stat-icon"><svg class="ic" ...>…</svg></span> with no extra CSS. */
+.ds svg.ic {
+    width: 1em; height: 1em; display: inline-block; vertical-align: -0.14em;
+    fill: none; stroke: currentColor; stroke-width: 1.9;
+    stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0;
+}

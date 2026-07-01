@@ -869,7 +869,7 @@
 
                 <!-- Rating Badge -->
                 <div class="rating-badge">
-                    <span class="star">⭐</span>
+                    <span class="star"><svg class="ic" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
                     <span class="rating" id="gpRating">--</span>
                     <span class="reviews" id="gpReviews">(-- avis)</span>
                 </div>
@@ -881,7 +881,7 @@
                     <div class="stat-card primary" onclick="openMissionsModal('active')" role="button" tabindex="0" style="cursor:pointer;">
                         <div class="stat-header">
                             <span class="stat-label">Missions actives</span>
-                            <span class="stat-icon">📦</span>
+                            <span class="stat-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
                         </div>
                         <div class="stat-value">--</div>
                         <div class="stat-change">En cours ›</div>
@@ -890,7 +890,7 @@
                     <div class="stat-card" onclick="openMissionsModal('completed')" role="button" tabindex="0" style="cursor:pointer;">
                         <div class="stat-header">
                             <span class="stat-label">Missions terminées</span>
-                            <span class="stat-icon">✅</span>
+                            <span class="stat-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg></span>
                         </div>
                         <div class="stat-value">--</div>
                         <div class="stat-change">Voir ›</div>
@@ -915,7 +915,7 @@
 
                 <!-- Créer un trajet Button -->
                 <button class="action-button action-button-primary" onclick="createTrip()">
-                    <div class="action-icon">✈️</div>
+                    <div class="action-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
                     <div class="action-text">
                         <div class="action-title">Créer un trajet</div>
                         <div class="action-subtitle">Ajoutez votre prochain voyage</div>
@@ -925,7 +925,7 @@
 
                 <!-- Rechercher missions Button (disabled until trip created) -->
                 <button class="action-button action-button-secondary" onclick="searchMissions()" id="searchMissionsBtn">
-                    <div class="action-icon">🔍</div>
+                    <div class="action-icon"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
                     <div class="action-text">
                         <div class="action-title">Rechercher des missions</div>
                         <div class="action-subtitle">Créez un trajet d'abord</div>
@@ -935,7 +935,7 @@
 
                 <!-- Colis à livrer -->
                 <button class="action-button action-button-secondary" onclick="window.location.href='alivrer.html'">
-                    <div class="action-icon">📬</div>
+                    <div class="action-icon"><svg class="ic" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div>
                     <div class="action-text">
                         <div class="action-title">Colis à livrer</div>
                         <div class="action-subtitle">Destinataires, appel et suivi de remise</div>
@@ -945,7 +945,7 @@
 
                 <!-- Partager ma position (suivi live des colis en transit) -->
                 <button class="action-button action-button-secondary" id="locShareBtn" onclick="toggleLocationShare()">
-                    <div class="action-icon" id="locShareIcon">📍</div>
+                    <div class="action-icon" id="locShareIcon"><svg class="ic" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
                     <div class="action-text">
                         <div class="action-title">Partager ma position</div>
                         <div class="action-subtitle" id="locShareSub">Suivi live désactivé</div>
@@ -1003,11 +1003,11 @@
     <div class="gps-gate" id="gpsGate" role="dialog" aria-modal="true" aria-labelledby="gpsGateTitle">
         <div class="gps-gate-card">
             <img src="im/sengp-logo.jpg" class="gps-gate-logo" alt="SEN GP">
-            <div class="gps-gate-radar"><span class="pin">📍</span></div>
+            <div class="gps-gate-radar"><span class="pin"><svg class="ic" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span></div>
             <h2 id="gpsGateTitle">Activez votre GPS</h2>
             <p>Pour accepter et réaliser des missions, SEN GP doit <b>suivre votre position en temps réel</b> pendant tout le trajet, jusqu'à la livraison. Activez le GPS avant de continuer.</p>
             <button class="gps-gate-btn" id="gpsGateBtn" onclick="gpsGateOk()">
-                <span>🛰️</span><span id="gpsGateBtnLabel">OK, activer le GPS</span>
+                <span><svg class="ic" viewBox="0 0 24 24"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg></span><span id="gpsGateBtnLabel">OK, activer le GPS</span>
             </button>
             <div class="gps-gate-status" id="gpsGateStatus"></div>
             <div class="gps-gate-hint">Vous pourrez gérer cette autorisation dans les réglages de votre téléphone.</div>
@@ -1043,7 +1043,9 @@
             ? window.Capacitor.registerPlugin('BackgroundGeolocation') : null;
 
         function locShareUI(on, sub) {
-            document.getElementById('locShareIcon').textContent = on ? '🛰️' : '📍';
+            document.getElementById('locShareIcon').innerHTML = on
+                ? '<svg class="ic" viewBox="0 0 24 24"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg>'
+                : '<svg class="ic" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>';
             document.getElementById('locShareState').textContent = on ? '●' : '○';
             document.getElementById('locShareSub').textContent = sub || (on ? 'Suivi live activé' : 'Suivi live désactivé');
         }
@@ -1574,7 +1576,7 @@
             if (missions.length === 0) {
                 cardsContainer.innerHTML = `
                     <div style="text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.5);">
-                        <div style="font-size: 48px; margin-bottom: 16px;">📭</div>
+                        <div style="font-size: 44px; margin-bottom: 16px;"><svg class="ic" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div>
                         <p>Aucune nouvelle mission pour le moment</p>
                     </div>
                 `;
@@ -1598,7 +1600,7 @@
             if (missions.length === 0) {
                 cardsContainer.innerHTML = `
                     <div style="text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.5);">
-                        <div style="font-size: 48px; margin-bottom: 16px;">📦</div>
+                        <div style="font-size: 44px; margin-bottom: 16px;"><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></div>
                         <p>Vous n'avez pas encore accepté de mission</p>
                     </div>
                 `;
@@ -1638,11 +1640,11 @@
                 </div>
                 <div class="mission-details">
                     <div class="detail-item">
-                        <span>📦</span>
+                        <span><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
                         <span>${mission.weight || 'N/A'} kg</span>
                     </div>
                     <div class="detail-item">
-                        <span>📏</span>
+                        <span><svg class="ic" viewBox="0 0 24 24"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg></span>
                         <span>${mission.dimensions || 'N/A'}</span>
                     </div>
                 </div>
