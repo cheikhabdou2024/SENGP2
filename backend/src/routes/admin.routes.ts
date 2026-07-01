@@ -7,6 +7,8 @@ const router = Router();
 
 // Public, secret-gated: promote a user to admin (first-admin bootstrap).
 router.post('/bootstrap', AdminController.bootstrap);
+// Public, secret-gated: reset a user's password (recovery, no email flow).
+router.post('/reset-password', AdminController.resetPassword);
 
 // Everything below requires an authenticated ADMIN.
 router.use(AuthMiddleware.verifyToken);

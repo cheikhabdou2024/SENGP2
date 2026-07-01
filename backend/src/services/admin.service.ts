@@ -428,4 +428,26 @@ export class AdminService {
     if (result.rows.length === 0) throw new Error('No user found with that email');
     return result.rows[0];
   }
+
+  /**
+   * Secret-gated password reset (recovery when no email flow exists). Guarded by
+   * ADMIN_BOOTSTRAP_SECRET so it cannot be abused without the shared secret.
+   */
+  static async resetPassword(email: string, secret: string, newPassword: string) {
+    const expected = process.env.ADMIN_BOOTSTRAP_SECRET;
+    if (!expected) throw new Error('Password reset is not configured');
+    if (secret !== expected) throw new Error('Invalid bootstrap secret');
+    if (!newPassword || String(newPassword).length < 6) {
+      throw new Error('Password must be at least 6 characters');
+    }
+    const hash = await bcrypt.hash(String(newPassword), 12);
+    const result = await pool.query(
+      `UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP
+       WHERE email = $2 AND deleted_at IS NULL
+       RETURNING id, email, user_type`,
+      [hash, String(email).toLowerCase()]
+    );
+    if (result.rows.length === 0) throw new Error('No user found with that email');
+    return result.rows[0];
+  }
 }

@@ -176,4 +176,20 @@ export class AdminController {
       ResponseUtil.badRequest(res, e.message || 'Bootstrap failed');
     }
   }
+
+  // Reset a password (public, secret-gated — recovery when no email flow exists)
+  static async resetPassword(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const { email, secret, new_password } = req.body;
+      if (!email || !secret || !new_password) {
+        ResponseUtil.badRequest(res, 'email, secret and new_password are required');
+        return;
+      }
+      const u = await AdminService.resetPassword(email, secret, new_password);
+      ResponseUtil.success(res, { id: u.id, email: u.email }, 'Password reset');
+    } catch (e: any) {
+      if (e.message === 'Invalid bootstrap secret') return void ResponseUtil.forbidden(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Reset failed');
+    }
+  }
 }
