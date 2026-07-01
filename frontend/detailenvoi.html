@@ -272,8 +272,9 @@
             }
         }
 
-        // Send the actual QR IMAGE via WhatsApp (Web Share API); falls back to
-        // saving the image + opening WhatsApp with the caption.
+        // Send the actual QR IMAGE via WhatsApp. In the app we use the native
+        // Capacitor Share plugin (the Web Share API is NOT supported in the Android
+        // WebView, which is why it previously sent only text). Web fallbacks follow.
         async function shareQrWhatsApp(){
             const m = mission || {};
             const trackingNum = m.tracking_number || m.mission_code || '';
@@ -285,14 +286,41 @@
                 `SEN GP — La livraison collaborative`;
             const img = document.getElementById('qrImg');
             const dataUrl = img && img.src;
+            const hasData = dataUrl && dataUrl.indexOf('data:') === 0;
+
+            // 1) Native app: write the PNG to a cache file, then share the FILE so
+            //    WhatsApp receives a real, scannable image.
+            const P = window.Capacitor && window.Capacitor.Plugins;
+            if (P && P.Share && P.Filesystem && hasData){
+                try {
+                    const base64 = dataUrl.split(',')[1];
+                    const fileName = `sengp-qr-${trackingNum || Date.now()}.png`;
+                    let uri;
+                    try {
+                        const w = await P.Filesystem.writeFile({ path: fileName, data: base64, directory: 'CACHE' });
+                        uri = w && w.uri;
+                    } catch (e) { /* getUri below */ }
+                    if (!uri){ const g = await P.Filesystem.getUri({ path: fileName, directory: 'CACHE' }); uri = g && g.uri; }
+                    await P.Share.share({ title: 'QR de livraison SEN GP', text: caption, files: [uri] });
+                    return;
+                } catch (e) {
+                    const msg = String((e && (e.message || e.errorMessage)) || '').toLowerCase();
+                    if (msg.includes('cancel') || msg.includes('abort')) return; // user dismissed
+                    // otherwise fall through to the web fallbacks
+                }
+            }
+
+            // 2) Browser Web Share with a file (works outside the app).
             let file = null;
-            if (dataUrl && dataUrl.indexOf('data:') === 0){
+            if (hasData){
                 try { const blob = await (await fetch(dataUrl)).blob(); file = new File([blob], `sengp-qr-${trackingNum}.png`, { type:'image/png' }); } catch(e){}
             }
             if (file && navigator.canShare && navigator.canShare({ files:[file] })){
                 try { await navigator.share({ files:[file], text: caption, title:'QR de livraison SEN GP' }); return; }
                 catch(e){ if (e && e.name === 'AbortError') return; }
             }
+
+            // 3) Last resort: save the image + open WhatsApp with the caption.
             if (dataUrl){ try { const a=document.createElement('a'); a.href=dataUrl; a.download=`sengp-qr-${trackingNum}.png`; document.body.appendChild(a); a.click(); a.remove(); } catch(e){} }
             window.open('https://wa.me/?text=' + encodeURIComponent(caption + `\n\n(QR code enregistré dans vos images — joignez-le à ce message.)`), '_blank');
         }
