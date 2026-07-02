@@ -28,10 +28,8 @@
     return;
   }
 
-  var host = window.location.hostname;
-  var isLocal = host === 'localhost' || host === '127.0.0.1' || host === '';
-
-  window.API_BASE_URL = isLocal
-    ? PROD_API_BASE_URL
-    : '/api/v1';
+  // Deployed web (e.g. Vercel/Netlify) is a static host with NO same-origin
+  // backend, so it must call the deployed API over HTTPS — same as the mobile
+  // app. (The API allows all origins by default, so cross-origin calls work.)
+  window.API_BASE_URL = PROD_API_BASE_URL;
 })();
