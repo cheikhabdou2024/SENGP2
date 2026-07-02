@@ -10,10 +10,8 @@ workflows:
       app_store_connect: codemagic
     environment:
       ios_signing:
-        # ad_hoc = installable .ipa without going through TestFlight (needs
-        # device UDIDs registered in the Apple Developer portal).
-        # Switch to app_store once you're ready to submit to TestFlight/App Store.
-        distribution_type: ad_hoc
+        # app_store = TestFlight / App Store distribution (no device UDIDs needed).
+        distribution_type: app_store
         bundle_identifier: com.sengp.app
       vars:
         XCODE_WORKSPACE: "frontend/ios/App/App.xcworkspace"
@@ -21,13 +19,8 @@ workflows:
       node: 20
       xcode: latest
       cocoapods: default
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: deploy/aws-android-prep
-          include: true
-      cancel_previous_builds: true
+    # Manual trigger only (no `triggering:` block) — start builds from the
+    # Codemagic dashboard ("Start new build") so a push doesn't auto-build iOS.
     scripts:
       - name: Install npm dependencies
         script: |

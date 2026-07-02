@@ -59,13 +59,13 @@ isn't committed, then archives and exports the IPA.
    `codemagic.yaml`. Codemagic uses the App Store Connect API key to auto-generate
    signing certificates/provisioning profiles for bundle ID `com.sengp.app` — no
    manual cert wrangling.
-4. For **ad_hoc** distribution (installable .ipa without TestFlight), register your
-   test devices' UDIDs in the Apple Developer Portal first, or switch
-   `distribution_type` in `codemagic.yaml` to `app_store` once you're ready to
-   ship via TestFlight.
-5. Trigger a build: push to `deploy/aws-android-prep`, or click "Start new build"
-   in the Codemagic dashboard. The `.ipa` is attached as a build artifact
-   (downloadable from the dashboard) and emailed to ahatcisse@gmail.com on
-   success/failure.
+4. Distribution is **`app_store`** (TestFlight / App Store) — no device UDIDs
+   needed. Create the app record in App Store Connect for bundle ID
+   `com.sengp.app` (first upload can also auto-create it).
+5. **Trigger builds manually** (the workflow has no push trigger): open the
+   Codemagic dashboard → **Start new build** → workflow **ios-ipa**. The `.ipa`
+   is a downloadable build artifact and is emailed to ahatcisse@gmail.com on
+   success/failure. To ship to testers, use Codemagic's App Store Connect
+   publishing (TestFlight) or upload the artifact yourself.
 
-Re-run steps 3–5 whenever you want a fresh build; no further one-time setup needed.
+Re-run step 5 whenever you want a fresh build; no further one-time setup needed.
