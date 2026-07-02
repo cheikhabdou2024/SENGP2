@@ -63,9 +63,15 @@ isn't committed, then archives and exports the IPA.
    needed. Create the app record in App Store Connect for bundle ID
    `com.sengp.app` (first upload can also auto-create it).
 5. **Trigger builds manually** (the workflow has no push trigger): open the
-   Codemagic dashboard → **Start new build** → workflow **ios-ipa**. The `.ipa`
-   is a downloadable build artifact and is emailed to ahatcisse@gmail.com on
-   success/failure. To ship to testers, use Codemagic's App Store Connect
-   publishing (TestFlight) or upload the artifact yourself.
+   Codemagic dashboard → **Start new build** → workflow **ios-ipa**. On success
+   the build is **auto-uploaded to App Store Connect and released to TestFlight**
+   (`submit_to_testflight: true`); the `.ipa` is also a downloadable artifact and
+   an email is sent to ahatcisse@gmail.com.
+6. **Invite testers** in App Store Connect → your app → **TestFlight** → add
+   testers by email or enable a public link. They install via the TestFlight app.
+   (First TestFlight build may need a short "Beta App Review" + your test-info /
+   export-compliance answers.)
 
 Re-run step 5 whenever you want a fresh build; no further one-time setup needed.
+When ready to ship publicly, set `submit_to_app_store: true` in `codemagic.yaml`
+(or submit that build from App Store Connect).
