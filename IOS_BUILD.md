@@ -1,4 +1,9 @@
-# Building the SEN GP iOS app (.ipa) — on a Mac
+# Building the SEN GP iOS app (.ipa)
+
+Two ways to get an `.ipa`: **locally on a Mac** (below), or **Codemagic cloud CI**
+(no local Xcode/CocoaPods needed — see [Option: Codemagic](#option-codemagic-cloud-build)
+at the bottom). Use Codemagic if your Mac's Xcode/Ruby/CocoaPods aren't set up, or you
+just want a build triggered from a git push.
 
 The iOS project (`frontend/ios/`) is **not** committed; you generate it fresh on the
 Mac, exactly like Android. Everything runs from the **`frontend/`** folder.
@@ -35,3 +40,32 @@ npx cap open ios
 - The API URL is already wired (`config.js` → the live App Runner backend) — iOS hits the same backend as Android; nothing to change.
 - **Google Sign-In on iOS** needs a separate iOS OAuth client (Google Cloud) + its reversed-client-ID URL scheme in Info.plist. Email/password login works without it — defer Google on iOS.
 - Re-run after web changes: `npm run build && npx cap sync ios`.
+
+## Option: Codemagic cloud build
+
+Builds the `.ipa` entirely in Codemagic's macOS cloud runners — you never need
+Xcode, Ruby, or CocoaPods locally. Config lives at the repo root: `codemagic.yaml`
+(workflow `ios-ipa`). It does the same steps as above (`npm install` → `npm run
+build` → `cap add ios` → `patch-ios.js` → `cap sync ios`) inside CI, since `ios/`
+isn't committed, then archives and exports the IPA.
+
+**One-time setup (Codemagic web UI, requires your Apple Developer account):**
+1. Sign up at codemagic.io, connect it to this GitHub repo (`cheikhabdou2024/SENGP2`).
+2. **Team settings → Integrations → Apple Developer Portal** → add an App Store
+   Connect API key (generate it at appstoreconnect.apple.com → Users and Access →
+   Integrations → App Store Connect API → "+"). Name the integration `codemagic`
+   to match `codemagic.yaml`, or edit the yaml to match whatever name you choose.
+3. In the app's Codemagic settings, confirm the `ios-ipa` workflow picked up from
+   `codemagic.yaml`. Codemagic uses the App Store Connect API key to auto-generate
+   signing certificates/provisioning profiles for bundle ID `com.sengp.app` — no
+   manual cert wrangling.
+4. For **ad_hoc** distribution (installable .ipa without TestFlight), register your
+   test devices' UDIDs in the Apple Developer Portal first, or switch
+   `distribution_type` in `codemagic.yaml` to `app_store` once you're ready to
+   ship via TestFlight.
+5. Trigger a build: push to `deploy/aws-android-prep`, or click "Start new build"
+   in the Codemagic dashboard. The `.ipa` is attached as a build artifact
+   (downloadable from the dashboard) and emailed to ahatcisse@gmail.com on
+   success/failure.
+
+Re-run steps 3–5 whenever you want a fresh build; no further one-time setup needed.
