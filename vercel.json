@@ -3,5 +3,19 @@
   "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/www",
   "installCommand": "echo 'no install needed (static build)'",
-  "framework": null
+  "framework": null,
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
+    }
+  ]
 }

@@ -10,3 +10,4 @@ video
 *.apk
 *.mp4
 .git
+frontend/* - Copie.html
