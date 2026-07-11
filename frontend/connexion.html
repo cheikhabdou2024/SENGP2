@@ -399,6 +399,7 @@
     <meta name="apple-mobile-web-app-title" content="SEN GP">
     <link rel="apple-touch-icon" href="icons/icon-180.png">
     <script src="pwa.js" defer></script>
+    <script src="gauth.js" defer></script>
 </head>
 <body class="ds">
     <div class="mobile-frame">
@@ -556,6 +557,37 @@
             }
         }
 
+        // Envoie l'ID token Google au backend puis route vers le bon tableau de bord.
+        // Utilisé par l'app native (plugin Capacitor) ET par le web (gauth.js / GIS).
+        async function finishGoogleAuth(idToken) {
+            const response = await fetch(`${window.API_BASE_URL}/auth/google`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_token: idToken, ...(EXPECTED_TYPE ? { expected_type: EXPECTED_TYPE } : {}) })
+            });
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                if (!enforceAccountType(data.data.user)) return;
+                localStorage.setItem('authToken', data.data.token);
+                localStorage.setItem('userData', JSON.stringify(data.data.user));
+                const ut = data.data.user.user_type;
+                window.location.href = ut === 'gp' ? 'dashgp.html' : 'dashexpediteur.html';
+            } else {
+                alert('Erreur Google: ' + (data.error || 'Connexion échouée'));
+            }
+        }
+
+        // Callback du bouton Google officiel affiché sur le web par gauth.js
+        window.handleGoogleCredential = async function (idToken) {
+            try {
+                await finishGoogleAuth(idToken);
+            } catch (e) {
+                console.error('Google sign-in error', e);
+                alert('Connexion Google échouée. Vérifiez votre connexion et réessayez.');
+            }
+        };
+
         async function socialLogin(provider) {
             if (provider !== 'google') return;
             try {
@@ -579,22 +611,7 @@
                     throw new Error('Token Google manquant');
                 }
 
-                const response = await fetch(`${window.API_BASE_URL}/auth/google`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id_token: idToken, ...(EXPECTED_TYPE ? { expected_type: EXPECTED_TYPE } : {}) })
-                });
-                const data = await response.json();
-
-                if (response.ok && data.success) {
-                    if (!enforceAccountType(data.data.user)) return;
-                    localStorage.setItem('authToken', data.data.token);
-                    localStorage.setItem('userData', JSON.stringify(data.data.user));
-                    const ut = data.data.user.user_type;
-                    window.location.href = ut === 'gp' ? 'dashgp.html' : 'dashexpediteur.html';
-                } else {
-                    alert('Erreur Google: ' + (data.error || 'Connexion échouée'));
-                }
+                await finishGoogleAuth(idToken);
             } catch (e) {
                 console.error('Google sign-in error', e);
                 // Dump complet de l'erreur pour diagnostic (code, message, et toutes les propriétés).
