@@ -5,7 +5,7 @@
   "author": "SEN GP Team",
   "license": "MIT",
   "scripts": {
-    "build": "mkdir -p www && cp *.html www/ && cp -r im www/ 2>/dev/null || true",
+    "build": "mkdir -p www && cp *.html manifest.json sw.js config.js www/ && cp -r icons www/ && (cp -r im www/ 2>/dev/null || true) && rm -f www/*Copie*",
     "build:all": "npm run build && cd backend && npm install && npm run build",
     "ionic:build": "npm run build",
     "ionic:serve": "npx http-server www -p 8100",

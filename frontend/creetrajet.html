@@ -460,6 +460,15 @@
             display: none;
         }
     </style>
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SEN GP">
+    <link rel="apple-touch-icon" href="icons/icon-180.png">
+    <script src="config.js"></script>
 </head>
 <body>
     <div class="mobile-frame">
@@ -816,7 +825,7 @@
                 formData.append('available_weight', availableWeight);
 
                 // API call to create trip
-                const response = await fetch('http://localhost:5000/api/v1/trips', {
+                const response = await fetch(window.API_BASE_URL + '/trips', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${authToken}`
