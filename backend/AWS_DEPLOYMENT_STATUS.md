@@ -15,7 +15,7 @@
 - ✅ EC2 Instance (t3.small)
 - ✅ RDS PostgreSQL Database (db.t3.micro)
   - Username: sengpadmin
-  - Password: SengP2024SecureDB!
+  - Password: (stored securely — see AWS Secrets Manager / EB console)
   - Engine: PostgreSQL 16.6
 - ✅ Application Load Balancer
 - ✅ Auto Scaling Group
@@ -124,7 +124,7 @@ RDS_HOSTNAME = <rds-endpoint>
 RDS_PORT = 5432
 RDS_DB_NAME = ebdb
 RDS_USERNAME = sengpadmin
-RDS_PASSWORD = SengP2024SecureDB!
+RDS_PASSWORD = <redacted — check EB console>
 ```
 
 ### 6. Test Locally with Docker
@@ -158,12 +158,12 @@ curl http://localhost:5000
 NODE_ENV=production
 PORT=5000
 API_VERSION=v1
-JWT_SECRET=sengp-production-jwt-secret-2024-secure-key
-JWT_REFRESH_SECRET=sengp-production-refresh-secret-2024-secure-key
+JWT_SECRET=<redacted>
+JWT_REFRESH_SECRET=<redacted>
 JWT_EXPIRES_IN=24h
 JWT_REFRESH_EXPIRES_IN=7d
-AWS_ACCESS_KEY_ID=AKIA2LIP2D4UMLIMBD6G
-AWS_SECRET_ACCESS_KEY=PphIWu9OpwljYGKilb3XVvHdqurpOtFsmTkp6qEa
+AWS_ACCESS_KEY_ID=<redacted>
+AWS_SECRET_ACCESS_KEY=<redacted>
 AWS_REGION=us-east-1
 AWS_S3_BUCKET=sengp-storage
 BCRYPT_ROUNDS=12
@@ -230,7 +230,7 @@ Current resources cost approximately:
 1. Rotate your AWS access keys:
    - Go to AWS IAM Console
    - Navigate to Security Credentials
-   - Delete the old access key: `AKIA2LIP2D4UMLIMBD6G`
+   - Delete the old (compromised) access key that was previously committed here
    - Create a new access key
    - Update your local AWS configuration: `aws configure`
 
