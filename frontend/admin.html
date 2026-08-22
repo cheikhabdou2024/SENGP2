@@ -354,11 +354,20 @@
         }
 
         // Fetch the signed-in admin's permission list (drives section visibility).
+        // Falls back to full access ('*') when the endpoint is unavailable — e.g. an
+        // older backend that predates RBAC (404), or a transient error — so the
+        // dashboard stays usable. The backend still enforces every action, so this
+        // only affects which buttons are shown, never what actually succeeds.
         async function loadPermissions(){
             try {
-                const { ok, json } = await api('/admin/me/permissions');
-                myPerms = (ok && json.data && json.data.permissions) ? json.data.permissions : [];
-            } catch (e) { myPerms = []; }
+                const { ok, json, status } = await api('/admin/me/permissions');
+                if (ok && json.data && Array.isArray(json.data.permissions)) {
+                    myPerms = json.data.permissions;
+                } else {
+                    // 404 = backend has no RBAC yet; any other failure = don't lock the UI.
+                    myPerms = ['*'];
+                }
+            } catch (e) { myPerms = ['*']; }
         }
         // Hide sidebar sections the admin has no permission for.
         function applyPermissionGates(){
