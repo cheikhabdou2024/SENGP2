@@ -11,7 +11,7 @@
 export const ALL_PERMISSIONS = [
   'users:read', 'users:write', 'users:verify', 'users:delete',
   'missions:read', 'missions:write', 'missions:assign', 'missions:delete',
-  'trips:read', 'trips:delete',
+  'trips:read', 'trips:write', 'trips:delete',
   'payments:read', 'payments:refund', 'payments:export',
   'withdrawals:read', 'withdrawals:approve', 'withdrawals:payout',
   'claims:read', 'claims:write',

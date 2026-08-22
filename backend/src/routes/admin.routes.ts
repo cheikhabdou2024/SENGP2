@@ -35,12 +35,16 @@ router.post('/kyc/:id/approve', requirePermission('users:verify'), AdminControll
 router.post('/kyc/:id/reject', requirePermission('users:verify'), AdminController.rejectKyc);
 
 router.get('/missions', requirePermission('missions:read'), AdminController.listMissions);
+router.get('/missions/:id', requirePermission('missions:read'), AdminController.getMissionDetail);
 router.put('/missions/:id', requirePermission('missions:write'), AdminController.updateMission);
 router.post('/missions/:id/assign', requirePermission('missions:assign'), AdminController.assignMission);
+router.post('/missions/:id/reassign', requirePermission('missions:assign'), AdminController.reassignMission);
 router.post('/missions/:id/confirm-arrival', requirePermission('missions:write'), AdminController.confirmArrival);
 router.delete('/missions/:id', requirePermission('missions:delete'), AdminController.deleteMission);
 
 router.get('/trips', requirePermission('trips:read'), AdminController.listTrips);
+router.get('/trips/:id', requirePermission('trips:read'), AdminController.getTripDetail);
+router.put('/trips/:id', requirePermission('trips:write'), AdminController.updateTrip);
 router.delete('/trips/:id', requirePermission('trips:delete'), AdminController.deleteTrip);
 
 router.get('/payments', requirePermission('payments:read'), AdminController.listPayments);

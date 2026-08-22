@@ -154,6 +154,25 @@ export class AdminController {
       ResponseUtil.badRequest(res, e.message || 'Confirmation failed');
     }
   }
+  static async getMissionDetail(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const d = await AdminService.getMissionDetail(req.params.id);
+      ResponseUtil.success(res, d);
+    } catch (e: any) {
+      if (e.message === 'Mission not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Failed');
+    }
+  }
+  static async reassignMission(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const m = await AdminService.reassignMission(req.params.id, req.body.gp_id);
+      void logAdminAction({ req, action: 'mission.reassign', entityType: 'mission', entityId: req.params.id, metadata: { gp_id: req.body.gp_id } });
+      ResponseUtil.success(res, m, 'Mission réassignée — le GP a été notifié');
+    } catch (e: any) {
+      if (e.message === 'Mission not found' || e.message === 'GP not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Reassign failed');
+    }
+  }
 
   // Trips
   static async listTrips(req: AuthRequest, res: Response): Promise<void> {
@@ -170,6 +189,25 @@ export class AdminController {
     } catch (e: any) {
       if (e.message && e.message.includes('not found')) return void ResponseUtil.notFound(res, e.message);
       ResponseUtil.badRequest(res, e.message || 'Delete failed');
+    }
+  }
+  static async getTripDetail(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const d = await AdminService.getTripDetail(req.params.id);
+      ResponseUtil.success(res, d);
+    } catch (e: any) {
+      if (e.message === 'Trip not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Failed');
+    }
+  }
+  static async updateTrip(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const t = await AdminService.updateTrip(req.params.id, req.body);
+      void logAdminAction({ req, action: 'trip.update', entityType: 'trip', entityId: req.params.id, metadata: { fields: Object.keys(req.body || {}) } });
+      ResponseUtil.success(res, t, 'Trip updated');
+    } catch (e: any) {
+      if (e.message === 'Trip not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Update failed');
     }
   }
 

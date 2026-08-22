@@ -463,6 +463,79 @@ export class AdminService {
     }
   }
 
+  /** Full mission detail: parties + trip + tracking timeline + payment/claims. */
+  static async getMissionDetail(id: string) {
+    const m = await pool.query(
+      `SELECT m.*,
+              e.first_name || ' ' || e.last_name AS expediteur_name, e.phone AS expediteur_phone, e.email AS expediteur_email,
+              g.first_name || ' ' || g.last_name AS gp_name, g.phone AS gp_phone, g.email AS gp_email,
+              t.trip_code, t.departure_date AS trip_departure_date, t.flight_number, t.airline
+         FROM missions m
+         LEFT JOIN users e ON m.expediteur_id = e.id
+         LEFT JOIN users g ON m.gp_id = g.id
+         LEFT JOIN trips t ON m.trip_id = t.id
+        WHERE m.id = $1`,
+      [id]
+    );
+    if (m.rows.length === 0) throw new Error('Mission not found');
+    const mission = m.rows[0];
+    // Presign package photos + QR when they are stored as S3 keys.
+    let photos = mission.package_photos;
+    if (typeof photos === 'string') { try { photos = JSON.parse(photos); } catch { photos = []; } }
+    if (Array.isArray(photos)) mission.package_photos = photos.map((p: string) => resolveEvidenceUrl(p));
+    if (mission.qr_code_url) mission.qr_code_url = resolveEvidenceUrl(mission.qr_code_url);
+
+    const [tracking, payment, claims] = await Promise.all([
+      pool.query(
+        `SELECT tr.id, tr.status, tr.location, tr.latitude, tr.longitude, tr.description, tr.created_at,
+                u.first_name || ' ' || u.last_name AS by_name
+           FROM mission_tracking tr
+           LEFT JOIN users u ON tr.created_by = u.id
+          WHERE tr.mission_id = $1 ORDER BY tr.created_at ASC`, [id]),
+      pool.query(
+        `SELECT payment_code, amount, commission, net_amount, payment_method, status, created_at
+           FROM payments WHERE mission_id = $1 ORDER BY created_at DESC`, [id]),
+      pool.query(
+        `SELECT claim_code, claim_type, status, priority, created_at
+           FROM claims WHERE mission_id = $1 ORDER BY created_at DESC`, [id]),
+    ]);
+    return { mission, tracking: tracking.rows, payments: payment.rows, claims: claims.rows };
+  }
+
+  /**
+   * Reassign a mission to a different GP (works whatever the current state,
+   * unlike assignMission which only claims a still-pending mission). Resets the
+   * mission to 'matched' + clears arrival confirmation, and notifies the new GP.
+   */
+  static async reassignMission(missionId: string, gpId: string) {
+    if (!gpId) throw new Error('gp_id is required');
+    const gp = await pool.query(
+      `SELECT id FROM users WHERE id = $1 AND user_type = 'gp' AND deleted_at IS NULL`, [gpId]
+    );
+    if (gp.rows.length === 0) throw new Error('GP not found');
+    const upd = await pool.query(
+      `UPDATE missions
+          SET gp_id = $1, status = 'matched', arrival_confirmed = FALSE, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $2
+        RETURNING id, mission_code, departure_city, arrival_city, offered_price, final_price`,
+      [gpId, missionId]
+    );
+    if (upd.rows.length === 0) throw new Error('Mission not found');
+    const m = upd.rows[0];
+    const route = `${m.departure_city} → ${m.arrival_city}`;
+    try {
+      await NotificationService.create({
+        user_id: gpId,
+        notification_type: NotificationType.MISSION_ASSIGNED,
+        title: `Mission réassignée : ${route}`,
+        message: `La mission ${m.mission_code} vous a été (ré)assignée. Acceptez ou déclinez depuis vos notifications.`,
+        action_url: 'notifications.html',
+        metadata: { mission_id: m.id, mission_code: m.mission_code, route, price: m.final_price ?? m.offered_price },
+      });
+    } catch (e) { logger.warn(`Mission ${missionId} reassigned but notification failed`); }
+    return m;
+  }
+
   // ---------- Trips ----------
   static async listTrips(params: { page: number; limit: number; search?: string; status?: string }) {
     const { page, limit, offset } = Helpers.getPaginationParams(params.page, params.limit);
@@ -491,6 +564,37 @@ export class AdminService {
     const result = await pool.query(`DELETE FROM trips WHERE id = $1 RETURNING id`, [id]);
     if (result.rows.length === 0) throw new Error('Trip not found (it may have linked missions)');
     return { id, deleted: true };
+  }
+
+  /** Trip detail: GP + linked missions. */
+  static async getTripDetail(id: string) {
+    const t = await pool.query(
+      `SELECT t.*, g.first_name || ' ' || g.last_name AS gp_name, g.phone AS gp_phone, g.email AS gp_email
+         FROM trips t LEFT JOIN users g ON t.gp_id = g.id WHERE t.id = $1`, [id]
+    );
+    if (t.rows.length === 0) throw new Error('Trip not found');
+    const missions = await pool.query(
+      `SELECT id, mission_code, status, departure_city, arrival_city, offered_price AS price, package_weight AS weight
+         FROM missions WHERE trip_id = $1 ORDER BY created_at DESC`, [id]
+    );
+    return { trip: t.rows[0], missions: missions.rows };
+  }
+
+  /** Moderate a trip (publish / unpublish / cancel, adjust capacity). */
+  static async updateTrip(id: string, data: any) {
+    const allowed = ['status', 'available_weight', 'max_packages'];
+    const sets: string[] = [];
+    const args: any[] = [];
+    let i = 1;
+    for (const key of allowed) {
+      if (data[key] !== undefined) { sets.push(`${key} = $${i++}`); args.push(data[key]); }
+    }
+    if (sets.length === 0) throw new Error('No updatable fields provided');
+    sets.push(`updated_at = CURRENT_TIMESTAMP`);
+    args.push(id);
+    const r = await pool.query(`UPDATE trips SET ${sets.join(', ')} WHERE id = $${i} RETURNING *`, args);
+    if (r.rows.length === 0) throw new Error('Trip not found');
+    return r.rows[0];
   }
 
   // ---------- Payments (read-only) ----------

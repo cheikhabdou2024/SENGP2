@@ -44,7 +44,7 @@ INSERT INTO admin_role (key, name, description, permissions, is_system) VALUES
      '["*"]', TRUE),
     ('operations', 'Opérations',
      'Gère les missions, l''affectation des GP et les trajets.',
-     '["users:read","missions:read","missions:write","missions:assign","missions:delete","trips:read","trips:delete","analytics:read","broadcast:send"]', TRUE),
+     '["users:read","missions:read","missions:write","missions:assign","missions:delete","trips:read","trips:write","trips:delete","analytics:read","broadcast:send"]', TRUE),
     ('finance', 'Finance',
      'Gère les paiements, remboursements et retraits.',
      '["payments:read","payments:refund","payments:export","withdrawals:read","withdrawals:approve","withdrawals:payout","analytics:read","audit:read"]', TRUE),

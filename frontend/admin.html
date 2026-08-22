@@ -518,9 +518,14 @@
                     head: ['Code','Trajet','Prix','Statut','Expéditeur','GP','Actions'],
                     row: m => {
                         const acts = [];
+                        acts.push(['act-edit','Détails',`showMissionDetail('${m.id}')`]);
                         // Only unassigned, still-pending missions can be assigned to a GP.
                         if (m.status === 'pending' && !m.gp_name && can('missions:assign')) {
                             acts.push(['act-ok','Affecter',`assignMission('${m.id}','${esc(m.mission_code)}')`]);
+                        }
+                        // An already-assigned mission can be moved to another GP.
+                        if (m.gp_name && can('missions:assign')) {
+                            acts.push(['act-ok','Réassigner',`reassignMissionUI('${m.id}','${esc(m.mission_code)}')`]);
                         }
                         // GP arrived at destination, awaiting the admin's confirmation.
                         if (m.status === 'out_for_delivery' && !m.arrival_confirmed && can('missions:write')) {
@@ -538,13 +543,17 @@
                 },
                 trips: {
                     head: ['Code','Trajet','GP','Départ','Statut','Colis','Actions'],
-                    row: t => [
+                    row: t => {
+                        const acts = [['act-edit','Détails',`showTripDetail('${t.id}')`]];
+                        if (can('trips:write')) acts.push(['act-edit','Modérer',`moderateTrip('${t.id}','${esc(t.status)}')`]);
+                        if (can('trips:delete')) acts.push(['act-del','Suppr.',`delTrip('${t.id}','${esc(t.trip_code)}')`]);
+                        return [
                         esc(t.trip_code), esc((t.departure_city||'?')+' → '+(t.arrival_city||'?')),
                         esc(t.gp_name||'—'), dt(t.departure_date),
                         `<span class="badge ${badgeFor(t.status)}">${esc(t.status)}</span>`,
                         `${t.current_packages||0}/${t.max_packages||0}`,
-                        actions(can('trips:delete') ? [['act-del','Suppr.',`delTrip('${t.id}','${esc(t.trip_code)}')`]] : [])
-                    ]
+                        actions(acts)
+                    ]; }
                 },
                 payments: {
                     head: ['Code','Montant','Commission','Net','Méthode','Statut','Payeur','Bénéf.','Date'],
@@ -789,12 +798,14 @@
         // Assign a pending mission to a GP. The GP is notified and confirms via
         // their notifications page (accept → mission becomes 'accepted'; decline →
         // released back to 'pending'). Backed by POST /admin/missions/:id/assign.
-        async function assignMission(id, code){
-            let { ok, json } = await api('/admin/users?user_type=gp&limit=200');
-            if (!ok) { toast('Erreur chargement des GPs: '+(json.error||json.message), 'err'); return; }
+        // Shared GP picker (used by both Affecter and Réassigner). Loads GPs,
+        // groups them by destination region, and calls handler(gpId) on confirm.
+        let _gpPickHandler = null;
+        async function openGpPicker(title, confirmLabel, handler){
+            const { ok, json } = await api('/admin/users?user_type=gp&limit=200');
+            if (!ok) { toast('Erreur chargement des GPs: '+((json&&(json.error||json.message))||''), 'err'); return; }
             const gps = (json.data || []).filter(g => g.status !== 'suspended');
-            if (!gps.length) { toast('Aucun GP disponible à affecter.', 'err'); return; }
-            // GPs are organised by category (destination region) in the picker.
+            if (!gps.length) { toast('Aucun GP disponible.', 'err'); return; }
             const region = (country) => {
                 const c = String(country||'').toLowerCase();
                 if (/france|espagne|spain|itali|allemagne|german|belg|portugal|royaume|angleterre|england|uk|pays-bas|suisse|europe/.test(c)) return '🇪🇺 Europe';
@@ -810,20 +821,32 @@
                 .filter(r => groups[r])
                 .map(r => `<optgroup label="${r}">${groups[r].map(opt).join('')}</optgroup>`)
                 .join('');
-            const old = document.getElementById('assignModal'); if (old) old.remove();
-            const ov = document.createElement('div');
-            ov.id = 'assignModal';
-            ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9999;';
-            ov.innerHTML =
-                '<div style="background:#1b1838;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:24px;width:90%;max-width:420px;">'
-              + '<div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:6px;">🎯 Affecter la mission ' + esc(code) + '</div>'
-              + '<div style="font-size:13px;color:rgba(255,255,255,.55);margin-bottom:16px;">Sélectionnez un GP. Il recevra une notification avec les détails et pourra l\'accepter ou la décliner.</div>'
-              + '<select id="assignGpSelect" style="width:100%;padding:11px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:14px;margin-bottom:18px;">' + opts + '</select>'
-              + '<div style="display:flex;gap:10px;">'
-              + '<button onclick="document.getElementById(\'assignModal\').remove()" style="flex:1;padding:11px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:rgba(255,255,255,.8);font-weight:600;cursor:pointer;">Annuler</button>'
-              + '<button id="assignConfirmBtn" onclick="confirmAssign(\'' + id + '\')" style="flex:1;padding:11px;background:linear-gradient(135deg,#FFD700,#FFA500);border:none;border-radius:10px;color:#1a1a2e;font-weight:700;cursor:pointer;">Affecter &amp; notifier</button>'
-              + '</div></div>';
-            document.body.appendChild(ov);
+            _gpPickHandler = handler;
+            const ov = openModal(
+                '<h3>' + esc(title) + '</h3>'
+              + '<p class="hint">Sélectionnez un GP. Il recevra une notification et pourra accepter ou décliner.</p>'
+              + '<label>Gros Porteur</label><select id="gpPickSelect">' + opts + '</select>'
+              + '<div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Annuler</button>'
+              + '<button class="btn-confirm" id="gpPickBtn" onclick="gpPickerConfirm()">' + esc(confirmLabel) + '</button></div>');
+        }
+        async function gpPickerConfirm(){
+            const sel = document.getElementById('gpPickSelect');
+            const gpId = sel && sel.value; if (!gpId) return;
+            const btn = document.getElementById('gpPickBtn'); if (btn) { btn.disabled = true; btn.textContent = '…'; }
+            const h = _gpPickHandler; closeModal();
+            if (h) await h(gpId);
+        }
+        function assignMission(id, code){
+            openGpPicker('🎯 Affecter la mission ' + code, 'Affecter & notifier', async (gpId) => {
+                const { ok, json } = await api('/admin/missions/'+id+'/assign', { method:'POST', body: JSON.stringify({ gp_id: gpId }) });
+                notify(ok, 'Mission affectée — le GP a été notifié.', json); if (ok) loadList();
+            });
+        }
+        function reassignMissionUI(id, code){
+            openGpPicker('🔄 Réassigner la mission ' + code, 'Réassigner & notifier', async (gpId) => {
+                const { ok, json } = await api('/admin/missions/'+id+'/reassign', { method:'POST', body: JSON.stringify({ gp_id: gpId }) });
+                notify(ok, 'Mission réassignée — le GP a été notifié.', json); if (ok) loadList();
+            });
         }
         async function confirmArrival(id, code){
             if (!await confirmDialog('Confirmer l\'arrivée du GP à destination pour ' + code + ' ? À faire après l\'appel WhatsApp de vérification. Le GP pourra alors scanner le QR du destinataire.', { title:'Confirmer l\'arrivée', confirmLabel:'Confirmer' })) return;
@@ -831,16 +854,82 @@
             notify(ok, 'Arrivée confirmée — le GP peut livrer.', json);
             if (ok) loadList();
         }
-        async function confirmAssign(missionId){
-            const sel = document.getElementById('assignGpSelect');
-            const gpId = sel && sel.value;
-            if (!gpId) return;
-            const btn = document.getElementById('assignConfirmBtn');
-            if (btn){ btn.disabled = true; btn.textContent = 'Affectation…'; }
-            const { ok, json } = await api('/admin/missions/'+missionId+'/assign', { method:'POST', body: JSON.stringify({ gp_id: gpId }) });
-            const modal = document.getElementById('assignModal'); if (modal) modal.remove();
-            notify(ok, 'Mission affectée — le GP a été notifié.', json);
-            if (ok) loadList();
+        // ---------- Mission detail (timeline + GPS map + parties) ----------
+        async function showMissionDetail(id){
+            const { ok, json } = await api('/admin/missions/'+id);
+            if (!ok) { toast('Erreur chargement de la mission', 'err'); return; }
+            const d = json.data; const m = d.mission;
+            const tel = (p) => p ? `<a href="tel:${esc(p)}">${esc(p)}</a>` : '—';
+            const party = (label, name, phone, email) =>
+                `<div style="flex:1;min-width:160px"><div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase">${label}</div>`
+              + `<div style="font-weight:600">${esc(name||'—')}</div><div style="font-size:12px;color:rgba(255,255,255,.7)">${tel(phone)}</div>`
+              + `<div style="font-size:12px;color:rgba(255,255,255,.5)">${esc(email||'')}</div></div>`;
+            // Timeline from mission_tracking
+            const tl = (d.tracking||[]).map(t => {
+                const gps = (t.latitude && t.longitude) ? ` · 📍 <a href="https://www.google.com/maps?q=${t.latitude},${t.longitude}" target="_blank">${(+t.latitude).toFixed(4)}, ${(+t.longitude).toFixed(4)}</a>` : '';
+                return `<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span class="badge ${badgeFor(t.status)}">${esc(t.status)}</span>
+                    <span style="font-size:11px;color:rgba(255,255,255,.5)">${new Date(t.created_at).toLocaleString('fr-FR')}</span></div>
+                    <div style="font-size:13px;color:rgba(255,255,255,.75);margin-top:3px">${esc(t.location||'')}${esc(t.description?(' — '+t.description):'')}${gps}</div></div>`;
+            }).join('') || '<div style="color:rgba(255,255,255,.4);padding:8px 0">Aucun événement de suivi.</div>';
+            // Latest GPS → inline OpenStreetMap (no key needed)
+            const pts = (d.tracking||[]).filter(t => t.latitude && t.longitude);
+            const last = pts.length ? pts[pts.length-1] : null;
+            const map = last ? `<div style="font-weight:600;margin:12px 0 6px">Dernière position</div>
+                <iframe title="carte" width="100%" height="220" style="border:1px solid rgba(255,255,255,.15);border-radius:10px"
+                 src="https://www.openstreetmap.org/export/embed.html?bbox=${(+last.longitude-0.02)}%2C${(+last.latitude-0.02)}%2C${(+last.longitude+0.02)}%2C${(+last.latitude+0.02)}&layer=mapnik&marker=${last.latitude}%2C${last.longitude}"></iframe>` : '';
+            const pay = (d.payments||[]).map(p => `<tr><td>${esc(p.payment_code)}</td><td>${fcfa(p.amount)}</td><td>${esc(p.payment_method)}</td><td><span class="badge ${badgeFor(p.status)}">${esc(p.status)}</span></td></tr>`).join('') || '<tr><td colspan="4" style="color:rgba(255,255,255,.4)">Aucun paiement</td></tr>';
+            const clm = (d.claims||[]).map(c => `<span class="badge ${badgeFor(c.status)}">${esc(c.claim_code)} · ${esc(c.claim_type)} (${esc(c.status)})</span>`).join(' ') || '<span style="color:rgba(255,255,255,.4)">Aucune</span>';
+            const reassignBtn = (m.gp_id && can('missions:assign'))
+                ? `<button class="btn-confirm" onclick="closeModal();reassignMissionUI('${m.id}','${esc(m.mission_code)}')">Réassigner</button>` : '';
+            openModal(
+                `<h3>${esc(m.mission_code)} <span class="badge ${badgeFor(m.status)}">${esc(m.status)}</span></h3>`
+              + `<p class="hint">${esc((m.departure_city||'?')+' → '+(m.arrival_city||'?'))} · ${fcfa(m.final_price || m.offered_price)} · ${esc(String(m.package_weight||'?'))} kg${m.arrival_confirmed?' · ✅ arrivée confirmée':''}</p>`
+              + `<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px">`
+              + party('Expéditeur', m.expediteur_name, m.expediteur_phone, m.expediteur_email)
+              + party('Gros Porteur', m.gp_name, m.gp_phone, m.gp_email)
+              + party('Destinataire', m.recipient_name, m.recipient_phone, '')
+              + `</div>`
+              + `<div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:4px">Enlèvement : ${esc(m.pickup_address||'—')}</div>`
+              + `<div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:4px">Livraison : ${esc(m.delivery_address||'—')}</div>`
+              + (m.package_description?`<div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:4px">Colis : ${esc(m.package_description)}</div>`:'')
+              + (m.trip_code?`<div style="font-size:13px;color:rgba(255,255,255,.7)">Trajet : ${esc(m.trip_code)} ${m.flight_number?('· '+esc(m.flight_number)):''} ${m.airline?('· '+esc(m.airline)):''}</div>`:'')
+              + map
+              + `<div style="font-weight:600;margin:14px 0 4px">Suivi</div>${tl}`
+              + `<div style="font-weight:600;margin:14px 0 6px">Paiements</div><div class="table-wrap"><table style="min-width:auto"><tbody>${pay}</tbody></table></div>`
+              + `<div style="font-weight:600;margin:14px 0 6px">Réclamations</div><div>${clm}</div>`
+              + `<div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Fermer</button>${reassignBtn}</div>`
+            );
+        }
+
+        // ---------- Trip detail + moderation ----------
+        async function showTripDetail(id){
+            const { ok, json } = await api('/admin/trips/'+id);
+            if (!ok) { toast('Erreur chargement du trajet', 'err'); return; }
+            const t = json.data.trip; const missions = json.data.missions || [];
+            const rows = missions.map(m => `<tr><td>${esc(m.mission_code)}</td><td>${esc((m.departure_city||'?')+'→'+(m.arrival_city||'?'))}</td><td>${fcfa(m.price)}</td><td><span class="badge ${badgeFor(m.status)}">${esc(m.status)}</span></td></tr>`).join('')
+                || '<tr><td colspan="4" style="color:rgba(255,255,255,.4)">Aucune mission liée</td></tr>';
+            openModal(
+                `<h3>${esc(t.trip_code)} <span class="badge ${badgeFor(t.status)}">${esc(t.status)}</span></h3>`
+              + `<p class="hint">${esc((t.departure_city||'?')+' → '+(t.arrival_city||'?'))} · ${dt(t.departure_date)} → ${dt(t.arrival_date)}</p>`
+              + `<div style="font-size:13px;color:rgba(255,255,255,.7)">GP : ${esc(t.gp_name||'—')} · ${t.gp_phone?`<a href="tel:${esc(t.gp_phone)}">${esc(t.gp_phone)}</a>`:'—'}</div>`
+              + `<div style="font-size:13px;color:rgba(255,255,255,.7)">${t.flight_number?('Vol '+esc(t.flight_number)+' '):''}${t.airline?('· '+esc(t.airline)):''} · Capacité ${t.current_packages||0}/${t.max_packages||0} colis · ${esc(String(t.available_weight||'?'))} kg dispo</div>`
+              + `<div style="font-weight:600;margin:14px 0 6px">Missions du trajet</div><div class="table-wrap"><table style="min-width:auto"><tbody>${rows}</tbody></table></div>`
+              + `<div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Fermer</button>`
+              + (can('trips:write')?`<button class="btn-confirm" onclick="closeModal();moderateTrip('${t.id}','${esc(t.status)}')">Modérer</button>`:'')
+              + `</div>`
+            );
+        }
+        async function moderateTrip(id, cur){
+            const v = await formModal({
+                title: 'Modérer le trajet',
+                hint: 'Changer le statut (publier, dépublier, annuler).',
+                fields: [{ name:'status', label:'Statut', type:'select', value: cur, options:['draft','published','active','completed','cancelled'] }],
+                confirmLabel: 'Appliquer'
+            });
+            if (!v || !v.status) return;
+            const { ok, json } = await api('/admin/trips/'+id, { method:'PUT', body: JSON.stringify({ status: v.status }) });
+            notify(ok, 'Trajet mis à jour', json); if (ok) loadList();
         }
         async function delTrip(id, code){
             if (!await confirmDialog('Supprimer le trajet ' + code + ' ?', { danger:true, confirmLabel:'Supprimer', title:'Supprimer le trajet' })) return;
