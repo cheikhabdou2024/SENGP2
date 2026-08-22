@@ -59,6 +59,53 @@ export class AdminController {
       ResponseUtil.badRequest(res, e.message || 'Delete failed');
     }
   }
+  static async getUserDetail(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const d = await AdminService.getUserDetail(req.params.id);
+      ResponseUtil.success(res, d);
+    } catch (e: any) {
+      if (e.message === 'User not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Failed');
+    }
+  }
+  static async createUser(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const u = await AdminService.createUser(req.body);
+      void logAdminAction({ req, action: 'user.create', entityType: 'user', entityId: u.id, description: u.email });
+      ResponseUtil.created(res, u, 'User created');
+    } catch (e: any) {
+      if (e.message === 'Email already registered') return void ResponseUtil.conflict(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Create failed');
+    }
+  }
+
+  // KYC / identity verification
+  static async listKyc(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const r = await AdminService.listKyc(listParams(req));
+      ResponseUtil.success(res, r.data, undefined, r.pagination);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
+  }
+  static async approveKyc(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const u = await AdminService.approveKyc(req.params.id, req.user!.id);
+      void logAdminAction({ req, action: 'kyc.approve', entityType: 'user', entityId: req.params.id });
+      ResponseUtil.success(res, u, 'Identité vérifiée');
+    } catch (e: any) {
+      if (e.message === 'User not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Approve failed');
+    }
+  }
+  static async rejectKyc(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const r = await AdminService.rejectKyc(req.params.id, req.user!.id, req.body.reason);
+      void logAdminAction({ req, action: 'kyc.reject', entityType: 'user', entityId: req.params.id, description: req.body.reason });
+      ResponseUtil.success(res, r, 'Pièce refusée');
+    } catch (e: any) {
+      if (e.message === 'User not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Reject failed');
+    }
+  }
 
   // Missions
   static async listMissions(req: AuthRequest, res: Response): Promise<void> {

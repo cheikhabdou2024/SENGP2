@@ -211,6 +211,7 @@
             <div class="sidebar">
                 <div class="nav-link active" data-view="overview" onclick="switchView('overview',this)">📊 <span>Vue globale</span></div>
                 <div class="nav-link" data-view="users" data-perm="users:read" onclick="switchView('users',this)">👥 <span>Utilisateurs</span></div>
+                <div class="nav-link" data-view="kyc" data-perm="users:verify" onclick="switchView('kyc',this)">🪪 <span>Vérification KYC</span></div>
                 <div class="nav-link" data-view="missions" data-perm="missions:read" onclick="switchView('missions',this)">📦 <span>Missions</span></div>
                 <div class="nav-link" data-view="trips" data-perm="trips:read" onclick="switchView('trips',this)">✈️ <span>Trajets</span></div>
                 <div class="nav-link" data-view="payments" data-perm="payments:read" onclick="switchView('payments',this)">💳 <span>Paiements</span></div>
@@ -388,11 +389,15 @@
             const main = document.getElementById('main');
             if (state.view === 'overview') return renderOverview(main);
             if (state.view === 'roles') return renderRoles(main);
+            if (state.view === 'kyc') return renderKyc(main);
+            const createBtn = (state.view === 'users' && can('users:write'))
+                ? `<button style="margin-left:auto;background:#7ee081;color:#06302c" onclick="createUserModal()">+ Créer un utilisateur</button>` : '';
             main.innerHTML = `
                 <div class="toolbar">
                     <input id="search" placeholder="Rechercher…" value="${esc(state.search)}">
                     ${statusFilter()}
                     <button onclick="applyFilters()">Filtrer</button>
+                    ${createBtn}
                 </div>
                 <div id="tableArea"><div class="loading">Chargement…</div></div>
                 <div class="pager" id="pager"></div>`;
@@ -488,7 +493,7 @@
                 <button ${(p.page||1)<=1?'disabled':''} onclick="goPage(${(p.page||1)-1})">←</button>
                 <button ${(p.page||1)>=totalPages?'disabled':''} onclick="goPage(${(p.page||1)+1})">→</button>`;
         }
-        function goPage(n){ state.page = n; loadList(); }
+        function goPage(n){ state.page = n; (state.view === 'kyc' ? loadKyc() : loadList()); }
 
         function renderTable(view, rows){
             if (!rows.length) return '<div class="empty">Aucun élément.</div>';
@@ -497,6 +502,7 @@
                     head: ['Nom','Email','Type','Statut','Ville','Inscrit','Actions'],
                     row: u => {
                         const acts = [];
+                        acts.push(['act-edit','Détails',`showUserDetail('${u.id}')`]);
                         if (can('users:write')) acts.push(['act-edit','Éditer',`editUser('${u.id}')`]);
                         if (can('roles:manage')) acts.push(['act-ok','Rôle',`assignRole('${u.id}','${esc(u.email)}')`]);
                         if (can('users:delete')) acts.push(['act-del','Suppr.',`delUser('${u.id}','${esc(u.email)}')`]);
@@ -631,22 +637,132 @@
 
         // ---------- Actions ----------
         async function editUser(id){
+            // Prefill from the user's current data.
+            const det = await api('/admin/users/'+id);
+            const u = (det.ok && det.json.data && det.json.data.user) ? det.json.data.user : {};
             const v = await formModal({
                 title: 'Éditer l\'utilisateur',
-                hint: 'Laissez « — » pour ne pas changer un champ. Pour accorder un rôle admin, utilisez « Rôle ».',
+                hint: 'Modifiez les champs voulus. Laissez le mot de passe vide pour le conserver. Pour accorder un rôle admin, utilisez « Rôle ».',
                 fields: [
-                    { name:'status', label:'Statut', type:'select', options:[['','—'],['pending','pending'],['verified','verified'],['suspended','suspended']] },
-                    { name:'user_type', label:'Type', type:'select', options:[['','—'],['expediteur','expediteur'],['gp','gp'],['admin','admin']] },
+                    { name:'first_name', label:'Prénom', value: u.first_name || '' },
+                    { name:'last_name', label:'Nom', value: u.last_name || '' },
+                    { name:'phone', label:'Téléphone', value: u.phone || '' },
+                    { name:'city', label:'Ville', value: u.city || '' },
+                    { name:'status', label:'Statut', type:'select', value: u.status, options:['pending','verified','suspended'] },
+                    { name:'user_type', label:'Type', type:'select', value: u.user_type, options:['expediteur','gp','admin'] },
+                    { name:'is_email_verified', label:'Email vérifié', type:'select', value: String(!!u.is_email_verified), options:[['true','Oui'],['false','Non']] },
+                    { name:'password', label:'Nouveau mot de passe (optionnel)', inputType:'password', value:'' },
                 ],
                 confirmLabel: 'Mettre à jour'
             });
             if (!v) return;
-            const body = {};
-            if (v.status) body.status = v.status;
-            if (v.user_type) body.user_type = v.user_type;
-            if (!Object.keys(body).length) { toast('Aucun changement', 'info'); return; }
+            const body = {
+                first_name: v.first_name, last_name: v.last_name, phone: v.phone, city: v.city,
+                status: v.status, user_type: v.user_type,
+                is_email_verified: v.is_email_verified === 'true',
+            };
+            if (v.password) body.password = v.password;
             const { ok, json } = await api('/admin/users/'+id, { method:'PUT', body: JSON.stringify(body) });
             notify(ok, 'Utilisateur mis à jour', json); if (ok) loadList();
+        }
+        async function createUserModal(){
+            const v = await formModal({
+                title: 'Créer un utilisateur',
+                fields: [
+                    { name:'first_name', label:'Prénom' },
+                    { name:'last_name', label:'Nom' },
+                    { name:'email', label:'Email', inputType:'email' },
+                    { name:'phone', label:'Téléphone (optionnel)' },
+                    { name:'user_type', label:'Type', type:'select', options:[['expediteur','expediteur'],['gp','gp']] },
+                    { name:'password', label:'Mot de passe (min. 8 caractères)', inputType:'password' },
+                ],
+                confirmLabel: 'Créer'
+            });
+            if (!v) return;
+            if (!v.email || !v.password || !v.first_name || !v.last_name) { toast('Prénom, nom, email et mot de passe sont requis', 'err'); return; }
+            const { ok, json } = await api('/admin/users', { method:'POST', body: JSON.stringify(v) });
+            notify(ok, 'Utilisateur créé', json); if (ok) loadList();
+        }
+        async function showUserDetail(id){
+            const { ok, json } = await api('/admin/users/'+id);
+            if (!ok) { toast('Erreur chargement du profil', 'err'); return; }
+            const d = json.data; const u = d.user; const s = d.stats || {};
+            const docs = [];
+            if (u.identity_document_url) docs.push(`<a href="${esc(u.identity_document_url)}" target="_blank"><img src="${esc(u.identity_document_url)}" style="width:100%;border-radius:8px;border:1px solid rgba(255,255,255,.15)"></a>`);
+            if (u.identity_document_url_back) docs.push(`<a href="${esc(u.identity_document_url_back)}" target="_blank"><img src="${esc(u.identity_document_url_back)}" style="width:100%;border-radius:8px;border:1px solid rgba(255,255,255,.15)"></a>`);
+            const kyc = u.identity_verified_at
+                ? `<span class="badge b-green">Vérifié</span>`
+                : (docs.length ? `<span class="badge b-yellow">En attente</span>` : `<span class="badge b-gray">Aucune pièce</span>`);
+            const recent = (d.recent_missions||[]).map(m =>
+                `<tr><td>${esc(m.mission_code)}</td><td>${esc((m.departure_city||'?')+'→'+(m.arrival_city||'?'))}</td><td><span class="badge ${badgeFor(m.status)}">${esc(m.status)}</span></td><td>${dt(m.created_at)}</td></tr>`).join('')
+                || '<tr><td colspan="4" style="color:rgba(255,255,255,.4)">Aucune mission</td></tr>';
+            openModal(
+                `<h3>${esc(u.first_name+' '+u.last_name)}</h3>`
+              + `<p class="hint">${esc(u.email)} · ${esc(u.phone||'—')} · <span class="badge b-blue">${esc(u.user_type)}</span> <span class="badge ${badgeFor(u.status)}">${esc(u.status)}</span> ${kyc}</p>`
+              + `<div class="stats-grid" style="grid-template-columns:repeat(2,1fr)">`
+              + card('Envois (expéditeur)', s.missions_as_expediteur||0)
+              + card('Missions (GP)', s.missions_as_gp||0)
+              + card('Total payé', fcfa(s.total_paid))
+              + card('Réclamations', s.claims||0)
+              + `</div>`
+              + `<div style="font-size:13px;color:rgba(255,255,255,.6);margin:14px 0 6px">Localisation : ${esc((u.city||'—')+', '+(u.country||'—'))} · Inscrit le ${dt(u.created_at)}</div>`
+              + (docs.length ? `<div style="font-weight:600;margin:12px 0 6px">Pièce d'identité</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${docs.join('')}</div>` : '')
+              + `<div style="font-weight:600;margin:14px 0 6px">Missions récentes</div>`
+              + `<div class="table-wrap"><table style="min-width:auto"><tbody>${recent}</tbody></table></div>`
+              + `<div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Fermer</button></div>`
+            );
+        }
+
+        // ---------- KYC / Vérification ----------
+        async function renderKyc(main){
+            main.innerHTML = `
+                <div class="toolbar">
+                    <input id="search" placeholder="Rechercher…" value="${esc(state.search)}">
+                    <button onclick="state.search=(document.getElementById('search').value||'');state.page=1;loadKyc()">Filtrer</button>
+                </div>
+                <div id="kycArea"><div class="loading">Chargement…</div></div>
+                <div class="pager" id="pager"></div>`;
+            document.getElementById('search').addEventListener('keydown', e => { if (e.key === 'Enter') { state.search=e.target.value; state.page=1; loadKyc(); } });
+            loadKyc();
+        }
+        async function loadKyc(){
+            const area = document.getElementById('kycArea');
+            area.innerHTML = '<div class="loading">Chargement…</div>';
+            const q = `?page=${state.page}&limit=20` + (state.search ? `&search=${encodeURIComponent(state.search)}` : '');
+            const { ok, json, status } = await api('/admin/kyc/queue' + q);
+            if (!ok) { area.innerHTML = `<div class="empty">${status===403?'Accès refusé.':'Erreur.'}</div>`; return; }
+            const rows = json.data || [];
+            if (!rows.length) { area.innerHTML = '<div class="empty">Aucune pièce en attente de vérification. 🎉</div>'; renderPager(json.meta); return; }
+            area.innerHTML = rows.map(u => {
+                const imgs = [];
+                if (u.identity_document_url) imgs.push(`<a href="${esc(u.identity_document_url)}" target="_blank"><img src="${esc(u.identity_document_url)}" style="width:180px;height:120px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,.15)"></a>`);
+                if (u.identity_document_url_back) imgs.push(`<a href="${esc(u.identity_document_url_back)}" target="_blank"><img src="${esc(u.identity_document_url_back)}" style="width:180px;height:120px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,.15)"></a>`);
+                return `<div class="role-card">
+                    <div class="rc-head">
+                        <h4>${esc(u.first_name+' '+u.last_name)}</h4>
+                        <span class="badge b-blue">${esc(u.user_type)}</span>
+                        <span class="badge b-gray">${esc(u.identity_document_type||'pièce')}</span>
+                        <span style="color:rgba(255,255,255,.5);font-size:12px">${esc(u.email)} · ${esc(u.phone||'—')}</span>
+                    </div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">${imgs.join('') || '<span style="color:rgba(255,255,255,.4)">Pas d\'image</span>'}</div>
+                    <div class="row-actions">
+                        <button class="act act-ok" onclick="approveKycUser('${u.id}','${esc(u.first_name+' '+u.last_name)}')">✅ Approuver</button>
+                        <button class="act act-del" onclick="rejectKycUser('${u.id}','${esc(u.first_name+' '+u.last_name)}')">✖ Refuser</button>
+                    </div>
+                </div>`;
+            }).join('');
+            renderPager(json.meta);
+        }
+        async function approveKycUser(id, name){
+            if (!await confirmDialog('Valider l\'identité de ' + name + ' ?', { title:'Vérification KYC', confirmLabel:'Approuver' })) return;
+            const { ok, json } = await api('/admin/kyc/'+id+'/approve', { method:'POST' });
+            notify(ok, 'Identité vérifiée', json); if (ok) loadKyc();
+        }
+        async function rejectKycUser(id, name){
+            const v = await formModal({ title:'Refuser la pièce de ' + name, fields:[{ name:'reason', label:'Motif (envoyé à l\'utilisateur)', type:'textarea', placeholder:'Ex. photo illisible, document expiré…' }], confirmLabel:'Refuser' });
+            if (!v) return;
+            const { ok, json } = await api('/admin/kyc/'+id+'/reject', { method:'POST', body: JSON.stringify({ reason: v.reason }) });
+            notify(ok, 'Pièce refusée', json); if (ok) loadKyc();
         }
         async function delUser(id, email){
             if (!await confirmDialog('Désactiver le compte ' + email + ' ?', { danger:true, confirmLabel:'Supprimer', title:'Supprimer l\'utilisateur' })) return;

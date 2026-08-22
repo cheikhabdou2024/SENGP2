@@ -23,9 +23,16 @@ router.get('/me/permissions', AdminController.myPermissions);
 router.get('/stats', AdminController.stats);
 
 router.get('/users', requirePermission('users:read'), AdminController.listUsers);
+router.post('/users', requirePermission('users:write'), AdminController.createUser);
+router.get('/users/:id', requirePermission('users:read'), AdminController.getUserDetail);
 router.put('/users/:id', requirePermission('users:write'), AdminController.updateUser);
 router.put('/users/:id/role', requirePermission('roles:manage'), AdminController.setUserRole);
 router.delete('/users/:id', requirePermission('users:delete'), AdminController.deleteUser);
+
+// KYC / identity verification
+router.get('/kyc/queue', requirePermission('users:verify'), AdminController.listKyc);
+router.post('/kyc/:id/approve', requirePermission('users:verify'), AdminController.approveKyc);
+router.post('/kyc/:id/reject', requirePermission('users:verify'), AdminController.rejectKyc);
 
 router.get('/missions', requirePermission('missions:read'), AdminController.listMissions);
 router.put('/missions/:id', requirePermission('missions:write'), AdminController.updateMission);
