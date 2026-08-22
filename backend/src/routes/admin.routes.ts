@@ -48,10 +48,14 @@ router.put('/trips/:id', requirePermission('trips:write'), AdminController.updat
 router.delete('/trips/:id', requirePermission('trips:delete'), AdminController.deleteTrip);
 
 router.get('/payments', requirePermission('payments:read'), AdminController.listPayments);
+router.get('/payments/export', requirePermission('payments:export'), AdminController.exportPayments);
+router.post('/payments/:id/refund', requirePermission('payments:refund'), AdminController.refundPayment);
 
 router.get('/withdrawals', requirePermission('withdrawals:read'), AdminController.listWithdrawals);
+router.get('/withdrawals/export', requirePermission('withdrawals:read'), AdminController.exportWithdrawals);
 router.put('/withdrawals/:id/approve', requirePermission('withdrawals:approve'), AdminController.approveWithdrawal);
 router.put('/withdrawals/:id/reject', requirePermission('withdrawals:approve'), AdminController.rejectWithdrawal);
+router.put('/withdrawals/:id/paid', requirePermission('withdrawals:payout'), AdminController.payWithdrawal);
 
 router.get('/claims', requirePermission('claims:read'), AdminController.listClaims);
 router.put('/claims/:id', requirePermission('claims:write'), AdminController.updateClaim);

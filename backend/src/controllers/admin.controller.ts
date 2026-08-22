@@ -3,6 +3,7 @@ import { AdminService } from '../services/admin.service';
 import { WithdrawalService } from '../services/withdrawal.service';
 import { ResponseUtil } from '../utils/response';
 import { logAdminAction } from '../utils/audit';
+import { toCsv } from '../utils/csv';
 import { AuthRequest, UserType } from '../types';
 import logger from '../utils/logger';
 
@@ -218,6 +219,33 @@ export class AdminController {
       ResponseUtil.success(res, r.data, undefined, r.pagination);
     } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
   }
+  static async refundPayment(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const p = await AdminService.refundPayment(req.params.id, req.user!.id, req.body.reason);
+      void logAdminAction({ req, action: 'payment.refund', entityType: 'payment', entityId: req.params.id, description: req.body.reason });
+      ResponseUtil.success(res, p, 'Paiement remboursé');
+    } catch (e: any) {
+      if (e.message === 'Payment not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Refund failed');
+    }
+  }
+  static async exportPayments(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const rows = await AdminService.listPaymentsForExport(listParams(req));
+      const csv = toCsv(rows, [
+        { key: 'payment_code', label: 'Code' }, { key: 'created_at', label: 'Date' },
+        { key: 'amount', label: 'Montant' }, { key: 'commission', label: 'Commission' },
+        { key: 'net_amount', label: 'Net' }, { key: 'currency', label: 'Devise' },
+        { key: 'payment_method', label: 'Méthode' }, { key: 'status', label: 'Statut' },
+        { key: 'transaction_type', label: 'Type' },
+        { key: 'payer_name', label: 'Payeur' }, { key: 'payee_name', label: 'Bénéficiaire' },
+      ]);
+      void logAdminAction({ req, action: 'payment.export', entityType: 'payment', metadata: { count: rows.length } });
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="payments.csv"');
+      res.status(200).send(csv);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Export failed'); }
+  }
 
   // Withdrawals (reuse WithdrawalService)
   static async listWithdrawals(req: AuthRequest, res: Response): Promise<void> {
@@ -240,6 +268,30 @@ export class AdminController {
       void logAdminAction({ req, action: 'withdrawal.reject', entityType: 'withdrawal', entityId: req.params.id, description: req.body.reason });
       ResponseUtil.success(res, w, 'Withdrawal rejected');
     } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Reject failed'); }
+  }
+  static async payWithdrawal(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const w = await WithdrawalService.markPaid(req.params.id, req.user!.id, req.body.reference, req.body.proof_url);
+      void logAdminAction({ req, action: 'withdrawal.paid', entityType: 'withdrawal', entityId: req.params.id, metadata: { reference: req.body.reference } });
+      ResponseUtil.success(res, w, 'Retrait marqué payé');
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Payout failed'); }
+  }
+  static async exportWithdrawals(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const rows = await WithdrawalService.listForExport((req.query.status as string) || undefined);
+      const csv = toCsv(rows, [
+        { key: 'withdrawal_code', label: 'Code' }, { key: 'created_at', label: 'Date' },
+        { key: 'gp_name', label: 'GP' }, { key: 'gp_phone', label: 'Téléphone' },
+        { key: 'amount', label: 'Montant' }, { key: 'currency', label: 'Devise' },
+        { key: 'withdrawal_method', label: 'Méthode' }, { key: 'account_number', label: 'Compte' },
+        { key: 'account_name', label: 'Nom du compte' }, { key: 'status', label: 'Statut' },
+        { key: 'external_reference', label: 'Référence' }, { key: 'completed_at', label: 'Payé le' },
+      ]);
+      void logAdminAction({ req, action: 'withdrawal.export', entityType: 'withdrawal', metadata: { count: rows.length } });
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="withdrawals.csv"');
+      res.status(200).send(csv);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Export failed'); }
   }
 
   // Claims

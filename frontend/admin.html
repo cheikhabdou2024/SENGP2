@@ -390,14 +390,19 @@
             if (state.view === 'overview') return renderOverview(main);
             if (state.view === 'roles') return renderRoles(main);
             if (state.view === 'kyc') return renderKyc(main);
-            const createBtn = (state.view === 'users' && can('users:write'))
-                ? `<button style="margin-left:auto;background:#7ee081;color:#06302c" onclick="createUserModal()">+ Créer un utilisateur</button>` : '';
+            let extra = '';
+            if (state.view === 'users' && can('users:write'))
+                extra = `<button style="margin-left:auto;background:#7ee081;color:#06302c" onclick="createUserModal()">+ Créer un utilisateur</button>`;
+            else if (state.view === 'payments' && can('payments:export'))
+                extra = `<button style="margin-left:auto" onclick="exportCsv('payments')">⬇ Exporter CSV</button>`;
+            else if (state.view === 'withdrawals')
+                extra = `<button style="margin-left:auto" onclick="exportCsv('withdrawals')">⬇ Exporter CSV</button>`;
             main.innerHTML = `
                 <div class="toolbar">
                     <input id="search" placeholder="Rechercher…" value="${esc(state.search)}">
                     ${statusFilter()}
                     <button onclick="applyFilters()">Filtrer</button>
-                    ${createBtn}
+                    ${extra}
                 </div>
                 <div id="tableArea"><div class="loading">Chargement…</div></div>
                 <div class="pager" id="pager"></div>`;
@@ -556,24 +561,32 @@
                     ]; }
                 },
                 payments: {
-                    head: ['Code','Montant','Commission','Net','Méthode','Statut','Payeur','Bénéf.','Date'],
+                    head: ['Code','Montant','Commission','Net','Méthode','Statut','Payeur','Bénéf.','Date','Actions'],
                     row: p => [
                         esc(p.payment_code), fcfa(p.amount), fcfa(p.commission), fcfa(p.net_amount),
                         esc(p.payment_method), `<span class="badge ${badgeFor(p.status)}">${esc(p.status)}</span>`,
-                        esc(p.payer_name||'—'), esc(p.payee_name||'—'), dt(p.created_at)
+                        esc(p.payer_name||'—'), esc(p.payee_name||'—'), dt(p.created_at),
+                        actions((p.status==='completed' && can('payments:refund')) ? [['act-del','Rembourser',`refundPayment('${p.id}','${esc(p.payment_code)}')`]] : [])
                     ]
                 },
                 withdrawals: {
                     head: ['Code','GP','Montant','Méthode','Compte','Statut','Actions'],
-                    row: w => [
+                    row: w => {
+                        const acts = [];
+                        if (w.status==='pending') {
+                            if (can('withdrawals:approve')) { acts.push(['act-ok','Approuver',`approveW('${w.id}')`]); acts.push(['act-del','Rejeter',`rejectW('${w.id}')`]); }
+                        } else if (w.status==='approved') {
+                            if (can('withdrawals:payout')) acts.push(['act-ok','Marquer payé',`payW('${w.id}')`]);
+                            if (can('withdrawals:approve')) acts.push(['act-del','Rejeter',`rejectW('${w.id}')`]);
+                        } else if (w.status==='completed' && w.external_reference) {
+                            acts.push(['act-edit','Réf: '+String(w.external_reference).slice(0,14),`void 0`]);
+                        }
+                        return [
                         esc(w.withdrawal_code), esc(w.gp_name||w.gp_id||'—'), fcfa(w.amount),
                         esc(w.withdrawal_method), esc(w.account_number||'—'),
                         `<span class="badge ${badgeFor(w.status)}">${esc(w.status)}</span>`,
-                        (w.status==='pending' && can('withdrawals:approve')) ? actions([
-                            ['act-ok','Approuver',`approveW('${w.id}')`],
-                            ['act-del','Rejeter',`rejectW('${w.id}')`]
-                        ]) : '—'
-                    ]
+                        acts.length ? actions(acts) : '—'
+                    ]; }
                 },
                 claims: {
                     head: ['Code','Type','Priorité','Statut','Demandeur','Message','Actions'],
@@ -937,15 +950,55 @@
             notify(ok, 'Trajet supprimé', json); if (ok) loadList();
         }
         async function approveW(id){
-            if (!await confirmDialog('Approuver ce retrait ? Le paiement est à effectuer manuellement.', { title:'Approuver le retrait', confirmLabel:'Approuver' })) return;
+            if (!await confirmDialog('Approuver (autoriser) ce retrait ? Vous le marquerez « payé » avec preuve une fois le virement effectué.', { title:'Approuver le retrait', confirmLabel:'Approuver' })) return;
             const { ok, json } = await api('/admin/withdrawals/'+id+'/approve', { method:'PUT' });
-            notify(ok, 'Retrait approuvé', json); if (ok) loadList();
+            notify(ok, 'Retrait approuvé — à marquer payé après virement', json); if (ok) loadList();
         }
         async function rejectW(id){
             const v = await formModal({ title:'Rejeter le retrait', fields:[{ name:'reason', label:'Raison du rejet', type:'textarea', placeholder:'Expliquez le motif…' }], confirmLabel:'Rejeter' });
             if (!v) return;
             const { ok, json } = await api('/admin/withdrawals/'+id+'/reject', { method:'PUT', body: JSON.stringify({ reason: v.reason }) });
             notify(ok, 'Retrait rejeté (solde recrédité)', json); if (ok) loadList();
+        }
+        async function payW(id){
+            const v = await formModal({
+                title: 'Marquer le retrait payé',
+                hint: 'Enregistrez la preuve du virement effectué.',
+                fields: [
+                    { name:'reference', label:'Référence du virement', placeholder:'Ex. TXN-12345 / Wave ref' },
+                    { name:'proof_url', label:'Lien de preuve (optionnel)', placeholder:'https://… reçu / capture' },
+                ],
+                confirmLabel: 'Confirmer le paiement'
+            });
+            if (!v) return;
+            const { ok, json } = await api('/admin/withdrawals/'+id+'/paid', { method:'PUT', body: JSON.stringify({ reference: v.reference, proof_url: v.proof_url }) });
+            notify(ok, 'Retrait marqué payé', json); if (ok) loadList();
+        }
+        async function refundPayment(id, code){
+            const v = await formModal({
+                title: 'Rembourser le paiement ' + code,
+                hint: 'Enregistre le remboursement côté plateforme et notifie le payeur. Le remboursement effectif chez le prestataire (Wave/Orange) est à effectuer séparément.',
+                fields: [{ name:'reason', label:'Motif du remboursement', type:'textarea', placeholder:'Ex. mission annulée, litige résolu…' }],
+                confirmLabel: 'Rembourser'
+            });
+            if (!v) return;
+            const { ok, json } = await api('/admin/payments/'+id+'/refund', { method:'POST', body: JSON.stringify({ reason: v.reason }) });
+            notify(ok, 'Paiement remboursé', json); if (ok) loadList();
+        }
+        // Download a CSV export (authenticated fetch → blob → download).
+        async function exportCsv(kind){
+            try {
+                const q = (state.status ? `?status=${encodeURIComponent(state.status)}` : '') + (state.search ? `${state.status?'&':'?'}search=${encodeURIComponent(state.search)}` : '');
+                const res = await fetch(API + '/admin/' + kind + '/export' + q, { headers: { 'Authorization': 'Bearer ' + token } });
+                if (!res.ok) { toast('Export refusé ('+res.status+')', 'err'); return; }
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = kind + '.csv';
+                document.body.appendChild(a); a.click(); a.remove();
+                URL.revokeObjectURL(url);
+                toast('Export téléchargé', 'ok');
+            } catch (e) { toast('Erreur export', 'err'); }
         }
         function playEvidence(u){
             try { window.open(decodeURIComponent(u), '_blank'); } catch (e) { toast('Impossible de lire le fichier.', 'err'); }

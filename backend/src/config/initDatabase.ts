@@ -52,7 +52,11 @@ export async function initDatabase(): Promise<void> {
     // Admin confirms the GP's arrival at destination (by WhatsApp call) before the
     // GP is allowed to scan the recipient's QR and deliver.
     await pool.query('ALTER TABLE missions ADD COLUMN IF NOT EXISTS arrival_confirmed BOOLEAN DEFAULT FALSE');
-    logger.info('✅ Schema patches applied (phone/password nullable, delivery_token, recipient, mission_assigned, qr_code_url TEXT)');
+    // Phase 4 (Finance): payout proof on withdrawals + refund tracking on payments.
+    await pool.query('ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS payout_proof_url VARCHAR(500)');
+    await pool.query('ALTER TABLE payments ADD COLUMN IF NOT EXISTS refund_reason TEXT');
+    await pool.query('ALTER TABLE payments ADD COLUMN IF NOT EXISTS refunded_at TIMESTAMP');
+    logger.info('✅ Schema patches applied (phone/password nullable, delivery_token, recipient, mission_assigned, qr_code_url TEXT, payout_proof/refund)');
 
     // Incremental migration files (idempotent — safe to run on every boot).
     try {

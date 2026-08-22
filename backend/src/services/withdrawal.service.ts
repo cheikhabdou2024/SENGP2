@@ -76,6 +76,22 @@ export class WithdrawalService {
     return this.list({ status }, page, limit);
   }
 
+  /** All withdrawals matching a status filter (no pagination) — for CSV export. */
+  static async listForExport(status?: string) {
+    let where = 'WHERE 1=1';
+    const params: any[] = [];
+    if (status) { where += ' AND w.status = $1'; params.push(status); }
+    const r = await pool.query(
+      `SELECT w.withdrawal_code, w.amount, w.currency, w.withdrawal_method, w.account_number,
+              w.account_name, w.status, w.external_reference, w.created_at, w.completed_at,
+              u.first_name || ' ' || u.last_name AS gp_name, u.phone AS gp_phone
+         FROM withdrawals w LEFT JOIN users u ON w.gp_id = u.id
+         ${where} ORDER BY w.created_at DESC`,
+      params
+    );
+    return r.rows;
+  }
+
   private static async list(
     filters: { gp_id?: string; status?: string },
     page: number,
@@ -120,44 +136,59 @@ export class WithdrawalService {
   }
 
   /**
-   * Admin approves a withdrawal: mark completed and record the payout against the
-   * wallet's total_withdrawn. (The actual money transfer is done manually.)
+   * Admin approves (greenlights) a withdrawal: pending → approved. The funds are
+   * already held (debited from available_balance at request time). The actual
+   * payout + proof is recorded later via markPaid().
    */
   static async approve(id: string, adminId: string): Promise<any> {
+    const result = await pool.query(
+      `UPDATE withdrawals
+       SET status = 'approved', approved_by = $1, approved_at = CURRENT_TIMESTAMP
+       WHERE id = $2 AND status = 'pending'
+       RETURNING *`,
+      [adminId, id]
+    );
+    if (result.rows.length === 0) throw new Error('Withdrawal not found or not pending');
+    const withdrawal = result.rows[0];
+    await this.notify(
+      withdrawal.gp_id,
+      'Retrait approuvé',
+      `Votre retrait de ${Helpers.formatCurrency(Number(withdrawal.amount))} a été approuvé. Le paiement est en cours.`
+    );
+    logger.info(`Withdrawal approved: ${withdrawal.withdrawal_code} by admin ${adminId}`);
+    return withdrawal;
+  }
+
+  /**
+   * Admin marks an approved withdrawal as paid: approved → completed, records the
+   * payout reference/proof, and books it against the wallet's total_withdrawn.
+   */
+  static async markPaid(id: string, adminId: string, reference?: string, proofUrl?: string): Promise<any> {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-
       const result = await client.query(
         `UPDATE withdrawals
-         SET status = 'completed', approved_by = $1, approved_at = CURRENT_TIMESTAMP,
-             processed_at = CURRENT_TIMESTAMP, completed_at = CURRENT_TIMESTAMP
-         WHERE id = $2 AND status = 'pending'
+         SET status = 'completed', processed_at = CURRENT_TIMESTAMP, completed_at = CURRENT_TIMESTAMP,
+             external_reference = COALESCE($2, external_reference), payout_proof_url = COALESCE($3, payout_proof_url),
+             approved_by = COALESCE(approved_by, $4)
+         WHERE id = $1 AND status = 'approved'
          RETURNING *`,
-        [adminId, id]
+        [id, reference || null, proofUrl || null, adminId]
       );
-
-      if (result.rows.length === 0) {
-        throw new Error('Withdrawal not found or not pending');
-      }
+      if (result.rows.length === 0) throw new Error('Withdrawal not found or not in approved state');
       const withdrawal = result.rows[0];
-
       await client.query(
-        `UPDATE wallet_balances
-         SET total_withdrawn = total_withdrawn + $1
-         WHERE user_id = $2`,
+        `UPDATE wallet_balances SET total_withdrawn = total_withdrawn + $1 WHERE user_id = $2`,
         [withdrawal.amount, withdrawal.gp_id]
       );
-
       await client.query('COMMIT');
-
       await this.notify(
         withdrawal.gp_id,
-        'Retrait approuvé',
-        `Votre retrait de ${Helpers.formatCurrency(Number(withdrawal.amount))} a été approuvé.`
+        'Retrait payé',
+        `Votre retrait de ${Helpers.formatCurrency(Number(withdrawal.amount))} a été payé${reference ? ` (réf. ${reference})` : ''}.`
       );
-
-      logger.info(`Withdrawal approved: ${withdrawal.withdrawal_code} by admin ${adminId}`);
+      logger.info(`Withdrawal paid: ${withdrawal.withdrawal_code} by admin ${adminId}`);
       return withdrawal;
     } catch (error) {
       await client.query('ROLLBACK');
@@ -168,7 +199,8 @@ export class WithdrawalService {
   }
 
   /**
-   * Admin rejects a withdrawal: refund the held funds back to available_balance.
+   * Admin rejects a withdrawal (from pending or approved): refund the held funds
+   * back to available_balance.
    */
   static async reject(id: string, adminId: string, reason: string): Promise<any> {
     const client = await pool.connect();
@@ -179,13 +211,13 @@ export class WithdrawalService {
         `UPDATE withdrawals
          SET status = 'rejected', approved_by = $1, approved_at = CURRENT_TIMESTAMP,
              rejection_reason = $2
-         WHERE id = $3 AND status = 'pending'
+         WHERE id = $3 AND status IN ('pending', 'approved')
          RETURNING *`,
         [adminId, reason || null, id]
       );
 
       if (result.rows.length === 0) {
-        throw new Error('Withdrawal not found or not pending');
+        throw new Error('Withdrawal not found or not cancellable');
       }
       const withdrawal = result.rows[0];
 
