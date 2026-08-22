@@ -105,6 +105,58 @@
         .pager button { padding:7px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:#fff; }
         .pager button:disabled { opacity:.4; }
 
+        /* Toast notifications (replaces alert) */
+        #toasts { position: fixed; top: 16px; right: 16px; z-index: 10000; display:flex; flex-direction:column; gap:10px; max-width: 340px; }
+        .toast {
+            padding: 12px 16px; border-radius: 12px; font-size: 13px; font-weight: 600;
+            background: rgba(30,30,52,0.96); border:1px solid rgba(255,255,255,0.15); color:#fff;
+            box-shadow: 0 8px 24px rgba(0,0,0,.4); animation: toastIn .2s ease;
+        }
+        .toast.ok { border-left: 4px solid #7ee081; }
+        .toast.err { border-left: 4px solid #ff8f8f; }
+        .toast.info { border-left: 4px solid #4ECDC4; }
+        @keyframes toastIn { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform:none; } }
+        @media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
+
+        /* Modal */
+        .modal-ov {
+            position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+            display:flex; align-items:center; justify-content:center; z-index: 9999; padding: 20px;
+        }
+        .modal {
+            background:#1b1838; border:1px solid rgba(255,255,255,.12); border-radius:16px;
+            padding: 24px; width: 100%; max-width: 460px; max-height: 88vh; overflow-y:auto;
+        }
+        .modal h3 { font-size: 17px; margin-bottom: 6px; }
+        .modal .hint { font-size: 13px; color: rgba(255,255,255,.55); margin-bottom: 16px; }
+        .modal label { display:block; font-size:12px; color:rgba(255,255,255,.7); margin: 12px 0 6px; }
+        .modal input, .modal select, .modal textarea {
+            width:100%; padding: 10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08); color:#fff; font-size:14px; font-family:inherit;
+        }
+        .modal-actions { display:flex; gap:10px; margin-top: 20px; }
+        .modal-actions button { flex:1; padding: 11px; border-radius:10px; font-weight:700; border:none; font-size:14px; }
+        .btn-cancel { background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15) !important; color: rgba(255,255,255,.8); }
+        .btn-confirm { background: linear-gradient(135deg,#FFD700,#FFA500); color:#1a1a2e; }
+        .btn-danger { background: rgba(255,107,107,.9); color:#fff; }
+
+        /* Permission chips (roles UI) */
+        .perm-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap:8px; margin-top:6px; }
+        .perm-chip {
+            display:flex; align-items:center; gap:7px; font-size:12px; color:rgba(255,255,255,.75);
+            padding:7px 9px; border-radius:8px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+        }
+        .perm-chip input { width:auto; }
+        .role-card {
+            background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:14px;
+            padding: 16px 18px; margin-bottom: 12px;
+        }
+        .role-card .rc-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+        .role-card .rc-head h4 { font-size:15px; }
+        .role-card .rc-perms { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+        .tag { font-size:11px; padding:3px 8px; border-radius:7px; background:rgba(78,205,196,.15); color:#4ECDC4; font-family: ui-monospace, monospace; }
+        .tag.all { background: rgba(255,215,0,.18); color:#FFD700; }
+
         @media (max-width: 720px) {
             .sidebar { width: 64px; }
             .nav-link span { display:none; }
@@ -125,6 +177,7 @@
     <script src="pwa.js" defer></script>
 </head>
 <body class="ds">
+    <div id="toasts"></div>
     <!-- LOGIN -->
     <div id="login">
         <div class="login-card">
@@ -157,12 +210,14 @@
         <div class="layout">
             <div class="sidebar">
                 <div class="nav-link active" data-view="overview" onclick="switchView('overview',this)">📊 <span>Vue globale</span></div>
-                <div class="nav-link" data-view="users" onclick="switchView('users',this)">👥 <span>Utilisateurs</span></div>
-                <div class="nav-link" data-view="missions" onclick="switchView('missions',this)">📦 <span>Missions</span></div>
-                <div class="nav-link" data-view="trips" onclick="switchView('trips',this)">✈️ <span>Trajets</span></div>
-                <div class="nav-link" data-view="payments" onclick="switchView('payments',this)">💳 <span>Paiements</span></div>
-                <div class="nav-link" data-view="withdrawals" onclick="switchView('withdrawals',this)">💸 <span>Retraits</span></div>
-                <div class="nav-link" data-view="claims" onclick="switchView('claims',this)">📝 <span>Réclamations</span></div>
+                <div class="nav-link" data-view="users" data-perm="users:read" onclick="switchView('users',this)">👥 <span>Utilisateurs</span></div>
+                <div class="nav-link" data-view="missions" data-perm="missions:read" onclick="switchView('missions',this)">📦 <span>Missions</span></div>
+                <div class="nav-link" data-view="trips" data-perm="trips:read" onclick="switchView('trips',this)">✈️ <span>Trajets</span></div>
+                <div class="nav-link" data-view="payments" data-perm="payments:read" onclick="switchView('payments',this)">💳 <span>Paiements</span></div>
+                <div class="nav-link" data-view="withdrawals" data-perm="withdrawals:read" onclick="switchView('withdrawals',this)">💸 <span>Retraits</span></div>
+                <div class="nav-link" data-view="claims" data-perm="claims:read" onclick="switchView('claims',this)">📝 <span>Réclamations</span></div>
+                <div class="nav-link" data-view="roles" data-perm="roles:read" onclick="switchView('roles',this)">🛡️ <span>Rôles &amp; Admins</span></div>
+                <div class="nav-link" data-view="audit" data-perm="audit:read" onclick="switchView('audit',this)">🧾 <span>Journal d'audit</span></div>
             </div>
             <div class="main" id="main"></div>
         </div>
@@ -182,6 +237,58 @@
         try { me = JSON.parse(localStorage.getItem('userData') || 'null'); } catch (e) {}
 
         const state = { view: 'overview', page: 1, search: '', status: '' };
+        let myPerms = null;   // string[] of the signed-in admin's permissions (['*'] = all)
+        let allPerms = [];    // full catalog, for the role editor
+
+        // Does the current admin hold a permission? Supports '*' and 'resource:*'.
+        function can(required){
+            if (!myPerms) return false;
+            if (myPerms.includes('*')) return true;
+            if (myPerms.includes(required)) return true;
+            return myPerms.includes(required.split(':')[0] + ':*');
+        }
+
+        // ---------- Toast (replaces alert) ----------
+        function toast(msg, kind){
+            const box = document.getElementById('toasts');
+            const t = document.createElement('div');
+            t.className = 'toast ' + (kind || 'info');
+            t.textContent = msg;
+            box.appendChild(t);
+            setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(()=>t.remove(), 300); }, 3600);
+        }
+        // Report an API result: ok → success toast, else → error toast.
+        function notify(ok, okMsg, json){
+            if (ok) toast(okMsg, 'ok');
+            else toast((json && (json.error||json.message)) || 'Erreur', 'err');
+        }
+
+        // ---------- Modal helpers (replace confirm/prompt) ----------
+        function closeModal(){ const m = document.getElementById('modalOv'); if (m) m.remove(); }
+        function openModal(innerHtml){
+            closeModal();
+            const ov = document.createElement('div');
+            ov.id = 'modalOv'; ov.className = 'modal-ov';
+            ov.innerHTML = '<div class="modal" role="dialog" aria-modal="true">' + innerHtml + '</div>';
+            ov.addEventListener('click', e => { if (e.target === ov) closeModal(); });
+            document.body.appendChild(ov);
+            return ov;
+        }
+        // Promise-based confirm dialog.
+        function confirmDialog(message, opts){
+            opts = opts || {};
+            return new Promise(resolve => {
+                const ov = openModal(
+                    '<h3>' + esc(opts.title || 'Confirmation') + '</h3>'
+                  + '<p class="hint">' + esc(message) + '</p>'
+                  + '<div class="modal-actions">'
+                  + '<button class="btn-cancel" id="mCancel">Annuler</button>'
+                  + '<button class="' + (opts.danger ? 'btn-danger' : 'btn-confirm') + '" id="mOk">' + esc(opts.confirmLabel || 'Confirmer') + '</button>'
+                  + '</div>');
+                ov.querySelector('#mCancel').onclick = () => { closeModal(); resolve(false); };
+                ov.querySelector('#mOk').onclick = () => { closeModal(); resolve(true); };
+            });
+        }
 
         function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
         function fcfa(n){ return (Number(n)||0).toLocaleString('fr-FR') + ' FCFA'; }
@@ -191,8 +298,10 @@
             opts.headers = Object.assign({ 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, opts.headers || {});
             return fetch(API + path, opts).then(async r => {
                 const j = await r.json().catch(() => ({}));
-                if (r.status === 401 || r.status === 403) { logout(); throw new Error(j.error || 'Accès refusé'); }
-                return { ok: r.ok, json: j };
+                // 401 = invalid/expired session → sign out. 403 = authenticated but
+                // lacks the permission → surface as a normal error, keep the session.
+                if (r.status === 401) { logout(); throw new Error(j.error || 'Session expirée'); }
+                return { ok: r.ok, json: j, status: r.status };
             });
         }
 
@@ -235,11 +344,27 @@
             document.getElementById('login').style.display = 'flex';
         }
 
-        function showApp(){
+        async function showApp(){
             document.getElementById('login').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             document.getElementById('who').textContent = me ? (me.first_name + ' ' + me.last_name + ' · ' + me.email) : '';
+            await loadPermissions();
+            applyPermissionGates();
             switchView('overview', document.querySelector('.nav-link'));
+        }
+
+        // Fetch the signed-in admin's permission list (drives section visibility).
+        async function loadPermissions(){
+            try {
+                const { ok, json } = await api('/admin/me/permissions');
+                myPerms = (ok && json.data && json.data.permissions) ? json.data.permissions : [];
+            } catch (e) { myPerms = []; }
+        }
+        // Hide sidebar sections the admin has no permission for.
+        function applyPermissionGates(){
+            document.querySelectorAll('.nav-link[data-perm]').forEach(el => {
+                el.style.display = can(el.getAttribute('data-perm')) ? '' : 'none';
+            });
         }
 
         function switchView(view, el){
@@ -253,6 +378,7 @@
         async function render(){
             const main = document.getElementById('main');
             if (state.view === 'overview') return renderOverview(main);
+            if (state.view === 'roles') return renderRoles(main);
             main.innerHTML = `
                 <div class="toolbar">
                     <input id="search" placeholder="Rechercher…" value="${esc(state.search)}">
@@ -360,31 +486,33 @@
             const defs = {
                 users: {
                     head: ['Nom','Email','Type','Statut','Ville','Inscrit','Actions'],
-                    row: u => [
+                    row: u => {
+                        const acts = [];
+                        if (can('users:write')) acts.push(['act-edit','Éditer',`editUser('${u.id}')`]);
+                        if (can('roles:manage')) acts.push(['act-ok','Rôle',`assignRole('${u.id}','${esc(u.email)}')`]);
+                        if (can('users:delete')) acts.push(['act-del','Suppr.',`delUser('${u.id}','${esc(u.email)}')`]);
+                        return [
                         esc(u.first_name+' '+u.last_name), esc(u.email),
                         `<span class="badge b-blue">${esc(u.user_type)}</span>`,
                         `<span class="badge ${badgeFor(u.status)}">${esc(u.status)}</span>`,
                         esc(u.city||'—'), dt(u.created_at),
-                        actions([
-                            ['act-edit','Éditer',`editUser('${u.id}')`],
-                            ['act-del','Suppr.',`delUser('${u.id}','${esc(u.email)}')`]
-                        ])
-                    ]
+                        actions(acts)
+                    ]; }
                 },
                 missions: {
                     head: ['Code','Trajet','Prix','Statut','Expéditeur','GP','Actions'],
                     row: m => {
                         const acts = [];
                         // Only unassigned, still-pending missions can be assigned to a GP.
-                        if (m.status === 'pending' && !m.gp_name) {
+                        if (m.status === 'pending' && !m.gp_name && can('missions:assign')) {
                             acts.push(['act-ok','Affecter',`assignMission('${m.id}','${esc(m.mission_code)}')`]);
                         }
                         // GP arrived at destination, awaiting the admin's confirmation.
-                        if (m.status === 'out_for_delivery' && !m.arrival_confirmed) {
+                        if (m.status === 'out_for_delivery' && !m.arrival_confirmed && can('missions:write')) {
                             acts.push(['act-ok','Confirmer arrivée',`confirmArrival('${m.id}','${esc(m.mission_code)}')`]);
                         }
-                        acts.push(['act-edit','Statut',`editMission('${m.id}','${esc(m.status)}')`]);
-                        acts.push(['act-del','Suppr.',`delMission('${m.id}','${esc(m.mission_code)}')`]);
+                        if (can('missions:write')) acts.push(['act-edit','Statut',`editMission('${m.id}','${esc(m.status)}')`]);
+                        if (can('missions:delete')) acts.push(['act-del','Suppr.',`delMission('${m.id}','${esc(m.mission_code)}')`]);
                         return [
                             esc(m.mission_code), esc((m.departure_city||'?')+' → '+(m.arrival_city||'?')),
                             fcfa(m.price), `<span class="badge ${badgeFor(m.status)}">${esc(m.status)}</span>`,
@@ -400,7 +528,7 @@
                         esc(t.gp_name||'—'), dt(t.departure_date),
                         `<span class="badge ${badgeFor(t.status)}">${esc(t.status)}</span>`,
                         `${t.current_packages||0}/${t.max_packages||0}`,
-                        actions([['act-del','Suppr.',`delTrip('${t.id}','${esc(t.trip_code)}')`]])
+                        actions(can('trips:delete') ? [['act-del','Suppr.',`delTrip('${t.id}','${esc(t.trip_code)}')`]] : [])
                     ]
                 },
                 payments: {
@@ -417,7 +545,7 @@
                         esc(w.withdrawal_code), esc(w.gp_name||w.gp_id||'—'), fcfa(w.amount),
                         esc(w.withdrawal_method), esc(w.account_number||'—'),
                         `<span class="badge ${badgeFor(w.status)}">${esc(w.status)}</span>`,
-                        w.status==='pending' ? actions([
+                        (w.status==='pending' && can('withdrawals:approve')) ? actions([
                             ['act-ok','Approuver',`approveW('${w.id}')`],
                             ['act-del','Rejeter',`rejectW('${w.id}')`]
                         ]) : '—'
@@ -435,9 +563,19 @@
                             `<span class="badge ${badgeFor(c.status)}">${esc(c.status)}</span>`,
                             esc(c.claimant_name||'—'),
                             msg,
-                            actions([['act-edit','Traiter',`editClaim('${c.id}','${esc(c.status)}')`]])
+                            actions(can('claims:write') ? [['act-edit','Traiter',`editClaim('${c.id}','${esc(c.status)}')`]] : [])
                         ];
                     }
+                },
+                audit: {
+                    head: ['Date','Admin','Action','Entité','Détails'],
+                    row: l => [
+                        new Date(l.created_at).toLocaleString('fr-FR'),
+                        esc(l.admin_name||l.admin_email||'—'),
+                        `<span class="tag">${esc(l.action)}</span>`,
+                        esc(l.entity_type) + (l.entity_id ? ` <span style="color:rgba(255,255,255,.4)">#${esc(String(l.entity_id).slice(0,8))}</span>` : ''),
+                        `<span style="color:rgba(255,255,255,.6)">${esc(l.description || (l.metadata ? JSON.stringify(l.metadata) : '—'))}</span>`
+                    ]
                 }
             };
             const d = defs[view];
@@ -448,32 +586,79 @@
             return `<div class="row-actions">${list.map(([cls,label,fn])=>`<button class="act ${cls}" onclick="${fn}">${label}</button>`).join('')}</div>`;
         }
 
+        // ---------- Generic form modal (replaces prompt) ----------
+        // fields: [{name,label,type:'text|select|textarea',options?,value?,placeholder?}]
+        // Resolves to an object of values, or null if cancelled.
+        function formModal(cfg){
+            return new Promise(resolve => {
+                const fieldHtml = cfg.fields.map(f => {
+                    if (f.type === 'select') {
+                        const opts = f.options.map(o => {
+                            const val = Array.isArray(o) ? o[0] : o;
+                            const lab = Array.isArray(o) ? o[1] : o;
+                            return `<option value="${esc(val)}"${(f.value===val)?' selected':''}>${esc(lab)}</option>`;
+                        }).join('');
+                        return `<label>${esc(f.label)}</label><select data-f="${esc(f.name)}">${opts}</select>`;
+                    }
+                    if (f.type === 'textarea') {
+                        return `<label>${esc(f.label)}</label><textarea data-f="${esc(f.name)}" rows="3" placeholder="${esc(f.placeholder||'')}">${esc(f.value||'')}</textarea>`;
+                    }
+                    return `<label>${esc(f.label)}</label><input data-f="${esc(f.name)}" type="${f.inputType||'text'}" value="${esc(f.value||'')}" placeholder="${esc(f.placeholder||'')}">`;
+                }).join('');
+                const ov = openModal(
+                    '<h3>' + esc(cfg.title) + '</h3>'
+                  + (cfg.hint ? '<p class="hint">' + esc(cfg.hint) + '</p>' : '')
+                  + fieldHtml
+                  + '<div class="modal-actions"><button class="btn-cancel" id="fCancel">Annuler</button>'
+                  + '<button class="btn-confirm" id="fOk">' + esc(cfg.confirmLabel||'Enregistrer') + '</button></div>');
+                ov.querySelector('#fCancel').onclick = () => { closeModal(); resolve(null); };
+                ov.querySelector('#fOk').onclick = () => {
+                    const out = {};
+                    ov.querySelectorAll('[data-f]').forEach(el => { out[el.getAttribute('data-f')] = el.value; });
+                    closeModal(); resolve(out);
+                };
+            });
+        }
+
         // ---------- Actions ----------
         async function editUser(id){
-            const status = prompt('Nouveau statut (pending / verified / suspended) — laisser vide pour ignorer:');
-            const type = prompt('Nouveau type (expediteur / gp / admin) — laisser vide pour ignorer:');
+            const v = await formModal({
+                title: 'Éditer l\'utilisateur',
+                hint: 'Laissez « — » pour ne pas changer un champ. Pour accorder un rôle admin, utilisez « Rôle ».',
+                fields: [
+                    { name:'status', label:'Statut', type:'select', options:[['','—'],['pending','pending'],['verified','verified'],['suspended','suspended']] },
+                    { name:'user_type', label:'Type', type:'select', options:[['','—'],['expediteur','expediteur'],['gp','gp'],['admin','admin']] },
+                ],
+                confirmLabel: 'Mettre à jour'
+            });
+            if (!v) return;
             const body = {};
-            if (status) body.status = status.trim();
-            if (type) body.user_type = type.trim();
-            if (!Object.keys(body).length) return;
+            if (v.status) body.status = v.status;
+            if (v.user_type) body.user_type = v.user_type;
+            if (!Object.keys(body).length) { toast('Aucun changement', 'info'); return; }
             const { ok, json } = await api('/admin/users/'+id, { method:'PUT', body: JSON.stringify(body) });
-            alert(ok ? 'Utilisateur mis à jour' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+            notify(ok, 'Utilisateur mis à jour', json); if (ok) loadList();
         }
         async function delUser(id, email){
-            if (!confirm('Supprimer (désactiver) '+email+' ?')) return;
+            if (!await confirmDialog('Désactiver le compte ' + email + ' ?', { danger:true, confirmLabel:'Supprimer', title:'Supprimer l\'utilisateur' })) return;
             const { ok, json } = await api('/admin/users/'+id, { method:'DELETE' });
-            alert(ok ? 'Utilisateur supprimé' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+            notify(ok, 'Utilisateur supprimé', json); if (ok) loadList();
         }
         async function editMission(id, cur){
-            const status = prompt('Nouveau statut mission (pending, accepted, in_transit, delivered, cancelled):', cur);
-            if (!status) return;
-            const { ok, json } = await api('/admin/missions/'+id, { method:'PUT', body: JSON.stringify({ status: status.trim() }) });
-            alert(ok ? 'Mission mise à jour' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+            const v = await formModal({
+                title: 'Changer le statut de la mission',
+                fields: [{ name:'status', label:'Statut', type:'select', value: cur,
+                    options:['pending','matched','accepted','picked_up','in_transit','in_customs','out_for_delivery','delivered','cancelled','disputed'] }],
+                confirmLabel: 'Mettre à jour'
+            });
+            if (!v || !v.status) return;
+            const { ok, json } = await api('/admin/missions/'+id, { method:'PUT', body: JSON.stringify({ status: v.status }) });
+            notify(ok, 'Mission mise à jour', json); if (ok) loadList();
         }
         async function delMission(id, code){
-            if (!confirm('Supprimer définitivement la mission '+code+' ?')) return;
+            if (!await confirmDialog('Supprimer définitivement la mission ' + code + ' et ses dépendances ?', { danger:true, confirmLabel:'Supprimer', title:'Supprimer la mission' })) return;
             const { ok, json } = await api('/admin/missions/'+id, { method:'DELETE' });
-            alert(ok ? 'Mission supprimée' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+            notify(ok, 'Mission supprimée', json); if (ok) loadList();
         }
 
         // Assign a pending mission to a GP. The GP is notified and confirms via
@@ -481,9 +666,9 @@
         // released back to 'pending'). Backed by POST /admin/missions/:id/assign.
         async function assignMission(id, code){
             let { ok, json } = await api('/admin/users?user_type=gp&limit=200');
-            if (!ok) { alert('Erreur chargement des GPs: '+(json.error||json.message)); return; }
+            if (!ok) { toast('Erreur chargement des GPs: '+(json.error||json.message), 'err'); return; }
             const gps = (json.data || []).filter(g => g.status !== 'suspended');
-            if (!gps.length) { alert('Aucun GP disponible à affecter.'); return; }
+            if (!gps.length) { toast('Aucun GP disponible à affecter.', 'err'); return; }
             // GPs are organised by category (destination region) in the picker.
             const region = (country) => {
                 const c = String(country||'').toLowerCase();
@@ -516,9 +701,9 @@
             document.body.appendChild(ov);
         }
         async function confirmArrival(id, code){
-            if (!confirm('Confirmer l\'arrivée du GP à destination pour '+code+' ?\n\n(À faire après l\'appel WhatsApp de vérification.) Le GP pourra alors scanner le QR du destinataire.')) return;
+            if (!await confirmDialog('Confirmer l\'arrivée du GP à destination pour ' + code + ' ? À faire après l\'appel WhatsApp de vérification. Le GP pourra alors scanner le QR du destinataire.', { title:'Confirmer l\'arrivée', confirmLabel:'Confirmer' })) return;
             const { ok, json } = await api('/admin/missions/'+id+'/confirm-arrival', { method:'POST' });
-            alert(ok ? '✅ Arrivée confirmée — le GP peut livrer.' : 'Erreur: '+(json.error||json.message));
+            notify(ok, 'Arrivée confirmée — le GP peut livrer.', json);
             if (ok) loadList();
         }
         async function confirmAssign(missionId){
@@ -529,36 +714,139 @@
             if (btn){ btn.disabled = true; btn.textContent = 'Affectation…'; }
             const { ok, json } = await api('/admin/missions/'+missionId+'/assign', { method:'POST', body: JSON.stringify({ gp_id: gpId }) });
             const modal = document.getElementById('assignModal'); if (modal) modal.remove();
-            alert(ok ? '✅ Mission affectée — le GP a été notifié.' : 'Erreur: '+(json.error||json.message));
+            notify(ok, 'Mission affectée — le GP a été notifié.', json);
             if (ok) loadList();
         }
         async function delTrip(id, code){
-            if (!confirm('Supprimer le trajet '+code+' ?')) return;
+            if (!await confirmDialog('Supprimer le trajet ' + code + ' ?', { danger:true, confirmLabel:'Supprimer', title:'Supprimer le trajet' })) return;
             const { ok, json } = await api('/admin/trips/'+id, { method:'DELETE' });
-            alert(ok ? 'Trajet supprimé' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+            notify(ok, 'Trajet supprimé', json); if (ok) loadList();
         }
         async function approveW(id){
-            if (!confirm('Approuver ce retrait ? (paiement à effectuer manuellement)')) return;
+            if (!await confirmDialog('Approuver ce retrait ? Le paiement est à effectuer manuellement.', { title:'Approuver le retrait', confirmLabel:'Approuver' })) return;
             const { ok, json } = await api('/admin/withdrawals/'+id+'/approve', { method:'PUT' });
-            alert(ok ? 'Retrait approuvé' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+            notify(ok, 'Retrait approuvé', json); if (ok) loadList();
         }
         async function rejectW(id){
-            const reason = prompt('Raison du rejet:'); if (reason===null) return;
-            const { ok, json } = await api('/admin/withdrawals/'+id+'/reject', { method:'PUT', body: JSON.stringify({ reason }) });
-            alert(ok ? 'Retrait rejeté (solde recrédité)' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+            const v = await formModal({ title:'Rejeter le retrait', fields:[{ name:'reason', label:'Raison du rejet', type:'textarea', placeholder:'Expliquez le motif…' }], confirmLabel:'Rejeter' });
+            if (!v) return;
+            const { ok, json } = await api('/admin/withdrawals/'+id+'/reject', { method:'PUT', body: JSON.stringify({ reason: v.reason }) });
+            notify(ok, 'Retrait rejeté (solde recrédité)', json); if (ok) loadList();
         }
         function playEvidence(u){
-            try { window.open(decodeURIComponent(u), '_blank'); } catch (e) { alert('Impossible de lire le fichier.'); }
+            try { window.open(decodeURIComponent(u), '_blank'); } catch (e) { toast('Impossible de lire le fichier.', 'err'); }
         }
 
         async function editClaim(id, cur){
-            const status = prompt('Statut réclamation (open, investigating, resolved, closed):', cur);
-            if (!status) return;
-            const resolution = prompt('Résolution / note (optionnel):') || undefined;
-            const body = { status: status.trim() };
-            if (resolution) body.resolution = resolution;
+            const v = await formModal({
+                title: 'Traiter la réclamation',
+                fields: [
+                    { name:'status', label:'Statut', type:'select', value: cur, options:['open','in_progress','resolved','rejected','closed'] },
+                    { name:'resolution', label:'Résolution / note (optionnel)', type:'textarea', placeholder:'Décision, compensation, note interne…' },
+                ],
+                confirmLabel: 'Enregistrer'
+            });
+            if (!v || !v.status) return;
+            const body = { status: v.status };
+            if (v.resolution) body.resolution = v.resolution;
             const { ok, json } = await api('/admin/claims/'+id, { method:'PUT', body: JSON.stringify(body) });
-            alert(ok ? 'Réclamation mise à jour' : 'Erreur: '+(json.error||json.message)); if (ok) loadList();
+            notify(ok, 'Réclamation mise à jour', json); if (ok) loadList();
+        }
+
+        // ---------- Roles & Admins ----------
+        async function renderRoles(main){
+            main.innerHTML = '<div class="loading">Chargement des rôles…</div>';
+            const { ok, json, status } = await api('/admin/roles');
+            if (!ok) { main.innerHTML = '<div class="empty">' + (status===403 ? 'Accès refusé.' : 'Erreur: ' + esc((json&&json.error)||'')) + '</div>'; return; }
+            allPerms = (json.meta && json.meta.catalog) ? json.meta.catalog : allPerms;
+            const roles = json.data || [];
+            const canManage = can('roles:manage');
+            const cards = roles.map(r => {
+                const perms = Array.isArray(r.permissions) ? r.permissions : [];
+                const tags = perms.includes('*')
+                    ? '<span class="tag all">Toutes les permissions</span>'
+                    : perms.map(p => `<span class="tag">${esc(p)}</span>`).join('') || '<span class="tag">Aucune</span>';
+                const acts = [];
+                if (canManage && !r.is_system) {
+                    acts.push(`<button class="act act-edit" onclick="editRole('${r.id}')">Éditer</button>`);
+                    acts.push(`<button class="act act-del" onclick="deleteRole('${r.id}','${esc(r.name)}')">Suppr.</button>`);
+                } else if (canManage && r.is_system) {
+                    acts.push(`<button class="act act-edit" onclick="editRole('${r.id}')">Renommer</button>`);
+                }
+                return '<div class="role-card">'
+                  + '<div class="rc-head">'
+                  + '<h4>' + esc(r.name) + '</h4>'
+                  + (r.is_system ? '<span class="badge b-blue">système</span>' : '')
+                  + '<span class="badge b-gray">' + (r.admin_count||0) + ' admin(s)</span>'
+                  + '<div style="margin-left:auto;display:flex;gap:6px;">' + acts.join('') + '</div>'
+                  + '</div>'
+                  + (r.description ? '<div style="font-size:13px;color:rgba(255,255,255,.6)">' + esc(r.description) + '</div>' : '')
+                  + '<div class="rc-perms">' + tags + '</div>'
+                  + '</div>';
+            }).join('');
+            main.innerHTML =
+                '<div class="toolbar"><div style="font-size:16px;font-weight:700;">Rôles d\'administration</div>'
+              + (canManage ? '<button style="margin-left:auto" onclick="editRole()">+ Nouveau rôle</button>' : '')
+              + '</div>' + (cards || '<div class="empty">Aucun rôle.</div>');
+        }
+
+        // Create (no id) or edit a custom role. System roles: name/description only.
+        async function editRole(id){
+            let role = null;
+            if (id) {
+                const { ok, json } = await api('/admin/roles');
+                if (ok) role = (json.data||[]).find(r => r.id === id);
+                if (json && json.meta && json.meta.catalog) allPerms = json.meta.catalog;
+            }
+            const isSystem = role && role.is_system;
+            const cur = new Set(Array.isArray(role && role.permissions) ? role.permissions : []);
+            const all = cur.has('*');
+            const permBoxes = isSystem ? '' : (
+                '<label>Permissions</label>'
+              + '<div class="perm-grid">'
+              + allPerms.map(p => `<label class="perm-chip"><input type="checkbox" data-perm value="${esc(p)}"${(all||cur.has(p))?' checked':''}> ${esc(p)}</label>`).join('')
+              + '</div>');
+            const ov = openModal(
+                '<h3>' + (id ? 'Éditer le rôle' : 'Nouveau rôle') + '</h3>'
+              + (isSystem ? '<p class="hint">Rôle système : les permissions sont gérées dans le code. Vous pouvez modifier le nom et la description.</p>' : '')
+              + '<label>Nom</label><input id="roleName" value="' + esc((role&&role.name)||'') + '" placeholder="Ex. Modérateur">'
+              + '<label>Description</label><input id="roleDesc" value="' + esc((role&&role.description)||'') + '" placeholder="Rôle et responsabilités">'
+              + permBoxes
+              + '<div class="modal-actions"><button class="btn-cancel" id="rCancel">Annuler</button>'
+              + '<button class="btn-confirm" id="rOk">' + (id ? 'Enregistrer' : 'Créer') + '</button></div>');
+            ov.querySelector('#rCancel').onclick = closeModal;
+            ov.querySelector('#rOk').onclick = async () => {
+                const name = ov.querySelector('#roleName').value.trim();
+                const description = ov.querySelector('#roleDesc').value.trim();
+                if (!name) { toast('Le nom est requis', 'err'); return; }
+                const body = { name, description };
+                if (!isSystem) body.permissions = [...ov.querySelectorAll('[data-perm]:checked')].map(c => c.value);
+                let res;
+                if (id) res = await api('/admin/roles/'+id, { method:'PUT', body: JSON.stringify(body) });
+                else res = await api('/admin/roles', { method:'POST', body: JSON.stringify(body) });
+                if (res.ok) { closeModal(); toast(id ? 'Rôle mis à jour' : 'Rôle créé', 'ok'); renderRoles(document.getElementById('main')); }
+                else toast((res.json && (res.json.error||res.json.message)) || 'Erreur', 'err');
+            };
+        }
+        async function deleteRole(id, name){
+            if (!await confirmDialog('Supprimer le rôle « ' + name + ' » ?', { danger:true, confirmLabel:'Supprimer', title:'Supprimer le rôle' })) return;
+            const { ok, json } = await api('/admin/roles/'+id, { method:'DELETE' });
+            notify(ok, 'Rôle supprimé', json); if (ok) renderRoles(document.getElementById('main'));
+        }
+        // Assign an admin role to a user (promotes them to admin).
+        async function assignRole(userId, email){
+            const { ok, json } = await api('/admin/roles');
+            if (!ok) { toast('Impossible de charger les rôles', 'err'); return; }
+            const roles = json.data || [];
+            const v = await formModal({
+                title: 'Attribuer un rôle admin',
+                hint: 'À ' + email + '. L\'utilisateur devient administrateur avec les permissions du rôle.',
+                fields: [{ name:'role_id', label:'Rôle', type:'select', options: roles.map(r => [r.id, r.name + (r.is_system?' (système)':'')]) }],
+                confirmLabel: 'Attribuer'
+            });
+            if (!v || !v.role_id) return;
+            const res = await api('/admin/users/'+userId+'/role', { method:'PUT', body: JSON.stringify({ role_id: v.role_id }) });
+            notify(res.ok, 'Rôle attribué', res.json); if (res.ok) loadList();
         }
 
         // ---------- Boot ----------

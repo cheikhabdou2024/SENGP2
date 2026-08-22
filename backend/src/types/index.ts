@@ -259,6 +259,9 @@ export interface AuthRequest extends Request {
     id: string;
     email: string;
     user_type: UserType;
+    // Fine-grained admin permissions resolved from the user's admin role.
+    // `undefined` on a legacy token (issued before RBAC) or a non-admin.
+    permissions?: string[];
   };
 }
 
@@ -266,6 +269,8 @@ export interface TokenPayload {
   sub: string;
   email: string;
   role: UserType;
+  // Admin permission list embedded at login (['*'] for super admins).
+  perms?: string[];
   iat?: number;
   exp?: number;
 }

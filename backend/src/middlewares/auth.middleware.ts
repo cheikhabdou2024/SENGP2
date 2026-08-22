@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { AuthRequest, TokenPayload, UserType } from '../types';
 import { ResponseUtil } from '../utils/response';
+import { hasPermission } from '../utils/permissions';
 import logger from '../utils/logger';
 
 export class AuthMiddleware {
@@ -33,6 +34,7 @@ export class AuthMiddleware {
         id: decoded.sub,
         email: decoded.email,
         user_type: decoded.role,
+        permissions: decoded.perms,
       };
 
       next();
@@ -95,6 +97,7 @@ export class AuthMiddleware {
         id: decoded.sub,
         email: decoded.email,
         user_type: decoded.role,
+        permissions: decoded.perms,
       };
 
       next();
@@ -102,5 +105,38 @@ export class AuthMiddleware {
       // If token is invalid, continue without user
       next();
     }
+  }
+
+  /**
+   * Require a specific admin permission (e.g. 'missions:assign').
+   *
+   * Reads the permission list embedded in the JWT. As a transition safeguard,
+   * an admin whose token predates RBAC (no `perms` claim) is allowed through —
+   * their next login issues a scoped token. Non-admins are always rejected.
+   */
+  static requirePermission(required: string) {
+    return (req: AuthRequest, res: Response, next: NextFunction): void => {
+      if (!req.user) {
+        ResponseUtil.unauthorized(res, 'Authentication required');
+        return;
+      }
+
+      // Legacy token issued before RBAC: fall back to admin-gate only.
+      if (req.user.permissions === undefined) {
+        if (req.user.user_type === UserType.ADMIN) {
+          next();
+          return;
+        }
+        ResponseUtil.forbidden(res, 'Insufficient permissions');
+        return;
+      }
+
+      if (!hasPermission(req.user.permissions, required)) {
+        ResponseUtil.forbidden(res, `Missing permission: ${required}`);
+        return;
+      }
+
+      next();
+    };
   }
 }

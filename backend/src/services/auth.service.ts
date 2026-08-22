@@ -151,7 +151,8 @@ export class AuthService {
         'UPDATE users SET last_login_at = CURRENT_TIMESTAMP, is_email_verified = TRUE WHERE id = $1',
         [user.id]
       );
-      const token = this.generateToken(user);
+      const perms = await this.resolvePermissions(user);
+      const token = this.generateToken(user, perms);
       logger.info(`Google login: ${email}`);
       return { user, token, isNew: false };
     }
@@ -243,8 +244,9 @@ export class AuthService {
     // Remove password from response
     delete user.password_hash;
 
-    // Generate JWT token
-    const token = this.generateToken(user);
+    // Generate JWT token (with admin permissions when applicable)
+    const perms = await this.resolvePermissions(user);
+    const token = this.generateToken(user, perms);
 
     logger.info(`User logged in: ${user.email}`);
 
@@ -252,19 +254,46 @@ export class AuthService {
   }
 
   /**
+   * Resolve the admin permission list for a user from their admin role.
+   * Returns `undefined` for non-admins and for admins with no role assigned
+   * (so the token carries no `perms` claim and the legacy admin-gate applies).
+   */
+  private static async resolvePermissions(user: Partial<User>): Promise<string[] | undefined> {
+    if (user.user_type !== UserType.ADMIN) return undefined;
+    try {
+      const r = await pool.query(
+        `SELECT ar.permissions
+           FROM users u
+           LEFT JOIN admin_role ar ON u.admin_role_id = ar.id
+          WHERE u.id = $1`,
+        [user.id]
+      );
+      const perms = r.rows[0]?.permissions;
+      if (!perms) return undefined;
+      if (Array.isArray(perms)) return perms;
+      if (typeof perms === 'string') { try { return JSON.parse(perms); } catch { return undefined; } }
+      return undefined;
+    } catch (e) {
+      logger.warn(`Could not resolve permissions for ${user.email}: ${(e as Error).message}`);
+      return undefined;
+    }
+  }
+
+  /**
    * Generate JWT token
    */
-  private static generateToken(user: Partial<User>): string {
+  private static generateToken(user: Partial<User>, perms?: string[]): string {
     const secret = process.env.JWT_SECRET;
     if (!secret) {
       throw new Error('JWT_SECRET is not defined');
     }
 
-    const payload = {
+    const payload: Record<string, any> = {
       sub: user.id!,
       email: user.email!,
       role: user.user_type!,
     };
+    if (perms && perms.length) payload.perms = perms;
 
     const expiresIn = process.env.JWT_EXPIRES_IN || '24h';
 
