@@ -4,6 +4,7 @@ import { Helpers } from '../utils/helpers';
 import { resolveEvidenceUrl } from '../utils/s3';
 import { NotificationService } from './notification.service';
 import { NotificationType } from '../types';
+import { ALL_PERMISSIONS } from '../utils/permissions';
 import logger from '../utils/logger';
 
 /**
@@ -411,18 +412,142 @@ export class AdminService {
     return result.rows[0];
   }
 
+  // ---------- Admin roles (RBAC) ----------
+  static async listRoles() {
+    const r = await pool.query(
+      `SELECT ar.id, ar.key, ar.name, ar.description, ar.permissions, ar.is_system,
+              ar.created_at, ar.updated_at,
+              (SELECT COUNT(*) FROM users u WHERE u.admin_role_id = ar.id AND u.deleted_at IS NULL) AS admin_count
+         FROM admin_role ar
+        ORDER BY ar.is_system DESC, ar.name ASC`
+    );
+    return { data: r.rows, catalog: ALL_PERMISSIONS };
+  }
+
+  /** Validate a permission list against the known catalog (allows '*'). */
+  private static sanitizePermissions(permissions: any): string[] {
+    if (!Array.isArray(permissions)) throw new Error('permissions must be an array');
+    const valid = new Set<string>([...ALL_PERMISSIONS, '*']);
+    const clean = [...new Set(permissions.map((p) => String(p)))];
+    const bad = clean.filter((p) => !valid.has(p));
+    if (bad.length) throw new Error(`Unknown permissions: ${bad.join(', ')}`);
+    return clean;
+  }
+
+  static async createRole(data: { key?: string; name: string; description?: string; permissions: any }) {
+    if (!data.name) throw new Error('name is required');
+    const key = (data.key || data.name).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+    if (!key) throw new Error('A valid key or name is required');
+    const perms = this.sanitizePermissions(data.permissions || []);
+    const exists = await pool.query('SELECT 1 FROM admin_role WHERE key = $1', [key]);
+    if (exists.rows.length) throw new Error('A role with this key already exists');
+    const r = await pool.query(
+      `INSERT INTO admin_role (key, name, description, permissions, is_system)
+       VALUES ($1, $2, $3, $4, FALSE)
+       RETURNING id, key, name, description, permissions, is_system, created_at, updated_at`,
+      [key, data.name, data.description || null, JSON.stringify(perms)]
+    );
+    return r.rows[0];
+  }
+
+  static async updateRole(id: string, data: { name?: string; description?: string; permissions?: any }) {
+    const cur = await pool.query('SELECT is_system FROM admin_role WHERE id = $1', [id]);
+    if (cur.rows.length === 0) throw new Error('Role not found');
+    // System-role permissions are managed in code (re-synced on deploy); editing
+    // them from the UI would silently revert. Name/description stay editable.
+    if (cur.rows[0].is_system && data.permissions !== undefined) {
+      throw new Error('Permissions of a system role cannot be edited (managed in code)');
+    }
+    const sets: string[] = [];
+    const args: any[] = [];
+    let i = 1;
+    if (data.name !== undefined) { sets.push(`name = $${i++}`); args.push(data.name); }
+    if (data.description !== undefined) { sets.push(`description = $${i++}`); args.push(data.description); }
+    if (data.permissions !== undefined) {
+      sets.push(`permissions = $${i++}`); args.push(JSON.stringify(this.sanitizePermissions(data.permissions)));
+    }
+    if (sets.length === 0) throw new Error('No updatable fields provided');
+    args.push(id);
+    const r = await pool.query(
+      `UPDATE admin_role SET ${sets.join(', ')} WHERE id = $${i}
+       RETURNING id, key, name, description, permissions, is_system, created_at, updated_at`,
+      args
+    );
+    return r.rows[0];
+  }
+
+  static async deleteRole(id: string) {
+    const cur = await pool.query('SELECT is_system FROM admin_role WHERE id = $1', [id]);
+    if (cur.rows.length === 0) throw new Error('Role not found');
+    if (cur.rows[0].is_system) throw new Error('System roles cannot be deleted');
+    const assigned = await pool.query(
+      'SELECT COUNT(*) FROM users WHERE admin_role_id = $1 AND deleted_at IS NULL',
+      [id]
+    );
+    if (parseInt(assigned.rows[0].count) > 0) {
+      throw new Error('Reassign the admins on this role before deleting it');
+    }
+    await pool.query('DELETE FROM admin_role WHERE id = $1', [id]);
+    return { id, deleted: true };
+  }
+
+  /** Assign an admin role to a user (promoting them to admin in the process). */
+  static async setUserRole(userId: string, roleId: string) {
+    if (!roleId) throw new Error('role_id is required');
+    const role = await pool.query('SELECT id, key, name, permissions FROM admin_role WHERE id = $1', [roleId]);
+    if (role.rows.length === 0) throw new Error('Role not found');
+    const r = await pool.query(
+      `UPDATE users
+          SET admin_role_id = $1, user_type = 'admin', status = 'verified', updated_at = CURRENT_TIMESTAMP
+        WHERE id = $2 AND deleted_at IS NULL
+        RETURNING id, email, user_type, admin_role_id`,
+      [roleId, userId]
+    );
+    if (r.rows.length === 0) throw new Error('User not found');
+    return { ...r.rows[0], role: role.rows[0] };
+  }
+
+  // ---------- Audit log ----------
+  static async listAudit(params: { page: number; limit: number; search?: string }) {
+    const { page, limit, offset } = Helpers.getPaginationParams(params.page, params.limit);
+    let where = 'WHERE 1=1';
+    const args: any[] = [];
+    let i = 1;
+    if (params.search) {
+      where += ` AND (l.action ILIKE $${i} OR l.entity_type ILIKE $${i} OR l.description ILIKE $${i}
+                 OR a.email ILIKE $${i})`;
+      args.push(`%${params.search}%`); i++;
+    }
+    const count = await pool.query(`SELECT COUNT(*) FROM admin_logs l LEFT JOIN users a ON l.admin_id = a.id ${where}`, args);
+    const total = parseInt(count.rows[0].count);
+    const rows = await pool.query(
+      `SELECT l.id, l.action, l.entity_type, l.entity_id, l.description, l.ip_address,
+              l.metadata, l.created_at,
+              a.first_name || ' ' || a.last_name AS admin_name, a.email AS admin_email
+         FROM admin_logs l
+         LEFT JOIN users a ON l.admin_id = a.id
+         ${where} ORDER BY l.created_at DESC LIMIT $${i} OFFSET $${i + 1}`,
+      [...args, limit, offset]
+    );
+    return { data: rows.rows, pagination: { page, limit, total, totalPages: Helpers.calculateTotalPages(total, limit) } };
+  }
+
   /**
    * One-time bootstrap: promote an existing user to ADMIN using a shared secret.
    * Guarded by ADMIN_BOOTSTRAP_SECRET (so it cannot be abused without the secret).
+   * The promoted user is given the super_admin role so they get full permissions.
    */
   static async bootstrapAdmin(email: string, secret: string) {
     const expected = process.env.ADMIN_BOOTSTRAP_SECRET;
     if (!expected) throw new Error('Admin bootstrap is not configured');
     if (secret !== expected) throw new Error('Invalid bootstrap secret');
     const result = await pool.query(
-      `UPDATE users SET user_type = 'admin', status = 'verified', updated_at = CURRENT_TIMESTAMP
-       WHERE email = $1 AND deleted_at IS NULL
-       RETURNING id, email, user_type`,
+      `UPDATE users
+          SET user_type = 'admin', status = 'verified',
+              admin_role_id = COALESCE(admin_role_id, (SELECT id FROM admin_role WHERE key = 'super_admin')),
+              updated_at = CURRENT_TIMESTAMP
+        WHERE email = $1 AND deleted_at IS NULL
+        RETURNING id, email, user_type`,
       [String(email).toLowerCase()]
     );
     if (result.rows.length === 0) throw new Error('No user found with that email');

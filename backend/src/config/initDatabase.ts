@@ -53,6 +53,16 @@ export async function initDatabase(): Promise<void> {
     // GP is allowed to scan the recipient's QR and deliver.
     await pool.query('ALTER TABLE missions ADD COLUMN IF NOT EXISTS arrival_confirmed BOOLEAN DEFAULT FALSE');
     logger.info('✅ Schema patches applied (phone/password nullable, delivery_token, recipient, mission_assigned, qr_code_url TEXT)');
+
+    // Incremental migration files (idempotent — safe to run on every boot).
+    try {
+      const rbacPath = path.join(__dirname, '../migrations/002_admin_rbac.sql');
+      await pool.query(fs.readFileSync(rbacPath, 'utf8'));
+      logger.info('✅ RBAC migration (002_admin_rbac) applied');
+    } catch (mErr) {
+      logger.error('❌ RBAC migration (002_admin_rbac) failed:', mErr);
+      logger.warn('⚠️  Admin role features may be unavailable until this is resolved.');
+    }
   } catch (error) {
     logger.error('❌ Error initializing database:', error);
 

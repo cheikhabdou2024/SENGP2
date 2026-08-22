@@ -2,7 +2,8 @@ import { Response } from 'express';
 import { AdminService } from '../services/admin.service';
 import { WithdrawalService } from '../services/withdrawal.service';
 import { ResponseUtil } from '../utils/response';
-import { AuthRequest } from '../types';
+import { logAdminAction } from '../utils/audit';
+import { AuthRequest, UserType } from '../types';
 import logger from '../utils/logger';
 
 /** Pull common list query params. */
@@ -37,6 +38,7 @@ export class AdminController {
   static async updateUser(req: AuthRequest, res: Response): Promise<void> {
     try {
       const u = await AdminService.updateUser(req.params.id, req.body);
+      void logAdminAction({ req, action: 'user.update', entityType: 'user', entityId: req.params.id, metadata: { fields: Object.keys(req.body || {}) } });
       ResponseUtil.success(res, u, 'User updated');
     } catch (e: any) {
       if (e.message === 'User not found') return void ResponseUtil.notFound(res, e.message);
@@ -50,6 +52,7 @@ export class AdminController {
         return;
       }
       const r = await AdminService.deleteUser(req.params.id);
+      void logAdminAction({ req, action: 'user.delete', entityType: 'user', entityId: req.params.id });
       ResponseUtil.success(res, r, 'User deleted');
     } catch (e: any) {
       if (e.message === 'User not found') return void ResponseUtil.notFound(res, e.message);
@@ -67,6 +70,7 @@ export class AdminController {
   static async updateMission(req: AuthRequest, res: Response): Promise<void> {
     try {
       const m = await AdminService.updateMission(req.params.id, req.body);
+      void logAdminAction({ req, action: 'mission.update', entityType: 'mission', entityId: req.params.id, metadata: { fields: Object.keys(req.body || {}) } });
       ResponseUtil.success(res, m, 'Mission updated');
     } catch (e: any) {
       if (e.message === 'Mission not found') return void ResponseUtil.notFound(res, e.message);
@@ -76,6 +80,7 @@ export class AdminController {
   static async deleteMission(req: AuthRequest, res: Response): Promise<void> {
     try {
       const r = await AdminService.deleteMission(req.params.id);
+      void logAdminAction({ req, action: 'mission.delete', entityType: 'mission', entityId: req.params.id });
       ResponseUtil.success(res, r, 'Mission deleted');
     } catch (e: any) {
       if (e.message === 'Mission not found') return void ResponseUtil.notFound(res, e.message);
@@ -85,6 +90,7 @@ export class AdminController {
   static async assignMission(req: AuthRequest, res: Response): Promise<void> {
     try {
       const m = await AdminService.assignMission(req.params.id, req.body.gp_id);
+      void logAdminAction({ req, action: 'mission.assign', entityType: 'mission', entityId: req.params.id, metadata: { gp_id: req.body.gp_id } });
       ResponseUtil.success(res, m, 'Mission assigned and GP notified');
     } catch (e: any) {
       if (e.message === 'Mission not found') return void ResponseUtil.notFound(res, e.message);
@@ -94,6 +100,7 @@ export class AdminController {
   static async confirmArrival(req: AuthRequest, res: Response): Promise<void> {
     try {
       const m = await AdminService.confirmArrival(req.params.id);
+      void logAdminAction({ req, action: 'mission.confirm_arrival', entityType: 'mission', entityId: req.params.id });
       ResponseUtil.success(res, m, 'Arrivée confirmée — le GP peut livrer');
     } catch (e: any) {
       if (e.message === 'Mission not found') return void ResponseUtil.notFound(res, e.message);
@@ -111,6 +118,7 @@ export class AdminController {
   static async deleteTrip(req: AuthRequest, res: Response): Promise<void> {
     try {
       const r = await AdminService.deleteTrip(req.params.id);
+      void logAdminAction({ req, action: 'trip.delete', entityType: 'trip', entityId: req.params.id });
       ResponseUtil.success(res, r, 'Trip deleted');
     } catch (e: any) {
       if (e.message && e.message.includes('not found')) return void ResponseUtil.notFound(res, e.message);
@@ -137,12 +145,14 @@ export class AdminController {
   static async approveWithdrawal(req: AuthRequest, res: Response): Promise<void> {
     try {
       const w = await WithdrawalService.approve(req.params.id, req.user!.id);
+      void logAdminAction({ req, action: 'withdrawal.approve', entityType: 'withdrawal', entityId: req.params.id });
       ResponseUtil.success(res, w, 'Withdrawal approved');
     } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Approve failed'); }
   }
   static async rejectWithdrawal(req: AuthRequest, res: Response): Promise<void> {
     try {
       const w = await WithdrawalService.reject(req.params.id, req.user!.id, req.body.reason || 'Rejected by admin');
+      void logAdminAction({ req, action: 'withdrawal.reject', entityType: 'withdrawal', entityId: req.params.id, description: req.body.reason });
       ResponseUtil.success(res, w, 'Withdrawal rejected');
     } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Reject failed'); }
   }
@@ -157,11 +167,72 @@ export class AdminController {
   static async updateClaim(req: AuthRequest, res: Response): Promise<void> {
     try {
       const c = await AdminService.updateClaim(req.params.id, req.user!.id, req.body);
+      void logAdminAction({ req, action: 'claim.update', entityType: 'claim', entityId: req.params.id, metadata: { fields: Object.keys(req.body || {}) } });
       ResponseUtil.success(res, c, 'Claim updated');
     } catch (e: any) {
       if (e.message === 'Claim not found') return void ResponseUtil.notFound(res, e.message);
       ResponseUtil.badRequest(res, e.message || 'Update failed');
     }
+  }
+
+  // ---------- Current admin's permissions ----------
+  static async myPermissions(req: AuthRequest, res: Response): Promise<void> {
+    // Legacy token (no perms claim) → treat a raw admin as full access.
+    const perms = req.user?.permissions ?? (req.user?.user_type === UserType.ADMIN ? ['*'] : []);
+    ResponseUtil.success(res, { permissions: perms, user_type: req.user?.user_type });
+  }
+
+  // ---------- Roles ----------
+  static async listRoles(_req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const r = await AdminService.listRoles();
+      ResponseUtil.success(res, r.data, undefined, { catalog: r.catalog } as any);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
+  }
+  static async createRole(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const role = await AdminService.createRole(req.body);
+      void logAdminAction({ req, action: 'role.create', entityType: 'admin_role', entityId: role.id, description: role.name });
+      ResponseUtil.created(res, role, 'Role created');
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Create failed'); }
+  }
+  static async updateRole(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const role = await AdminService.updateRole(req.params.id, req.body);
+      void logAdminAction({ req, action: 'role.update', entityType: 'admin_role', entityId: req.params.id });
+      ResponseUtil.success(res, role, 'Role updated');
+    } catch (e: any) {
+      if (e.message === 'Role not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Update failed');
+    }
+  }
+  static async deleteRole(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const r = await AdminService.deleteRole(req.params.id);
+      void logAdminAction({ req, action: 'role.delete', entityType: 'admin_role', entityId: req.params.id });
+      ResponseUtil.success(res, r, 'Role deleted');
+    } catch (e: any) {
+      if (e.message === 'Role not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Delete failed');
+    }
+  }
+  static async setUserRole(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const r = await AdminService.setUserRole(req.params.id, req.body.role_id);
+      void logAdminAction({ req, action: 'user.set_role', entityType: 'user', entityId: req.params.id, metadata: { role_id: req.body.role_id } });
+      ResponseUtil.success(res, r, 'Role assigned');
+    } catch (e: any) {
+      if (e.message === 'User not found' || e.message === 'Role not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Assign failed');
+    }
+  }
+
+  // ---------- Audit log ----------
+  static async listAudit(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const r = await AdminService.listAudit(listParams(req));
+      ResponseUtil.success(res, r.data, undefined, r.pagination);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
   }
 
   // Bootstrap (public, secret-gated)
