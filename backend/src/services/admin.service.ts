@@ -877,14 +877,14 @@ export class AdminService {
   static async getRecentActivity(limit = 12) {
     const r = await pool.query(
       `SELECT * FROM (
-         SELECT 'mission' AS kind, mission_code AS ref, status AS detail,
+         SELECT 'mission' AS kind, mission_code AS ref, status::text AS detail,
                 (departure_city || ' → ' || arrival_city) AS extra, created_at FROM missions
          UNION ALL
-         SELECT 'payment', payment_code, status, amount::text, created_at FROM payments WHERE status = 'completed'
+         SELECT 'payment', payment_code, status::text, amount::text, created_at FROM payments WHERE status = 'completed'
          UNION ALL
-         SELECT 'user', (first_name || ' ' || last_name), user_type, '', created_at FROM users WHERE deleted_at IS NULL
+         SELECT 'user', (first_name || ' ' || last_name), user_type::text, '', created_at FROM users WHERE deleted_at IS NULL
          UNION ALL
-         SELECT 'claim', claim_code, status, '', created_at FROM claims
+         SELECT 'claim', claim_code, status::text, '', created_at FROM claims
        ) e ORDER BY created_at DESC LIMIT $1`,
       [limit]
     );
