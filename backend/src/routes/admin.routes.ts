@@ -44,6 +44,8 @@ router.post('/kyc/:id/approve', requirePermission('users:verify'), AdminControll
 router.post('/kyc/:id/reject', requirePermission('users:verify'), AdminController.rejectKyc);
 
 router.get('/missions', requirePermission('missions:read'), AdminController.listMissions);
+router.get('/missions/export', requirePermission('missions:read'), AdminController.exportMissions);
+router.get('/missions/status-series', requirePermission('missions:read'), AdminController.missionStatusSeries);
 router.get('/missions/:id', requirePermission('missions:read'), AdminController.getMissionDetail);
 router.put('/missions/:id', requirePermission('missions:write'), AdminController.updateMission);
 router.post('/missions/:id/assign', requirePermission('missions:assign'), AdminController.assignMission);

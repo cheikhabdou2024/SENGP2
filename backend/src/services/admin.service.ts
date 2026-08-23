@@ -319,12 +319,13 @@ export class AdminService {
   }
 
   // ---------- Missions ----------
-  static async listMissions(params: { page: number; limit: number; search?: string; status?: string }) {
+  static async listMissions(params: { page: number; limit: number; search?: string; status?: string; expediteur_id?: string }) {
     const { page, limit, offset } = Helpers.getPaginationParams(params.page, params.limit);
     let where = 'WHERE 1=1';
     const args: any[] = [];
     let i = 1;
     if (params.status) { where += ` AND m.status = $${i++}`; args.push(params.status); }
+    if (params.expediteur_id) { where += ` AND m.expediteur_id = $${i++}`; args.push(params.expediteur_id); }
     if (params.search) {
       where += ` AND (m.mission_code ILIKE $${i} OR m.departure_city ILIKE $${i} OR m.arrival_city ILIKE $${i} OR m.tracking_number ILIKE $${i})`;
       args.push(`%${params.search}%`); i++;
@@ -343,6 +344,48 @@ export class AdminService {
       [...args, limit, offset]
     );
     return { data: rows.rows, pagination: { page, limit, total, totalPages: Helpers.calculateTotalPages(total, limit) } };
+  }
+
+  /** Daily mission counts by current status — for the Missions KPI sparklines. */
+  static async getMissionStatusSeries(from: string, to: string, interval: string) {
+    const unit = ['day', 'week', 'month'].includes(interval) ? interval : 'day';
+    const r = await pool.query(
+      `SELECT to_char(date_trunc($3, created_at), 'YYYY-MM-DD') AS period,
+              COUNT(*) AS total,
+              COUNT(*) FILTER (WHERE status = 'pending') AS pending,
+              COUNT(*) FILTER (WHERE status = 'in_transit') AS in_transit,
+              COUNT(*) FILTER (WHERE status = 'delivered') AS delivered,
+              COUNT(*) FILTER (WHERE status = 'cancelled') AS cancelled
+         FROM missions
+        WHERE created_at >= ($1)::date AND created_at < (($2)::date + interval '1 day')
+        GROUP BY 1 ORDER BY 1`,
+      [from, to, unit]
+    );
+    const series = r.rows.map((x: any) => ({ period: x.period, total:+x.total, pending:+x.pending, in_transit:+x.in_transit, delivered:+x.delivered, cancelled:+x.cancelled }));
+    const totals = series.reduce((t: any, s: any) => ({ total:t.total+s.total, pending:t.pending+s.pending, in_transit:t.in_transit+s.in_transit, delivered:t.delivered+s.delivered, cancelled:t.cancelled+s.cancelled }), { total:0,pending:0,in_transit:0,delivered:0,cancelled:0 });
+    return { series, totals };
+  }
+
+  /** All missions matching filters (no pagination) — for CSV export. */
+  static async listMissionsForExport(params: { search?: string; status?: string; expediteur_id?: string }) {
+    let where = 'WHERE 1=1';
+    const args: any[] = [];
+    let i = 1;
+    if (params.status) { where += ` AND m.status = $${i++}`; args.push(params.status); }
+    if (params.expediteur_id) { where += ` AND m.expediteur_id = $${i++}`; args.push(params.expediteur_id); }
+    if (params.search) {
+      where += ` AND (m.mission_code ILIKE $${i} OR m.departure_city ILIKE $${i} OR m.arrival_city ILIKE $${i} OR m.tracking_number ILIKE $${i})`;
+      args.push(`%${params.search}%`); i++;
+    }
+    const r = await pool.query(
+      `SELECT m.mission_code, m.departure_city, m.arrival_city, m.arrival_country,
+              m.offered_price, m.final_price, m.package_weight, m.status, m.tracking_number, m.created_at,
+              e.first_name || ' ' || e.last_name AS expediteur, g.first_name || ' ' || g.last_name AS gp
+         FROM missions m LEFT JOIN users e ON m.expediteur_id = e.id LEFT JOIN users g ON m.gp_id = g.id
+         ${where} ORDER BY m.created_at DESC`,
+      args
+    );
+    return r.rows;
   }
 
   static async updateMission(id: string, data: any) {

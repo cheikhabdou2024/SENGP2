@@ -534,6 +534,7 @@
             if (state.view === 'roles') return renderRoles(main);
             if (state.view === 'kyc') return renderKyc(main);
             if (state.view === 'users') return renderUsers(main);
+            if (state.view === 'missions') return renderMissions(main);
             let extra = '';
             if (state.view === 'payments' && can('payments:export'))
                 extra = `<button style="margin-left:auto" onclick="exportCsv('payments')">⬇ Exporter CSV</button>`;
@@ -580,6 +581,63 @@
             loadUserKpis();
             loadList();
         }
+        // Dedicated Missions view.
+        async function renderMissions(main){
+            const createBtn = can('missions:write') ? `<button class="pill-btn accent" onclick="toast('Les missions sont créées par les expéditeurs depuis l\\'app. Depuis l\\'admin : affectez/gérez-les.', 'info')">＋ Créer une mission</button>` : '';
+            const exportBtn = can('missions:read') ? `<button class="pill-btn" onclick="exportCsv('missions')">⬇ Exporter</button>` : '';
+            let expSel = '';
+            if (can('users:read')) {
+                let opts = '<option value="">Tous les expéditeurs</option>';
+                try { const r = await api('/admin/users?user_type=expediteur&limit=200');
+                    if (r.ok) opts += (r.json.data||[]).map(u=>`<option value="${u.id}"${state.mExpediteur===u.id?' selected':''}>${esc(u.first_name+' '+u.last_name)}</option>`).join('');
+                } catch(e){}
+                expSel = `<select id="mexp">${opts}</select>`;
+            }
+            main.innerHTML = `
+                <div class="page-head">
+                    <div><h1>Missions</h1><p>Suivez toutes les missions et leur progression en temps réel.</p></div>
+                    <div class="head-tools">${createBtn}</div>
+                </div>
+                <div class="kpi-grid" id="missionKpis"><div class="loading">Chargement…</div></div>
+                <div class="toolbar">
+                    <input id="search" placeholder="Rechercher une mission…" value="${esc(state.search)}">
+                    ${statusFilter()}
+                    ${expSel}
+                    <button onclick="applyFilters()">🔎 Filtrer</button>
+                    <span style="margin-left:auto"></span>${exportBtn}
+                </div>
+                <div id="tableArea"><div class="loading">Chargement…</div></div>
+                <div class="pager" id="pager"></div>`;
+            document.getElementById('search').addEventListener('keydown', e => { if (e.key === 'Enter') applyFilters(); });
+            loadMissionKpis();
+            loadList();
+        }
+        async function loadMissionKpis(){
+            const el = document.getElementById('missionKpis'); if (!el) return;
+            const iso = d => d.toISOString().slice(0,10);
+            const to = new Date(), from = new Date(Date.now()-29*864e5);
+            const pTo = new Date(from.getTime()-864e5), pFrom = new Date(pTo.getTime()-29*864e5);
+            const [st, cur, prev] = await Promise.all([
+                api('/admin/stats'),
+                api(`/admin/missions/status-series?from=${iso(from)}&to=${iso(to)}&interval=day`),
+                api(`/admin/missions/status-series?from=${iso(pFrom)}&to=${iso(pTo)}&interval=day`),
+            ]);
+            if (!st.ok) { el.innerHTML = ''; return; }
+            const m = st.json.data.missions;
+            const cs = cur.ok ? cur.json.data : null, ps = prev.ok ? prev.json.data : null;
+            const kpi = (ico,bg,label,value,key) => {
+                const delta = (cs && ps) ? fmtDelta(cs.totals[key]||0, ps.totals[key]||0) : '';
+                const spark = cs ? `<div class="kpi-spark">${svgSpark(cs.series.map(x=>x[key]||0), bg)}</div>` : '';
+                return `<div class="kpi"><div class="kpi-top"><div class="kpi-ico" style="background:${bg}20;color:${bg}">${ico}</div><div class="kpi-label">${label}</div></div>
+                    <div class="kpi-val">${esc(value)}</div>
+                    <div class="kpi-bottom"><span>${delta||''} <span style="font-size:11px;color:var(--faint)">vs période préc.</span></span>${spark}</div></div>`;
+            };
+            el.innerHTML = kpi('📦','#8b5cf6','Total missions', m.total, 'total')
+                + kpi('⏳','#fbbf24','En attente', m.pending, 'pending')
+                + kpi('🚚','#38bdf8','En transit', m.in_transit, 'in_transit')
+                + kpi('✅','#34d399','Livrées', m.delivered, 'delivered')
+                + kpi('✖️','#fb7185','Annulées', m.cancelled, 'cancelled');
+        }
         async function loadUserKpis(){
             const el = document.getElementById('usersKpis'); if (!el) return;
             const iso = d => d.toISOString().slice(0,10);
@@ -625,6 +683,8 @@
             state.status = sEl ? sEl.value : '';
             const tEl = document.getElementById('utype');
             if (tEl) state.uType = tEl.value;
+            const eEl = document.getElementById('mexp');
+            if (eEl) state.mExpediteur = eEl.value;
             state.page = 1;
             loadList();
         }
@@ -973,7 +1033,8 @@
             const q = `?page=${state.page}&limit=20`
                 + (state.search ? `&search=${encodeURIComponent(state.search)}` : '')
                 + (state.status ? `&status=${encodeURIComponent(state.status)}` : '')
-                + (state.view==='users' && state.uType ? `&user_type=${encodeURIComponent(state.uType)}` : '');
+                + (state.view==='users' && state.uType ? `&user_type=${encodeURIComponent(state.uType)}` : '')
+                + (state.view==='missions' && state.mExpediteur ? `&expediteur_id=${encodeURIComponent(state.mExpediteur)}` : '');
             try {
                 const { ok, json } = await api('/admin/' + state.view + q);
                 if (!ok) throw new Error(json.error || 'Erreur');
@@ -1516,6 +1577,7 @@
                 if (state.status) params.push(`status=${encodeURIComponent(state.status)}`);
                 if (state.search) params.push(`search=${encodeURIComponent(state.search)}`);
                 if (kind==='users' && state.uType) params.push(`user_type=${encodeURIComponent(state.uType)}`);
+                if (kind==='missions' && state.mExpediteur) params.push(`expediteur_id=${encodeURIComponent(state.mExpediteur)}`);
                 const q = params.length ? ('?' + params.join('&')) : '';
                 const res = await fetch(API + '/admin/' + kind + '/export' + q, { headers: { 'Authorization': 'Bearer ' + token } });
                 if (!res.ok) { toast('Export refusé ('+res.status+')', 'err'); return; }

@@ -15,6 +15,7 @@ function listParams(req: AuthRequest) {
     search: (req.query.search as string) || undefined,
     status: (req.query.status as string) || undefined,
     user_type: (req.query.user_type as string) || undefined,
+    expediteur_id: (req.query.expediteur_id as string) || undefined,
   };
 }
 
@@ -223,6 +224,32 @@ export class AdminController {
       if (e.message === 'Mission not found') return void ResponseUtil.notFound(res, e.message);
       ResponseUtil.badRequest(res, e.message || 'Confirmation failed');
     }
+  }
+  static async missionStatusSeries(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const to = (req.query.to as string) || new Date().toISOString().slice(0, 10);
+      const from = (req.query.from as string) || new Date(Date.now() - 29 * 864e5).toISOString().slice(0, 10);
+      const interval = (req.query.interval as string) || 'day';
+      const data = await AdminService.getMissionStatusSeries(from, to, interval);
+      ResponseUtil.success(res, data);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
+  }
+  static async exportMissions(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const rows = await AdminService.listMissionsForExport(listParams(req));
+      const csv = toCsv(rows, [
+        { key: 'mission_code', label: 'Code' }, { key: 'created_at', label: 'Créé le' },
+        { key: 'departure_city', label: 'Départ' }, { key: 'arrival_city', label: 'Arrivée' },
+        { key: 'arrival_country', label: 'Pays' }, { key: 'offered_price', label: 'Prix' },
+        { key: 'final_price', label: 'Prix final' }, { key: 'package_weight', label: 'Poids' },
+        { key: 'status', label: 'Statut' }, { key: 'tracking_number', label: 'Suivi' },
+        { key: 'expediteur', label: 'Expéditeur' }, { key: 'gp', label: 'GP' },
+      ]);
+      void logAdminAction({ req, action: 'mission.export', entityType: 'mission', metadata: { count: rows.length } });
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="missions.csv"');
+      res.status(200).send(csv);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Export failed'); }
   }
   static async getMissionDetail(req: AuthRequest, res: Response): Promise<void> {
     try {
