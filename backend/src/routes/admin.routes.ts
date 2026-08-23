@@ -19,8 +19,9 @@ router.use(AuthMiddleware.requireRole(UserType.ADMIN));
 // The signed-in admin's own permission set (used by the UI to gate sections).
 router.get('/me/permissions', AdminController.myPermissions);
 
-// Overview counts are the landing view for every admin (no extra permission).
+// Overview counts + activity are the landing view for every admin (no extra permission).
 router.get('/stats', AdminController.stats);
+router.get('/activity', AdminController.activity);
 
 // Analytics
 router.get('/analytics/timeseries', requirePermission('analytics:read'), AdminController.analyticsTimeseries);

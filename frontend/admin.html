@@ -5,104 +5,198 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEN GP - Administration</title>
     <style>
+        :root {
+            --bg: #0a0e1a; --bg2: #0d1120; --surface: #141a2e; --surface2: #1a2138;
+            --border: rgba(255,255,255,.07); --border2: rgba(255,255,255,.12);
+            --ink: #eef1f8; --muted: rgba(233,238,250,.62); --faint: rgba(233,238,250,.4);
+            --accent: #6366f1; --accent2: #8b5cf6; --accent-soft: rgba(99,102,241,.16);
+            --good: #34d399; --warn: #fbbf24; --bad: #fb7185; --info: #38bdf8;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0f0c29;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff; min-height: 100vh;
+            background: var(--bg); color: var(--ink); min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
-        a { color: #4ECDC4; }
+        a { color: var(--accent2); text-decoration: none; }
         button { font-family: inherit; cursor: pointer; }
 
         /* Login gate */
-        #login { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        #login { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+            background: radial-gradient(1200px 600px at 30% -10%, rgba(99,102,241,.14), transparent), var(--bg); }
         .login-card {
-            width: 100%; max-width: 380px; background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 32px;
+            width: 100%; max-width: 380px; background: var(--surface);
+            border: 1px solid var(--border2); border-radius: 20px; padding: 32px;
+            box-shadow: 0 24px 60px rgba(0,0,0,.5);
         }
         .login-card h1 { font-size: 22px; margin-bottom: 6px; }
-        .login-card p { color: rgba(255,255,255,0.6); font-size: 13px; margin-bottom: 20px; }
+        .login-card p { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
         .field { margin-bottom: 14px; }
-        .field label { display:block; font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 6px; }
+        .field label { display:block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
         .field input {
-            width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15);
-            background: #fff; color: #1a1a2e; font-size: 14px;
+            width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border2);
+            background: rgba(255,255,255,.06); color: var(--ink); font-size: 14px;
         }
         .btn-primary {
             width: 100%; padding: 13px; border: none; border-radius: 12px; font-weight: 700; font-size: 15px;
-            background: linear-gradient(135deg,#FF6B6B,#FFE66D); color:#1a1a2e;
+            background: linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff;
         }
         .btn-primary:disabled { opacity:.6; }
 
         /* App shell */
         #app { display: none; }
-        .topbar {
-            display:flex; align-items:center; justify-content:space-between; gap:12px;
-            padding: 14px 20px; background: rgba(255,255,255,0.04);
-            border-bottom: 1px solid rgba(255,255,255,0.1); position: sticky; top:0; z-index:5;
-            backdrop-filter: blur(10px);
-        }
-        .topbar h1 { font-size: 18px; }
-        .topbar .who { font-size: 12px; color: rgba(255,255,255,0.6); }
-        .btn-logout {
-            padding: 8px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(255,255,255,0.08); color:#fff; font-size: 13px;
-        }
-        .layout { display: flex; min-height: calc(100vh - 57px); }
-        .sidebar {
-            width: 190px; flex-shrink: 0; padding: 14px 10px; border-right: 1px solid rgba(255,255,255,0.08);
-        }
-        .nav-link {
-            display:flex; align-items:center; gap:10px; padding: 11px 14px; border-radius: 10px;
-            color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 600; margin-bottom: 4px;
-        }
-        .nav-link.active { background: rgba(255,215,0,0.15); color: #FFD700; }
-        .main { flex: 1; padding: 20px; overflow-x: auto; }
+        .layout { display: flex; min-height: 100vh; }
 
-        /* Stats cards */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap: 12px; margin-bottom: 8px; }
-        .stat {
-            background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 16px;
+        /* Sidebar */
+        .sidebar {
+            width: 232px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto;
         }
-        .stat .label { font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
+        .brand { display:flex; align-items:center; gap:11px; padding: 18px 18px 14px; }
+        .brand-logo { width:34px; height:34px; border-radius:10px; background: linear-gradient(135deg,var(--accent),var(--accent2));
+            display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; color:#fff; flex-shrink:0; }
+        .brand-name { font-weight:800; font-size:15px; line-height:1.1; }
+        .brand-sub { font-size:11px; color:var(--faint); }
+        .side-nav { flex:1; padding: 6px 12px 12px; }
+        .nav-section { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint);
+            margin: 16px 12px 6px; font-weight:700; }
+        .nav-link {
+            display:flex; align-items:center; gap:11px; padding: 9px 12px; border-radius: 10px;
+            color: var(--muted); font-size: 13.5px; font-weight: 600; margin-bottom: 2px; position: relative;
+            transition: background .12s, color .12s;
+        }
+        .nav-link svg { width:18px; height:18px; flex-shrink:0; stroke: currentColor; }
+        .nav-link:hover { background: rgba(255,255,255,.04); color: var(--ink); }
+        .nav-link.active { background: var(--accent-soft); color: #fff; }
+        .nav-link.active::before { content:''; position:absolute; left:-12px; top:8px; bottom:8px; width:3px;
+            border-radius:0 3px 3px 0; background: var(--accent); }
+        .side-foot { padding: 12px; border-top: 1px solid var(--border); }
+        .user-chip { display:flex; align-items:center; gap:10px; padding:8px; border-radius:12px; background: var(--surface); }
+        .avatar { width:34px; height:34px; border-radius:10px; background: linear-gradient(135deg,var(--accent),var(--accent2));
+            display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:#fff; flex-shrink:0; }
+        .user-chip .u-name { font-size:13px; font-weight:700; line-height:1.1; }
+        .user-chip .u-mail { font-size:11px; color:var(--faint); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:120px; }
+
+        /* Topbar */
+        .content { flex:1; min-width:0; display:flex; flex-direction:column; }
+        .topbar {
+            display:flex; align-items:center; gap:14px; padding: 12px 26px;
+            border-bottom: 1px solid var(--border); position: sticky; top:0; z-index:20;
+            background: rgba(10,14,26,.82); backdrop-filter: blur(12px);
+        }
+        .search { flex:1; max-width:420px; position:relative; }
+        .search input { width:100%; padding: 9px 12px 9px 34px; border-radius:10px; border:1px solid var(--border2);
+            background: rgba(255,255,255,.05); color:var(--ink); font-size:13px; }
+        .search::before { content:'🔍'; position:absolute; left:11px; top:50%; transform:translateY(-50%); font-size:12px; opacity:.6; }
+        .top-actions { margin-left:auto; display:flex; align-items:center; gap:10px; }
+        .icon-btn { width:38px; height:38px; border-radius:10px; border:1px solid var(--border2); background: var(--surface);
+            color: var(--muted); display:flex; align-items:center; justify-content:center; font-size:15px; position:relative; }
+        .icon-btn:hover { color: var(--ink); border-color: var(--accent); }
+        .icon-btn .dot { position:absolute; top:7px; right:8px; width:7px; height:7px; border-radius:50%; background: var(--bad); }
+        .top-user { display:flex; align-items:center; gap:9px; padding:5px 10px 5px 6px; border-radius:12px;
+            border:1px solid var(--border2); background: var(--surface); }
+        .top-user .u-name { font-size:13px; font-weight:700; line-height:1.1; }
+        .top-user .u-mail { font-size:11px; color:var(--faint); }
+        .btn-logout { padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border2);
+            background: var(--surface); color:var(--ink); font-size: 13px; }
+        .main { flex: 1; padding: 24px 26px 40px; overflow-x: hidden; }
+
+        /* Page header (overview) */
+        .page-head { display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom: 20px; }
+        .page-head h1 { font-size: 24px; font-weight: 800; letter-spacing:-.02em; }
+        .page-head p { color: var(--muted); font-size: 14px; margin-top: 3px; }
+        .head-tools { margin-left:auto; display:flex; gap:10px; flex-wrap:wrap; }
+        .pill-btn { display:inline-flex; align-items:center; gap:8px; padding:9px 13px; border-radius:10px;
+            border:1px solid var(--border2); background: var(--surface); color: var(--ink); font-size:13px; font-weight:600; }
+        .pill-btn.accent { background: linear-gradient(135deg,var(--accent),var(--accent2)); border:none; color:#fff; }
+
+        /* KPI cards */
+        .kpi-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap:16px; margin-bottom: 20px; }
+        .kpi { background: var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px; position:relative; overflow:hidden; }
+        .kpi-top { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+        .kpi-ico { width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:17px; }
+        .kpi-label { font-size:13px; color:var(--muted); font-weight:600; }
+        .kpi-val { font-size:27px; font-weight:800; letter-spacing:-.02em; }
+        .kpi-bottom { display:flex; align-items:flex-end; justify-content:space-between; margin-top:8px; gap:8px; }
+        .kpi-delta { font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:3px; }
+        .kpi-delta.up { color: var(--good); } .kpi-delta.down { color: var(--bad); } .kpi-delta.flat { color: var(--faint); }
+        .kpi-spark { flex:1; max-width:120px; height:34px; }
+
+        /* Panels */
+        .grid-2 { display:grid; grid-template-columns: 2fr 1fr; gap:16px; margin-bottom:16px; }
+        .grid-3 { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-bottom:16px; }
+        .panel { background: var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px; min-width:0; }
+        .panel-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; }
+        .panel-head h3 { font-size:15px; font-weight:700; }
+        .panel-head .link { font-size:12px; color:var(--accent2); font-weight:600; cursor:pointer; }
+        .seg { display:inline-flex; background: var(--bg2); border:1px solid var(--border); border-radius:9px; padding:3px; gap:2px; }
+        .seg button { padding:5px 11px; border-radius:7px; border:none; background:transparent; color:var(--muted); font-size:12px; font-weight:600; }
+        .seg button.active { background: var(--accent); color:#fff; }
+
+        /* Donut */
+        .donut-wrap { display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+        .donut-legend { flex:1; min-width:150px; display:flex; flex-direction:column; gap:9px; }
+        .donut-legend .li { display:flex; align-items:center; gap:9px; font-size:13px; }
+        .donut-legend .li .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+        .donut-legend .li .lv { margin-left:auto; color:var(--muted); font-weight:600; font-variant-numeric:tabular-nums; }
+
+        /* Alerts + activity feeds */
+        .feed { display:flex; flex-direction:column; gap:2px; }
+        .feed-item { display:flex; align-items:flex-start; gap:11px; padding:10px 4px; border-bottom:1px solid var(--border); }
+        .feed-item:last-child { border-bottom:none; }
+        .feed-ico { width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+        .feed-main { flex:1; min-width:0; }
+        .feed-title { font-size:13px; font-weight:600; }
+        .feed-sub { font-size:12px; color:var(--faint); }
+        .feed-time { font-size:11px; color:var(--faint); white-space:nowrap; }
+
+        /* Quick actions */
+        .quick-bar { display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-top:4px; }
+        .qbtn { display:flex; align-items:center; justify-content:center; gap:9px; padding:14px; border-radius:13px;
+            border:1px solid var(--border2); background: var(--surface); color:var(--ink); font-size:13.5px; font-weight:600; }
+        .qbtn:hover { border-color: var(--accent); background: var(--surface2); }
+        .qbtn.accent { background: linear-gradient(135deg,var(--accent),var(--accent2)); border:none; color:#fff; }
+
+        /* Stats cards (used by analytics + detail modals) */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(170px,1fr)); gap: 14px; margin-bottom: 8px; }
+        .stat { background: var(--surface); border:1px solid var(--border); border-radius: 14px; padding: 16px; }
+        .stat .label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
         .stat .value { font-size: 24px; font-weight: 800; }
-        .stat .sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
-        .section-title { font-size: 16px; font-weight: 700; margin: 18px 0 12px; }
+        .stat .sub { font-size: 11px; color: var(--faint); margin-top: 4px; }
+        .section-title { font-size: 15px; font-weight: 700; margin: 20px 0 12px; }
 
         /* Toolbar */
-        .toolbar { display:flex; gap:10px; margin-bottom: 12px; flex-wrap: wrap; }
+        .toolbar { display:flex; gap:10px; margin-bottom: 14px; flex-wrap: wrap; align-items:center; }
         .toolbar input, .toolbar select {
-            padding: 9px 12px; border-radius: 10px; border:1px solid rgba(255,255,255,0.15);
-            background: rgba(255,255,255,0.08); color:#fff; font-size: 13px;
+            padding: 9px 12px; border-radius: 10px; border:1px solid var(--border2);
+            background: rgba(255,255,255,0.05); color:var(--ink); font-size: 13px;
         }
         .toolbar input { min-width: 200px; }
-        .toolbar button {
-            padding: 9px 14px; border-radius: 10px; border:none; background:#4ECDC4; color:#06302c; font-weight:700; font-size:13px;
+        .toolbar > button {
+            padding: 9px 14px; border-radius: 10px; border:none; background:var(--accent); color:#fff; font-weight:700; font-size:13px;
         }
 
         /* Table */
-        .table-wrap { overflow-x: auto; border:1px solid rgba(255,255,255,0.08); border-radius: 12px; }
+        .table-wrap { overflow-x: auto; border:1px solid var(--border); border-radius: 14px; background: var(--surface); }
         table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 640px; }
-        th, td { text-align: left; padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.06); white-space: nowrap; }
-        th { color: rgba(255,255,255,0.55); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; }
-        tr:hover td { background: rgba(255,255,255,0.03); }
+        th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        th { color: var(--faint); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; background: var(--bg2); }
+        tbody tr:last-child td { border-bottom:none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
         .badge { padding: 3px 9px; border-radius: 8px; font-size: 11px; font-weight: 700; }
-        .b-green { background: rgba(76,175,80,.2); color:#7ee081; }
-        .b-yellow { background: rgba(255,215,0,.18); color:#FFD700; }
-        .b-red { background: rgba(255,107,107,.2); color:#ff8f8f; }
-        .b-blue { background: rgba(78,205,196,.2); color:#4ECDC4; }
-        .b-gray { background: rgba(255,255,255,.12); color:#ccc; }
+        .b-green { background: rgba(52,211,153,.16); color:var(--good); }
+        .b-yellow { background: rgba(251,191,36,.16); color:var(--warn); }
+        .b-red { background: rgba(251,113,133,.16); color:var(--bad); }
+        .b-blue { background: rgba(99,102,241,.18); color:#a5b4fc; }
+        .b-gray { background: rgba(255,255,255,.1); color:var(--muted); }
         .row-actions { display:flex; gap:6px; }
-        .act {
-            padding: 6px 10px; border-radius: 8px; border:none; font-size: 12px; font-weight: 600;
-        }
-        .act-edit { background: rgba(78,205,196,.2); color:#4ECDC4; }
-        .act-del { background: rgba(255,107,107,.2); color:#ff8f8f; }
-        .act-ok { background: rgba(76,175,80,.25); color:#7ee081; }
-        .empty, .loading { text-align:center; padding: 40px; color: rgba(255,255,255,0.5); }
-        .pager { display:flex; gap:8px; align-items:center; justify-content:flex-end; margin-top:12px; font-size:13px; }
-        .pager button { padding:7px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:#fff; }
+        .act { padding: 6px 10px; border-radius: 8px; border:none; font-size: 12px; font-weight: 600; }
+        .act-edit { background: rgba(99,102,241,.18); color:#a5b4fc; }
+        .act-del { background: rgba(251,113,133,.16); color:var(--bad); }
+        .act-ok { background: rgba(52,211,153,.18); color:var(--good); }
+        .empty, .loading { text-align:center; padding: 40px; color: var(--faint); }
+        .pager { display:flex; gap:8px; align-items:center; justify-content:flex-end; margin-top:12px; font-size:13px; color:var(--muted); }
+        .pager button { padding:7px 12px; border-radius:8px; border:1px solid var(--border2); background:var(--surface); color:var(--ink); }
         .pager button:disabled { opacity:.4; }
 
         /* Toast notifications (replaces alert) */
@@ -124,8 +218,9 @@
             display:flex; align-items:center; justify-content:center; z-index: 9999; padding: 20px;
         }
         .modal {
-            background:#1b1838; border:1px solid rgba(255,255,255,.12); border-radius:16px;
+            background:var(--surface2); border:1px solid var(--border2); border-radius:16px;
             padding: 24px; width: 100%; max-width: 460px; max-height: 88vh; overflow-y:auto;
+            box-shadow: 0 30px 70px rgba(0,0,0,.55);
         }
         .modal h3 { font-size: 17px; margin-bottom: 6px; }
         .modal .hint { font-size: 13px; color: rgba(255,255,255,.55); margin-bottom: 16px; }
@@ -137,8 +232,8 @@
         .modal-actions { display:flex; gap:10px; margin-top: 20px; }
         .modal-actions button { flex:1; padding: 11px; border-radius:10px; font-weight:700; border:none; font-size:14px; }
         .btn-cancel { background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15) !important; color: rgba(255,255,255,.8); }
-        .btn-confirm { background: linear-gradient(135deg,#FFD700,#FFA500); color:#1a1a2e; }
-        .btn-danger { background: rgba(255,107,107,.9); color:#fff; }
+        .btn-confirm { background: linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+        .btn-danger { background: var(--bad); color:#1a1a2e; }
 
         /* Permission chips (roles UI) */
         .perm-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap:8px; margin-top:6px; }
@@ -154,14 +249,18 @@
         .role-card .rc-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
         .role-card .rc-head h4 { font-size:15px; }
         .role-card .rc-perms { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
-        .tag { font-size:11px; padding:3px 8px; border-radius:7px; background:rgba(78,205,196,.15); color:#4ECDC4; font-family: ui-monospace, monospace; }
-        .tag.all { background: rgba(255,215,0,.18); color:#FFD700; }
+        .tag { font-size:11px; padding:3px 8px; border-radius:7px; background:rgba(99,102,241,.18); color:#a5b4fc; font-family: ui-monospace, monospace; }
+        .tag.all { background: rgba(251,191,36,.18); color:var(--warn); }
 
-        @media (max-width: 720px) {
-            .sidebar { width: 64px; }
-            .nav-link span { display:none; }
+        @media (max-width: 1024px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+        @media (max-width: 860px) {
+            .sidebar { width: 66px; }
+            .brand-name, .brand-sub, .nav-link span, .nav-section, .side-foot .u-name, .side-foot .u-mail { display:none; }
             .nav-link { justify-content:center; }
+            .user-chip { justify-content:center; }
+            .top-user .u-name, .top-user .u-mail { display:none; }
         }
+        @media (max-width: 560px) { .main { padding: 16px; } .search { display:none; } }
     </style>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
@@ -200,29 +299,56 @@
 
     <!-- APP -->
     <div id="app">
-        <div class="topbar">
-            <h1>🛠️ Administration</h1>
-            <div style="display:flex;align-items:center;gap:12px;">
-                <span class="who" id="who"></span>
-                <button class="btn-logout" onclick="logout()">Déconnexion</button>
-            </div>
-        </div>
         <div class="layout">
-            <div class="sidebar">
-                <div class="nav-link active" data-view="overview" onclick="switchView('overview',this)">📊 <span>Vue globale</span></div>
-                <div class="nav-link" data-view="analytics" data-perm="analytics:read" onclick="switchView('analytics',this)">📈 <span>Analytics</span></div>
-                <div class="nav-link" data-view="users" data-perm="users:read" onclick="switchView('users',this)">👥 <span>Utilisateurs</span></div>
-                <div class="nav-link" data-view="kyc" data-perm="users:verify" onclick="switchView('kyc',this)">🪪 <span>Vérification KYC</span></div>
-                <div class="nav-link" data-view="missions" data-perm="missions:read" onclick="switchView('missions',this)">📦 <span>Missions</span></div>
-                <div class="nav-link" data-view="trips" data-perm="trips:read" onclick="switchView('trips',this)">✈️ <span>Trajets</span></div>
-                <div class="nav-link" data-view="payments" data-perm="payments:read" onclick="switchView('payments',this)">💳 <span>Paiements</span></div>
-                <div class="nav-link" data-view="withdrawals" data-perm="withdrawals:read" onclick="switchView('withdrawals',this)">💸 <span>Retraits</span></div>
-                <div class="nav-link" data-view="claims" data-perm="claims:read" onclick="switchView('claims',this)">📝 <span>Réclamations</span></div>
-                <div class="nav-link" data-view="reviews" data-perm="reviews:read" onclick="switchView('reviews',this)">⭐ <span>Avis</span></div>
-                <div class="nav-link" data-view="roles" data-perm="roles:read" onclick="switchView('roles',this)">🛡️ <span>Rôles &amp; Admins</span></div>
-                <div class="nav-link" data-view="audit" data-perm="audit:read" onclick="switchView('audit',this)">🧾 <span>Journal d'audit</span></div>
+            <aside class="sidebar">
+                <div class="brand">
+                    <div class="brand-logo">S</div>
+                    <div><div class="brand-name">SENGP</div><div class="brand-sub">Administration</div></div>
+                </div>
+                <nav class="side-nav">
+                    <div class="nav-link active" data-view="overview" onclick="switchView('overview',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> <span>Overview</span></div>
+                    <div class="nav-link" data-view="analytics" data-perm="analytics:read" onclick="switchView('analytics',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l3-4 3 3 4-6"/></svg> <span>Analytics</span></div>
+
+                    <div class="nav-section">Opérations</div>
+                    <div class="nav-link" data-view="users" data-perm="users:read" onclick="switchView('users',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg> <span>Utilisateurs</span></div>
+                    <div class="nav-link" data-view="missions" data-perm="missions:read" onclick="switchView('missions',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/></svg> <span>Missions</span></div>
+                    <div class="nav-link" data-view="trips" data-perm="trips:read" onclick="switchView('trips',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l20-8-8 20-2.5-8.5z"/></svg> <span>Trajets</span></div>
+                    <div class="nav-link" data-view="kyc" data-perm="users:verify" onclick="switchView('kyc',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="12" r="2"/><path d="M14 10h4M14 14h4"/></svg> <span>Vérification KYC</span></div>
+
+                    <div class="nav-section">Finances</div>
+                    <div class="nav-link" data-view="payments" data-perm="payments:read" onclick="switchView('payments',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> <span>Paiements</span></div>
+                    <div class="nav-link" data-view="withdrawals" data-perm="withdrawals:read" onclick="switchView('withdrawals',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg> <span>Retraits</span></div>
+                    <div class="nav-link" data-view="analytics" data-perm="analytics:read" onclick="switchView('analytics',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-8"/><path d="M14 7h6v6"/></svg> <span>Revenus &amp; Comm.</span></div>
+
+                    <div class="nav-section">Confiance</div>
+                    <div class="nav-link" data-view="claims" data-perm="claims:read" onclick="switchView('claims',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> <span>Réclamations</span></div>
+                    <div class="nav-link" data-view="reviews" data-perm="reviews:read" onclick="switchView('reviews',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 18l-5.9 3 1.2-6.5L2.5 9.9 9.1 9z"/></svg> <span>Avis</span></div>
+
+                    <div class="nav-section">Administration</div>
+                    <div class="nav-link" data-view="roles" data-perm="roles:read" onclick="switchView('roles',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/></svg> <span>Rôles &amp; Admins</span></div>
+                    <div class="nav-link" data-view="audit" data-perm="audit:read" onclick="switchView('audit',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg> <span>Journal d'audit</span></div>
+                </nav>
+                <div class="side-foot">
+                    <div class="user-chip">
+                        <div class="avatar" id="sideAvatar">AS</div>
+                        <div style="min-width:0"><div class="u-name" id="sideUserName">Admin</div><div class="u-mail" id="sideUserMail"></div></div>
+                    </div>
+                </div>
+            </aside>
+            <div class="content">
+                <div class="topbar">
+                    <div class="search"><input id="globalSearch" placeholder="Rechercher un utilisateur…" onkeydown="if(event.key==='Enter')globalSearchGo()"></div>
+                    <div class="top-actions">
+                        <button class="icon-btn" title="Alertes" onclick="switchView('claims', document.querySelector('.nav-link[data-view=claims]'))">🔔<span class="dot" id="bellDot" style="display:none"></span></button>
+                        <div class="top-user">
+                            <div class="avatar" id="topAvatar">AS</div>
+                            <div><div class="u-name" id="topUserName">Admin</div><div class="u-mail" id="topUserMail"></div></div>
+                        </div>
+                        <button class="btn-logout" onclick="logout()">Déconnexion</button>
+                    </div>
+                </div>
+                <div class="main" id="main"></div>
             </div>
-            <div class="main" id="main"></div>
         </div>
     </div>
 
@@ -350,10 +476,24 @@
         async function showApp(){
             document.getElementById('login').style.display = 'none';
             document.getElementById('app').style.display = 'block';
-            document.getElementById('who').textContent = me ? (me.first_name + ' ' + me.last_name + ' · ' + me.email) : '';
+            const name = me ? (me.first_name + ' ' + me.last_name) : 'Admin';
+            const initials = me ? ((me.first_name||' ')[0] + (me.last_name||' ')[0]).toUpperCase() : 'AS';
+            ['sideUserName','topUserName'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = name; });
+            ['sideUserMail','topUserMail'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = me ? me.email : ''; });
+            ['sideAvatar','topAvatar'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = initials; });
             await loadPermissions();
             applyPermissionGates();
             switchView('overview', document.querySelector('.nav-link'));
+        }
+        // Topbar search → jump to Users filtered by the query.
+        function globalSearchGo(){
+            const q = (document.getElementById('globalSearch').value || '').trim();
+            if (!q) return;
+            if (!can('users:read')) { toast('Recherche indisponible pour votre rôle', 'info'); return; }
+            switchView('users', document.querySelector('.nav-link[data-view=users]'));
+            state.search = q; state.page = 1;
+            const inp = document.getElementById('search'); if (inp) inp.value = q;
+            loadList();
         }
 
         // Fetch the signed-in admin's permission list (drives section visibility).
@@ -434,45 +574,187 @@
             loadList();
         }
 
+        function card(label, value, sub){
+            return `<div class="stat"><div class="label">${label}</div><div class="value">${esc(value)}</div>${sub?`<div class="sub">${esc(sub)}</div>`:''}</div>`;
+        }
+        // Relative time in French.
+        function timeAgo(d){
+            const s = Math.max(0, (Date.now() - new Date(d).getTime())/1000);
+            if (s < 60) return 'à l\'instant';
+            if (s < 3600) return 'il y a ' + Math.floor(s/60) + ' min';
+            if (s < 86400) return 'il y a ' + Math.floor(s/3600) + ' h';
+            if (s < 172800) return 'hier';
+            return 'il y a ' + Math.floor(s/86400) + ' j';
+        }
+        // Tiny sparkline (area + line) from an array of numbers.
+        function svgSpark(vals, color){
+            const n = vals.length; if (!n) return '';
+            const W=120, H=34, max=Math.max(1,...vals), min=Math.min(0,...vals);
+            const x=i=> n===1?W/2:i*W/(n-1);
+            const y=v=> H-2 - ((v-min)/((max-min)||1))*(H-4);
+            const pts = vals.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+            return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" preserveAspectRatio="none">`
+                 + `<polygon points="0,${H} ${pts} ${W},${H}" fill="${color}" opacity="0.14"/>`
+                 + `<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2"/></svg>`;
+        }
+        // Donut chart from segments [{label,value,color}].
+        function svgDonut(segments, total, centerLabel){
+            const r=52, C=2*Math.PI*r, cx=60, cy=60; let off=0;
+            const arcs = segments.filter(s=>s.value>0).map(s => {
+                const frac = total>0 ? s.value/total : 0; const len = frac*C;
+                const el = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}" stroke-width="16"
+                    stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"
+                    transform="rotate(-90 ${cx} ${cy})"/>`;
+                off += len; return el;
+            }).join('');
+            return `<svg viewBox="0 0 120 120" width="132" height="132">`
+                 + `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="16"/>`
+                 + arcs
+                 + `<text x="60" y="56" text-anchor="middle" font-size="26" font-weight="800" fill="#fff">${total}</text>`
+                 + `<text x="60" y="74" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.5)">${esc(centerLabel||'Total')}</text></svg>`;
+        }
+        function fmtDelta(cur, prev){
+            if (prev == null) return '';
+            let pct; if (prev === 0) pct = cur>0?100:0; else pct = (cur-prev)/prev*100;
+            const cls = pct>0.5?'up':(pct<-0.5?'down':'flat');
+            const arrow = cls==='up'?'↑':(cls==='down'?'↓':'→');
+            return `<span class="kpi-delta ${cls}">${arrow} ${Math.abs(pct).toFixed(1)}%</span>`;
+        }
+        function setOverviewRange(r){ state.oRange = r; renderOverview(document.getElementById('main')); }
+
         async function renderOverview(main){
-            main.innerHTML = '<div class="loading">Chargement des statistiques…</div>';
+            main.innerHTML = '<div class="loading">Chargement du tableau de bord…</div>';
+            if (!state.oRange) state.oRange = '30j';
+            const R = {'7j':{d:7,i:'day'},'30j':{d:30,i:'day'},'3mois':{d:90,i:'week'},'1an':{d:365,i:'month'}}[state.oRange];
+            const iso = d => d.toISOString().slice(0,10);
+            const to = new Date(), from = new Date(Date.now()-(R.d-1)*864e5);
+            const prevTo = new Date(from.getTime()-864e5), prevFrom = new Date(prevTo.getTime()-(R.d-1)*864e5);
+            const hasAn = can('analytics:read');
             try {
-                const { ok, json } = await api('/admin/stats');
-                if (!ok) throw new Error(json.error || 'Erreur');
-                const s = json.data;
+                const reqs = [api('/admin/stats'), api('/admin/activity?limit=8')];
+                if (hasAn) reqs.push(
+                    api(`/admin/analytics/timeseries?from=${iso(from)}&to=${iso(to)}&interval=${R.i}`),
+                    api(`/admin/analytics/timeseries?from=${iso(prevFrom)}&to=${iso(prevTo)}&interval=${R.i}`),
+                    api(`/admin/analytics/top-routes?from=${iso(from)}&to=${iso(to)}&limit=5`),
+                    api('/admin/analytics/gp-performance?limit=5'));
+                const res = await Promise.all(reqs);
+                if (!res[0].ok) throw new Error((res[0].json&&res[0].json.error)||'Erreur');
+                const s = res[0].json.data;
+                const activity = (res[1].ok && res[1].json.data) || [];
+                const cur = hasAn && res[2].ok ? res[2].json.data.totals : null;
+                const prev = hasAn && res[3].ok ? res[3].json.data.totals : null;
+                const series = hasAn && res[2].ok ? res[2].json.data.series : [];
+                const routes = hasAn && res[4] && res[4].ok ? res[4].json.data : [];
+                const gps = hasAn && res[5] && res[5].ok ? res[5].json.data : [];
+                const spk = k => series.map(x => Number(x[k])||0);
+
+                // KPI cards (values = totals; delta + sparkline = period, when analytics allowed)
+                const kpi = (ico, bg, label, value, cKey, sparkColor) => {
+                    const has = cKey && cur && (cKey in cur);
+                    const delta = (has && prev) ? fmtDelta(cur[cKey]||0, prev[cKey]||0) : '';
+                    const spark = (has && series.length) ? `<div class="kpi-spark">${svgSpark(spk(cKey), sparkColor)}</div>` : '';
+                    return `<div class="kpi"><div class="kpi-top"><div class="kpi-ico" style="background:${bg}20;color:${bg}">${ico}</div>
+                        <div class="kpi-label">${label}</div></div>
+                        <div class="kpi-val">${esc(value)}</div>
+                        <div class="kpi-bottom">${delta || '<span class="kpi-delta flat">—</span>'}${spark}</div></div>`;
+                };
+                const kpis = `<div class="kpi-grid">
+                    ${kpi('💼','#8b5cf6','Volume traité', fcfa(s.payments.gross_volume), 'gross', '#8b5cf6')}
+                    ${kpi('📦','#34d399','Missions', s.missions.total, 'missions', '#34d399')}
+                    ${kpi('👥','#38bdf8','Utilisateurs', s.users.total, 'new_users', '#38bdf8')}
+                    ${kpi('🧾','#fbbf24','Paiements', s.payments.completed_count, 'payments', '#fbbf24')}
+                    ${kpi('🛡️','#fb7185','Réclamations', s.claims.open, null, '#fb7185')}
+                </div>`;
+
+                // Revenue chart
+                const seg = ['7j','30j','3mois','1an'].map(r => `<button class="${state.oRange===r?'active':''}" onclick="setOverviewRange('${r}')">${r}</button>`).join('');
+                const chart = hasAn
+                    ? svgLines(series, { keys:[{key:'gross',color:'#8b5cf6',label:'Volume',fill:true},{key:'commission',color:'#34d399',label:'Commission'}] })
+                    : `<div class="empty">Réservé aux rôles avec accès analytics.</div>`;
+
+                // Missions donut
+                const m = s.missions;
+                const segs = [
+                    {label:'En attente', value:+m.pending, color:'#8b5cf6'},
+                    {label:'Acceptées', value:+m.accepted, color:'#34d399'},
+                    {label:'En transit', value:+m.in_transit, color:'#38bdf8'},
+                    {label:'Livrées', value:+m.delivered, color:'#22c55e'},
+                    {label:'Annulées', value:+m.cancelled, color:'#fb7185'},
+                ];
+                const known = segs.reduce((a,x)=>a+x.value,0);
+                if (+m.total > known) segs.push({label:'Autres', value:+m.total-known, color:'#64748b'});
+                const legend = segs.map(x => `<div class="li"><span class="dot" style="background:${x.color}"></span>${x.label}<span class="lv">${x.value} (${m.total>0?Math.round(x.value/m.total*100):0}%)</span></div>`).join('');
+
+                // Alerts
+                const alerts = [];
+                if (+s.claims.open>0) alerts.push({c:'#fb7185',i:'🛡️',t:`${s.claims.open} réclamation(s) en attente de traitement`});
+                if (+s.missions.pending>0) alerts.push({c:'#fbbf24',i:'📦',t:`${s.missions.pending} mission(s) en attente d'acceptation`});
+                if (+s.withdrawals.pending>0) alerts.push({c:'#38bdf8',i:'💸',t:`${s.withdrawals.pending} retrait(s) en attente (${fcfa(s.withdrawals.pending_amount)})`});
+                const anyAlert = alerts.length>0;
+                const alertHtml = anyAlert ? alerts.map(a=>`<div class="feed-item"><div class="feed-ico" style="background:${a.c}20;color:${a.c}">${a.i}</div><div class="feed-main"><div class="feed-title">${esc(a.t)}</div></div></div>`).join('')
+                    : `<div class="feed-item"><div class="feed-ico" style="background:#34d39920;color:#34d399">✓</div><div class="feed-main"><div class="feed-title">Tout est à jour.</div></div></div>`;
+                const bd = document.getElementById('bellDot'); if (bd) bd.style.display = anyAlert ? 'block' : 'none';
+
+                // Activity feed
+                const actMeta = { mission:{i:'📦',c:'#38bdf8'}, payment:{i:'💰',c:'#34d399'}, user:{i:'👤',c:'#fbbf24'}, claim:{i:'🛡️',c:'#fb7185'} };
+                const actTitle = a => a.kind==='mission' ? `Mission ${a.ref} · ${a.detail}`
+                    : a.kind==='payment' ? `Paiement reçu` : a.kind==='user' ? `Nouvel utilisateur` : `Réclamation ${a.ref}`;
+                const actSub = a => a.kind==='mission' ? (a.extra||'') : a.kind==='payment' ? `${a.ref} · ${fcfa(a.detail)}`
+                    : a.kind==='user' ? `${a.ref} (${a.detail})` : (a.detail||'');
+                const actHtml = activity.length ? activity.map(a => { const mm=actMeta[a.kind]||{i:'•',c:'#64748b'};
+                    return `<div class="feed-item"><div class="feed-ico" style="background:${mm.c}20;color:${mm.c}">${mm.i}</div>
+                        <div class="feed-main"><div class="feed-title">${esc(actTitle(a))}</div><div class="feed-sub">${esc(actSub(a))}</div></div>
+                        <div class="feed-time">${timeAgo(a.created_at)}</div></div>`; }).join('')
+                    : `<div class="empty">Aucune activité.</div>`;
+
+                // Top routes / GP tables
+                const routeRows = routes.length ? routes.map(r=>`<tr><td>${esc((r.departure_city||'?')+' → '+(r.arrival_city||'?'))}</td><td>${esc(r.arrival_country||'—')}</td><td>${r.missions}</td><td>${fcfa(r.volume)}</td></tr>`).join('') : `<tr><td colspan="4" style="color:var(--faint)">${hasAn?'Aucune donnée':'Accès analytics requis'}</td></tr>`;
+                const gpRows = gps.length ? gps.map(g=>`<tr><td><div style="display:flex;align-items:center;gap:8px"><span class="avatar" style="width:26px;height:26px;font-size:11px">${esc(((g.gp_name||'  ')[0]||'')+((g.gp_name||'').split(' ')[1]||' ')[0]||'')}</span>${esc(g.gp_name||'—')}</div></td><td>${g.missions_completed}</td><td>${fcfa(g.total_earnings)}</td><td>⭐${Number(g.average_rating||0).toFixed(1)}</td></tr>`).join('') : `<tr><td colspan="4" style="color:var(--faint)">${hasAn?'Aucune donnée':'Accès analytics requis'}</td></tr>`;
+
+                // Quick actions
+                const qa = [];
+                if (can('users:write')) qa.push(['accent','➕ Ajouter un utilisateur','createUserModal()']);
+                if (can('users:verify')) qa.push(['',"🪪 Vérifier KYC","switchView('kyc',document.querySelector('.nav-link[data-view=kyc]'))"]);
+                if (can('missions:read')) qa.push(['',"📦 Voir les missions","switchView('missions',document.querySelector('.nav-link[data-view=missions]'))"]);
+                if (can('payments:export')) qa.push(['',"⬇ Exporter paiements","exportCsv('payments')"]);
+                if (can('analytics:read')) qa.push(['',"📈 Rapport analytique","switchView('analytics',document.querySelector('.nav-link[data-view=analytics]'))"]);
+                const quick = qa.length ? `<div class="section-title">Actions rapides</div><div class="quick-bar">${qa.map(([cls,label,fn])=>`<button class="qbtn ${cls}" onclick="${fn}">${label}</button>`).join('')}</div>` : '';
+
+                const rangeLabel = `${from.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})} – ${to.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'})}`;
+                const exportBtn = can('payments:export') ? `<button class="pill-btn" onclick="exportCsv('payments')">⬇ Exporter</button>` : '';
+
                 main.innerHTML = `
-                    <div class="section-title">Utilisateurs</div>
-                    <div class="stats-grid">
-                        ${card('Total', s.users.total)}
-                        ${card('Expéditeurs', s.users.expediteurs)}
-                        ${card('Gros Porteurs', s.users.gps)}
-                        ${card('Admins', s.users.admins)}
-                        ${card('Suspendus', s.users.suspended)}
+                    <div class="page-head">
+                        <div><h1>Bonjour, ${esc((me&&me.first_name)||'Admin')} 👋</h1>
+                        <p>Voici un aperçu des activités de SEN GP.</p></div>
+                        <div class="head-tools">
+                            <span class="pill-btn">📅 ${rangeLabel}</span>
+                            ${exportBtn}
+                        </div>
                     </div>
-                    <div class="section-title">Missions</div>
-                    <div class="stats-grid">
-                        ${card('Total', s.missions.total)}
-                        ${card('En attente', s.missions.pending)}
-                        ${card('Acceptées', s.missions.accepted)}
-                        ${card('En transit', s.missions.in_transit)}
-                        ${card('Livrées', s.missions.delivered)}
-                        ${card('Annulées', s.missions.cancelled)}
+                    ${kpis}
+                    <div class="grid-2">
+                        <div class="panel">
+                            <div class="panel-head"><h3>Revenus & commissions</h3><div class="seg">${seg}</div></div>
+                            ${chart}
+                        </div>
+                        <div class="panel">
+                            <div class="panel-head"><h3>Statut des missions</h3></div>
+                            <div class="donut-wrap">${svgDonut(segs, +m.total, 'Total')}<div class="donut-legend">${legend}</div></div>
+                        </div>
                     </div>
-                    <div class="section-title">Finances</div>
-                    <div class="stats-grid">
-                        ${card('Volume (payé)', fcfa(s.payments.gross_volume))}
-                        ${card('Commissions', fcfa(s.payments.commission_total))}
-                        ${card('Paiements OK', s.payments.completed_count)}
-                        ${card('Retraits en attente', s.withdrawals.pending, fcfa(s.withdrawals.pending_amount))}
-                        ${card('Trajets', s.trips.total)}
-                        ${card('Réclamations ouvertes', s.claims.open)}
+                    <div class="grid-3">
+                        <div class="panel"><div class="panel-head"><h3>Alertes</h3><span class="link" onclick="switchView('claims',document.querySelector('.nav-link[data-view=claims]'))">Voir tout</span></div><div class="feed">${alertHtml}</div></div>
+                        <div class="panel"><div class="panel-head"><h3>Top routes</h3></div><div class="table-wrap"><table style="min-width:auto"><thead><tr><th>Route</th><th>Pays</th><th>Miss.</th><th>Volume</th></tr></thead><tbody>${routeRows}</tbody></table></div></div>
+                        <div class="panel"><div class="panel-head"><h3>Activité récente</h3></div><div class="feed">${actHtml}</div></div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="panel"><div class="panel-head"><h3>Top transporteurs (GP)</h3><span class="link" onclick="switchView('analytics',document.querySelector('.nav-link[data-view=analytics]'))">Rapport</span></div><div class="table-wrap"><table style="min-width:auto"><thead><tr><th>Transporteur</th><th>Missions</th><th>Revenus</th><th>Note</th></tr></thead><tbody>${gpRows}</tbody></table></div></div>
+                        <div class="panel">${quick || '<div class="panel-head"><h3>Actions rapides</h3></div><div class="empty">Aucune action disponible pour votre rôle.</div>'}</div>
                     </div>`;
             } catch (e) {
                 main.innerHTML = `<div class="empty">Erreur: ${esc(e.message)}</div>`;
             }
-        }
-        function card(label, value, sub){
-            return `<div class="stat"><div class="label">${label}</div><div class="value">${esc(value)}</div>${sub?`<div class="sub">${esc(sub)}</div>`:''}</div>`;
         }
 
         // ---------- Analytics ----------

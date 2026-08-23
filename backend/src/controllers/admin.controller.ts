@@ -29,6 +29,14 @@ export class AdminController {
     }
   }
 
+  static async activity(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const limit = parseInt(req.query.limit as string) || 12;
+      const data = await AdminService.getRecentActivity(limit);
+      ResponseUtil.success(res, data);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
+  }
+
   // Analytics
   static async analyticsTimeseries(req: AuthRequest, res: Response): Promise<void> {
     try {

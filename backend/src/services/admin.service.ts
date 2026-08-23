@@ -873,6 +873,24 @@ export class AdminService {
     return { id, deleted: true };
   }
 
+  /** Recent cross-domain activity feed for the overview (missions/payments/users/claims). */
+  static async getRecentActivity(limit = 12) {
+    const r = await pool.query(
+      `SELECT * FROM (
+         SELECT 'mission' AS kind, mission_code AS ref, status AS detail,
+                (departure_city || ' → ' || arrival_city) AS extra, created_at FROM missions
+         UNION ALL
+         SELECT 'payment', payment_code, status, amount::text, created_at FROM payments WHERE status = 'completed'
+         UNION ALL
+         SELECT 'user', (first_name || ' ' || last_name), user_type, '', created_at FROM users WHERE deleted_at IS NULL
+         UNION ALL
+         SELECT 'claim', claim_code, status, '', created_at FROM claims
+       ) e ORDER BY created_at DESC LIMIT $1`,
+      [limit]
+    );
+    return r.rows;
+  }
+
   // ---------- Analytics ----------
   /**
    * Revenue / commission / volume time series between two dates (inclusive),
