@@ -217,6 +217,7 @@
                 <div class="nav-link" data-view="payments" data-perm="payments:read" onclick="switchView('payments',this)">💳 <span>Paiements</span></div>
                 <div class="nav-link" data-view="withdrawals" data-perm="withdrawals:read" onclick="switchView('withdrawals',this)">💸 <span>Retraits</span></div>
                 <div class="nav-link" data-view="claims" data-perm="claims:read" onclick="switchView('claims',this)">📝 <span>Réclamations</span></div>
+                <div class="nav-link" data-view="reviews" data-perm="reviews:read" onclick="switchView('reviews',this)">⭐ <span>Avis</span></div>
                 <div class="nav-link" data-view="roles" data-perm="roles:read" onclick="switchView('roles',this)">🛡️ <span>Rôles &amp; Admins</span></div>
                 <div class="nav-link" data-view="audit" data-perm="audit:read" onclick="switchView('audit',this)">🧾 <span>Journal d'audit</span></div>
             </div>
@@ -600,9 +601,19 @@
                             `<span class="badge ${badgeFor(c.status)}">${esc(c.status)}</span>`,
                             esc(c.claimant_name||'—'),
                             msg,
-                            actions(can('claims:write') ? [['act-edit','Traiter',`editClaim('${c.id}','${esc(c.status)}')`]] : [])
+                            (function(){ const a=[['act-ok','Fil',`showClaimThread('${c.id}')`]]; if(can('claims:write')) a.push(['act-edit','Traiter',`editClaim('${c.id}','${esc(c.status)}')`]); return actions(a); })()
                         ];
                     }
+                },
+                reviews: {
+                    head: ['Note','Commentaire','Type','Auteur','Évalué','Mission','Date','Actions'],
+                    row: r => [
+                        '⭐'.repeat(Math.max(0,Math.min(5,r.rating||0))) + ` ${r.rating||0}`,
+                        `<div style="max-width:260px;white-space:normal">${esc(r.comment||'—')}</div>`,
+                        esc(r.review_type||'—'), esc(r.reviewer_name||'—'), esc(r.reviewee_name||'—'),
+                        esc(r.mission_code||'—'), dt(r.created_at),
+                        actions(can('reviews:moderate') ? [['act-del','Supprimer',`deleteReview('${r.id}')`]] : [])
+                    ]
                 },
                 audit: {
                     head: ['Date','Admin','Action','Entité','Détails'],
@@ -1018,6 +1029,69 @@
             if (v.resolution) body.resolution = v.resolution;
             const { ok, json } = await api('/admin/claims/'+id, { method:'PUT', body: JSON.stringify(body) });
             notify(ok, 'Réclamation mise à jour', json); if (ok) loadList();
+        }
+        // ---------- Claim discussion thread + compensation ----------
+        async function showClaimThread(id){
+            const { ok, json } = await api('/admin/claims/'+id+'/thread');
+            if (!ok) { toast('Erreur chargement de la réclamation', 'err'); return; }
+            const c = json.data.claim; const msgs = json.data.messages || [];
+            const ev = (c.evidence_urls || []).filter(Boolean);
+            const evHtml = ev.length ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">` + ev.map(u =>
+                (/\.(mp3|wav|ogg|m4a|webm)(\?|$)/i.test(u)
+                    ? `<audio controls src="${esc(u)}" style="max-width:100%"></audio>`
+                    : `<a href="${esc(u)}" target="_blank"><img src="${esc(u)}" style="width:120px;height:90px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,.15)"></a>`)).join('') + `</div>` : '';
+            const thread = msgs.length ? msgs.map(mm => {
+                const mine = mm.sender_role === 'admin';
+                return `<div style="display:flex;justify-content:${mine?'flex-end':'flex-start'};margin:6px 0">
+                    <div style="max-width:78%;background:${mine?'rgba(78,205,196,.15)':'rgba(255,255,255,.06)'};border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:8px 12px">
+                        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:2px">${esc(mine?'Admin':(mm.sender_name||'Utilisateur'))} · ${new Date(mm.created_at).toLocaleString('fr-FR')}</div>
+                        <div style="font-size:14px;white-space:pre-wrap">${esc(mm.message)}</div>
+                    </div></div>`;
+            }).join('') : '<div style="color:rgba(255,255,255,.4);padding:8px 0">Aucun message pour l\'instant.</div>';
+            const canWrite = can('claims:write');
+            const replyBox = canWrite ? `<label>Répondre</label>
+                <textarea id="claimReply" rows="2" placeholder="Votre réponse au demandeur…"></textarea>
+                <div class="modal-actions"><button class="btn-confirm" onclick="sendClaimReply('${c.id}')">Envoyer</button>
+                <button class="btn-cancel" onclick="compensateClaimUI('${c.id}')">💰 Compenser</button>
+                <button class="btn-cancel" onclick="closeModal()">Fermer</button></div>`
+              : `<div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Fermer</button></div>`;
+            openModal(
+                `<h3>${esc(c.claim_code)} <span class="badge ${badgeFor(c.status)}">${esc(c.status)}</span> <span class="badge ${badgeFor(c.priority)}">${esc(c.priority)}</span></h3>`
+              + `<p class="hint">${esc(c.claim_type)} · ${esc(c.claimant_name||'—')} (${esc(c.claimant_type||'')}) · ${c.mission_code?('Mission '+esc(c.mission_code)):''}</p>`
+              + `<div style="font-weight:600;margin-top:6px">${esc(c.title||'')}</div>`
+              + `<div style="font-size:14px;color:rgba(255,255,255,.8);margin:4px 0">${esc(c.description||'')}</div>`
+              + evHtml
+              + (c.resolution?`<div style="font-size:13px;color:#7ee081;margin:6px 0">Résolution : ${esc(c.resolution)}</div>`:'')
+              + (c.compensation_amount?`<div style="font-size:13px;color:#FFD700;margin:6px 0">Compensation : ${fcfa(c.compensation_amount)}</div>`:'')
+              + `<div style="font-weight:600;margin:14px 0 6px">Discussion</div>`
+              + `<div style="max-height:220px;overflow-y:auto;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px">${thread}</div>`
+              + replyBox
+            );
+        }
+        async function sendClaimReply(id){
+            const el = document.getElementById('claimReply'); const message = (el && el.value || '').trim();
+            if (!message) { toast('Écrivez un message', 'err'); return; }
+            const { ok, json } = await api('/admin/claims/'+id+'/reply', { method:'POST', body: JSON.stringify({ message }) });
+            if (ok) { toast('Réponse envoyée', 'ok'); showClaimThread(id); } else notify(false, '', json);
+        }
+        async function compensateClaimUI(id){
+            const v = await formModal({
+                title: 'Compenser la réclamation',
+                hint: 'Le montant est crédité au portefeuille si le demandeur est un GP, sinon enregistré pour versement manuel.',
+                fields: [
+                    { name:'amount', label:'Montant (FCFA)', inputType:'number' },
+                    { name:'note', label:'Note de résolution (optionnel)', type:'textarea' },
+                ],
+                confirmLabel: 'Valider la compensation'
+            });
+            if (!v || !v.amount) return;
+            const { ok, json } = await api('/admin/claims/'+id+'/compensate', { method:'POST', body: JSON.stringify({ amount: Number(v.amount), note: v.note }) });
+            notify(ok, 'Compensation enregistrée', json); if (ok) { closeModal(); loadList(); }
+        }
+        async function deleteReview(id){
+            if (!await confirmDialog('Supprimer cet avis ? La note moyenne de l\'évalué sera recalculée.', { danger:true, confirmLabel:'Supprimer', title:'Supprimer l\'avis' })) return;
+            const { ok, json } = await api('/admin/reviews/'+id, { method:'DELETE' });
+            notify(ok, 'Avis supprimé', json); if (ok) loadList();
         }
 
         // ---------- Roles & Admins ----------

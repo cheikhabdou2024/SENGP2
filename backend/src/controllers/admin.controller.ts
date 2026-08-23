@@ -311,6 +311,53 @@ export class AdminController {
       ResponseUtil.badRequest(res, e.message || 'Update failed');
     }
   }
+  static async claimThread(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const d = await AdminService.getClaimThread(req.params.id);
+      ResponseUtil.success(res, d);
+    } catch (e: any) {
+      if (e.message === 'Claim not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Failed');
+    }
+  }
+  static async replyClaim(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const msg = await AdminService.addClaimMessage(req.params.id, req.user!.id, req.body.message);
+      void logAdminAction({ req, action: 'claim.reply', entityType: 'claim', entityId: req.params.id });
+      ResponseUtil.created(res, msg, 'Réponse envoyée');
+    } catch (e: any) {
+      if (e.message === 'Claim not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Reply failed');
+    }
+  }
+  static async compensateClaim(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const r = await AdminService.compensateClaim(req.params.id, req.user!.id, req.body.amount, req.body.note);
+      void logAdminAction({ req, action: 'claim.compensate', entityType: 'claim', entityId: req.params.id, metadata: { amount: req.body.amount } });
+      ResponseUtil.success(res, r, 'Compensation enregistrée');
+    } catch (e: any) {
+      if (e.message === 'Claim not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Compensation failed');
+    }
+  }
+
+  // Reviews
+  static async listReviews(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const r = await AdminService.listReviews(listParams(req));
+      ResponseUtil.success(res, r.data, undefined, r.pagination);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
+  }
+  static async deleteReview(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const r = await AdminService.deleteReview(req.params.id);
+      void logAdminAction({ req, action: 'review.delete', entityType: 'review', entityId: req.params.id });
+      ResponseUtil.success(res, r, 'Avis supprimé');
+    } catch (e: any) {
+      if (e.message === 'Review not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Delete failed');
+    }
+  }
 
   // ---------- Current admin's permissions ----------
   static async myPermissions(req: AuthRequest, res: Response): Promise<void> {

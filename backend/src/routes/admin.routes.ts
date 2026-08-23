@@ -58,7 +58,14 @@ router.put('/withdrawals/:id/reject', requirePermission('withdrawals:approve'), 
 router.put('/withdrawals/:id/paid', requirePermission('withdrawals:payout'), AdminController.payWithdrawal);
 
 router.get('/claims', requirePermission('claims:read'), AdminController.listClaims);
+router.get('/claims/:id/thread', requirePermission('claims:read'), AdminController.claimThread);
+router.post('/claims/:id/reply', requirePermission('claims:write'), AdminController.replyClaim);
+router.post('/claims/:id/compensate', requirePermission('claims:write'), AdminController.compensateClaim);
 router.put('/claims/:id', requirePermission('claims:write'), AdminController.updateClaim);
+
+// Reviews moderation
+router.get('/reviews', requirePermission('reviews:read'), AdminController.listReviews);
+router.delete('/reviews/:id', requirePermission('reviews:moderate'), AdminController.deleteReview);
 
 // Roles & RBAC administration
 router.get('/roles', requirePermission('roles:read'), AdminController.listRoles);

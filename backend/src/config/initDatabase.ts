@@ -56,6 +56,16 @@ export async function initDatabase(): Promise<void> {
     await pool.query('ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS payout_proof_url VARCHAR(500)');
     await pool.query('ALTER TABLE payments ADD COLUMN IF NOT EXISTS refund_reason TEXT');
     await pool.query('ALTER TABLE payments ADD COLUMN IF NOT EXISTS refunded_at TIMESTAMP');
+    // Phase 5 (Support): claim discussion thread (admin ↔ claimant).
+    await pool.query(`CREATE TABLE IF NOT EXISTS claim_messages (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      claim_id UUID NOT NULL REFERENCES claims(id) ON DELETE CASCADE,
+      sender_id UUID REFERENCES users(id),
+      sender_role VARCHAR(20) NOT NULL DEFAULT 'admin',
+      message TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`);
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_claim_messages_claim ON claim_messages(claim_id)');
     logger.info('✅ Schema patches applied (phone/password nullable, delivery_token, recipient, mission_assigned, qr_code_url TEXT, payout_proof/refund)');
 
     // Incremental migration files (idempotent — safe to run on every boot).
