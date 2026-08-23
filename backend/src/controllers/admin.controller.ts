@@ -16,6 +16,7 @@ function listParams(req: AuthRequest) {
     status: (req.query.status as string) || undefined,
     user_type: (req.query.user_type as string) || undefined,
     expediteur_id: (req.query.expediteur_id as string) || undefined,
+    gp_id: (req.query.gp_id as string) || undefined,
   };
 }
 
@@ -287,6 +288,32 @@ export class AdminController {
       if (e.message && e.message.includes('not found')) return void ResponseUtil.notFound(res, e.message);
       ResponseUtil.badRequest(res, e.message || 'Delete failed');
     }
+  }
+  static async tripStatusSeries(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const to = (req.query.to as string) || new Date().toISOString().slice(0, 10);
+      const from = (req.query.from as string) || new Date(Date.now() - 29 * 864e5).toISOString().slice(0, 10);
+      const interval = (req.query.interval as string) || 'day';
+      const data = await AdminService.getTripStatusSeries(from, to, interval);
+      ResponseUtil.success(res, data);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
+  }
+  static async exportTrips(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const rows = await AdminService.listTripsForExport(listParams(req));
+      const csv = toCsv(rows, [
+        { key: 'trip_code', label: 'Code' }, { key: 'departure_city', label: 'Départ' },
+        { key: 'arrival_city', label: 'Arrivée' }, { key: 'departure_date', label: 'Date départ' },
+        { key: 'arrival_date', label: 'Date arrivée' }, { key: 'flight_number', label: 'Vol' },
+        { key: 'airline', label: 'Compagnie' }, { key: 'available_weight', label: 'Poids dispo' },
+        { key: 'current_packages', label: 'Colis' }, { key: 'max_packages', label: 'Max colis' },
+        { key: 'status', label: 'Statut' }, { key: 'gp', label: 'GP' },
+      ]);
+      void logAdminAction({ req, action: 'trip.export', entityType: 'trip', metadata: { count: rows.length } });
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="trips.csv"');
+      res.status(200).send(csv);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Export failed'); }
   }
   static async getTripDetail(req: AuthRequest, res: Response): Promise<void> {
     try {

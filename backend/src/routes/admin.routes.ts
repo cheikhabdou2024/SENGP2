@@ -54,6 +54,8 @@ router.post('/missions/:id/confirm-arrival', requirePermission('missions:write')
 router.delete('/missions/:id', requirePermission('missions:delete'), AdminController.deleteMission);
 
 router.get('/trips', requirePermission('trips:read'), AdminController.listTrips);
+router.get('/trips/export', requirePermission('trips:read'), AdminController.exportTrips);
+router.get('/trips/status-series', requirePermission('trips:read'), AdminController.tripStatusSeries);
 router.get('/trips/:id', requirePermission('trips:read'), AdminController.getTripDetail);
 router.put('/trips/:id', requirePermission('trips:write'), AdminController.updateTrip);
 router.delete('/trips/:id', requirePermission('trips:delete'), AdminController.deleteTrip);

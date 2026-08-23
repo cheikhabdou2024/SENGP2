@@ -535,6 +535,7 @@
             if (state.view === 'kyc') return renderKyc(main);
             if (state.view === 'users') return renderUsers(main);
             if (state.view === 'missions') return renderMissions(main);
+            if (state.view === 'trips') return renderTrips(main);
             let extra = '';
             if (state.view === 'payments' && can('payments:export'))
                 extra = `<button style="margin-left:auto" onclick="exportCsv('payments')">⬇ Exporter CSV</button>`;
@@ -580,6 +581,63 @@
             document.getElementById('search').addEventListener('keydown', e => { if (e.key === 'Enter') applyFilters(); });
             loadUserKpis();
             loadList();
+        }
+        // Dedicated Trajets view.
+        async function renderTrips(main){
+            const createBtn = can('trips:write') ? `<button class="pill-btn accent" onclick="toast('Les trajets sont créés par les GP depuis l\\'app. Depuis l\\'admin : modérez/gérez-les.', 'info')">＋ Créer un trajet</button>` : '';
+            const exportBtn = can('trips:read') ? `<button class="pill-btn" onclick="exportCsv('trips')">⬇ Exporter</button>` : '';
+            let gpSel = '';
+            if (can('users:read')) {
+                let opts = '<option value="">Tous les GPs</option>';
+                try { const r = await api('/admin/users?user_type=gp&limit=200');
+                    if (r.ok) opts += (r.json.data||[]).map(u=>`<option value="${u.id}"${state.tGp===u.id?' selected':''}>${esc(u.first_name+' '+u.last_name)}</option>`).join('');
+                } catch(e){}
+                gpSel = `<select id="tgp">${opts}</select>`;
+            }
+            main.innerHTML = `
+                <div class="page-head">
+                    <div><h1>Trajets</h1><p>Gérez tous les trajets disponibles dans le réseau.</p></div>
+                    <div class="head-tools">${createBtn}</div>
+                </div>
+                <div class="kpi-grid" id="tripKpis"><div class="loading">Chargement…</div></div>
+                <div class="toolbar">
+                    <input id="search" placeholder="Rechercher un trajet…" value="${esc(state.search)}">
+                    ${statusFilter()}
+                    ${gpSel}
+                    <button onclick="applyFilters()">🔎 Filtrer</button>
+                    <span style="margin-left:auto"></span>${exportBtn}
+                </div>
+                <div id="tableArea"><div class="loading">Chargement…</div></div>
+                <div class="pager" id="pager"></div>`;
+            document.getElementById('search').addEventListener('keydown', e => { if (e.key === 'Enter') applyFilters(); });
+            loadTripKpis();
+            loadList();
+        }
+        async function loadTripKpis(){
+            const el = document.getElementById('tripKpis'); if (!el) return;
+            const iso = d => d.toISOString().slice(0,10);
+            const to = new Date(), from = new Date(Date.now()-29*864e5);
+            const pTo = new Date(from.getTime()-864e5), pFrom = new Date(pTo.getTime()-29*864e5);
+            const [st, cur, prev] = await Promise.all([
+                api('/admin/stats'),
+                api(`/admin/trips/status-series?from=${iso(from)}&to=${iso(to)}&interval=day`),
+                api(`/admin/trips/status-series?from=${iso(pFrom)}&to=${iso(pTo)}&interval=day`),
+            ]);
+            if (!st.ok) { el.innerHTML = ''; return; }
+            const t = st.json.data.trips;
+            const cs = cur.ok ? cur.json.data : null, ps = prev.ok ? prev.json.data : null;
+            const kpi = (ico,bg,label,value,key) => {
+                const delta = (cs && ps) ? fmtDelta(cs.totals[key]||0, ps.totals[key]||0) : '';
+                const spark = cs ? `<div class="kpi-spark">${svgSpark(cs.series.map(x=>x[key]||0), bg)}</div>` : '';
+                return `<div class="kpi"><div class="kpi-top"><div class="kpi-ico" style="background:${bg}20;color:${bg}">${ico}</div><div class="kpi-label">${label}</div></div>
+                    <div class="kpi-val">${esc(value)}</div>
+                    <div class="kpi-bottom"><span>${delta||''} <span style="font-size:11px;color:var(--faint)">vs période préc.</span></span>${spark}</div></div>`;
+            };
+            el.innerHTML = kpi('✈️','#8b5cf6','Total trajets', t.total, 'total')
+                + kpi('📢','#34d399','Publiés', t.published, 'published')
+                + kpi('⏳','#fbbf24','Brouillons', t.draft, 'draft')
+                + kpi('🟢','#38bdf8','Actifs', t.active, 'active')
+                + kpi('✖️','#fb7185','Annulés', t.cancelled, 'cancelled');
         }
         // Dedicated Missions view.
         async function renderMissions(main){
@@ -685,6 +743,8 @@
             if (tEl) state.uType = tEl.value;
             const eEl = document.getElementById('mexp');
             if (eEl) state.mExpediteur = eEl.value;
+            const gEl = document.getElementById('tgp');
+            if (gEl) state.tGp = gEl.value;
             state.page = 1;
             loadList();
         }
@@ -1034,7 +1094,8 @@
                 + (state.search ? `&search=${encodeURIComponent(state.search)}` : '')
                 + (state.status ? `&status=${encodeURIComponent(state.status)}` : '')
                 + (state.view==='users' && state.uType ? `&user_type=${encodeURIComponent(state.uType)}` : '')
-                + (state.view==='missions' && state.mExpediteur ? `&expediteur_id=${encodeURIComponent(state.mExpediteur)}` : '');
+                + (state.view==='missions' && state.mExpediteur ? `&expediteur_id=${encodeURIComponent(state.mExpediteur)}` : '')
+                + (state.view==='trips' && state.tGp ? `&gp_id=${encodeURIComponent(state.tGp)}` : '');
             try {
                 const { ok, json } = await api('/admin/' + state.view + q);
                 if (!ok) throw new Error(json.error || 'Erreur');
@@ -1122,11 +1183,11 @@
                     }
                 },
                 trips: {
-                    head: ['Code','Trajet','GP','Départ','Statut','Colis','Actions'],
+                    head: ['Code','Trajet','GP','Départ','Statut','Cours','Actions'],
                     row: t => {
                         const acts = [['act-edit','Détails',`showTripDetail('${t.id}')`]];
-                        if (can('trips:write')) acts.push(['act-edit','Modérer',`moderateTrip('${t.id}','${esc(t.status)}')`]);
-                        if (can('trips:delete')) acts.push(['act-del','Suppr.',`delTrip('${t.id}','${esc(t.trip_code)}')`]);
+                        if (can('trips:write')) acts.push(['act-edit','Modifier',`moderateTrip('${t.id}','${esc(t.status)}')`]);
+                        if (can('trips:delete')) acts.push(['act-del','Supprimer',`delTrip('${t.id}','${esc(t.trip_code)}')`]);
                         return [
                         esc(t.trip_code), esc((t.departure_city||'?')+' → '+(t.arrival_city||'?')),
                         esc(t.gp_name||'—'), dt(t.departure_date),
@@ -1578,6 +1639,7 @@
                 if (state.search) params.push(`search=${encodeURIComponent(state.search)}`);
                 if (kind==='users' && state.uType) params.push(`user_type=${encodeURIComponent(state.uType)}`);
                 if (kind==='missions' && state.mExpediteur) params.push(`expediteur_id=${encodeURIComponent(state.mExpediteur)}`);
+                if (kind==='trips' && state.tGp) params.push(`gp_id=${encodeURIComponent(state.tGp)}`);
                 const q = params.length ? ('?' + params.join('&')) : '';
                 const res = await fetch(API + '/admin/' + kind + '/export' + q, { headers: { 'Authorization': 'Bearer ' + token } });
                 if (!res.ok) { toast('Export refusé ('+res.status+')', 'err'); return; }
