@@ -27,6 +27,7 @@ router.get('/activity', AdminController.activity);
 router.get('/analytics/timeseries', requirePermission('analytics:read'), AdminController.analyticsTimeseries);
 router.get('/analytics/top-routes', requirePermission('analytics:read'), AdminController.analyticsTopRoutes);
 router.get('/analytics/gp-performance', requirePermission('analytics:read'), AdminController.analyticsGpPerformance);
+router.get('/analytics/payment-methods', requirePermission('analytics:read'), AdminController.analyticsPaymentMethods);
 
 router.get('/users', requirePermission('users:read'), AdminController.listUsers);
 router.post('/users', requirePermission('users:write'), AdminController.createUser);

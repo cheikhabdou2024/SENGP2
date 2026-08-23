@@ -877,14 +877,23 @@ export class AdminService {
   static async getRecentActivity(limit = 12) {
     const r = await pool.query(
       `SELECT * FROM (
-         SELECT 'mission' AS kind, mission_code AS ref, status::text AS detail,
-                (departure_city || ' → ' || arrival_city) AS extra, created_at FROM missions
+         SELECT 'mission' AS kind, m.mission_code AS ref, m.status::text AS detail,
+                (m.departure_city || ' → ' || m.arrival_city) AS extra,
+                (e.first_name || ' ' || e.last_name) AS who, m.created_at
+           FROM missions m LEFT JOIN users e ON m.expediteur_id = e.id
          UNION ALL
-         SELECT 'payment', payment_code, status::text, amount::text, created_at FROM payments WHERE status = 'completed'
+         SELECT 'payment', p.payment_code, p.status::text, p.amount::text,
+                COALESCE(pe.first_name || ' ' || pe.last_name, pa.first_name || ' ' || pa.last_name), p.created_at
+           FROM payments p LEFT JOIN users pe ON p.payee_id = pe.id LEFT JOIN users pa ON p.payer_id = pa.id
+          WHERE p.status = 'completed'
          UNION ALL
-         SELECT 'user', (first_name || ' ' || last_name), user_type::text, '', created_at FROM users WHERE deleted_at IS NULL
+         SELECT 'user', (u.first_name || ' ' || u.last_name), u.user_type::text, '',
+                (u.first_name || ' ' || u.last_name), u.created_at
+           FROM users u WHERE u.deleted_at IS NULL
          UNION ALL
-         SELECT 'claim', claim_code, status::text, '', created_at FROM claims
+         SELECT 'claim', c.claim_code, c.status::text, '',
+                (cu.first_name || ' ' || cu.last_name), c.created_at
+           FROM claims c LEFT JOIN users cu ON c.claimant_id = cu.id
        ) e ORDER BY created_at DESC LIMIT $1`,
       [limit]
     );
@@ -946,6 +955,20 @@ export class AdminService {
         GROUP BY departure_city, arrival_city, arrival_country
         ORDER BY missions DESC, volume DESC LIMIT $3`,
       [from, to, limit]
+    );
+    return r.rows;
+  }
+
+  /** Completed-payment volume broken down by payment method, in a date range. */
+  static async getPaymentMethodBreakdown(from: string, to: string) {
+    const r = await pool.query(
+      `SELECT payment_method::text AS method,
+              COALESCE(SUM(amount), 0) AS amount, COUNT(*) AS count
+         FROM payments
+        WHERE status = 'completed'
+          AND created_at >= ($1)::date AND created_at < (($2)::date + interval '1 day')
+        GROUP BY payment_method ORDER BY amount DESC`,
+      [from, to]
     );
     return r.rows;
   }

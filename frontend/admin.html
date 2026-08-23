@@ -598,7 +598,8 @@
                  + `<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2"/></svg>`;
         }
         // Donut chart from segments [{label,value,color}].
-        function svgDonut(segments, total, centerLabel){
+        function fcfaShort(n){ n=Number(n)||0; if(n>=1e6) return (n/1e6).toFixed(2).replace(/\.?0+$/,'')+'M'; if(n>=1e3) return Math.round(n/1e3)+'K'; return String(Math.round(n)); }
+        function svgDonut(segments, total, centerLabel, centerText){
             const r=52, C=2*Math.PI*r, cx=60, cy=60; let off=0;
             const arcs = segments.filter(s=>s.value>0).map(s => {
                 const frac = total>0 ? s.value/total : 0; const len = frac*C;
@@ -610,8 +611,8 @@
             return `<svg viewBox="0 0 120 120" width="132" height="132">`
                  + `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="16"/>`
                  + arcs
-                 + `<text x="60" y="56" text-anchor="middle" font-size="26" font-weight="800" fill="#fff">${total}</text>`
-                 + `<text x="60" y="74" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.5)">${esc(centerLabel||'Total')}</text></svg>`;
+                 + `<text x="60" y="${centerText?54:56}" text-anchor="middle" font-size="${centerText?20:26}" font-weight="800" fill="#fff">${esc(centerText!=null?centerText:total)}</text>`
+                 + `<text x="60" y="${centerText?72:74}" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.5)">${esc(centerLabel||'Total')}</text></svg>`;
         }
         function fmtDelta(cur, prev){
             if (prev == null) return '';
@@ -795,63 +796,120 @@
             const grid=[0,.5,1].map(f=>{const gy=P.t+f*(H-P.t-P.b);return `<line x1="${P.l}" y1="${gy}" x2="${W-P.r}" y2="${gy}" stroke="rgba(255,255,255,.08)"/><text x="${P.l-6}" y="${gy+3}" text-anchor="end" font-size="9" fill="rgba(255,255,255,.4)">${Math.round(maxV*(1-f))}</text>`;}).join('');
             return `<div style="overflow-x:auto"><svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" style="min-width:520px">${grid}${bars}${labels}</svg></div>`;
         }
+        const PM_META = { wave:{l:'Wave',c:'#22c55e'}, orange_money:{l:'Orange Money',c:'#fb923c'},
+            free_money:{l:'Free Money',c:'#38bdf8'}, card:{l:'Carte bancaire',c:'#fbbf24'},
+            bank_transfer:{l:'Virement',c:'#8b5cf6'}, cash:{l:'Espèces',c:'#a78bfa'} };
+        let _anSeries = [];
+        function setAnRange(r){ state.aRange = r; renderAnalytics(document.getElementById('main')); }
+        function anEvoSvg(){
+            const f = state.aEvo || 'all'; const keys = [];
+            if (f==='all'||f==='missions') keys.push({key:'missions',color:'#6366f1',label:'Missions'});
+            if (f==='all'||f==='payments') keys.push({key:'payments',color:'#34d399',label:'Paiements'});
+            if (f==='all'||f==='new_users') keys.push({key:'new_users',color:'#8b5cf6',label:'Nouveaux utilisateurs'});
+            return svgLines(_anSeries, { keys });
+        }
+        function setAnEvo(v){ state.aEvo = v; const el = document.getElementById('evoChart'); if (el) el.innerHTML = anEvoSvg(); }
+
         async function renderAnalytics(main){
-            if (!state.aFrom) { state.aFrom = isoDaysAgo(29); state.aTo = new Date().toISOString().slice(0,10); state.aInterval = 'day'; }
-            main.innerHTML = `
-                <div class="toolbar">
-                    <label style="font-size:12px;color:rgba(255,255,255,.6);align-self:center">Du</label>
-                    <input type="date" id="aFrom" value="${state.aFrom}">
-                    <label style="font-size:12px;color:rgba(255,255,255,.6);align-self:center">au</label>
-                    <input type="date" id="aTo" value="${state.aTo}">
-                    <select id="aInterval">
-                        <option value="day"${state.aInterval==='day'?' selected':''}>Jour</option>
-                        <option value="week"${state.aInterval==='week'?' selected':''}>Semaine</option>
-                        <option value="month"${state.aInterval==='month'?' selected':''}>Mois</option>
-                    </select>
-                    <button onclick="applyAnalytics()">Appliquer</button>
-                </div>
-                <div id="aBody"><div class="loading">Chargement des analytics…</div></div>`;
-            loadAnalytics();
-        }
-        function applyAnalytics(){
-            state.aFrom = document.getElementById('aFrom').value || state.aFrom;
-            state.aTo = document.getElementById('aTo').value || state.aTo;
-            state.aInterval = document.getElementById('aInterval').value;
-            loadAnalytics();
-        }
-        async function loadAnalytics(){
-            const body = document.getElementById('aBody');
-            body.innerHTML = '<div class="loading">Chargement…</div>';
-            const qs = `?from=${state.aFrom}&to=${state.aTo}&interval=${state.aInterval}`;
+            if (!state.aRange) state.aRange = '30j';
+            if (!state.aEvo) state.aEvo = 'all';
+            main.innerHTML = '<div class="loading">Chargement des analytics…</div>';
+            const R = {'7j':{d:7,i:'day'},'30j':{d:30,i:'day'},'3mois':{d:90,i:'week'},'1an':{d:365,i:'month'}}[state.aRange];
+            const iso = d => d.toISOString().slice(0,10);
+            const to = new Date(), from = new Date(Date.now()-(R.d-1)*864e5);
+            const prevTo = new Date(from.getTime()-864e5), prevFrom = new Date(prevTo.getTime()-(R.d-1)*864e5);
             try {
-                const [ts, routes, gps] = await Promise.all([
-                    api('/admin/analytics/timeseries'+qs),
-                    api('/admin/analytics/top-routes'+`?from=${state.aFrom}&to=${state.aTo}&limit=10`),
-                    api('/admin/analytics/gp-performance?limit=10'),
+                const [ts, tsp, routes, pm, act] = await Promise.all([
+                    api(`/admin/analytics/timeseries?from=${iso(from)}&to=${iso(to)}&interval=${R.i}`),
+                    api(`/admin/analytics/timeseries?from=${iso(prevFrom)}&to=${iso(prevTo)}&interval=${R.i}`),
+                    api(`/admin/analytics/top-routes?from=${iso(from)}&to=${iso(to)}&limit=6`),
+                    api(`/admin/analytics/payment-methods?from=${iso(from)}&to=${iso(to)}`),
+                    api('/admin/activity?limit=8'),
                 ]);
-                if (!ts.ok) { body.innerHTML = `<div class="empty">${ts.status===403?'Accès refusé.':'Erreur.'}</div>`; return; }
-                const d = ts.json.data; const t = d.totals || {}; const s = d.series || [];
-                const routeRows = (routes.json.data||[]).map(r => `<tr><td>${esc((r.departure_city||'?')+' → '+(r.arrival_city||'?'))}</td><td>${esc(r.arrival_country||'—')}</td><td>${r.missions}</td><td>${fcfa(r.volume)}</td></tr>`).join('') || '<tr><td colspan="4" style="color:rgba(255,255,255,.4)">Aucune donnée</td></tr>';
-                const gpRows = (gps.json.data||[]).map(g => `<tr><td>${esc(g.gp_name||'—')}</td><td>${g.missions_completed}</td><td>${fcfa(g.total_earnings)}</td><td>⭐${Number(g.average_rating||0).toFixed(1)} (${g.total_reviews||0})</td></tr>`).join('') || '<tr><td colspan="4" style="color:rgba(255,255,255,.4)">Aucune donnée</td></tr>';
-                body.innerHTML =
-                    `<div class="stats-grid">`
-                  + card('Volume (GMV)', fcfa(t.gross)) + card('Commissions', fcfa(t.commission))
-                  + card('Paiements', t.payments||0) + card('Panier moyen', fcfa(t.avg_order))
-                  + card('Missions créées', t.missions||0) + card('Nouveaux users', t.new_users||0)
-                  + `</div>`
-                  + `<div class="section-title">Revenus & commissions</div>`
-                  + `<div class="card" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px">`
-                  + svgLines(s, { keys:[{key:'gross',color:'#4ECDC4',label:'Volume',fill:true},{key:'commission',color:'#FFD700',label:'Commission'}] })
-                  + `</div>`
-                  + `<div class="section-title">Missions créées</div>`
-                  + `<div class="card" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px">`
-                  + svgBars(s, 'missions', '#8b7dff')
-                  + `</div>`
-                  + `<div class="section-title">Top routes</div>`
-                  + `<div class="table-wrap"><table><thead><tr><th>Route</th><th>Pays</th><th>Missions</th><th>Volume</th></tr></thead><tbody>${routeRows}</tbody></table></div>`
-                  + `<div class="section-title">Performance GP</div>`
-                  + `<div class="table-wrap"><table><thead><tr><th>GP</th><th>Missions</th><th>Gains</th><th>Note</th></tr></thead><tbody>${gpRows}</tbody></table></div>`;
-            } catch (e) { body.innerHTML = '<div class="empty">Erreur de chargement.</div>'; }
+                if (!ts.ok) { main.innerHTML = `<div class="empty">${ts.status===403?'Accès refusé (permission analytics:read requise).':'Erreur de chargement.'}</div>`; return; }
+                const cur = ts.json.data.totals, prev = tsp.ok ? tsp.json.data.totals : null;
+                const s = ts.json.data.series || []; _anSeries = s;
+                const spk = k => s.map(x => Number(x[k])||0);
+
+                // KPI cards
+                const kpi = (ico,bg,label,value,cKey,color) => {
+                    const delta = prev ? fmtDelta(cur[cKey]||0, prev[cKey]||0) : '';
+                    return `<div class="kpi"><div class="kpi-top"><div class="kpi-ico" style="background:${bg}20;color:${bg}">${ico}</div><div class="kpi-label">${label}</div></div>
+                        <div class="kpi-val">${esc(value)}</div>
+                        <div class="kpi-bottom"><span>${delta||''} <span style="font-size:11px;color:var(--faint)">vs période préc.</span></span><div class="kpi-spark">${svgSpark(spk(cKey), color)}</div></div></div>`;
+                };
+                const kpis = `<div class="kpi-grid">
+                    ${kpi('💼','#8b5cf6','Volume traité', fcfa(cur.gross), 'gross', '#8b5cf6')}
+                    ${kpi('％','#34d399','Commissions', fcfa(cur.commission), 'commission', '#34d399')}
+                    ${kpi('🧾','#38bdf8','Paiements', cur.payments||0, 'payments', '#38bdf8')}
+                    ${kpi('📦','#fbbf24','Missions créées', cur.missions||0, 'missions', '#fbbf24')}
+                    ${kpi('👥','#a78bfa','Nouveaux utilisateurs', cur.new_users||0, 'new_users', '#a78bfa')}
+                </div>`;
+
+                // Payment method donut
+                const pmData = (pm.ok && pm.json.data) || [];
+                const pmTotal = pmData.reduce((a,x)=>a+Number(x.amount||0),0);
+                const pmSegs = pmData.map(x => { const meta = PM_META[x.method]||{l:x.method,c:'#64748b'}; return {label:meta.l, value:Number(x.amount||0), color:meta.c}; });
+                const pmLegend = pmSegs.length ? pmSegs.map(x => `<div class="li"><span class="dot" style="background:${x.color}"></span>${esc(x.label)}<span class="lv">${fcfaShort(x.value)} (${pmTotal>0?(x.value/pmTotal*100).toFixed(1):0}%)</span></div>`).join('') : '<div style="color:var(--faint)">Aucun paiement complété.</div>';
+
+                // Performance vs previous
+                const perfMetrics = [['Volume traité','gross','#8b5cf6'],['Commissions','commission','#34d399'],['Paiements','payments','#38bdf8'],['Missions créées','missions','#fbbf24'],['Nouveaux utilisateurs','new_users','#a78bfa']];
+                const perfVals = perfMetrics.map(([l,k,c]) => { const cu=cur[k]||0, pv=prev?prev[k]||0:0; let pct = pv===0?(cu>0?100:0):(cu-pv)/pv*100; return {l,c,pct}; });
+                const maxAbs = Math.max(1, ...perfVals.map(p=>Math.abs(p.pct)));
+                const perfBars = perfVals.map(p => `<div style="display:flex;align-items:center;gap:10px;margin:9px 0">
+                    <div style="width:150px;font-size:13px;color:var(--muted)">${p.l}</div>
+                    <div class="kpi-delta ${p.pct>0.5?'up':(p.pct<-0.5?'down':'flat')}" style="width:70px">${p.pct>=0?'↑':'↓'} ${Math.abs(p.pct).toFixed(1)}%</div>
+                    <div style="flex:1;height:8px;background:var(--bg2);border-radius:5px;overflow:hidden"><div style="height:100%;width:${Math.abs(p.pct)/maxAbs*100}%;background:${p.c};border-radius:5px"></div></div></div>`).join('');
+
+                // Top routes with share bar
+                const rdata = (routes.ok && routes.json.data) || [];
+                const rTotalVol = rdata.reduce((a,x)=>a+Number(x.volume||0),0);
+                const routeRows = rdata.length ? rdata.map(r => { const part = rTotalVol>0 ? Number(r.volume)/rTotalVol*100 : 0;
+                    return `<tr><td>${esc((r.departure_city||'?')+' → '+(r.arrival_city||'?'))}</td><td>${esc(r.arrival_country||'—')}</td><td>${r.missions}</td><td>${fcfa(r.volume)}</td>
+                    <td><div style="display:flex;align-items:center;gap:8px"><span style="font-variant-numeric:tabular-nums;width:44px">${part.toFixed(1)}%</span><div style="flex:1;min-width:60px;height:6px;background:var(--bg2);border-radius:4px;overflow:hidden"><div style="height:100%;width:${part}%;background:var(--accent);border-radius:4px"></div></div></div></td></tr>`;
+                }).join('') : '<tr><td colspan="5" style="color:var(--faint)">Aucune donnée</td></tr>';
+
+                // Recent activity table
+                const typeBadge = { mission:['Mission','b-blue'], payment:['Paiement','b-blue'], user:['Utilisateur','b-blue'], claim:['Réclamation','b-red'] };
+                const actDesc = a => a.kind==='mission' ? `Mission ${a.ref} ${esc(a.detail)}${a.extra?(' – '+esc(a.extra)):''}`
+                    : a.kind==='payment' ? `Paiement reçu${a.who?(' de '+esc(a.who)):''}` : a.kind==='user' ? `Nouvel utilisateur inscrit${a.who?(' – '+esc(a.who)):''}` : `Réclamation ${a.ref} ${esc(a.detail)}`;
+                const actRows = ((act.ok && act.json.data)||[]).map(a => { const tb = typeBadge[a.kind]||['—','b-gray'];
+                    const montant = a.kind==='payment' ? fcfa(a.extra) : '—';
+                    return `<tr><td>${new Date(a.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</td>
+                    <td><span class="badge ${tb[1]}">${tb[0]}</span></td><td>${actDesc(a)}</td><td>${montant}</td>
+                    <td><span class="badge ${badgeFor(a.detail)}">${esc(a.detail||'—')}</span></td><td>${esc(a.who||'—')}</td></tr>`;
+                }).join('') || '<tr><td colspan="6" style="color:var(--faint)">Aucune activité</td></tr>';
+
+                const seg = ['7j','30j','3mois','1an'].map(r => `<button class="${state.aRange===r?'active':''}" onclick="setAnRange('${r}')">${r}</button>`).join('');
+                const rangeLabel = `${from.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})} – ${to.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'})}`;
+                const exportBtn = can('payments:export') ? `<button class="pill-btn" onclick="exportCsv('payments')">⬇ Exporter</button>` : '';
+
+                main.innerHTML = `
+                    <div class="page-head">
+                        <div><h1>Analytics</h1><p>Analysez les performances et l'activité de votre plateforme.</p></div>
+                        <div class="head-tools"><span class="pill-btn">📅 ${rangeLabel}</span>${exportBtn}</div>
+                    </div>
+                    ${kpis}
+                    <div class="grid-2">
+                        <div class="panel"><div class="panel-head"><h3>Revenus & commissions</h3><div class="seg">${seg}</div></div>
+                            ${svgLines(s, { keys:[{key:'gross',color:'#8b5cf6',label:'Volume (FCFA)',fill:true},{key:'commission',color:'#34d399',label:'Commission (FCFA)'}] })}</div>
+                        <div class="panel"><div class="panel-head"><h3>Répartition par moyen de paiement</h3></div>
+                            <div class="donut-wrap">${svgDonut(pmSegs, pmTotal, 'FCFA', fcfaShort(pmTotal))}<div class="donut-legend">${pmLegend}</div></div></div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="panel"><div class="panel-head"><h3>Évolution quotidienne</h3>
+                            <select onchange="setAnEvo(this.value)" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg2);color:var(--ink);font-size:12px">
+                                <option value="all">Tous</option><option value="missions"${state.aEvo==='missions'?' selected':''}>Missions</option>
+                                <option value="payments"${state.aEvo==='payments'?' selected':''}>Paiements</option><option value="new_users"${state.aEvo==='new_users'?' selected':''}>Nouveaux users</option>
+                            </select></div>
+                            <div id="evoChart">${anEvoSvg()}</div></div>
+                        <div class="panel"><div class="panel-head"><h3>Performance vs période précédente</h3></div>${perfBars}</div>
+                    </div>
+                    <div class="panel" style="margin-bottom:16px"><div class="panel-head"><h3>Top routes par volume</h3></div>
+                        <div class="table-wrap"><table style="min-width:auto"><thead><tr><th>Route</th><th>Pays</th><th>Missions</th><th>Volume</th><th>Part</th></tr></thead><tbody>${routeRows}</tbody></table></div></div>
+                    <div class="panel"><div class="panel-head"><h3>Activité récente</h3><span class="link" onclick="switchView('audit',document.querySelector('.nav-link[data-view=audit]'))">Voir tout</span></div>
+                        <div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Montant</th><th>Statut</th><th>Utilisateur</th></tr></thead><tbody>${actRows}</tbody></table></div></div>`;
+            } catch (e) { main.innerHTML = '<div class="empty">Erreur de chargement.</div>'; }
         }
 
         async function loadList(){

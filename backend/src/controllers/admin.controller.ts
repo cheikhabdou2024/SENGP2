@@ -65,6 +65,14 @@ export class AdminController {
       ResponseUtil.success(res, data);
     } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
   }
+  static async analyticsPaymentMethods(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const to = (req.query.to as string) || new Date().toISOString().slice(0, 10);
+      const from = (req.query.from as string) || new Date(Date.now() - 29 * 864e5).toISOString().slice(0, 10);
+      const data = await AdminService.getPaymentMethodBreakdown(from, to);
+      ResponseUtil.success(res, data);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
+  }
 
   // Users
   static async listUsers(req: AuthRequest, res: Response): Promise<void> {
