@@ -22,6 +22,11 @@ router.get('/me/permissions', AdminController.myPermissions);
 // Overview counts are the landing view for every admin (no extra permission).
 router.get('/stats', AdminController.stats);
 
+// Analytics
+router.get('/analytics/timeseries', requirePermission('analytics:read'), AdminController.analyticsTimeseries);
+router.get('/analytics/top-routes', requirePermission('analytics:read'), AdminController.analyticsTopRoutes);
+router.get('/analytics/gp-performance', requirePermission('analytics:read'), AdminController.analyticsGpPerformance);
+
 router.get('/users', requirePermission('users:read'), AdminController.listUsers);
 router.post('/users', requirePermission('users:write'), AdminController.createUser);
 router.get('/users/:id', requirePermission('users:read'), AdminController.getUserDetail);

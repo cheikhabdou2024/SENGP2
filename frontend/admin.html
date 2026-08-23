@@ -210,6 +210,7 @@
         <div class="layout">
             <div class="sidebar">
                 <div class="nav-link active" data-view="overview" onclick="switchView('overview',this)">📊 <span>Vue globale</span></div>
+                <div class="nav-link" data-view="analytics" data-perm="analytics:read" onclick="switchView('analytics',this)">📈 <span>Analytics</span></div>
                 <div class="nav-link" data-view="users" data-perm="users:read" onclick="switchView('users',this)">👥 <span>Utilisateurs</span></div>
                 <div class="nav-link" data-view="kyc" data-perm="users:verify" onclick="switchView('kyc',this)">🪪 <span>Vérification KYC</span></div>
                 <div class="nav-link" data-view="missions" data-perm="missions:read" onclick="switchView('missions',this)">📦 <span>Missions</span></div>
@@ -389,6 +390,7 @@
         async function render(){
             const main = document.getElementById('main');
             if (state.view === 'overview') return renderOverview(main);
+            if (state.view === 'analytics') return renderAnalytics(main);
             if (state.view === 'roles') return renderRoles(main);
             if (state.view === 'kyc') return renderKyc(main);
             let extra = '';
@@ -471,6 +473,103 @@
         }
         function card(label, value, sub){
             return `<div class="stat"><div class="label">${label}</div><div class="value">${esc(value)}</div>${sub?`<div class="sub">${esc(sub)}</div>`:''}</div>`;
+        }
+
+        // ---------- Analytics ----------
+        function isoDaysAgo(n){ const d = new Date(Date.now() - n*864e5); return d.toISOString().slice(0,10); }
+        // Dependency-free responsive SVG line/area chart for one or two numeric series.
+        function svgLines(series, cfg){
+            const W=760, H=220, P={l:48,r:14,t:14,b:26};
+            const n = series.length;
+            if (!n) return '<div class="empty">Aucune donnée sur la période.</div>';
+            const keys = cfg.keys; // [{key,color,label,fill?}]
+            const maxV = Math.max(1, ...series.flatMap(s => keys.map(k => Number(s[k.key])||0)));
+            const x = i => P.l + (n===1 ? (W-P.l-P.r)/2 : i*(W-P.l-P.r)/(n-1));
+            const y = v => H-P.b - (Number(v)||0)/maxV*(H-P.t-P.b);
+            const grid = [0,.25,.5,.75,1].map(f => { const gy=P.t+f*(H-P.t-P.b); const val=Math.round(maxV*(1-f));
+                return `<line x1="${P.l}" y1="${gy}" x2="${W-P.r}" y2="${gy}" stroke="rgba(255,255,255,.08)"/>`
+                     + `<text x="${P.l-6}" y="${gy+3}" text-anchor="end" font-size="9" fill="rgba(255,255,255,.4)">${val>=1000?(val/1000).toFixed(0)+'k':val}</text>`; }).join('');
+            const paths = keys.map(k => {
+                const pts = series.map((s,i) => `${x(i)},${y(s[k.key])}`).join(' ');
+                const area = k.fill ? `<polygon points="${P.l},${H-P.b} ${pts} ${x(n-1)},${H-P.b}" fill="${k.color}" opacity="0.12"/>` : '';
+                const end = `<circle cx="${x(n-1)}" cy="${y(series[n-1][k.key])}" r="3" fill="${k.color}"/>`;
+                return area + `<polyline points="${pts}" fill="none" stroke="${k.color}" stroke-width="2"/>` + end;
+            }).join('');
+            const step = Math.ceil(n/6);
+            const labels = series.map((s,i) => (i%step===0||i===n-1) ? `<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.4)">${esc(s.period.slice(5))}</text>` : '').join('');
+            const legend = keys.map(k => `<span style="display:inline-flex;align-items:center;gap:5px;margin-right:14px;font-size:12px;color:rgba(255,255,255,.7)"><span style="width:10px;height:10px;border-radius:2px;background:${k.color}"></span>${esc(k.label)}</span>`).join('');
+            return `<div style="margin-bottom:6px">${legend}</div><div style="overflow-x:auto"><svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" style="min-width:520px">${grid}${paths}${labels}</svg></div>`;
+        }
+        function svgBars(series, key, color){
+            const W=760,H=180,P={l:48,r:14,t:14,b:26}; const n=series.length;
+            if(!n) return '';
+            const maxV=Math.max(1,...series.map(s=>Number(s[key])||0));
+            const bw=(W-P.l-P.r)/n*0.65;
+            const y=v=>H-P.b-(Number(v)||0)/maxV*(H-P.t-P.b);
+            const bars=series.map((s,i)=>{const cx=P.l+i*(W-P.l-P.r)/n+((W-P.l-P.r)/n-bw)/2; const yy=y(s[key]);
+                return `<rect x="${cx}" y="${yy}" width="${bw}" height="${H-P.b-yy}" fill="${color}" opacity="0.8" rx="2"/>`;}).join('');
+            const step=Math.ceil(n/6);
+            const labels=series.map((s,i)=>(i%step===0||i===n-1)?`<text x="${P.l+i*(W-P.l-P.r)/n+(W-P.l-P.r)/n/2}" y="${H-8}" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.4)">${esc(s.period.slice(5))}</text>`:'').join('');
+            const grid=[0,.5,1].map(f=>{const gy=P.t+f*(H-P.t-P.b);return `<line x1="${P.l}" y1="${gy}" x2="${W-P.r}" y2="${gy}" stroke="rgba(255,255,255,.08)"/><text x="${P.l-6}" y="${gy+3}" text-anchor="end" font-size="9" fill="rgba(255,255,255,.4)">${Math.round(maxV*(1-f))}</text>`;}).join('');
+            return `<div style="overflow-x:auto"><svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" style="min-width:520px">${grid}${bars}${labels}</svg></div>`;
+        }
+        async function renderAnalytics(main){
+            if (!state.aFrom) { state.aFrom = isoDaysAgo(29); state.aTo = new Date().toISOString().slice(0,10); state.aInterval = 'day'; }
+            main.innerHTML = `
+                <div class="toolbar">
+                    <label style="font-size:12px;color:rgba(255,255,255,.6);align-self:center">Du</label>
+                    <input type="date" id="aFrom" value="${state.aFrom}">
+                    <label style="font-size:12px;color:rgba(255,255,255,.6);align-self:center">au</label>
+                    <input type="date" id="aTo" value="${state.aTo}">
+                    <select id="aInterval">
+                        <option value="day"${state.aInterval==='day'?' selected':''}>Jour</option>
+                        <option value="week"${state.aInterval==='week'?' selected':''}>Semaine</option>
+                        <option value="month"${state.aInterval==='month'?' selected':''}>Mois</option>
+                    </select>
+                    <button onclick="applyAnalytics()">Appliquer</button>
+                </div>
+                <div id="aBody"><div class="loading">Chargement des analytics…</div></div>`;
+            loadAnalytics();
+        }
+        function applyAnalytics(){
+            state.aFrom = document.getElementById('aFrom').value || state.aFrom;
+            state.aTo = document.getElementById('aTo').value || state.aTo;
+            state.aInterval = document.getElementById('aInterval').value;
+            loadAnalytics();
+        }
+        async function loadAnalytics(){
+            const body = document.getElementById('aBody');
+            body.innerHTML = '<div class="loading">Chargement…</div>';
+            const qs = `?from=${state.aFrom}&to=${state.aTo}&interval=${state.aInterval}`;
+            try {
+                const [ts, routes, gps] = await Promise.all([
+                    api('/admin/analytics/timeseries'+qs),
+                    api('/admin/analytics/top-routes'+`?from=${state.aFrom}&to=${state.aTo}&limit=10`),
+                    api('/admin/analytics/gp-performance?limit=10'),
+                ]);
+                if (!ts.ok) { body.innerHTML = `<div class="empty">${ts.status===403?'Accès refusé.':'Erreur.'}</div>`; return; }
+                const d = ts.json.data; const t = d.totals || {}; const s = d.series || [];
+                const routeRows = (routes.json.data||[]).map(r => `<tr><td>${esc((r.departure_city||'?')+' → '+(r.arrival_city||'?'))}</td><td>${esc(r.arrival_country||'—')}</td><td>${r.missions}</td><td>${fcfa(r.volume)}</td></tr>`).join('') || '<tr><td colspan="4" style="color:rgba(255,255,255,.4)">Aucune donnée</td></tr>';
+                const gpRows = (gps.json.data||[]).map(g => `<tr><td>${esc(g.gp_name||'—')}</td><td>${g.missions_completed}</td><td>${fcfa(g.total_earnings)}</td><td>⭐${Number(g.average_rating||0).toFixed(1)} (${g.total_reviews||0})</td></tr>`).join('') || '<tr><td colspan="4" style="color:rgba(255,255,255,.4)">Aucune donnée</td></tr>';
+                body.innerHTML =
+                    `<div class="stats-grid">`
+                  + card('Volume (GMV)', fcfa(t.gross)) + card('Commissions', fcfa(t.commission))
+                  + card('Paiements', t.payments||0) + card('Panier moyen', fcfa(t.avg_order))
+                  + card('Missions créées', t.missions||0) + card('Nouveaux users', t.new_users||0)
+                  + `</div>`
+                  + `<div class="section-title">Revenus & commissions</div>`
+                  + `<div class="card" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px">`
+                  + svgLines(s, { keys:[{key:'gross',color:'#4ECDC4',label:'Volume',fill:true},{key:'commission',color:'#FFD700',label:'Commission'}] })
+                  + `</div>`
+                  + `<div class="section-title">Missions créées</div>`
+                  + `<div class="card" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px">`
+                  + svgBars(s, 'missions', '#8b7dff')
+                  + `</div>`
+                  + `<div class="section-title">Top routes</div>`
+                  + `<div class="table-wrap"><table><thead><tr><th>Route</th><th>Pays</th><th>Missions</th><th>Volume</th></tr></thead><tbody>${routeRows}</tbody></table></div>`
+                  + `<div class="section-title">Performance GP</div>`
+                  + `<div class="table-wrap"><table><thead><tr><th>GP</th><th>Missions</th><th>Gains</th><th>Note</th></tr></thead><tbody>${gpRows}</tbody></table></div>`;
+            } catch (e) { body.innerHTML = '<div class="empty">Erreur de chargement.</div>'; }
         }
 
         async function loadList(){

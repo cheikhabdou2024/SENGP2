@@ -873,6 +873,80 @@ export class AdminService {
     return { id, deleted: true };
   }
 
+  // ---------- Analytics ----------
+  /**
+   * Revenue / commission / volume time series between two dates (inclusive),
+   * bucketed by day|week|month. Merges payments, missions and signups per bucket.
+   */
+  static async getAnalyticsTimeseries(from: string, to: string, interval: string) {
+    const unit = ['day', 'week', 'month'].includes(interval) ? interval : 'day';
+    // Upper bound is exclusive next-day so `to` is inclusive of the whole day.
+    const bounds = ['($1)::date', '(($2)::date + interval \'1 day\')'];
+    const [pay, mis, usr] = await Promise.all([
+      pool.query(
+        `SELECT to_char(date_trunc($3, created_at), 'YYYY-MM-DD') AS period,
+                COALESCE(SUM(amount) FILTER (WHERE status = 'completed'), 0) AS gross,
+                COALESCE(SUM(commission) FILTER (WHERE status = 'completed'), 0) AS commission,
+                COUNT(*) FILTER (WHERE status = 'completed') AS payments
+           FROM payments WHERE created_at >= ${bounds[0]} AND created_at < ${bounds[1]}
+          GROUP BY 1 ORDER BY 1`, [from, to, unit]),
+      pool.query(
+        `SELECT to_char(date_trunc($3, created_at), 'YYYY-MM-DD') AS period, COUNT(*) AS missions
+           FROM missions WHERE created_at >= ${bounds[0]} AND created_at < ${bounds[1]}
+          GROUP BY 1 ORDER BY 1`, [from, to, unit]),
+      pool.query(
+        `SELECT to_char(date_trunc($3, created_at), 'YYYY-MM-DD') AS period, COUNT(*) AS new_users
+           FROM users WHERE created_at >= ${bounds[0]} AND created_at < ${bounds[1]}
+          GROUP BY 1 ORDER BY 1`, [from, to, unit]),
+    ]);
+    // Merge the three series by period.
+    const map: Record<string, any> = {};
+    const put = (rows: any[], f: (m: any, r: any) => void) => rows.forEach((r) => {
+      map[r.period] = map[r.period] || { period: r.period, gross: 0, commission: 0, payments: 0, missions: 0, new_users: 0 };
+      f(map[r.period], r);
+    });
+    put(pay.rows, (m, r) => { m.gross = Number(r.gross); m.commission = Number(r.commission); m.payments = Number(r.payments); });
+    put(mis.rows, (m, r) => { m.missions = Number(r.missions); });
+    put(usr.rows, (m, r) => { m.new_users = Number(r.new_users); });
+    const series = Object.values(map).sort((a: any, b: any) => a.period < b.period ? -1 : 1);
+    const totals = series.reduce((t: any, s: any) => ({
+      gross: t.gross + s.gross, commission: t.commission + s.commission,
+      payments: t.payments + s.payments, missions: t.missions + s.missions, new_users: t.new_users + s.new_users,
+    }), { gross: 0, commission: 0, payments: 0, missions: 0, new_users: 0 });
+    totals.avg_order = totals.payments ? Math.round(totals.gross / totals.payments) : 0;
+    return { interval: unit, from, to, series, totals };
+  }
+
+  /** Most-used routes (departure → arrival) in a date range. */
+  static async getTopRoutes(from: string, to: string, limit = 10) {
+    const r = await pool.query(
+      `SELECT departure_city, arrival_city, arrival_country,
+              COUNT(*) AS missions,
+              COALESCE(SUM(offered_price), 0) AS volume
+         FROM missions
+        WHERE created_at >= ($1)::date AND created_at < (($2)::date + interval '1 day')
+        GROUP BY departure_city, arrival_city, arrival_country
+        ORDER BY missions DESC, volume DESC LIMIT $3`,
+      [from, to, limit]
+    );
+    return r.rows;
+  }
+
+  /** Top GPs by completed missions / earnings / rating. */
+  static async getGpPerformance(limit = 10) {
+    const r = await pool.query(
+      `SELECT u.id, u.first_name || ' ' || u.last_name AS gp_name, u.average_rating, u.total_reviews,
+              COALESCE(gp.total_missions_completed, 0) AS missions_completed,
+              COALESCE(gp.total_earnings, 0) AS total_earnings,
+              COALESCE(gp.success_rate, 0) AS success_rate
+         FROM users u JOIN gp_profiles gp ON gp.user_id = u.id
+        WHERE u.deleted_at IS NULL
+        ORDER BY missions_completed DESC, total_earnings DESC LIMIT $1`,
+      [limit]
+    );
+    return r.rows;
+  }
+
   // ---------- Admin roles (RBAC) ----------
   static async listRoles() {
     const r = await pool.query(

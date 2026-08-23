@@ -29,6 +29,35 @@ export class AdminController {
     }
   }
 
+  // Analytics
+  static async analyticsTimeseries(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const to = (req.query.to as string) || new Date().toISOString().slice(0, 10);
+      const from = (req.query.from as string) ||
+        new Date(Date.now() - 29 * 864e5).toISOString().slice(0, 10);
+      const interval = (req.query.interval as string) || 'day';
+      const data = await AdminService.getAnalyticsTimeseries(from, to, interval);
+      ResponseUtil.success(res, data);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
+  }
+  static async analyticsTopRoutes(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const to = (req.query.to as string) || new Date().toISOString().slice(0, 10);
+      const from = (req.query.from as string) ||
+        new Date(Date.now() - 29 * 864e5).toISOString().slice(0, 10);
+      const limit = parseInt(req.query.limit as string) || 10;
+      const data = await AdminService.getTopRoutes(from, to, limit);
+      ResponseUtil.success(res, data);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
+  }
+  static async analyticsGpPerformance(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const data = await AdminService.getGpPerformance(limit);
+      ResponseUtil.success(res, data);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
+  }
+
   // Users
   static async listUsers(req: AuthRequest, res: Response): Promise<void> {
     try {
