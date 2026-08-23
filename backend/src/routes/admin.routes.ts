@@ -30,6 +30,8 @@ router.get('/analytics/gp-performance', requirePermission('analytics:read'), Adm
 router.get('/analytics/payment-methods', requirePermission('analytics:read'), AdminController.analyticsPaymentMethods);
 
 router.get('/users', requirePermission('users:read'), AdminController.listUsers);
+router.get('/users/export', requirePermission('users:read'), AdminController.exportUsers);
+router.get('/users/status-series', requirePermission('users:read'), AdminController.userStatusSeries);
 router.post('/users', requirePermission('users:write'), AdminController.createUser);
 router.get('/users/:id', requirePermission('users:read'), AdminController.getUserDetail);
 router.put('/users/:id', requirePermission('users:write'), AdminController.updateUser);

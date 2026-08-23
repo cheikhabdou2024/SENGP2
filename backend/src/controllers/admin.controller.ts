@@ -124,6 +124,30 @@ export class AdminController {
       ResponseUtil.badRequest(res, e.message || 'Create failed');
     }
   }
+  static async userStatusSeries(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const to = (req.query.to as string) || new Date().toISOString().slice(0, 10);
+      const from = (req.query.from as string) || new Date(Date.now() - 29 * 864e5).toISOString().slice(0, 10);
+      const interval = (req.query.interval as string) || 'day';
+      const data = await AdminService.getUserStatusSeries(from, to, interval);
+      ResponseUtil.success(res, data);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
+  }
+  static async exportUsers(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const rows = await AdminService.listUsersForExport(listParams(req));
+      const csv = toCsv(rows, [
+        { key: 'name', label: 'Nom' }, { key: 'email', label: 'Email' }, { key: 'phone', label: 'Téléphone' },
+        { key: 'user_type', label: 'Type' }, { key: 'status', label: 'Statut' },
+        { key: 'is_email_verified', label: 'Email vérifié' }, { key: 'country', label: 'Pays' },
+        { key: 'city', label: 'Ville' }, { key: 'created_at', label: 'Inscrit le' }, { key: 'last_login_at', label: 'Dernière connexion' },
+      ]);
+      void logAdminAction({ req, action: 'user.export', entityType: 'user', metadata: { count: rows.length } });
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="users.csv"');
+      res.status(200).send(csv);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Export failed'); }
+  }
 
   // KYC / identity verification
   static async listKyc(req: AuthRequest, res: Response): Promise<void> {

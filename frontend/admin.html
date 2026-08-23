@@ -533,10 +533,9 @@
             if (state.view === 'analytics') return renderAnalytics(main);
             if (state.view === 'roles') return renderRoles(main);
             if (state.view === 'kyc') return renderKyc(main);
+            if (state.view === 'users') return renderUsers(main);
             let extra = '';
-            if (state.view === 'users' && can('users:write'))
-                extra = `<button style="margin-left:auto;background:#7ee081;color:#06302c" onclick="createUserModal()">+ Créer un utilisateur</button>`;
-            else if (state.view === 'payments' && can('payments:export'))
+            if (state.view === 'payments' && can('payments:export'))
                 extra = `<button style="margin-left:auto" onclick="exportCsv('payments')">⬇ Exporter CSV</button>`;
             else if (state.view === 'withdrawals')
                 extra = `<button style="margin-left:auto" onclick="exportCsv('withdrawals')">⬇ Exporter CSV</button>`;
@@ -551,6 +550,60 @@
                 <div class="pager" id="pager"></div>`;
             document.getElementById('search').addEventListener('keydown', e => { if (e.key === 'Enter') applyFilters(); });
             loadList();
+        }
+
+        // Dedicated Users view: header + KPI cards + rich toolbar (reuses loadList/pager).
+        function renderUsers(main){
+            const createBtn = can('users:write') ? `<button class="pill-btn accent" onclick="createUserModal()">＋ Créer un utilisateur</button>` : '';
+            const exportBtn = can('users:read') ? `<button class="pill-btn" onclick="exportCsv('users')">⬇ Exporter</button>` : '';
+            const typeSel = `<select id="utype">
+                <option value="">Tous les types</option>
+                <option value="expediteur"${state.uType==='expediteur'?' selected':''}>Expéditeur</option>
+                <option value="gp"${state.uType==='gp'?' selected':''}>GP</option>
+                <option value="admin"${state.uType==='admin'?' selected':''}>Admin</option></select>`;
+            main.innerHTML = `
+                <div class="page-head">
+                    <div><h1>Utilisateurs</h1><p>Gérez les utilisateurs et suivez leurs activités.</p></div>
+                    <div class="head-tools">${createBtn}</div>
+                </div>
+                <div class="kpi-grid" id="usersKpis"><div class="loading">Chargement…</div></div>
+                <div class="toolbar">
+                    <input id="search" placeholder="Rechercher un utilisateur…" value="${esc(state.search)}">
+                    ${statusFilter()}
+                    ${typeSel}
+                    <button onclick="applyFilters()">🔎 Filtrer</button>
+                    <span style="margin-left:auto"></span>${exportBtn}
+                </div>
+                <div id="tableArea"><div class="loading">Chargement…</div></div>
+                <div class="pager" id="pager"></div>`;
+            document.getElementById('search').addEventListener('keydown', e => { if (e.key === 'Enter') applyFilters(); });
+            loadUserKpis();
+            loadList();
+        }
+        async function loadUserKpis(){
+            const el = document.getElementById('usersKpis'); if (!el) return;
+            const iso = d => d.toISOString().slice(0,10);
+            const to = new Date(), from = new Date(Date.now()-29*864e5);
+            const pTo = new Date(from.getTime()-864e5), pFrom = new Date(pTo.getTime()-29*864e5);
+            const [st, cur, prev] = await Promise.all([
+                api('/admin/stats'),
+                api(`/admin/users/status-series?from=${iso(from)}&to=${iso(to)}&interval=day`),
+                api(`/admin/users/status-series?from=${iso(pFrom)}&to=${iso(pTo)}&interval=day`),
+            ]);
+            if (!st.ok) { el.innerHTML = ''; return; }
+            const u = st.json.data.users;
+            const cs = cur.ok ? cur.json.data : null, ps = prev.ok ? prev.json.data : null;
+            const kpi = (ico,bg,label,value,key) => {
+                const delta = (cs && ps) ? fmtDelta(cs.totals[key]||0, ps.totals[key]||0) : '';
+                const spark = cs ? `<div class="kpi-spark">${svgSpark(cs.series.map(x=>x[key]||0), bg)}</div>` : '';
+                return `<div class="kpi"><div class="kpi-top"><div class="kpi-ico" style="background:${bg}20;color:${bg}">${ico}</div><div class="kpi-label">${label}</div></div>
+                    <div class="kpi-val">${esc(value)}</div>
+                    <div class="kpi-bottom"><span>${delta||''} <span style="font-size:11px;color:var(--faint)">vs période préc.</span></span>${spark}</div></div>`;
+            };
+            el.innerHTML = kpi('👥','#8b5cf6','Total utilisateurs', u.total, 'total')
+                + kpi('✅','#34d399','Vérifiés', u.verified, 'verified')
+                + kpi('⏳','#fbbf24','En attente', u.pending, 'pending')
+                + kpi('⛔','#fb7185','Suspendus', u.suspended, 'suspended');
         }
 
         function statusFilter(){
@@ -570,6 +623,8 @@
             state.search = (document.getElementById('search')||{}).value || '';
             const sEl = document.getElementById('status');
             state.status = sEl ? sEl.value : '';
+            const tEl = document.getElementById('utype');
+            if (tEl) state.uType = tEl.value;
             state.page = 1;
             loadList();
         }
@@ -917,7 +972,8 @@
             area.innerHTML = '<div class="loading">Chargement…</div>';
             const q = `?page=${state.page}&limit=20`
                 + (state.search ? `&search=${encodeURIComponent(state.search)}` : '')
-                + (state.status ? `&status=${encodeURIComponent(state.status)}` : '');
+                + (state.status ? `&status=${encodeURIComponent(state.status)}` : '')
+                + (state.view==='users' && state.uType ? `&user_type=${encodeURIComponent(state.uType)}` : '');
             try {
                 const { ok, json } = await api('/admin/' + state.view + q);
                 if (!ok) throw new Error(json.error || 'Erreur');
@@ -932,11 +988,25 @@
         function renderPager(p){
             const pager = document.getElementById('pager');
             if (!p) { pager.innerHTML=''; return; }
-            const totalPages = p.totalPages || 1;
+            const cur = p.page || state.page || 1, tp = p.totalPages || 1, total = p.total || 0, limit = p.limit || 20;
+            const a = total ? (cur-1)*limit + 1 : 0, b = Math.min(cur*limit, total);
+            // Windowed page numbers with ellipses.
+            const nums = []; const add = n => nums.push(n);
+            if (tp <= 7) { for (let i=1;i<=tp;i++) add(i); }
+            else {
+                add(1);
+                if (cur > 3) nums.push('…');
+                for (let i=Math.max(2,cur-1); i<=Math.min(tp-1,cur+1); i++) add(i);
+                if (cur < tp-2) nums.push('…');
+                add(tp);
+            }
+            const numHtml = nums.map(n => n==='…' ? `<span style="padding:0 4px;color:var(--faint)">…</span>`
+                : `<button ${n===cur?'style="background:var(--accent);color:#fff;border-color:var(--accent)"':''} onclick="goPage(${n})">${n}</button>`).join('');
             pager.innerHTML = `
-                <span>Page ${p.page||state.page} / ${totalPages} · ${p.total||0} éléments</span>
-                <button ${(p.page||1)<=1?'disabled':''} onclick="goPage(${(p.page||1)-1})">←</button>
-                <button ${(p.page||1)>=totalPages?'disabled':''} onclick="goPage(${(p.page||1)+1})">→</button>`;
+                <span style="margin-right:auto;color:var(--muted)">Affichage ${a} à ${b} sur ${total} éléments</span>
+                <button ${cur<=1?'disabled':''} onclick="goPage(${cur-1})">‹</button>
+                ${numHtml}
+                <button ${cur>=tp?'disabled':''} onclick="goPage(${cur+1})">›</button>`;
         }
         function goPage(n){ state.page = n; (state.view === 'kyc' ? loadKyc() : loadList()); }
 
@@ -944,17 +1014,21 @@
             if (!rows.length) return '<div class="empty">Aucun élément.</div>';
             const defs = {
                 users: {
-                    head: ['Nom','Email','Type','Statut','Ville','Inscrit','Actions'],
+                    head: ['Utilisateur','Email','Type','Statut','Ville','Inscrit le','Actions'],
                     row: u => {
+                        const nm = ((u.first_name||' ')[0]||'') + ((u.last_name||' ')[0]||'');
+                        const typeLabel = { expediteur:'Expéditeur', gp:'GP', admin:'Admin' }[u.user_type] || u.user_type;
+                        const stMeta = { verified:['✓ Vérifié','b-green'], pending:['⏳ En attente','b-yellow'], suspended:['⛔ Suspendu','b-red'], deleted:['Supprimé','b-gray'] }[u.status] || [u.status,'b-gray'];
                         const acts = [];
                         acts.push(['act-edit','Détails',`showUserDetail('${u.id}')`]);
                         if (can('users:write')) acts.push(['act-edit','Éditer',`editUser('${u.id}')`]);
                         if (can('roles:manage')) acts.push(['act-ok','Rôle',`assignRole('${u.id}','${esc(u.email)}')`]);
-                        if (can('users:delete')) acts.push(['act-del','Suppr.',`delUser('${u.id}','${esc(u.email)}')`]);
+                        if (can('users:delete')) acts.push(['act-del','🗑',`delUser('${u.id}','${esc(u.email)}')`]);
                         return [
-                        esc(u.first_name+' '+u.last_name), esc(u.email),
-                        `<span class="badge b-blue">${esc(u.user_type)}</span>`,
-                        `<span class="badge ${badgeFor(u.status)}">${esc(u.status)}</span>`,
+                        `<div style="display:flex;align-items:center;gap:10px"><span class="avatar" style="width:32px;height:32px;font-size:12px">${esc(nm.toUpperCase())}</span><span style="font-weight:600">${esc(u.first_name+' '+u.last_name)}</span></div>`,
+                        esc(u.email),
+                        `<span class="badge b-blue">${esc(typeLabel)}</span>`,
+                        `<span class="badge ${stMeta[1]}">${esc(stMeta[0])}</span>`,
                         esc(u.city||'—'), dt(u.created_at),
                         actions(acts)
                     ]; }
@@ -1438,7 +1512,11 @@
         // Download a CSV export (authenticated fetch → blob → download).
         async function exportCsv(kind){
             try {
-                const q = (state.status ? `?status=${encodeURIComponent(state.status)}` : '') + (state.search ? `${state.status?'&':'?'}search=${encodeURIComponent(state.search)}` : '');
+                const params = [];
+                if (state.status) params.push(`status=${encodeURIComponent(state.status)}`);
+                if (state.search) params.push(`search=${encodeURIComponent(state.search)}`);
+                if (kind==='users' && state.uType) params.push(`user_type=${encodeURIComponent(state.uType)}`);
+                const q = params.length ? ('?' + params.join('&')) : '';
                 const res = await fetch(API + '/admin/' + kind + '/export' + q, { headers: { 'Authorization': 'Bearer ' + token } });
                 if (!res.ok) { toast('Export refusé ('+res.status+')', 'err'); return; }
                 const blob = await res.blob();

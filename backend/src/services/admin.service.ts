@@ -22,6 +22,8 @@ export class AdminService {
           COUNT(*) FILTER (WHERE user_type = 'expediteur' AND deleted_at IS NULL) AS expediteurs,
           COUNT(*) FILTER (WHERE user_type = 'gp' AND deleted_at IS NULL) AS gps,
           COUNT(*) FILTER (WHERE user_type = 'admin' AND deleted_at IS NULL) AS admins,
+          COUNT(*) FILTER (WHERE status = 'verified' AND deleted_at IS NULL) AS verified,
+          COUNT(*) FILTER (WHERE status = 'pending' AND deleted_at IS NULL) AS pending,
           COUNT(*) FILTER (WHERE status = 'suspended' AND deleted_at IS NULL) AS suspended
         FROM users`),
       pool.query(`
@@ -79,6 +81,46 @@ export class AdminService {
       [...args, limit, offset]
     );
     return { data: rows.rows, pagination: { page, limit, total, totalPages: Helpers.calculateTotalPages(total, limit) } };
+  }
+
+  /** Daily signup counts split by current status — for the Users KPI sparklines. */
+  static async getUserStatusSeries(from: string, to: string, interval: string) {
+    const unit = ['day', 'week', 'month'].includes(interval) ? interval : 'day';
+    const r = await pool.query(
+      `SELECT to_char(date_trunc($3, created_at), 'YYYY-MM-DD') AS period,
+              COUNT(*) AS total,
+              COUNT(*) FILTER (WHERE status = 'verified') AS verified,
+              COUNT(*) FILTER (WHERE status = 'pending') AS pending,
+              COUNT(*) FILTER (WHERE status = 'suspended') AS suspended
+         FROM users
+        WHERE deleted_at IS NULL
+          AND created_at >= ($1)::date AND created_at < (($2)::date + interval '1 day')
+        GROUP BY 1 ORDER BY 1`,
+      [from, to, unit]
+    );
+    const series = r.rows.map((x: any) => ({ period: x.period, total: +x.total, verified: +x.verified, pending: +x.pending, suspended: +x.suspended }));
+    const totals = series.reduce((t: any, s: any) => ({ total: t.total+s.total, verified: t.verified+s.verified, pending: t.pending+s.pending, suspended: t.suspended+s.suspended }), { total:0, verified:0, pending:0, suspended:0 });
+    return { series, totals };
+  }
+
+  /** All users matching filters (no pagination) — for CSV export. */
+  static async listUsersForExport(params: { search?: string; user_type?: string; status?: string }) {
+    let where = 'WHERE deleted_at IS NULL';
+    const args: any[] = [];
+    let i = 1;
+    if (params.user_type) { where += ` AND user_type = $${i++}`; args.push(params.user_type); }
+    if (params.status) { where += ` AND status = $${i++}`; args.push(params.status); }
+    if (params.search) {
+      where += ` AND (email ILIKE $${i} OR first_name ILIKE $${i} OR last_name ILIKE $${i} OR phone ILIKE $${i})`;
+      args.push(`%${params.search}%`); i++;
+    }
+    const r = await pool.query(
+      `SELECT first_name || ' ' || last_name AS name, email, phone, user_type, status,
+              is_email_verified, country, city, created_at, last_login_at
+         FROM users ${where} ORDER BY created_at DESC`,
+      args
+    );
+    return r.rows;
   }
 
   static async updateUser(id: string, data: any) {
