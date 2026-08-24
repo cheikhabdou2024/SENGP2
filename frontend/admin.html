@@ -1736,40 +1736,82 @@
         }
 
         // ---------- Roles & Admins ----------
+        const ROLE_ICON = { super_admin:['🛡️','#8b5cf6'], operations:['💼','#34d399'], finance:['💳','#38bdf8'],
+            support:['🎧','#fb7185'], verification:['🪪','#22d3ee'], analyst:['📊','#a78bfa'] };
+        let _roles = [];
         async function renderRoles(main){
             main.innerHTML = '<div class="loading">Chargement des rôles…</div>';
             const { ok, json, status } = await api('/admin/roles');
-            if (!ok) { main.innerHTML = '<div class="empty">' + (status===403 ? 'Accès refusé.' : 'Erreur: ' + esc((json&&json.error)||'')) + '</div>'; return; }
+            if (!ok) { main.innerHTML = '<div class="empty">' + (status===403 ? 'Accès refusé (roles:read requis).' : 'Erreur: ' + esc((json&&json.error)||'')) + '</div>'; return; }
             allPerms = (json.meta && json.meta.catalog) ? json.meta.catalog : allPerms;
-            const roles = json.data || [];
+            _roles = json.data || [];
             const canManage = can('roles:manage');
-            const cards = roles.map(r => {
-                const perms = Array.isArray(r.permissions) ? r.permissions : [];
-                const tags = perms.includes('*')
-                    ? '<span class="tag all">Toutes les permissions</span>'
-                    : perms.map(p => `<span class="tag">${esc(p)}</span>`).join('') || '<span class="tag">Aucune</span>';
+            const admins = _roles.reduce((a,r)=>a+(+r.admin_count||0),0);
+            const modules = new Set(allPerms.map(p => p.split(':')[0])).size;
+            const createBtn = canManage ? `<button class="pill-btn accent" onclick="editRole()">＋ Nouveau rôle</button>` : '';
+            const kcard = (ico,bg,label,value,sub) => `<div class="kpi"><div class="kpi-top"><div class="kpi-ico" style="background:${bg}20;color:${bg}">${ico}</div><div class="kpi-label">${label}</div></div>
+                <div class="kpi-val">${esc(value)}</div><div class="kpi-bottom"><span style="font-size:12px;color:var(--faint)">${esc(sub)}</span></div></div>`;
+            main.innerHTML = `
+                <div class="page-head">
+                    <div><h1>Rôles & Admins</h1><p>Gérez les rôles d'accès et les comptes administrateurs.</p></div>
+                    <div class="head-tools">${createBtn}</div>
+                </div>
+                <div class="kpi-grid">
+                    ${kcard('🛡️','#8b5cf6','Total rôles', _roles.length, 'système + personnalisés')}
+                    ${kcard('👤','#38bdf8','Administrateurs', admins, 'comptes admin actifs')}
+                    ${kcard('🔑','#34d399','Permissions', allPerms.length, 'permissions disponibles')}
+                    ${kcard('🧩','#fbbf24','Modules', modules, 'ressources couvertes')}
+                </div>
+                <div class="toolbar">
+                    <input id="roleSearch" placeholder="Rechercher un rôle…" oninput="renderRolesTable()">
+                    <select id="roleType" onchange="renderRolesTable()"><option value="">Tous les types</option><option value="system">Système</option><option value="custom">Personnalisé</option></select>
+                    <span style="margin-left:auto"></span><button class="pill-btn" onclick="exportRolesCsv()">⬇ Exporter</button>
+                </div>
+                <div id="tableArea"></div>`;
+            renderRolesTable();
+        }
+        function renderRolesTable(){
+            const area = document.getElementById('tableArea'); if (!area) return;
+            const canManage = can('roles:manage');
+            const q = (document.getElementById('roleSearch')?.value||'').toLowerCase();
+            const tf = document.getElementById('roleType')?.value||'';
+            let rows = _roles.filter(r => (!q || (r.name+' '+r.key+' '+(r.description||'')).toLowerCase().includes(q))
+                && (!tf || (tf==='system'?r.is_system:!r.is_system)));
+            const body = rows.map(r => {
+                const ic = ROLE_ICON[r.key] || ['🧩','#64748b'];
+                const perms = Array.isArray(r.permissions)?r.permissions:[];
+                const permCell = perms.includes('*')
+                    ? `<div>Toutes</div><span class="badge b-yellow">Accès complet</span>`
+                    : `<div>${perms.length}</div>${perms.length?`<span class="link" style="color:var(--accent2);cursor:pointer;font-size:12px" onclick="showRolePerms('${r.id}')">Voir les permissions</span>`:''}`;
                 const acts = [];
-                if (canManage && !r.is_system) {
-                    acts.push(`<button class="act act-edit" onclick="editRole('${r.id}')">Éditer</button>`);
-                    acts.push(`<button class="act act-del" onclick="deleteRole('${r.id}','${esc(r.name)}')">Suppr.</button>`);
-                } else if (canManage && r.is_system) {
-                    acts.push(`<button class="act act-edit" onclick="editRole('${r.id}')">Renommer</button>`);
-                }
-                return '<div class="role-card">'
-                  + '<div class="rc-head">'
-                  + '<h4>' + esc(r.name) + '</h4>'
-                  + (r.is_system ? '<span class="badge b-blue">système</span>' : '')
-                  + '<span class="badge b-gray">' + (r.admin_count||0) + ' admin(s)</span>'
-                  + '<div style="margin-left:auto;display:flex;gap:6px;">' + acts.join('') + '</div>'
-                  + '</div>'
-                  + (r.description ? '<div style="font-size:13px;color:rgba(255,255,255,.6)">' + esc(r.description) + '</div>' : '')
-                  + '<div class="rc-perms">' + tags + '</div>'
-                  + '</div>';
-            }).join('');
-            main.innerHTML =
-                '<div class="toolbar"><div style="font-size:16px;font-weight:700;">Rôles d\'administration</div>'
-              + (canManage ? '<button style="margin-left:auto" onclick="editRole()">+ Nouveau rôle</button>' : '')
-              + '</div>' + (cards || '<div class="empty">Aucun rôle.</div>');
+                if (canManage) acts.push(`<button class="act act-edit" onclick="editRole('${r.id}')">${r.is_system?'Renommer':'Éditer'}</button>`);
+                if (canManage && !r.is_system) acts.push(`<button class="act act-del" onclick="deleteRole('${r.id}','${esc(r.name)}')">Suppr.</button>`);
+                return `<tr>
+                    <td><div style="display:flex;align-items:center;gap:11px"><span class="kpi-ico" style="width:36px;height:36px;background:${ic[1]}20;color:${ic[1]};font-size:15px">${ic[0]}</span>
+                        <div><div style="font-weight:600">${esc(r.name)}</div><div style="font-size:12px;color:var(--faint);white-space:normal;max-width:280px">${esc(r.description||'')}</div></div></div></td>
+                    <td><span class="badge ${r.is_system?'b-blue':'b-gray'}">${r.is_system?'Système':'Personnalisé'}</span></td>
+                    <td>${r.admin_count||0} <span style="color:var(--faint);font-size:12px">admin</span></td>
+                    <td>${permCell}</td>
+                    <td><span class="badge b-green">Actif</span></td>
+                    <td><div class="row-actions">${acts.join('') || '<span style="color:var(--faint)">—</span>'}</div></td>
+                </tr>`;
+            }).join('') || '<tr><td colspan="6" style="color:var(--faint)">Aucun rôle.</td></tr>';
+            area.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Rôle</th><th>Type</th><th>Admin(s)</th><th>Permissions</th><th>Statut</th><th>Actions</th></tr></thead><tbody>${body}</tbody></table></div>`;
+        }
+        function showRolePerms(id){
+            const r = _roles.find(x=>x.id===id); if (!r) return;
+            const perms = Array.isArray(r.permissions)?r.permissions:[];
+            const tags = perms.includes('*') ? '<span class="tag all">Toutes les permissions</span>' : perms.map(p=>`<span class="tag">${esc(p)}</span>`).join(' ') || 'Aucune';
+            openModal(`<h3>${esc(r.name)} — permissions</h3><p class="hint">${esc(r.description||'')}</p><div style="display:flex;flex-wrap:wrap;gap:6px">${tags}</div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Fermer</button></div>`);
+        }
+        function exportRolesCsv(){
+            const rows = [['Rôle','Clé','Type','Admins','Permissions','Description']].concat(
+                _roles.map(r => [r.name, r.key, r.is_system?'Système':'Personnalisé', r.admin_count||0,
+                    (Array.isArray(r.permissions)&&r.permissions.includes('*'))?'*':(r.permissions||[]).join(' '), (r.description||'').replace(/\n/g,' ')]));
+            const csv = rows.map(row => row.map(c => { let s=String(c==null?'':c); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }).join(',')).join('\r\n');
+            const blob = new Blob([csv], {type:'text/csv'}); const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href=url; a.download='roles.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+            toast('Export téléchargé', 'ok');
         }
 
         // Create (no id) or edit a custom role. System roles: name/description only.
