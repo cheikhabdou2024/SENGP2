@@ -1241,6 +1241,55 @@ export class AdminService {
     return { data: rows.rows, pagination: { page, limit, total, totalPages: Helpers.calculateTotalPages(total, limit) } };
   }
 
+  // ---------- Broadcast ----------
+  /** Send a notification to a user segment. Returns the number of recipients. */
+  static async sendBroadcast(adminId: string, params: { audience: string; title: string; message: string }) {
+    const { audience, title, message } = params;
+    if (!title || !title.trim() || !message || !message.trim()) throw new Error('title and message are required');
+    let seg = 'deleted_at IS NULL';
+    if (['expediteur', 'gp', 'admin'].includes(audience)) seg += ` AND user_type = '${audience}'`;
+    else if (['verified', 'pending', 'suspended'].includes(audience)) seg += ` AND status = '${audience}'`;
+    else if (audience && audience !== 'all') throw new Error('Invalid audience');
+    const r = await pool.query(
+      `INSERT INTO notifications (user_id, notification_type, title, message)
+       SELECT id, 'system_alert', $1, $2 FROM users WHERE ${seg}`,
+      [title.trim(), message.trim()]
+    );
+    return { recipients: r.rowCount || 0, audience: audience || 'all' };
+  }
+
+  // ---------- Platform settings ----------
+  static SETTING_DEFAULTS: Record<string, any> = {
+    commission_pct: Number(process.env.PLATFORM_COMMISSION_PERCENTAGE) || 10,
+    insurance_pct: Number(process.env.INSURANCE_FEE_PERCENTAGE) || 2,
+    min_withdrawal: Number(process.env.MIN_WITHDRAWAL_AMOUNT) || 5000,
+    supported_countries: ['Sénégal', 'France', 'USA', 'Canada', 'Maroc', 'Côte d\'Ivoire', 'Mali'],
+  };
+
+  static async getSettings() {
+    const r = await pool.query('SELECT key, value, updated_at FROM platform_setting');
+    const stored: Record<string, any> = {};
+    r.rows.forEach((row: any) => { stored[row.key] = row.value; });
+    const settings: Record<string, any> = {};
+    for (const k of Object.keys(this.SETTING_DEFAULTS)) settings[k] = (k in stored) ? stored[k] : this.SETTING_DEFAULTS[k];
+    return settings;
+  }
+
+  static async updateSettings(data: any, adminId: string) {
+    const allowed = Object.keys(this.SETTING_DEFAULTS);
+    const keys = Object.keys(data || {}).filter(k => allowed.includes(k));
+    if (keys.length === 0) throw new Error('No valid settings provided');
+    for (const k of keys) {
+      await pool.query(
+        `INSERT INTO platform_setting (key, value, updated_by, updated_at)
+         VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
+         ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_by = EXCLUDED.updated_by, updated_at = CURRENT_TIMESTAMP`,
+        [k, JSON.stringify(data[k]), adminId]
+      );
+    }
+    return this.getSettings();
+  }
+
   /**
    * One-time bootstrap: promote an existing user to ADMIN using a shared secret.
    * Guarded by ADMIN_BOOTSTRAP_SECRET (so it cannot be abused without the secret).

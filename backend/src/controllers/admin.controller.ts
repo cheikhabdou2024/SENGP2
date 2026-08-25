@@ -542,6 +542,30 @@ export class AdminController {
     } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
   }
 
+  // Broadcast
+  static async broadcast(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const r = await AdminService.sendBroadcast(req.user!.id, req.body);
+      void logAdminAction({ req, action: 'broadcast.send', entityType: 'notification', description: req.body.title, metadata: { audience: req.body.audience, recipients: r.recipients } });
+      ResponseUtil.success(res, r, `Diffusé à ${r.recipients} utilisateur(s)`);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Broadcast failed'); }
+  }
+
+  // Settings
+  static async getSettings(_req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const data = await AdminService.getSettings();
+      ResponseUtil.success(res, data);
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
+  }
+  static async updateSettings(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const data = await AdminService.updateSettings(req.body, req.user!.id);
+      void logAdminAction({ req, action: 'settings.update', entityType: 'settings', metadata: { keys: Object.keys(req.body || {}) } });
+      ResponseUtil.success(res, data, 'Paramètres enregistrés');
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Update failed'); }
+  }
+
   // Bootstrap (public, secret-gated)
   static async bootstrap(req: AuthRequest, res: Response): Promise<void> {
     try {

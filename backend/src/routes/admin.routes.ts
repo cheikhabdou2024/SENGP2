@@ -89,4 +89,11 @@ router.delete('/roles/:id', requirePermission('roles:manage'), AdminController.d
 // Audit log
 router.get('/audit', requirePermission('audit:read'), AdminController.listAudit);
 
+// Broadcast (mass notifications)
+router.post('/broadcast', requirePermission('broadcast:send'), AdminController.broadcast);
+
+// Platform settings
+router.get('/settings', requirePermission('settings:read'), AdminController.getSettings);
+router.put('/settings', requirePermission('settings:write'), AdminController.updateSettings);
+
 export default router;
