@@ -1849,7 +1849,9 @@
                         <div class="feed">
                             <div class="feed-item"><div class="feed-ico" style="background:#38bdf820;color:#38bdf8">🔔</div><div class="feed-main"><div class="feed-title">Notification in-app</div><div class="feed-sub">Chaque destinataire reçoit une notification dans l'application.</div></div></div>
                             <div class="feed-item"><div class="feed-ico" style="background:#fbbf2420;color:#fbbf24">🎯</div><div class="feed-main"><div class="feed-title">Ciblage</div><div class="feed-sub">Choisissez le segment avant d'envoyer — l'envoi est immédiat et non annulable.</div></div></div>
+                            <div class="feed-item"><div class="feed-ico" style="background:#8b5cf620;color:#8b5cf6">📲</div><div class="feed-main"><div class="feed-title">Push (Web Push / VAPID)</div><div class="feed-sub">Auto-hébergé sur AWS, sans Firebase. Les utilisateurs qui ont installé la PWA et autorisé les notifications reçoivent un push.</div></div></div>
                         </div>
+                        <div class="modal-actions"><button class="btn-cancel" onclick="window.sengpEnablePush && window.sengpEnablePush()">🔔 Activer les notifications sur cet appareil</button></div>
                     </div>
                 </div>`;
         }
@@ -1861,7 +1863,7 @@
             const label = document.getElementById('bcAudience').selectedOptions[0].textContent;
             if (!await confirmDialog(`Envoyer cette notification à « ${label} » ? L'envoi est immédiat.`, { title:'Confirmer la diffusion', confirmLabel:'Envoyer' })) return;
             const { ok, json } = await api('/admin/broadcast', { method:'POST', body: JSON.stringify({ audience, title, message }) });
-            if (ok) { toast(`Diffusé à ${json.data.recipients} utilisateur(s)`, 'ok'); document.getElementById('bcTitle').value=''; document.getElementById('bcMsg').value=''; }
+            if (ok) { toast(`Diffusé à ${json.data.recipients} utilisateur(s)` + (json.data.pushed!=null?` · ${json.data.pushed} push`:''), 'ok'); document.getElementById('bcTitle').value=''; document.getElementById('bcMsg').value=''; }
             else notify(false, '', json);
         }
 

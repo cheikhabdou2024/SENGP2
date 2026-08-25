@@ -1,10 +1,40 @@
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { NotificationService } from '../services/notification.service';
 import { ResponseUtil } from '../utils/response';
+import { getVapidPublicKey, saveSubscription, removeSubscription } from '../utils/webpush';
 import { AuthRequest } from '../types';
 import logger from '../utils/logger';
 
 export class NotificationController {
+  /** Public: the VAPID public key the browser needs to subscribe to Web Push. */
+  static async vapidPublicKey(_req: Request, res: Response): Promise<void> {
+    try {
+      const publicKey = await getVapidPublicKey();
+      ResponseUtil.success(res, { publicKey });
+    } catch (e: any) {
+      logger.error('vapidPublicKey error:', e);
+      ResponseUtil.serverError(res, 'Push not available');
+    }
+  }
+  /** Register the current user's browser push subscription. */
+  static async subscribe(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) { ResponseUtil.unauthorized(res); return; }
+      await saveSubscription(req.user.id, req.body);
+      ResponseUtil.success(res, { subscribed: true }, 'Notifications activées');
+    } catch (e: any) {
+      ResponseUtil.badRequest(res, e.message || 'Subscribe failed');
+    }
+  }
+  /** Remove a push subscription (by endpoint). */
+  static async unsubscribe(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (req.body?.endpoint) await removeSubscription(req.body.endpoint);
+      ResponseUtil.success(res, { unsubscribed: true });
+    } catch (e: any) {
+      ResponseUtil.badRequest(res, e.message || 'Unsubscribe failed');
+    }
+  }
   /**
    * Get current user's notifications
    * GET /api/v1/notifications  and  GET /api/v1/notifications/my-notifications

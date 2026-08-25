@@ -6,6 +6,7 @@ import { NotificationService } from './notification.service';
 import { WalletService } from './wallet.service';
 import { NotificationType } from '../types';
 import { ALL_PERMISSIONS } from '../utils/permissions';
+import { pushToSegment } from '../utils/webpush';
 import logger from '../utils/logger';
 
 /**
@@ -1255,7 +1256,11 @@ export class AdminService {
        SELECT id, 'system_alert', $1, $2 FROM users WHERE ${seg}`,
       [title.trim(), message.trim()]
     );
-    return { recipients: r.rowCount || 0, audience: audience || 'all' };
+    // Best-effort Web Push to subscribed devices in the same segment.
+    let pushed = 0;
+    try { pushed = await pushToSegment(seg, { title: title.trim(), body: message.trim(), url: 'notifications.html' }); }
+    catch (e) { /* pushToSegment already swallows its own errors */ }
+    return { recipients: r.rowCount || 0, pushed, audience: audience || 'all' };
   }
 
   // ---------- Platform settings ----------

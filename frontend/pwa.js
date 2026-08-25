@@ -18,6 +18,46 @@
         });
     }
 
+    // --- Web Push (VAPID, self-hosted sur AWS — sans Firebase) ---
+    function urlB64ToUint8Array(b64) {
+        var pad = '='.repeat((4 - b64.length % 4) % 4);
+        var s = (b64 + pad).replace(/-/g, '+').replace(/_/g, '/');
+        var raw = atob(s); var a = new Uint8Array(raw.length);
+        for (var i = 0; i < raw.length; i++) a[i] = raw.charCodeAt(i);
+        return a;
+    }
+    async function sengpSubscribePush(interactive) {
+        try {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) { if (interactive) alert('Notifications non supportées sur cet appareil.'); return false; }
+            var token = localStorage.getItem('authToken');
+            if (!token) { if (interactive) alert('Connectez-vous d\'abord.'); return false; }
+            var perm = Notification.permission;
+            if (perm === 'default' && interactive) perm = await Notification.requestPermission();
+            if (perm !== 'granted') { if (interactive) alert('Autorisez les notifications pour les activer.'); return false; }
+            var api = window.API_BASE_URL || '/api/v1';
+            var reg = await navigator.serviceWorker.ready;
+            var sub = await reg.pushManager.getSubscription();
+            if (!sub) {
+                var vk = (await (await fetch(api + '/notifications/vapid-public-key')).json()).data.publicKey;
+                sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8Array(vk) });
+            }
+            await fetch(api + '/notifications/subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                body: JSON.stringify(sub)
+            });
+            if (interactive) alert('Notifications activées ✅');
+            return true;
+        } catch (e) { console.warn('Push subscribe failed:', e); if (interactive) alert('Échec de l\'activation des notifications.'); return false; }
+    }
+    window.sengpEnablePush = function () { return sengpSubscribePush(true); };
+    // Auto-abonnement silencieux si déjà autorisé + connecté.
+    if ('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window) {
+        window.addEventListener('load', function () {
+            if (Notification.permission === 'granted' && localStorage.getItem('authToken')) sengpSubscribePush(false);
+        });
+    }
+
     // --- Invite d'installation ---
     var isStandalone =
         (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||

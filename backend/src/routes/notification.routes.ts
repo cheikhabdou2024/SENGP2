@@ -7,8 +7,15 @@ import { createNotificationValidator } from '../validators/notification.validato
 
 const router = Router();
 
-// All notification routes require authentication
+// Public: VAPID public key for Web Push subscription.
+router.get('/vapid-public-key', NotificationController.vapidPublicKey);
+
+// All notification routes below require authentication
 router.use(AuthMiddleware.verifyToken);
+
+// Web Push subscription management
+router.post('/subscribe', NotificationController.subscribe);
+router.post('/unsubscribe', NotificationController.unsubscribe);
 
 // Current user's notifications
 router.get('/my-notifications', NotificationController.getMyNotifications);
