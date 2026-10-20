@@ -855,194 +855,243 @@
         }
 
         /* ============================================
-           ACCOUNT TYPE SCREEN - STYLES
+           PROFILE SELECTION SCREEN (screen 4)
+           Everything (logo, 2 cards, CTA) fits one screen; sizes follow the viewport height.
            ============================================ */
-        .account-type-content {
-            padding: 30px 30px 100px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-y: auto;
-        }
+        .screen4 { background: #07142F; overflow: hidden; }
 
-        .logo-container {
-            margin-bottom: 20px;
-            flex-shrink: 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        .logo-img {
-            width: 140px;
-            height: 140px;
-            object-fit: contain;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 20px rgba(255, 107, 107, 0.2);
-            animation: float 4s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        .header-text {
-            text-align: center;
-            margin-bottom: 25px;
-            flex-shrink: 0;
-        }
-
-        .subtitle {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.6;
-        }
-
-        .account-types {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-bottom: 20px;
-            flex-shrink: 0;
-        }
-
-        .account-card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .account-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255, 107, 107, 0.5);
-            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.2);
-        }
-
-        .account-card.selected {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: #00FF66;
-            box-shadow: 0 15px 35px rgba(0, 255, 102, 0.2), inset 0 0 15px rgba(0, 255, 102, 0.1);
-            transform: translateY(-5px);
-        }
-
-        .account-card.unselected {
-            opacity: 0.4;
-            transform: scale(0.98);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 12px;
-        }
-
-        .card-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            flex-shrink: 0;
-        }
-
-        .sender-icon {
-            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
-            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
-        }
-
-        .carrier-icon {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-        }
-
-        .card-title {
-            flex: 1;
-        }
-
-        .card-title h3 {
-            font-size: 20px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .card-title .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .card-description {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.6;
-            margin-bottom: 16px;
-        }
-
-        .card-features {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .feature-tag {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .check-indicator {
+        .pf-bg { position: absolute; inset: 0; z-index: 0; }
+        .pf-bg img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; }
+        .pf-bg::after {
+            content: "";
             position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 28px;
-            height: 28px;
+            inset: 0;
+            background: linear-gradient(180deg,
+                rgba(7, 20, 47, 0.2) 0%,
+                rgba(7, 20, 47, 0.62) 24%,
+                rgba(7, 20, 47, 0.92) 46%,
+                #07142F 100%);
+        }
+
+        .pf-scroll {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            padding: env(safe-area-inset-top, 0px) 16px 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            color: #F8FAFF;
+        }
+
+        .pf-hero { margin-top: auto; align-self: center; text-align: center; padding-top: 6px; flex-shrink: 0; }
+        .pf-logo {
+            display: block;
+            height: clamp(76px, 15vh, 150px);
+            height: clamp(76px, calc(52dvh - 274px), 190px);
+            width: auto;
+            max-width: 100%;
+            margin: 0 auto;
+            filter: drop-shadow(0 8px 24px rgba(255, 106, 36, 0.25));
+        }
+        .pf-tagline {
+            font-size: 10px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: #C3CEE2;
+            text-shadow: 0 1px 6px rgba(7, 20, 47, 0.9);
+        }
+
+        .pf-heading { text-align: center; margin: clamp(8px, 2dvh, 18px) 0 clamp(14px, 2.6dvh, 26px); flex-shrink: 0; }
+        .pf-title {
+            font-size: 25px;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #F8FAFF;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+        }
+        .pf-title span {
+            background: linear-gradient(90deg, #FF6A24, #FFC247);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: #FFC247;
+        }
+
+        .pf-cards { display: flex; flex-direction: column; gap: clamp(16px, 3dvh, 28px); border: 0; padding: 0; margin: 0; min-width: 0; flex-shrink: 0; }
+
+        .pf-card { display: block; position: relative; cursor: pointer; border-radius: 20px; -webkit-tap-highlight-color: transparent; }
+        .pf-card--sender  { --accent: #12D6C5; --tint: rgba(18, 214, 197, 0.14); --on-accent: #042A2C; --badge: #12D6C5; }
+        .pf-card--carrier { --accent: #FF8B2E; --tint: rgba(255, 139, 46, 0.14); --on-accent: #2A1200; --badge: linear-gradient(90deg, #FF6A24, #FFC247); }
+
+        .pf-radio { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+
+        .pf-card__inner {
+            position: relative;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            grid-template-areas: "icon head";
+            align-items: center;
+            column-gap: 16px;
+            padding: clamp(14px, 2.2dvh, 22px) 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(170, 184, 208, 0.2);
+            background: linear-gradient(160deg, rgba(16, 41, 75, 0.62), rgba(11, 29, 58, 0.8));
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, transform 0.15s ease;
+        }
+        .pf-card:hover .pf-card__inner { border-color: rgba(170, 184, 208, 0.4); }
+        .pf-card:active .pf-card__inner { transform: scale(0.985); }
+        .pf-radio:checked + .pf-card__inner {
+            border-color: var(--accent);
+            background: linear-gradient(160deg, var(--tint), rgba(11, 29, 58, 0.84) 70%);
+            box-shadow: 0 0 0 1px var(--accent), 0 0 28px var(--tint), 0 10px 28px rgba(0, 0, 0, 0.35);
+        }
+        .pf-radio:focus-visible + .pf-card__inner { outline: 2px solid #F8FAFF; outline-offset: 3px; }
+
+        .pf-icon {
+            grid-area: icon;
+            position: relative;
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
+            color: var(--accent);
+            background: radial-gradient(circle at 35% 30%, var(--tint), rgba(255, 255, 255, 0.03) 75%);
+            border: 1px solid var(--tint);
+        }
+        .pf-icon .pf-i { width: 36px; height: 36px; }
+        .pf-icon__badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0B1D3A;
+            border: 1px solid var(--accent);
+        }
+        .pf-icon__badge .pf-i { width: 14px; height: 14px; stroke-width: 2.2; }
+        /* Illustrated icon (supplied artwork carries its own globe + plane badge) */
+        .pf-icon--img { width: 80px; height: 74px; border: 0; background: none; border-radius: 0; }
+        .pf-icon--img img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(255, 139, 46, 0.35)); }
+
+        .pf-card__head { grid-area: head; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding-right: 34px; min-width: 0; }
+        .pf-card__title { font-size: 21px; font-weight: 700; line-height: 1.2; color: #F8FAFF; }
+        .pf-card__desc { font-size: 12.5px; line-height: 1.35; color: #B7C4DB; }
+        .pf-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--on-accent);
+            background: var(--badge);
         }
 
-        .account-card.selected .check-indicator {
-            background: linear-gradient(135deg, #00FF66 0%, #00cc52 100%);
-            border-color: #00FF66;
-            box-shadow: 0 0 15px rgba(0, 255, 102, 0.5);
+
+        .pf-check {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(170, 184, 208, 0.55);
+            color: transparent;
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+        .pf-check .pf-i { width: 14px; height: 14px; stroke-width: 3; }
+        .pf-radio:checked + .pf-card__inner .pf-check {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--on-accent);
+            transform: scale(1.05);
         }
 
-        .check-indicator::before {
-            content: '✓';
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        .pf-cta {
+            position: sticky;
+            bottom: 0;
+            z-index: 2;
+            margin: clamp(16px, 3dvh, 28px) -16px auto;
+            padding: 12px 16px 10px;
+            padding-bottom: calc(10px + var(--pf-banner-h, 0px) + env(safe-area-inset-bottom, 0px));
+            background: linear-gradient(180deg, rgba(7, 20, 47, 0), rgba(7, 20, 47, 0.94) 38%);
+            flex-shrink: 0;
         }
+        .pf-continue {
+            width: 100%;
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 0;
+            border-radius: 18px;
+            font: inherit;
+            font-size: 17px;
+            font-weight: 700;
+            color: #07142F;
+            background: linear-gradient(90deg, #FF6A24, #FFC247);
+            box-shadow: 0 10px 26px rgba(255, 106, 36, 0.35);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.15s ease, filter 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+        }
+        .pf-continue .pf-i { width: 20px; height: 20px; stroke-width: 2.6; }
+        .pf-continue:not(:disabled):active { transform: scale(0.98); filter: brightness(0.94); }
+        .pf-continue:focus-visible { outline: 2px solid #F8FAFF; outline-offset: 3px; }
+        .pf-continue:disabled { color: #8D9BB5; background: #1B2D4D; box-shadow: none; cursor: not-allowed; }
 
-        .account-card.selected .check-indicator::before {
-            opacity: 1;
+        .pf-i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .screen4.active .pf-reveal { animation: pfReveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 70ms + 150ms); }
+        @keyframes pfReveal { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+        @media (max-width: 359px) {
+            .pf-scroll { padding-left: 12px; padding-right: 12px; }
+            .pf-cta { margin-left: -12px; margin-right: -12px; padding-left: 12px; padding-right: 12px; }
+            .pf-title { font-size: 22px; }
+            .pf-card__inner { padding: 10px; column-gap: 10px; }
+            .pf-icon { width: 58px; height: 58px; }
+            .pf-icon--img { width: 66px; height: 61px; }
+            .pf-icon .pf-i { width: 30px; height: 30px; }
+            .pf-card__title { font-size: 18px; }
+        }
+        @media (max-height: 700px) {
+            .pf-heading { margin: 6px 0 8px; }
+            .pf-title { font-size: 22px; }
+        }
+        @media (max-height: 620px) {
+            .pf-tagline { display: none; }
+            .pf-logo { height: 68px; }
+            .pf-card__inner { padding: 10px; }
+        }
+        /* Compact the PWA install banner (pwa.js) while this screen is shown, so it eats less of the viewport */
+        body:has(.screen4.active) #sengp-install-banner {
+            bottom: 8px !important;
+            padding: 8px 12px !important;
+            gap: 10px !important;
+            font-size: 12px !important;
+            line-height: 1.3 !important;
+            border-radius: 14px !important;
+        }
+        body:has(.screen4.active) #sengp-install-banner img { width: 34px !important; height: 34px !important; }
+        body:has(.screen4.active) #sengp-install-banner strong { font-size: 13px !important; }
+        @media (max-height: 520px) {
+            .pf-logo { height: 64px; }
         }
 
         /* ============================================
@@ -1150,57 +1199,6 @@
             box-shadow: 0 12px 28px rgba(255, 107, 107, 0.5);
         }
 
-        .continue-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
-            color: #1a1a2e;
-            border: none;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
-            margin-top: 15px;
-            margin-bottom: 15px;
-            opacity: 0.5;
-            pointer-events: none;
-            flex-shrink: 0;
-        }
-
-        .continue-btn.active {
-            opacity: 1;
-            pointer-events: auto;
-            background: linear-gradient(135deg, #00FF66 0%, #00cc52 100%);
-            box-shadow: 0 8px 25px rgba(0, 255, 102, 0.4);
-            color: #1a1a2e;
-        }
-
-        .continue-btn.active:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(0, 255, 102, 0.5);
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-            flex-shrink: 0;
-        }
-
-        .login-link a {
-            color: #FFE66D;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .login-link a:hover {
-            color: #FF6B6B;
-        }
-
         /* ============================================
            RESPONSIVE DESIGN - ANDROID DEVICES
            ============================================ */
@@ -1290,59 +1288,8 @@
                 padding: 10px 0;
             }
 
-            /* Account Type Cards */
-            .account-type-content {
-                padding: 25px 20px 18px;
-            }
-
-            .logo {
-                width: 70px;
-                height: 70px;
-                font-size: 36px;
-            }
-
-            .header-text {
-                margin-bottom: 20px;
-            }
-
             h1 {
                 font-size: 22px;
-            }
-
-            .subtitle {
-                font-size: 13px;
-            }
-
-            .account-card {
-                padding: 18px;
-            }
-
-            .card-icon {
-                width: 50px;
-                height: 50px;
-                font-size: 26px;
-            }
-
-            .card-title h3 {
-                font-size: 18px;
-            }
-
-            .card-description {
-                font-size: 12px;
-            }
-
-            .feature-tag {
-                font-size: 11px;
-                padding: 5px 10px;
-            }
-
-            .continue-btn {
-                padding: 14px;
-                font-size: 15px;
-            }
-
-            .login-link {
-                font-size: 13px;
             }
 
             /* Bottom navigation */
@@ -1471,16 +1418,6 @@
             .wallet::before {
                 font-size: 60px;
             }
-
-            .account-card {
-                padding: 22px;
-            }
-
-            .card-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 30px;
-            }
         }
 
         /* Landscape orientation adjustments */
@@ -1575,36 +1512,6 @@
                 padding: 10px 18px;
                 font-size: 13px;
             }
-
-            /* Account type adjustments for landscape */
-            .account-type-content {
-                padding: 20px 25px 15px;
-            }
-
-            .logo {
-                width: 60px;
-                height: 60px;
-                font-size: 32px;
-                margin-bottom: 15px;
-            }
-
-            .header-text {
-                margin-bottom: 18px;
-            }
-
-            .account-types {
-                gap: 12px;
-            }
-
-            .account-card {
-                padding: 16px;
-            }
-
-            .continue-btn {
-                padding: 12px;
-                margin-top: 12px;
-                margin-bottom: 12px;
-            }
         }
 
         /* Extra safe area for devices with notch */
@@ -1642,10 +1549,6 @@
         .bottom-nav {
                 padding-bottom: max(30px, env(safe-area-inset-bottom));
             }
-
-            .account-type-content {
-                padding-bottom: max(20px, env(safe-area-inset-bottom));
-            }
         }
 
         /* High DPI screens */
@@ -1678,6 +1581,16 @@
     <script src="pwa.js" defer></script>
 </head>
 <body class="ds">
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <defs>
+            <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+            <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+            <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+            <symbol id="i-package" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></symbol>
+            <symbol id="i-plane" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></symbol>
+            <symbol id="i-truck" viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></symbol>
+        </defs>
+    </svg>
     <div class="mobile-frame">
         <!-- Screens Container -->
         <div class="screens-container">
@@ -1798,77 +1711,66 @@
                  SCREEN 4 - Account Type Selection
                  ============================================ -->
             <div class="screen screen4">
-                <div class="account-type-content">
-                    <div class="logo-container">
-                        <img src="im/sengp-logo.jpg" class="logo-img" alt="SENGP Logo">
+                <div class="pf-bg" aria-hidden="true">
+                    <picture>
+                        <source type="image/webp" srcset="im/sengp-profile-background.webp">
+                        <img src="im/sengp-profile-background.jpg" alt="" width="941" height="1672" decoding="async">
+                    </picture>
+                </div>
+
+                <div class="pf-scroll">
+                    <header class="pf-hero pf-reveal" style="--i:0">
+                        <picture>
+                            <source type="image/webp" srcset="im/sengp-logo.webp">
+                            <img class="pf-logo" src="im/sengp-logo.png" alt="SENGP" width="768" height="475" decoding="async">
+                        </picture>
+                        <p class="pf-tagline">Vos colis, notre engagement</p>
+                    </header>
+
+                    <div class="pf-heading pf-reveal" style="--i:1">
+                        <h2 class="pf-title" id="pfTitle">Choisissez votre <span>profil</span></h2>
                     </div>
 
-                    <div class="header-text">
-                        <h1>Choisissez votre profil</h1>
-                        <p class="subtitle">Sélectionnez le type de compte qui correspond à vos besoins</p>
+                    <fieldset class="pf-cards" aria-labelledby="pfTitle">
+                        <label class="pf-card pf-card--sender pf-reveal" style="--i:2">
+                            <input class="pf-radio" type="radio" name="accountType" value="sender">
+                            <span class="pf-card__inner">
+                                <span class="pf-check" aria-hidden="true"><svg class="pf-i"><use href="#i-check"/></svg></span>
+                                <span class="pf-icon" aria-hidden="true">
+                                    <svg class="pf-i"><use href="#i-package"/></svg>
+                                    <span class="pf-icon__badge"><svg class="pf-i"><use href="#i-send"/></svg></span>
+                                </span>
+                                <span class="pf-card__head">
+                                    <span class="pf-card__title">Expéditeur</span>
+                                    <span class="pf-badge">Client</span>
+                                    <span class="pf-card__desc">Envoyez vos colis à l'étranger</span>
+                                </span>
+                            </span>
+                        </label>
+
+                        <label class="pf-card pf-card--carrier pf-reveal" style="--i:3">
+                            <input class="pf-radio" type="radio" name="accountType" value="carrier">
+                            <span class="pf-card__inner">
+                                <span class="pf-check" aria-hidden="true"><svg class="pf-i"><use href="#i-check"/></svg></span>
+                                <span class="pf-icon pf-icon--img" aria-hidden="true">
+                                    <picture>
+                                        <source type="image/webp" srcset="im/sengp-gp-icon.webp">
+                                        <img src="im/sengp-gp-icon.png" alt="" width="256" height="236" decoding="async">
+                                    </picture>
+                                </span>
+                                <span class="pf-card__head">
+                                    <span class="pf-card__title">Gros Porteur</span>
+                                    <span class="pf-badge">GP</span>
+                                    <span class="pf-card__desc">Gagnez de l'argent en voyageant</span>
+                                </span>
+                            </span>
+                        </label>
+                    </fieldset>
+                    <div class="pf-cta pf-reveal" style="--i:4">
+                        <button type="button" class="pf-continue" id="continueBtn" onclick="continueToSignup()" disabled>
+                            Continuer <svg class="pf-i" aria-hidden="true"><use href="#i-arrow"/></svg>
+                        </button>
                     </div>
-
-                    <div class="account-types">
-                        <div class="account-card" onclick="selectAccount('sender', this)">
-                            <div class="check-indicator"></div>
-                            <div class="card-header">
-                                <div class="card-icon sender-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></svg></div>
-                                <div class="card-title">
-                                    <h3>Expéditeur</h3>
-                                    <span class="badge">Client</span>
-                                </div>
-                            </div>
-                            <p class="card-description">
-                                Envoyez vos colis à l'international de manière rapide, économique et sécurisée.
-                            </p>
-                            <div class="card-features">
-                                <div class="feature-tag">
-                                    <span class="feature-icon"><svg class="ic" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
-                                    <span>Prix compétitifs</span>
-                                </div>
-                                <div class="feature-tag">
-                                    <span class="feature-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
-                                    <span>Suivi en temps réel</span>
-                                </div>
-                                <div class="feature-tag">
-                                    <span class="feature-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
-                                    <span>Assurance incluse</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="account-card" onclick="selectAccount('carrier', this)">
-                            <div class="check-indicator"></div>
-                            <div class="card-header">
-                                <div class="card-icon carrier-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
-                                <div class="card-title">
-                                    <h3>Gros Porteur  </h3>
-                                    <span class="badge">GP</span>
-                                </div>
-                            </div>
-                            <p class="card-description">
-                                Gagnez de l'argent en transportant des colis lors de vos voyages internationaux.
-                            </p>
-                            <div class="card-features">
-                                <div class="feature-tag">
-                                    <span class="feature-icon"><svg class="ic" viewBox="0 0 24 24"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></span>
-                                    <span>Revenus extra</span>
-                                </div>
-                                <div class="feature-tag">
-                                    <span class="feature-icon"><svg class="ic" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-                                    <span>Système de notation</span>
-                                </div>
-                                <div class="feature-tag">
-                                    <span class="feature-icon"><svg class="ic" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
-                                    <span>Paiement rapide</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button class="continue-btn" id="continueBtn" onclick="continueToSignup()">
-                        Continuer
-                    </button>
                 </div>
 
 
@@ -2057,32 +1959,43 @@
             goToScreen(4);
         }
 
-        function selectAccount(type, element) {
-            // Remove selection from all cards
-            document.querySelectorAll('.account-card').forEach(card => {
-                card.classList.remove('selected');
-                card.classList.add('unselected');
-            });
+        let isNavigating = false;
 
-            // Add selection to clicked card
-            element.classList.remove('unselected');
-            element.classList.add('selected');
-            
-            // Store selected type
+        // Called when a profile radio changes; the visual state comes from :checked in CSS.
+        function selectAccount(type) {
             selectedAccountType = type;
-
-            // Enable continue button
-            document.getElementById('continueBtn').classList.add('active');
-
-            // Add haptic feedback effect
-            element.style.transform = 'scale(0.98)';
-            setTimeout(() => {
-                element.style.transform = '';
-            }, 100);
+            document.getElementById('continueBtn').disabled = false;
         }
 
+        function syncAccountSelection() {
+            const checked = document.querySelector('input[name="accountType"]:checked');
+            if (checked) selectAccount(checked.value);
+            isNavigating = false;
+        }
+
+        document.querySelectorAll('input[name="accountType"]').forEach(radio => {
+            radio.addEventListener('change', () => selectAccount(radio.value));
+        });
+        // Restores state when the browser re-shows the page (back button / bfcache)
+        window.addEventListener('pageshow', syncAccountSelection);
+
+        // Reserve room under the CTA for the PWA install banner (pwa.js), whatever its height
+        (function trackInstallBanner() {
+            const root = document.documentElement;
+            let ro = null;
+            const sync = () => {
+                const b = document.getElementById('sengp-install-banner');
+                root.style.setProperty('--pf-banner-h', b ? b.offsetHeight + 8 + 'px' : '0px');
+                if (b && !ro && window.ResizeObserver) { ro = new ResizeObserver(sync); ro.observe(b); }
+                if (!b && ro) { ro.disconnect(); ro = null; }
+            };
+            new MutationObserver(sync).observe(document.body, { childList: true });
+            sync();
+        })();
+
         function continueToSignup() {
-            if (selectedAccountType) {
+            if (selectedAccountType && !isNavigating) {
+                isNavigating = true;
                 // Rediriger vers la page de connexion avec le type de compte choisi
                 window.location.href = `connexion.html?type=${selectedAccountType}`;
             }
