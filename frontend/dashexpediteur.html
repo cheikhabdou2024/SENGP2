@@ -5,986 +5,227 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEN GP - Dashboard Expéditeur</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html { background: #F4F8FD; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #F4F8FD;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            color: #0B1D3A;
         }
 
-        .mobile-frame {
-            width: 100%;
-            max-width: 375px;
-            height: 667px;
-            background: linear-gradient(135deg, rgba(15, 12, 41, 0.95) 0%, rgba(48, 43, 99, 0.95) 50%, rgba(36, 36, 62, 0.95) 100%);
-            border-radius: 40px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            overflow: hidden;
-            position: relative;
-        }
+        /* ============================================
+           SENDER HOME
+           ============================================ */
+        .mobile-frame { position: relative; width: 100%; overflow: hidden; background: #F4F8FD; }
+        .hm-screen { position: absolute; inset: 0; background: #F4F8FD; }
+        .hm-i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+        button { font: inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
 
-        .status-bar {
-            height: 44px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .time { color: #fff; }
-        .indicators { 
-            display: flex; 
-            gap: 5px;
-            align-items: center;
-        }
-        .signal, .wifi, .battery { 
-            width: 18px; 
-            height: 12px; 
-            background: rgba(255,255,255,0.8);
-            border-radius: 2px;
-        }
-
-        .content {
-            height: calc(100% - 44px - 85px);
+        .hm-scroll {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+            overflow-x: hidden;
             overflow-y: auto;
-            padding-bottom: 20px;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .content::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .content::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-
-        /* Header Section */
-        .header {
-            padding: 20px 20px 15px;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .greeting {
-            flex: 1;
-        }
-
-        .greeting h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .greeting p {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .profile-avatar {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
-            background-size: cover;
-            background-position: center;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: 800;
-            color: #1a1a2e;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.85);
-            overflow: hidden;
-        }
-
-        .profile-avatar.has-photo span {
-            display: none;
-        }
-
-        .profile-avatar:hover {
-            transform: scale(1.05);
-        }
-
-        /* Search Bar */
-        .search-bar {
-            position: relative;
-        }
-
-        .country-selector {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .country-picker {
-            flex: 1;
-            background: #ffffff;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
-            padding: 12px 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .country-picker:hover {
-            border-color: #4ECDC4;
-            box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.15);
-        }
-
-        .country-picker.active {
-            border-color: #4ECDC4;
-            box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.15);
-        }
-
-        .flag {
-            font-size: 28px;
-            line-height: 1;
-        }
-
-        .country-info {
-            flex: 1;
-            text-align: left;
-        }
-
-        .country-label {
-            font-size: 10px;
-            color: rgba(26, 26, 46, 0.5);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-        }
-
-        .country-name {
-            font-size: 14px;
-            color: #1a1a2e;
-            font-weight: 600;
-        }
-
-        .country-placeholder {
-            font-size: 14px;
-            color: rgba(26, 26, 46, 0.4);
-            font-weight: 500;
-        }
-
-        .arrow-separator {
-            font-size: 20px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* Country Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .country-modal {
-            width: 90%;
-            max-width: 340px;
-            max-height: 500px;
-            background: linear-gradient(135deg, rgba(15, 12, 41, 0.98) 0%, rgba(48, 43, 99, 0.98) 100%);
-            border-radius: 24px;
-            overflow: hidden;
-            animation: slideUp 0.3s ease;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-header {
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .modal-close {
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 20px;
-            color: rgba(255, 255, 255, 0.7);
-            transition: all 0.3s ease;
-        }
-
-        .modal-close:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: #ffffff;
-        }
-
-        .modal-search {
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.03);
-        }
-
-        .modal-search input {
-            width: 100%;
-            padding: 12px 16px;
-            background: #ffffff;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            font-size: 14px;
-            color: #1a1a2e;
-        }
-
-        .modal-search input::placeholder {
-            color: rgba(26, 26, 46, 0.4);
-        }
-
-        .country-list {
-            max-height: 340px;
-            overflow-y: auto;
-            padding: 10px;
-        }
-
-        .country-list::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .country-list::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .country-list::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-        }
-
-        .country-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .country-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #4ECDC4;
-            transform: translateX(5px);
-        }
-
-        .country-item .flag {
-            font-size: 32px;
-        }
-
-        .country-details {
-            flex: 1;
-        }
-
-        .country-item .country-name {
-            font-size: 15px;
-            color: #ffffff;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .country-city {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .search-input {
-            display: none;
-        }
-
-        .search-icon {
-            display: none;
-        }
-
-        /* Stats Cards */
-        .stats-section {
-            padding: 20px 20px 10px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .stat-card.primary {
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(255, 230, 109, 0.15) 100%);
-            border-color: rgba(255, 107, 107, 0.3);
-        }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 500;
-        }
-
-        .stat-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.08);
-            color: rgba(255, 255, 255, 0.85);
-        }
-
-        .stat-card.primary .stat-icon {
-            background: rgba(255, 107, 107, 0.22);
-            color: #FFB199;
-        }
-
-        /* Reusable line-icon (Lucide style, matches bottom nav) */
-        .ico {
-            width: 18px;
-            height: 18px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.9;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            flex: none;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .stat-change {
-            font-size: 11px;
-            color: #4CAF50;
-            font-weight: 600;
-        }
-
-        .stat-change.negative {
-            color: #FF6B6B;
-        }
-
-        /* Quick Actions */
-        .quick-actions {
-            padding: 15px 20px;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .view-all {
-            font-size: 13px;
-            color: #FFE66D;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .view-all:hover {
-            color: #FF6B6B;
-        }
-
-        .action-button {
-            width: 100%;
-            padding: 18px 20px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
-            border: none;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
-            margin-bottom: 15px;
-        }
-
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(255, 107, 107, 0.5);
-        }
-
-        .action-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: #1a1a2e;
-        }
-
-        .action-icon .ico {
-            width: 24px;
-            height: 24px;
-            stroke-width: 2;
-        }
-
-        .action-text {
-            flex: 1;
-            text-align: left;
-        }
-
-        .action-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 2px;
-        }
-
-        .action-subtitle {
-            font-size: 12px;
-            color: rgba(26, 26, 46, 0.7);
-        }
-
-        .action-arrow {
-            font-size: 20px;
-            color: #1a1a2e;
-        }
-
-        /* Recent Shipments */
-        .shipments-section {
-            padding: 15px 20px;
-        }
-
-        .shipment-card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .shipment-card:hover {
-            transform: translateX(5px);
-            background: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .shipment-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .shipment-id {
-            font-size: 14px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .shipment-status {
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .status-in-transit {
-            background: rgba(255, 230, 109, 0.2);
-            color: #FFE66D;
-            border: 1px solid rgba(255, 230, 109, 0.3);
-        }
-
-        .status-delivered {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4CAF50;
-            border: 1px solid rgba(76, 175, 80, 0.3);
-        }
-
-        .status-pending {
-            background: rgba(78, 205, 196, 0.2);
-            color: #4ECDC4;
-            border: 1px solid rgba(78, 205, 196, 0.3);
-        }
-
-        .shipment-route {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .route-location {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 500;
-        }
-
-        .route-location .flag {
-            font-size: 24px;
-        }
-
-        .route-arrow {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .shipment-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .shipment-date {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .shipment-carrier {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .carrier-avatar {
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-        }
-
-        .empty-icon {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 16px;
-            opacity: 0.45;
-        }
-
-        .empty-icon .ico {
-            width: 60px;
-            height: 60px;
-            stroke-width: 1.4;
-        }
-
-        .empty-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 8px;
-        }
-
-        .empty-description {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
-            line-height: 1.6;
-        }
-
-        /* Bottom Navigation */
-        .bottom-nav {
+        .hm-bg { position: absolute; top: 0; left: 0; right: 0; z-index: 0; pointer-events: none; aspect-ratio: 941 / 1672; background: linear-gradient(180deg, #0B1D3A 0%, #2B4A7A 42%, #F4F8FD 88%); }
+        .hm-bg img { display: block; width: 100%; height: auto; }
+        .hm-bg::after {
+            content: "";
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(18, 16, 36, 0.92);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-top: 1px solid rgba(255, 255, 255, 0.07);
-            display: flex;
-            justify-content: space-around;
-            align-items: stretch;
-            padding: 9px 6px calc(9px + env(safe-area-inset-bottom));
-            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            cursor: pointer;
-            flex: 1;
-            position: relative;
-            padding: 6px 0;
-            border-radius: 14px;
-            color: rgba(255, 255, 255, 0.5);
-            transition: color 0.25s ease;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .nav-item.active {
-            color: #FF6B6B;
-        }
-
-        .nav-item.active::after {
-            content: '';
-            position: absolute;
-            top: -9px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 26px;
-            height: 3px;
-            border-radius: 0 0 3px 3px;
-            background: linear-gradient(90deg, #FF6B6B, #FFE66D);
-        }
-
-        .nav-item:not(.active):active {
-            color: rgba(255, 255, 255, 0.85);
-        }
-
-        .nav-icon-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 24px;
-            height: 24px;
-        }
-
-        .nav-icon {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .nav-icon svg {
-            width: 24px;
-            height: 24px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.9;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: transform 0.25s ease;
-        }
-
-        .nav-item.active .nav-icon svg {
-            transform: translateY(-1px) scale(1.06);
-        }
-
-        .nav-label {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.2px;
-            color: inherit;
-        }
-
-        .nav-badge {
-            position: absolute;
-            top: -4px;
-            left: calc(50% + 4px);
-            min-width: 17px;
-            height: 17px;
-            background: #FF4757;
-            border: 1.5px solid #121024;
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            font-weight: 800;
-            color: white;
-            padding: 0 4px;
-            z-index: 2;
-        }
-
-        .nav-badge.hidden {
-            display: none;
-        }
-
-        /* Accessibility - Focus states */
-        .nav-item:focus-visible {
-            outline: 2px solid #FF6B6B;
-            outline-offset: 2px;
-            border-radius: 12px;
-        }
-
-        @media (min-width: 768px) {
-            .nav-label { font-size: 11px; }
-        }
-
-        @media (max-width: 375px) {
-            .mobile-frame {
-                border-radius: 0;
-                height: 100vh;
-            }
-        }
-
-        /* QR Code Button in shipment cards */
-        .shipment-qr-btn {
-            margin-top: 10px;
-            width: 100%;
-            padding: 8px 12px;
-            background: linear-gradient(135deg, rgba(78, 205, 196, 0.2) 0%, rgba(68, 160, 141, 0.2) 100%);
-            border: 1px solid rgba(78, 205, 196, 0.4);
-            border-radius: 10px;
-            color: #4ECDC4;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-        }
-
-        .shipment-qr-btn:hover {
-            background: linear-gradient(135deg, rgba(78, 205, 196, 0.35) 0%, rgba(68, 160, 141, 0.35) 100%);
-        }
-
-        /* QR Modal */
-        .qr-modal-overlay {
-            position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.75);
-            z-index: 1000;
-            display: none;
-            align-items: flex-end;
-            justify-content: center;
-            backdrop-filter: blur(4px);
+            background:
+                linear-gradient(180deg, rgba(7, 20, 47, 0.38) 0%, rgba(7, 20, 47, 0) 26%),
+                linear-gradient(180deg, rgba(7, 20, 47, 0) 22%, rgba(7, 20, 47, 0.5) 38%, rgba(7, 20, 47, 0) 56%),
+                linear-gradient(180deg, rgba(244, 248, 253, 0) 58%, #F4F8FD 100%);
         }
 
-        .qr-modal-overlay.open {
-            display: flex;
+        .hm-page {
+            position: relative;
+            z-index: 1;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: calc(env(safe-area-inset-top, 0px) + 14px) 20px 16px;
         }
 
-        .qr-modal {
-            background: linear-gradient(180deg, #1e1b3a 0%, #16213e 100%);
-            border-radius: 24px 24px 0 0;
-            padding: 24px 20px 36px;
-            width: 100%;
-            max-width: 375px;
-            border-top: 1px solid rgba(255,255,255,0.15);
-        }
+        /* ---- top row ---- */
+        .hm-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+        .hm-brand { display: flex; flex-direction: column; align-items: flex-start; }
+        .hm-logo { display: block; width: clamp(100px, 29vw, 132px); height: auto; filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.45)); }
+        .hm-tagline { margin-top: 2px; font-size: 9px; font-style: italic; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #F8FAFF; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7); }
 
-        .qr-modal-handle {
-            width: 40px;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
-            margin: 0 auto 20px;
-        }
-
-        .qr-modal-title {
-            font-size: 18px;
-            font-weight: 700;
+        .hm-avatar {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            border: 2px solid #F8FAFF;
+            background: #9A6A4F center / cover no-repeat;
             color: #fff;
-            text-align: center;
-            margin-bottom: 4px;
-        }
-
-        .qr-modal-subtitle {
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .qr-code-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 16px;
-        }
-
-        .qr-code-container img {
-            width: 180px;
-            height: 180px;
-            border-radius: 12px;
-            border: 3px solid rgba(78, 205, 196, 0.4);
-            background: #fff;
-            padding: 6px;
-        }
-
-        .qr-loading {
-            width: 180px;
-            height: 180px;
-            border-radius: 12px;
-            border: 3px solid rgba(78, 205, 196, 0.4);
-            background: rgba(255,255,255,0.05);
+            font-size: 20px;
+            font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: rgba(255,255,255,0.5);
-            font-size: 13px;
-        }
-
-        .qr-tracking-badge {
-            text-align: center;
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.06);
-            border-radius: 8px;
-            font-size: 13px;
-            color: rgba(255,255,255,0.8);
-            margin-bottom: 20px;
-            font-family: monospace;
-            letter-spacing: 1px;
-        }
-
-        .qr-instructions {
-            background: rgba(78, 205, 196, 0.08);
-            border: 1px solid rgba(78, 205, 196, 0.2);
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 12px;
-            color: rgba(255,255,255,0.7);
-            line-height: 1.6;
-            margin-bottom: 16px;
-        }
-
-        .btn-whatsapp {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-            border: none;
-            border-radius: 12px;
-            color: #fff;
-            font-size: 14px;
-            font-weight: 700;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
             cursor: pointer;
+        }
+        .hm-avatar.has-photo span { display: none; }
+        .hm-avatar__dot { position: absolute; right: 0; bottom: 1px; width: 13px; height: 13px; border-radius: 50%; background: #22C55E; border: 2px solid #F8FAFF; }
+
+        /* ---- greeting ---- */
+        .hm-greeting { margin-top: clamp(48px, 13.5dvh, 140px); }
+        .hm-greeting h1 { font-size: 30px; font-weight: 800; line-height: 1.15; letter-spacing: -0.3px; color: #F8FAFF; text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5); }
+        .hm-greeting h1 .hm-name { background: linear-gradient(90deg, #F5B335, #E8890C); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: #F5B335; }
+        .hm-greeting p { margin-top: 4px; font-size: 16px; color: #DCE5F3; text-shadow: 0 1px 10px rgba(7, 20, 47, 0.8); }
+
+        /* ---- cards ---- */
+        .hm-card { background: #fff; border-radius: 26px; box-shadow: 0 10px 30px rgba(11, 29, 58, 0.09); }
+
+        .hm-route { margin-top: 16px; padding: 12px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 4px; }
+        .hm-side { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 56px; padding: 4px 2px; border: 0; background: none; text-align: left; cursor: pointer; border-radius: 16px; }
+        .hm-flag { flex-shrink: 0; width: 36px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 30px; line-height: 1; border-radius: 6px; }
+        .hm-side__txt { display: flex; flex-direction: column; min-width: 0; }
+        .hm-label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #6B7A93; }
+        .hm-place { font-size: 15px; font-weight: 700; line-height: 1.2; color: #0B1D3A; overflow-wrap: break-word; hyphens: auto; -webkit-hyphens: auto; }
+        .hm-place--ph { color: #0B1D3A; }
+        .hm-side .hm-i { width: 18px; height: 18px; color: #8A97AD; margin-left: auto; }
+        .hm-swap { width: 42px; height: 42px; flex-shrink: 0; border: 0; border-radius: 50%; background: #EDF1F7; color: #0B1D3A; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.25s ease, background 0.2s ease; }
+        .hm-swap .hm-i { width: 22px; height: 22px; }
+        .hm-swap:active { transform: rotate(180deg) scale(0.94); background: #E1E8F2; }
+
+        .hm-stats { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hm-stat { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; align-items: start; padding: 16px 14px; border: 0; border-radius: 24px; text-align: left; cursor: pointer; transition: transform 0.15s ease; }
+        .hm-stat:active { transform: scale(0.985); }
+        .hm-stat--active { background: #FFF4E4; color: #E8890C; }
+        .hm-stat--done { background: #EAF3FF; color: #0B2A55; }
+        .hm-stat__icon { width: 40px; height: 40px; margin-top: 4px; }
+        .hm-stat__body { display: flex; flex-direction: column; min-width: 0; padding-right: 14px; }
+        .hm-stat__label { font-size: 13px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: #6B7A93; }
+        .hm-stat__value { font-size: 36px; font-weight: 800; line-height: 1.1; color: #0B1D3A; }
+        .hm-stat__note { font-size: 14px; color: #6B7A93; }
+        .hm-stat__go { position: absolute; top: 14px; right: 12px; width: 18px; height: 18px; color: #8A97AD; }
+
+        .hm-create { margin-top: 14px; width: 100%; min-height: 58px; padding: 0 22px; display: flex; align-items: center; justify-content: space-between; gap: 14px; border: 0; border-radius: 999px; background: linear-gradient(180deg, #16355F 0%, #0B1D3A 100%); color: #F8FAFF; font-size: 19px; font-weight: 700; box-shadow: 0 14px 30px rgba(11, 29, 58, 0.32); cursor: pointer; transition: transform 0.15s ease, filter 0.2s ease; }
+        .hm-create:active { transform: scale(0.985); filter: brightness(1.12); }
+        .hm-create__label { flex: 1; text-align: center; }
+        .hm-create .hm-i { width: 30px; height: 30px; }
+        .hm-create .hm-create__go { width: 24px; height: 24px; stroke-width: 2.4; }
+
+        /* ---- last shipment ---- */
+        .hm-sec-head { margin: 18px 2px 8px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+        .hm-sec-head h2 { font-size: 21px; font-weight: 800; letter-spacing: -0.2px; color: #0B1D3A; }
+        .view-all { display: inline-flex; align-items: center; gap: 2px; min-height: 36px; font-size: 16px; font-weight: 700; color: #C26A00; text-decoration: none; }
+        .view-all .hm-i { width: 18px; height: 18px; }
+
+        .hm-ship { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 12px; text-decoration: none; color: inherit; transition: transform 0.15s ease; }
+        .hm-ship:active { transform: scale(0.99); }
+        .hm-ship__thumb { width: 68px; height: 68px; border-radius: 16px; background: linear-gradient(160deg, #F7F1E8, #F1E7D8); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .hm-ship__thumb img { width: 86%; height: auto; display: block; }
+        .hm-ship__main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+        .hm-ship__top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px 10px; }
+        .hm-ship__code { font-size: 15px; font-weight: 800; color: #0B1D3A; overflow-wrap: anywhere; }
+        .hm-pill { padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+        .hm-pill--pending { background: #E3F0FF; color: #1767C8; }
+        .hm-pill--transit { background: #FFF0D6; color: #A25A00; }
+        .hm-pill--done { background: #DDF6E6; color: #137A3D; }
+        .hm-ship__route { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 6px; font-size: 15px; color: #3E4C66; }
+        .hm-ship__route .hm-i { width: 18px; height: 18px; color: #4B9BEA; }
+        .hm-ship__route .hm-flag-sm { font-size: 18px; line-height: 1; }
+        .hm-ship__meta { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 6px; font-size: 14px; color: #6B7A93; }
+        .hm-ship__meta .hm-i { width: 18px; height: 18px; }
+        .hm-ship__go { width: 20px; height: 20px; color: #8A97AD; }
+
+        .hm-empty { padding: 28px 20px; text-align: center; }
+        .hm-empty .hm-i { width: 40px; height: 40px; color: #E8890C; }
+        .hm-empty__title { margin-top: 8px; font-size: 18px; font-weight: 800; }
+        .hm-empty__desc { margin-top: 4px; font-size: 15px; color: #6B7A93; }
+
+        /* ---- bottom navigation ---- */
+        .hm-nav {
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            z-index: 20;
+            height: calc(68px + env(safe-area-inset-bottom, 0px));
+            padding: 0 6px env(safe-area-inset-bottom, 0px);
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 10px;
-            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.96);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid #E3EAF3;
+            box-shadow: 0 -8px 24px rgba(11, 29, 58, 0.06);
+        }
+        .hm-nav__item { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; background: none; color: #6B7A93; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .hm-nav__item[aria-current="page"] { color: #D97706; font-weight: 700; }
+        .hm-nav__icon { position: relative; display: flex; }
+        .hm-nav__icon .hm-i { width: 26px; height: 26px; }
+        .hm-badge { position: absolute; top: -6px; right: -9px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #EF4444; color: #fff; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; }
+        .hm-badge.hidden { display: none; }
+
+        /* ---- country modal ---- */
+        .modal-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; background: rgba(7, 20, 47, 0.55); opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .hm-sheet { width: 100%; max-width: 480px; max-height: 82dvh; display: flex; flex-direction: column; background: #fff; border-radius: 26px 26px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); transform: translateY(24px); transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+        .modal-overlay.show .hm-sheet { transform: none; }
+        .hm-sheet__head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 8px; }
+        .hm-sheet__head h3 { font-size: 19px; font-weight: 800; color: #0B1D3A; }
+        .hm-close { width: 40px; height: 40px; border: 0; border-radius: 50%; background: #EDF1F7; color: #0B1D3A; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .hm-close .hm-i { width: 20px; height: 20px; }
+        .hm-search { padding: 4px 20px 10px; }
+        .ds .hm-search input, .ds .hm-search input:focus { width: 100%; min-height: 48px; padding: 0 16px; border: 1px solid #D5DEEA; border-radius: 14px; background: #F4F8FD; color: #0B1D3A; font: inherit; font-size: 16px; outline: none; box-shadow: none; }
+        .ds .hm-search input:focus { border-color: #E8890C; box-shadow: 0 0 0 3px rgba(232, 137, 12, 0.18); }
+        .hm-list { overflow-y: auto; padding: 0 12px 14px; }
+        .hm-country { width: 100%; display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 6px 10px; border: 0; border-radius: 14px; background: none; text-align: left; cursor: pointer; }
+        .hm-country:active, .hm-country:hover { background: #F1F5FA; }
+        .hm-country .hm-flag { font-size: 28px; }
+        .hm-country__name { font-size: 16px; font-weight: 700; color: #0B1D3A; }
+        .hm-country__city { font-size: 14px; color: #6B7A93; }
+
+        .hm-side:focus-visible, .hm-swap:focus-visible, .hm-stat:focus-visible, .hm-create:focus-visible, .hm-ship:focus-visible,
+        .hm-avatar:focus-visible, .view-all:focus-visible, .hm-nav__item:focus-visible, .hm-close:focus-visible, .hm-country:focus-visible { outline: 2px solid #E8890C; outline-offset: 2px; }
+
+        .hm-reveal { animation: hmReveal 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 70ms + 60ms); }
+        @keyframes hmReveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+        @media (prefers-reduced-motion: reduce) {
+            .hm-reveal { animation: none; }
+            * { transition-duration: 0.01ms !important; }
         }
 
-        .btn-whatsapp:hover { opacity: 0.9; }
-
-        .btn-close-qr {
-            width: 100%;
-            padding: 12px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 12px;
-            color: rgba(255,255,255,0.7);
-            font-size: 14px;
-            cursor: pointer;
+        @media (max-width: 400px) {
+            .hm-side > .hm-i { display: none; }
+            .hm-flag { width: 30px; font-size: 26px; }
+            .hm-place { font-size: 14px; }
+            .hm-stat { column-gap: 8px; }
+            .hm-stat__icon { width: 30px; height: 30px; margin-top: 2px; }
+            .hm-stat__label { font-size: 12px; letter-spacing: 0.03em; }
+        }
+        @media (max-width: 359px) {
+            .hm-page { padding-left: 14px; padding-right: 14px; }
+            .hm-greeting h1 { font-size: 26px; }
+            .hm-route { padding: 12px 10px; }
+            .hm-flag { width: 34px; font-size: 26px; }
+            .hm-place { font-size: 13px; }
+            .hm-flag { width: 30px; }
+            .hm-stat { padding: 14px 10px; column-gap: 8px; }
+            .hm-stat__icon { width: 32px; height: 32px; }
+            .hm-stat__value { font-size: 30px; }
+            .hm-create { font-size: 17px; padding: 0 16px; }
+            .hm-ship { gap: 10px; padding: 12px 10px; }
+            .hm-ship__thumb { width: 60px; height: 60px; }
         }
 
-            /* sengp-responsive-override */
+        /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
-        </style>
+    </style>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -1000,177 +241,156 @@
 </head>
 <body class="ds">
     <div class="mobile-frame">
+        <div class="hm-screen">
 
-        <!-- Content -->
-        <div class="content">
-            <!-- Header -->
-            <div class="header">
-                <div class="header-top">
-                    <div class="greeting">
-                        <h1>Chargement... 👋</h1>
+            <!-- Scrollable content (pull-to-refresh attaches to .content) -->
+            <div class="content hm-scroll">
+                <div class="hm-bg" aria-hidden="true">
+                    <picture>
+                        <source type="image/webp" srcset="im/sengp-home-background.webp">
+                        <img src="im/sengp-home-background.jpg" alt="" width="941" height="1672" decoding="async">
+                    </picture>
+                </div>
+
+                <div class="hm-page">
+                    <!-- Top row: brand + avatar -->
+                    <header class="hm-top hm-reveal" style="--i:0">
+                        <div class="hm-brand">
+                            <picture>
+                                <source type="image/webp" srcset="im/sengp-logo.webp">
+                                <img class="hm-logo" src="im/sengp-logo.png" alt="SENGP" width="768" height="475" decoding="async">
+                            </picture>
+                            <p class="hm-tagline">Vos colis, notre engagement</p>
+                        </div>
+                        <button type="button" class="hm-avatar" id="profileAvatar" onclick="openProfile()" aria-label="Mon profil">
+                            <span id="profileInitials">EX</span>
+                            <i class="hm-avatar__dot" aria-hidden="true"></i>
+                        </button>
+                    </header>
+
+                    <!-- Greeting -->
+                    <div class="hm-greeting hm-reveal" style="--i:1">
+                        <h1 id="greetingTitle">Bonjour 👋</h1>
                         <p>Prêt à envoyer un colis ?</p>
                     </div>
-                    <div class="profile-avatar" id="profileAvatar" onclick="openProfile()">
-                        <span id="profileInitials">EX</span>
-                    </div>
-                </div>
 
-                <!-- Search Bar / Country Selector -->
-                <div class="search-bar">
-                    <div class="country-selector">
-                        <div class="country-picker" id="departureSelector" onclick="openCountryModal('departure')">
-                            <span class="flag" id="departureFlag">🇸🇳</span>
-                            <div class="country-info">
-                                <div class="country-label">Départ</div>
-                                <div class="country-name" id="departureName">Dakar, Sénégal</div>
-                            </div>
-                        </div>
-                        
-                        <span class="arrow-separator">→</span>
-                        
-                        <div class="country-picker" id="arrivalSelector" onclick="openCountryModal('arrival')">
-                            <span class="flag" id="arrivalFlag">🌍</span>
-                            <div class="country-info">
-                                <div class="country-label">Arrivée</div>
-                                <div class="country-placeholder" id="arrivalName">Choisir destination</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    <!-- Route selector -->
+                    <section class="hm-card hm-route hm-reveal" style="--i:2" aria-label="Itinéraire">
+                        <button type="button" class="hm-side" id="departureSelector" onclick="openCountryModal('departure')">
+                            <span class="hm-flag" id="departureFlag">🇸🇳</span>
+                            <span class="hm-side__txt">
+                                <span class="hm-label">Départ</span>
+                                <span class="hm-place" id="departureName">Dakar, Sénégal</span>
+                            </span>
+                            <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
 
-            <!-- Stats Section -->
-            <div class="stats-section">
-                <div class="stats-grid">
-                    <div class="stat-card primary" style="cursor:pointer" onclick="location.href='envois.html?status=active'">
-                        <div class="stat-header">
-                            <span class="stat-label">En cours</span>
-                            <span class="stat-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span>
-                        </div>
-                        <div class="stat-value">0</div>
-                        <div class="stat-change">Chargement...</div>
-                    </div>
+                        <button type="button" class="hm-swap" onclick="swapRoute()" aria-label="Inverser départ et arrivée">
+                            <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>
+                        </button>
 
-                    <div class="stat-card" style="cursor:pointer" onclick="location.href='envois.html?status=delivered'">
-                        <div class="stat-header">
-                            <span class="stat-label">Livrés</span>
-                            <span class="stat-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21.8 10A10 10 0 1 1 17 3.34"/><path d="m9 11 3 3L22 4"/></svg></span>
-                        </div>
-                        <div class="stat-value">0</div>
-                        <div class="stat-change">Chargement...</div>
-                    </div>
+                        <button type="button" class="hm-side" id="arrivalSelector" onclick="openCountryModal('arrival')">
+                            <span class="hm-flag" id="arrivalFlag">🌍</span>
+                            <span class="hm-side__txt">
+                                <span class="hm-label">Arrivée</span>
+                                <span class="hm-place hm-place--ph" id="arrivalName">Choisir destination</span>
+                            </span>
+                            <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                        </button>
+                    </section>
 
-                    <div class="stat-card" style="cursor:pointer" onclick="location.href='envois.html'">
-                        <div class="stat-header">
-                            <span class="stat-label">Dépenses</span>
-                            <span class="stat-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span>
-                        </div>
-                        <div class="stat-value">0</div>
-                        <div class="stat-change">Chargement...</div>
-                    </div>
+                    <!-- Stats -->
+                    <section class="hm-stats hm-reveal" style="--i:3" aria-label="Mes envois">
+                        <button type="button" class="hm-stat hm-stat--active" onclick="location.href='envois.html?status=active'">
+                            <svg class="hm-i hm-stat__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
+                            <span class="hm-stat__body">
+                                <span class="hm-stat__label">En cours</span>
+                                <span class="hm-stat__value" id="statActiveValue">0</span>
+                                <span class="hm-stat__note" id="statActiveNote">Chargement…</span>
+                            </span>
+                            <svg class="hm-i hm-stat__go" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                        </button>
 
-                    <div class="stat-card" style="cursor:pointer" onclick="location.href='envois.html'">
-                        <div class="stat-header">
-                            <span class="stat-label">Économies</span>
-                            <span class="stat-icon"><svg class="ico" viewBox="0 0 24 24"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg></span>
+                        <button type="button" class="hm-stat hm-stat--done" onclick="location.href='envois.html?status=delivered'">
+                            <svg class="hm-i hm-stat__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+                            <span class="hm-stat__body">
+                                <span class="hm-stat__label">Livrés</span>
+                                <span class="hm-stat__value" id="statDeliveredValue">0</span>
+                                <span class="hm-stat__note" id="statDeliveredNote">Chargement…</span>
+                            </span>
+                            <svg class="hm-i hm-stat__go" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                        </button>
+                    </section>
+
+                    <!-- Create shipment -->
+                    <button type="button" class="hm-create hm-reveal" style="--i:4" onclick="createShipment()">
+                        <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                        <span class="hm-create__label">Créer un envoi</span>
+                        <svg class="hm-i hm-create__go" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+
+                    <!-- Last shipment -->
+                    <section class="hm-reveal" style="--i:5" aria-labelledby="lastShipmentTitle">
+                        <div class="hm-sec-head">
+                            <h2 id="lastShipmentTitle">Mon dernier envoi</h2>
+                            <a href="envois.html" class="view-all" onclick="viewAllShipments(event)">Voir tout <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a>
                         </div>
-                        <div class="stat-value">0</div>
-                        <div class="stat-change">vs services classiques</div>
-                    </div>
+                        <!-- Rendered by displayMissions() -->
+                        <div id="shipmentsList"></div>
+                    </section>
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <div class="section-header">
-                    <h2 class="section-title">Action rapide</h2>
-                </div>
-
-                <button class="action-button" onclick="createShipment()">
-                    <div class="action-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div>
-                    <div class="action-text">
-                        <div class="action-title">Créer un envoi</div>
-                        <div class="action-subtitle">Trouvez un GP pour votre colis</div>
-                    </div>
-                    <div class="action-arrow">→</div>
+            <!-- Bottom navigation -->
+            <nav class="hm-nav" aria-label="Navigation principale">
+                <button type="button" class="hm-nav__item" aria-current="page" onclick="navigateTo('home')">
+                    <span class="hm-nav__icon"><svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span>
+                    <span>Accueil</span>
                 </button>
-            </div>
+                <button type="button" class="hm-nav__item" onclick="navigateTo('reclamation')">
+                    <span class="hm-nav__icon"><svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 4 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>
+                    <span>Réclamation</span>
+                </button>
+                <button type="button" class="hm-nav__item" onclick="navigateTo('tracking')">
+                    <span class="hm-nav__icon"><svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+                    <span>Suivi</span>
+                </button>
+                <button type="button" class="hm-nav__item" onclick="navigateTo('notifications')">
+                    <span class="hm-nav__icon">
+                        <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+                        <span class="hm-badge hidden" id="expNotifBadge"></span>
+                    </span>
+                    <span>Notifications</span>
+                </button>
+                <button type="button" class="hm-nav__item" onclick="navigateTo('profile')">
+                    <span class="hm-nav__icon"><svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+                    <span>Profil</span>
+                </button>
+            </nav>
 
-            <!-- Recent Shipments -->
-            <div class="shipments-section">
-                <div class="section-header">
-                    <h2 class="section-title">Mes envois récents</h2>
-                    <a href="#" class="view-all" onclick="viewAllShipments()">Voir tout</a>
+            <!-- Country selection sheet -->
+            <div class="modal-overlay" id="countryModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+                <div class="hm-sheet">
+                    <div class="hm-sheet__head">
+                        <h3 id="modalTitle">Choisir le pays de départ</h3>
+                        <button type="button" class="hm-close" onclick="closeCountryModal()" aria-label="Fermer"><svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+                    </div>
+                    <div class="hm-search">
+                        <input type="text" id="countrySearch" placeholder="Rechercher un pays..." oninput="filterCountries()" autocomplete="off" aria-label="Rechercher un pays">
+                    </div>
+                    <div class="hm-list" id="countryList"></div>
                 </div>
-
-                <!-- Les missions seront chargées ici dynamiquement par JavaScript -->
-            </div>
-        </div>
-
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <div class="nav-item active" onclick="navigateTo('home')" tabindex="0" role="button" aria-label="Accueil">
-                <div class="nav-icon-wrapper">
-                    <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
-                </div>
-                <div class="nav-label">Accueil</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('reclamation')" tabindex="0" role="button" aria-label="Réclamation">
-                <div class="nav-icon-wrapper">
-                    <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10.3 4 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
-                </div>
-                <div class="nav-label">Réclamation</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('tracking')" tabindex="0" role="button" aria-label="Suivi">
-                <div class="nav-icon-wrapper">
-                    <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-                </div>
-                <div class="nav-label">Suivi</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('notifications')" tabindex="0" role="button" aria-label="Notifications">
-                <div class="nav-icon-wrapper">
-                    <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
-                    <div class="nav-badge hidden" id="expNotifBadge"></div>
-                </div>
-                <div class="nav-label">Notifications</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil">
-                <div class="nav-icon-wrapper">
-                    <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
-                </div>
-                <div class="nav-label">Profil</div>
-            </div>
-        </div>
-
-        <!-- Country Selection Modal -->
-        <div class="modal-overlay" id="countryModal">
-            <div class="country-modal">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="modalTitle">Choisir le pays de départ</h3>
-                    <button class="modal-close" onclick="closeCountryModal()">×</button>
-                </div>
-
-                <div class="modal-search">
-                    <input 
-                        type="text" 
-                        id="countrySearch" 
-                        placeholder="Rechercher un pays..."
-                        oninput="filterCountries()"
-                    />
-                </div>
-
-                <div class="country-list" id="countryList"></div>
             </div>
         </div>
     </div>
-
     <script>
         // Configuration de l'API
         const API_BASE_URL = window.API_BASE_URL;
+
+        // Escape text coming from the API before it is placed in HTML
+        function esc(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
 
         // Récupérer le token d'authentification
         function getAuthToken() {
@@ -1180,49 +400,37 @@
         // Récupérer les données utilisateur
         function getUserData() {
             const userData = localStorage.getItem('userData');
-            return userData ? JSON.parse(userData) : null;
+            try { return userData ? JSON.parse(userData) : null; } catch (e) { return null; }
         }
 
         // Charger les données du dashboard au chargement de la page
         async function loadDashboardData() {
-            console.log('=== DASHBOARD LOADING ===');
-
-            // Afficher tout le contenu de localStorage
-            console.log('LocalStorage keys:', Object.keys(localStorage));
-            console.log('All localStorage items:');
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                console.log(`  ${key}:`, localStorage.getItem(key));
-            }
-
             const token = getAuthToken();
             const userData = getUserData();
 
-            console.log('Retrieved Token:', token ? 'Present (' + token.substring(0, 20) + '...)' : 'Missing');
-            console.log('Retrieved User Data:', userData);
-
             if (!token || !userData) {
                 // Rediriger vers la page de connexion si pas authentifié
-                console.error('Authentication failed!');
-                console.error('  Token present:', !!token);
-                console.error('  User data present:', !!userData);
                 alert('Session expirée. Veuillez vous reconnecter.');
                 window.location.href = 'connexion.html';
                 return;
             }
 
-            console.log('Authentication OK - Loading dashboard data...');
-
             // Mettre à jour le nom de l'utilisateur
             const firstName = userData.first_name || userData.firstName || 'Utilisateur';
-            document.querySelector('.greeting h1').textContent = `Bonjour, ${firstName} 👋`;
+            const title = document.getElementById('greetingTitle');
+            title.textContent = 'Bonjour, ';
+            const nameEl = document.createElement('span');
+            nameEl.className = 'hm-name';
+            nameEl.textContent = firstName;
+            title.appendChild(nameEl);
+            title.appendChild(document.createTextNode(' 👋'));
 
             // Avatar : photo de profil Google si disponible, sinon initiales.
             const avatar = document.getElementById('profileAvatar');
             const initialsEl = document.getElementById('profileInitials');
             const photo = userData.profile_photo_url;
             if (photo) {
-                avatar.style.backgroundImage = `url("${photo}")`;
+                avatar.style.backgroundImage = `url(${JSON.stringify(String(photo))})`;
                 avatar.classList.add('has-photo');
             } else {
                 const a = (userData.first_name || '').charAt(0);
@@ -1232,17 +440,14 @@
             }
 
             // Masque les pastilles dont la valeur est 0 ou vide.
-            document.querySelectorAll('.nav-badge').forEach((bdg) => {
+            document.querySelectorAll('.hm-badge').forEach((bdg) => {
                 const n = parseInt((bdg.textContent || '').trim(), 10);
                 bdg.classList.toggle('hidden', !n);
             });
 
             try {
-                // Charger les missions de l'utilisateur
-                await loadUserMissions(token);
-
-                // Charger les statistiques
-                await loadUserStats(token);
+                // Missions + statistiques (une seule requête)
+                await loadMissions(token);
                 // Pastille de notifications non lues (compte réel)
                 await loadUnreadNotifCount(token);
             } catch (error) {
@@ -1265,8 +470,8 @@
             } catch (e) {}
         }
 
-        // Charger les missions de l'utilisateur
-        async function loadUserMissions(token) {
+        // Charger les missions de l'utilisateur, puis en déduire l'affichage et les statistiques
+        async function loadMissions(token) {
             try {
                 const response = await fetch(`${API_BASE_URL}/missions/my-missions`, {
                     method: 'GET',
@@ -1283,166 +488,98 @@
                 const result = await response.json();
                 const missions = result.data || [];
 
-                // Mettre à jour l'affichage des missions
                 displayMissions(missions);
+                updateStatsDisplay(calculateStats(missions));
             } catch (error) {
                 console.error('Erreur:', error);
-                // Afficher les données mock en cas d'erreur
-                console.log('Utilisation des données mock');
-            }
-        }
-
-        // Charger les statistiques de l'utilisateur
-        async function loadUserStats(token) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/missions/my-missions`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Erreur lors du chargement des statistiques');
-                }
-
-                const result = await response.json();
-                const missions = result.data || [];
-
-                // Calculer les statistiques
-                const stats = calculateStats(missions);
-
-                // Mettre à jour l'affichage des statistiques
-                updateStatsDisplay(stats);
-            } catch (error) {
-                console.error('Erreur:', error);
+                document.getElementById('statActiveNote').textContent = 'Indisponible';
+                document.getElementById('statDeliveredNote').textContent = 'Indisponible';
             }
         }
 
         // Calculer les statistiques à partir des missions
         function calculateStats(missions) {
-            const stats = {
-                enCours: 0,
-                livres: 0,
-                depenses: 0,
-                economisees: 0
-            };
+            const stats = { enCours: 0, livres: 0 };
 
             missions.forEach(mission => {
-                const status = mission.status.toLowerCase();
+                const status = String(mission.status || '').toLowerCase();
 
                 if (['pending', 'matched', 'accepted', 'picked_up', 'in_transit', 'in_customs', 'out_for_delivery'].includes(status)) {
                     stats.enCours++;
                 } else if (status === 'delivered') {
                     stats.livres++;
                 }
-
-                if (mission.final_price || mission.offered_price) {
-                    stats.depenses += parseFloat(mission.final_price || mission.offered_price);
-                }
             });
-
-            // Estimation des économies (30% par rapport aux services classiques)
-            stats.economisees = Math.round(stats.depenses * 0.3);
 
             return stats;
         }
 
         // Mettre à jour l'affichage des statistiques
         function updateStatsDisplay(stats) {
-            const statCards = document.querySelectorAll('.stat-card');
+            document.getElementById('statActiveValue').textContent = stats.enCours;
+            document.getElementById('statActiveNote').textContent =
+                stats.enCours === 0 ? 'Aucune mission' : (stats.enCours === 1 ? 'Mission active' : 'Missions actives');
 
-            // En cours
-            statCards[0].querySelector('.stat-value').textContent = stats.enCours;
-            statCards[0].querySelector('.stat-change').textContent = stats.enCours > 0 ? 'Missions actives' : 'Aucune mission';
-
-            // Livrés
-            statCards[1].querySelector('.stat-value').textContent = stats.livres;
-            statCards[1].querySelector('.stat-change').textContent = stats.livres > 0 ? 'Missions terminées' : 'Aucune livraison';
-
-            // Dépenses
-            statCards[2].querySelector('.stat-value').textContent = formatPrice(stats.depenses);
-            statCards[2].querySelector('.stat-change').textContent = stats.depenses > 0 ? 'Total dépensé' : 'Aucune dépense';
-
-            // Économies
-            statCards[3].querySelector('.stat-value').textContent = formatPrice(stats.economisees);
+            document.getElementById('statDeliveredValue').textContent = stats.livres;
+            document.getElementById('statDeliveredNote').textContent =
+                stats.livres === 0 ? 'Aucune livraison' : (stats.livres === 1 ? 'Mission terminée' : 'Missions terminées');
         }
 
-        // Formater le prix
-        function formatPrice(amount) {
-            if (amount >= 1000000) {
-                return Math.round(amount / 1000000) + 'M';
-            } else if (amount >= 1000) {
-                return Math.round(amount / 1000) + 'k';
-            }
-            return Math.round(amount);
-        }
-
-        // Afficher les missions
+        // Afficher le dernier envoi
         function displayMissions(missions) {
-            const shipmentsSection = document.querySelector('.shipments-section');
-            const existingCards = shipmentsSection.querySelectorAll('.shipment-card');
-
-            // Supprimer les cartes existantes
-            existingCards.forEach(card => card.remove());
+            const list = document.getElementById('shipmentsList');
+            list.textContent = '';
 
             if (missions.length === 0) {
-                // Afficher un message si aucune mission
-                const emptyState = document.createElement('div');
-                emptyState.className = 'empty-state';
-                emptyState.innerHTML = `
-                    <div class="empty-icon"><svg class="ico" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div>
-                    <div class="empty-title">Aucun envoi</div>
-                    <div class="empty-description">Vous n'avez pas encore créé d'envoi. Commencez dès maintenant !</div>
-                `;
-                shipmentsSection.appendChild(emptyState);
+                list.innerHTML = `
+                    <div class="hm-card hm-empty">
+                        <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
+                        <div class="hm-empty__title">Aucun envoi</div>
+                        <div class="hm-empty__desc">Vous n'avez pas encore créé d'envoi. Commencez dès maintenant !</div>
+                    </div>`;
                 return;
             }
 
-            // Afficher les 3 dernières missions
-            const recentMissions = missions.slice(0, 3);
-            recentMissions.forEach(mission => {
-                const card = createMissionCard(mission);
-                shipmentsSection.appendChild(card);
-            });
+            // Le plus récent (la liste arrive triée du plus récent au plus ancien)
+            list.appendChild(createMissionCard(missions[0]));
         }
 
         // Créer une carte de mission
         function createMissionCard(mission) {
-            const card = document.createElement('div');
-            card.className = 'shipment-card';
-            card.style.cursor = 'pointer';
-            card.onclick = () => viewShipmentDetails(mission.id);
+            const card = document.createElement('a');
+            card.className = 'hm-card hm-ship';
+            card.href = `detailenvoi.html?id=${encodeURIComponent(mission.id)}`;
 
             const statusClass = getStatusClass(mission.status);
             const statusText = getStatusText(mission.status);
             const departureFlag = getCountryFlag(mission.departure_country);
             const arrivalFlag = getCountryFlag(mission.arrival_country);
+            const gpHtml = mission.gp_id ? '<span>· GP assigné</span>' : '';
 
             card.innerHTML = `
-                <div class="shipment-header">
-                    <span class="shipment-id">${mission.mission_code || mission.tracking_number}</span>
-                    <span class="shipment-status ${statusClass}">${statusText}</span>
-                </div>
-                <div class="shipment-route">
-                    <div class="route-location">
-                        <span class="flag">${departureFlag}</span>
-                        <span>${mission.departure_city}</span>
-                    </div>
-                    <span class="route-arrow">→</span>
-                    <div class="route-location">
-                        <span class="flag">${arrivalFlag}</span>
-                        <span>${mission.arrival_city}</span>
-                    </div>
-                </div>
-                <div class="shipment-footer">
-                    <span class="shipment-date">Créé: ${formatDate(mission.created_at)}</span>
-                    <div class="shipment-carrier">
-                        ${mission.gp_id ? `<div class="carrier-avatar">GP</div><span>GP assigné</span>` : `<span style="color: rgba(255, 255, 255, 0.5);">Recherche GP...</span>`}
-                    </div>
-                </div>
-            `;
+                <span class="hm-ship__thumb" aria-hidden="true">
+                    <picture>
+                        <source type="image/webp" srcset="im/sengp-package-thumb.webp">
+                        <img src="im/sengp-package-thumb.png" alt="" width="372" height="282" loading="lazy" decoding="async">
+                    </picture>
+                </span>
+                <span class="hm-ship__main">
+                    <span class="hm-ship__top">
+                        <span class="hm-ship__code">${esc(mission.mission_code || mission.tracking_number)}</span>
+                        <span class="hm-pill ${statusClass}">${esc(statusText)}</span>
+                    </span>
+                    <span class="hm-ship__route">
+                        <span class="hm-flag-sm">${departureFlag}</span><span>${esc(mission.departure_city)}</span>
+                        <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        <span class="hm-flag-sm">${arrivalFlag}</span><span>${esc(mission.arrival_city)}</span>
+                    </span>
+                    <span class="hm-ship__meta">
+                        <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+                        <span>${esc(formatDate(mission.created_at))}</span>
+                        ${gpHtml}
+                    </span>
+                </span>
+                <svg class="hm-i hm-ship__go" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>`;
 
             return card;
         }
@@ -1450,18 +587,18 @@
         // Obtenir la classe CSS pour le statut
         function getStatusClass(status) {
             const statusMap = {
-                'pending': 'status-pending',
-                'matched': 'status-pending',
-                'accepted': 'status-in-transit',
-                'picked_up': 'status-in-transit',
-                'in_transit': 'status-in-transit',
-                'in_customs': 'status-in-transit',
-                'out_for_delivery': 'status-in-transit',
-                'delivered': 'status-delivered',
-                'cancelled': 'status-pending',
-                'disputed': 'status-pending'
+                'pending': 'hm-pill--pending',
+                'matched': 'hm-pill--pending',
+                'accepted': 'hm-pill--transit',
+                'picked_up': 'hm-pill--transit',
+                'in_transit': 'hm-pill--transit',
+                'in_customs': 'hm-pill--transit',
+                'out_for_delivery': 'hm-pill--transit',
+                'delivered': 'hm-pill--done',
+                'cancelled': 'hm-pill--pending',
+                'disputed': 'hm-pill--pending'
             };
-            return statusMap[status.toLowerCase()] || 'status-pending';
+            return statusMap[String(status || '').toLowerCase()] || 'hm-pill--pending';
         }
 
         // Obtenir le texte du statut en français
@@ -1478,7 +615,7 @@
                 'cancelled': 'Annulé',
                 'disputed': 'Litige'
             };
-            return statusMap[status.toLowerCase()] || status;
+            return statusMap[String(status || '').toLowerCase()] || status || '';
         }
 
         // Obtenir le drapeau du pays
@@ -1506,8 +643,8 @@
         // Formater la date
         function formatDate(dateString) {
             const date = new Date(dateString);
-            const options = { day: 'numeric', month: 'short', year: 'numeric' };
-            return date.toLocaleDateString('fr-FR', options);
+            if (isNaN(date.getTime())) return '';
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
         }
 
         // Database des pays avec drapeaux et villes principales
@@ -1554,48 +691,43 @@
         function openCountryModal(type) {
             currentSelector = type;
             const modal = document.getElementById('countryModal');
-            const modalTitle = document.getElementById('modalTitle');
-            
-            if (type === 'departure') {
-                modalTitle.textContent = 'Choisir le pays de départ';
-            } else {
-                modalTitle.textContent = 'Choisir le pays d\'arrivée';
-            }
+            document.getElementById('modalTitle').textContent =
+                type === 'departure' ? 'Choisir le pays de départ' : 'Choisir le pays d\'arrivée';
 
             renderCountryList(countries);
             modal.classList.add('show');
         }
 
         function closeCountryModal() {
-            const modal = document.getElementById('countryModal');
-            modal.classList.remove('show');
+            document.getElementById('countryModal').classList.remove('show');
             document.getElementById('countrySearch').value = '';
         }
 
         function renderCountryList(countriesToShow) {
             const countryList = document.getElementById('countryList');
-            countryList.innerHTML = '';
+            countryList.textContent = '';
 
             countriesToShow.forEach(country => {
-                const item = document.createElement('div');
-                item.className = 'country-item';
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'hm-country';
                 item.onclick = () => selectCountry(country);
-                
+
                 item.innerHTML = `
-                    <span class="flag">${country.flag}</span>
-                    <div class="country-details">
-                        <div class="country-name">${country.name}</div>
-                        <div class="country-city">${country.city}</div>
-                    </div>
+                    <span class="hm-flag">${country.flag}</span>
+                    <span>
+                        <span class="hm-country__name">${esc(country.name)}</span><br>
+                        <span class="hm-country__city">${esc(country.city)}</span>
+                    </span>
                 `;
-                
+
                 countryList.appendChild(item);
             });
         }
 
         function filterCountries() {
             const searchValue = document.getElementById('countrySearch').value.toLowerCase();
-            const filtered = countries.filter(country => 
+            const filtered = countries.filter(country =>
                 country.name.toLowerCase().includes(searchValue) ||
                 country.city.toLowerCase().includes(searchValue)
             );
@@ -1603,67 +735,54 @@
         }
 
         function selectCountry(country) {
-            if (currentSelector === 'departure') {
-                document.getElementById('departureFlag').textContent = country.flag;
-                document.getElementById('departureName').textContent = `${country.city}, ${country.name}`;
-                document.getElementById('departureName').classList.remove('country-placeholder');
-                document.getElementById('departureName').classList.add('country-name');
-            } else {
-                document.getElementById('arrivalFlag').textContent = country.flag;
-                document.getElementById('arrivalName').textContent = `${country.city}, ${country.name}`;
-                document.getElementById('arrivalName').classList.remove('country-placeholder');
-                document.getElementById('arrivalName').classList.add('country-name');
-            }
+            const prefix = currentSelector === 'departure' ? 'departure' : 'arrival';
+            document.getElementById(prefix + 'Flag').textContent = country.flag;
+            const nameEl = document.getElementById(prefix + 'Name');
+            nameEl.textContent = `${country.city}, ${country.name}`;
+            nameEl.classList.remove('hm-place--ph');
 
             closeCountryModal();
-
-            // Alert pour montrer la sélection
-            setTimeout(() => {
-                alert(`Pays sélectionné: ${country.flag} ${country.name}\nVille: ${country.city}`);
-            }, 300);
         }
 
-        // Close modal when clicking outside
+        // Swap departure and arrival (opens the destination picker if none is chosen yet)
+        function swapRoute() {
+            const arrivalName = document.getElementById('arrivalName');
+            if (arrivalName.classList.contains('hm-place--ph')) {
+                openCountryModal('arrival');
+                return;
+            }
+            const depFlag = document.getElementById('departureFlag');
+            const depName = document.getElementById('departureName');
+            const arrFlag = document.getElementById('arrivalFlag');
+            [depFlag.textContent, arrFlag.textContent] = [arrFlag.textContent, depFlag.textContent];
+            [depName.textContent, arrivalName.textContent] = [arrivalName.textContent, depName.textContent];
+        }
+
+        // Close the sheet when clicking outside it, or with Escape
         document.getElementById('countryModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeCountryModal();
             }
         });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeCountryModal();
+        });
+
         function createShipment() {
             // Rediriger vers la page de création d'envoi
             window.location.href = 'creenvoi.html';
         }
 
-        function viewShipmentDetails(id) {
-            if (!id) return;
-            window.location.href = `detailenvoi.html?id=${id}`;
-        }
-
-        function viewAllShipments() {
-            if (typeof event !== 'undefined' && event) event.preventDefault();
+        function viewAllShipments(e) {
+            if (e) e.preventDefault();
             window.location.href = 'envois.html';
         }
 
         function openProfile() {
-            alert('Ouvrir le profil\n\nInformations personnelles, paramètres, etc.');
-        }
-
-        function showSearchResults() {
-            // Fonction désactivée car remplacée par le sélecteur de pays
+            window.location.href = 'profile.html';
         }
 
         function navigateTo(section) {
-            // Remove active class from all items
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-
-            // Add active class to clicked item
-            if (event && event.currentTarget) {
-                event.currentTarget.classList.add('active');
-            }
-
-            // Navigate to the appropriate page
             const pages = {
                 'home': 'dashexpediteur.html',
                 'reclamation': 'reclamation.html',
@@ -1672,36 +791,18 @@
                 'profile': 'profile.html'
             };
 
+            // Already on the home page: just go back to the top
+            if (section === 'home') {
+                document.querySelector('.hm-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
             if (pages[section]) {
-                // Don't reload if already on the same page
-                if (section !== 'home') {
-                    window.location.href = pages[section];
-                }
+                window.location.href = pages[section];
             }
         }
 
-        // Keyboard navigation support
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.click();
-                }
-            });
-        });
-
-        // Animation on load
-        window.addEventListener('load', () => {
-            document.querySelector('.content').style.opacity = '0';
-
-            setTimeout(() => {
-                document.querySelector('.content').style.transition = 'opacity 0.8s ease';
-                document.querySelector('.content').style.opacity = '1';
-
-                // Charger les données du dashboard
-                loadDashboardData();
-            }, 100);
-        });
+        // Charger les données du dashboard
+        window.addEventListener('load', loadDashboardData);
     </script>
     <script src="ptr.js"></script>
     <script src="deeplink.js"></script>
