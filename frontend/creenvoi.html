@@ -11,218 +11,180 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --cr-navy: #0B1D3A;
+            --cr-muted: #6B7A93;
+            --cr-line: #E3EAF3;
+            --cr-blue: #2F6BFF;
+            --cr-grad: linear-gradient(90deg, #06B6F4 0%, #3B6FFA 55%, #9B5BF5 100%);
+        }
+
+        html { background: #F4F8FD; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #F4F8FD;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            color: var(--cr-navy);
         }
 
         .mobile-frame {
+            position: relative;
             width: 100%;
-            max-width: 375px;
-            height: 667px;
-            background: linear-gradient(135deg, rgba(15, 12, 41, 0.95) 0%, rgba(48, 43, 99, 0.95) 50%, rgba(36, 36, 62, 0.95) 100%);
-            border-radius: 40px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
             overflow: hidden;
-            position: relative;
+            background: #F4F8FD;
         }
+        /* theme.css paints a dark gradient on .mobile-frame (!important): cover it */
+        .mobile-frame::before { content: ""; position: absolute; inset: 0; z-index: 0; background: #F4F8FD; }
 
-        .status-bar {
-            height: 44px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
+        .cr-i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+        button { font: inherit; -webkit-tap-highlight-color: transparent; }
 
-        .time { color: #fff; }
-        .indicators { 
-            display: flex; 
-            gap: 5px;
-            align-items: center;
-        }
-        .signal, .wifi, .battery { 
-            width: 18px; 
-            height: 12px; 
-            background: rgba(255,255,255,0.8);
-            border-radius: 2px;
-        }
-
-        /* Header */
-        .header {
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .back-btn {
-            width: 36px;
-            height: 36px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateX(-3px);
-        }
-
-        .header-title h1 {
-            font-size: 20px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .header-title p {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: 2px;
-        }
-
-        /* Progress Stepper */
-        .progress-container {
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .stepper {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            margin-bottom: 15px;
-        }
-
-        .stepper::before {
-            content: '';
+        /* ---- scroll area (hero + steps) ---- */
+        .cr-scroll {
             position: absolute;
-            top: 18px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.1);
-            z-index: 0;
-        }
-
-        .stepper-progress {
-            position: absolute;
-            top: 18px;
-            left: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #FF6B6B 0%, #FFE66D 100%);
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1;
-            box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
-        }
-
-        .step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .step-circle {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.5);
-            transition: all 0.4s ease;
-        }
-
-        .step.active .step-circle {
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
-            border-color: #FFE66D;
-            color: #1a1a2e;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.5);
-            transform: scale(1.1);
-        }
-
-        .step.completed .step-circle {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-            border-color: #4CAF50;
-            color: white;
-        }
-
-        .step-label {
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .step.active .step-label {
-            color: #FFE66D;
-        }
-
-        .step.completed .step-label {
-            color: #4CAF50;
-        }
-
-        /* Content */
-        .content {
-            height: calc(100% - 44px - 77px - 90px - 80px);
+            top: 0; left: 0; right: 0;
+            bottom: calc(92px + var(--cr-banner-h, 0px) + env(safe-area-inset-bottom, 0px));
+            overflow-x: hidden;
             overflow-y: auto;
-            padding: 20px;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+            background: #F4F8FD;
+            z-index: 1;
+            scrollbar-width: none;
         }
+        .cr-scroll::-webkit-scrollbar { display: none; }
 
-        .content::-webkit-scrollbar {
-            width: 4px;
+        /* ---- hero: photo + header + stepper ---- */
+        .cr-hero { position: relative; height: calc(164px + env(safe-area-inset-top, 0px)); overflow: hidden; background: linear-gradient(180deg, #0B1D3A, #2B4A7A); }
+        .cr-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% 46%; }
+        .cr-hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(7, 20, 47, 0.55) 0%, rgba(7, 20, 47, 0.18) 55%, rgba(7, 20, 47, 0.38) 100%),
+                linear-gradient(180deg, rgba(244, 248, 253, 0) 78%, #F4F8FD 100%);
         }
+        .cr-hero__in { position: relative; z-index: 2; max-width: 480px; margin: 0 auto; padding: calc(env(safe-area-inset-top, 0px) + 16px) 18px 0; }
 
-        .content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
+        .header { display: flex; align-items: center; gap: 14px; }
+        /* theme.css gives every .header a translucent bar: not wanted on the photo */
+        .ds .cr-hero .header { padding: 0; background: none; border: 0; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
+        .back-btn { width: 46px; height: 46px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(255, 255, 255, 0.2); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff; cursor: pointer; }
+        .back-btn .cr-i { width: 22px; height: 22px; }
+        .back-btn:active { transform: scale(0.95); }
+        .header-title h1 { font-size: 26px; font-weight: 800; line-height: 1.1; letter-spacing: -0.3px; color: #fff; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55); }
+        .header-title p { margin-top: 3px; font-size: 15px; color: #E8EEF8; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6); }
 
-        .step-content {
-            display: none;
-            animation: fadeInUp 0.5s ease;
-        }
+        .stepper { position: relative; margin-top: 14px; display: grid; grid-template-columns: repeat(4, 1fr); }
+        .stepper::before { content: ""; position: absolute; top: 16px; left: 12.5%; right: 12.5%; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, 0.38); }
+        .stepper-progress { position: absolute; top: 16px; left: 12.5%; height: 3px; border-radius: 2px; background: linear-gradient(90deg, #5AA0FF, #2F6BFF); box-shadow: 0 0 10px rgba(47, 107, 255, 0.7); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; }
+        .step { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .step-circle { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #fff; background: rgba(120, 130, 150, 0.55); border: 2px solid rgba(255, 255, 255, 0.7); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); transition: all 0.35s ease; }
+        .step.active .step-circle { background: var(--cr-blue); border-color: #fff; box-shadow: 0 0 0 4px rgba(47, 107, 255, 0.35), 0 6px 16px rgba(47, 107, 255, 0.5); }
+        .step.completed .step-circle { background: var(--cr-blue); border-color: #fff; }
+        .step-label { font-size: 13px; font-weight: 600; text-align: center; color: rgba(255, 255, 255, 0.9); text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); }
+        .step.active .step-label { color: #8EC1FF; font-weight: 700; }
+        .step.completed .step-label { color: #fff; }
 
-        .step-content.active {
-            display: block;
-        }
-
+        /* ---- steps ---- */
+        .content { position: relative; z-index: 3; max-width: 480px; margin: -8px auto 0; padding: 0 14px 22px; }
+        .step-content { display: none; animation: fadeInUp 0.5s ease; }
+        .step-content.active { display: block; }
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Steps 2-4 keep their dark styling inside a panel until they get their own mockups */
+        .step-content.dark-panel { padding: 18px 16px 6px; border-radius: 26px; color: #fff; background: linear-gradient(160deg, #15183C 0%, #1D2152 55%, #191C44 100%); box-shadow: 0 14px 34px rgba(11, 29, 58, 0.28); }
+
+        .dark-panel input::placeholder, .dark-panel textarea::placeholder { color: rgba(255, 255, 255, 0.5); }
+
+        /* ---- step 1 cards ---- */
+        .cr-card { margin-bottom: 14px; padding: 16px; border: 0; background: #fff; border-radius: 26px; box-shadow: 0 10px 30px rgba(11, 29, 58, 0.07); min-width: 0; }
+        .cr-card h2, .cr-card legend { font-size: 19px; font-weight: 800; letter-spacing: -0.2px; color: var(--cr-navy); }
+        .cr-card legend { float: left; width: 100%; margin-bottom: 12px; padding: 0; }
+        .cr-card legend + * { clear: both; }
+        .cr-req { color: #E5484D; }
+        .cr-sub { margin-top: 2px; font-size: 14px; line-height: 1.4; color: var(--cr-muted); }
+
+        /* photo card */
+        .pc-top { display: flex; align-items: center; gap: 12px; margin: -2px 0 12px; }
+        .pc-box { display: block; width: clamp(120px, 38vw, 160px); height: auto; flex-shrink: 0; margin: -6px 0 -8px -6px; }
+        .pc-top h2 { font-size: 21px; }
+        .pc-top p { margin-top: 4px; font-size: 15px; line-height: 1.4; color: var(--cr-muted); }
+        .pc-drop { position: relative; width: 100%; min-height: 128px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 1.5px dashed #AFC3E3; border-radius: 20px; background: #F5F9FF; cursor: pointer; text-align: center; transition: background 0.2s ease, border-color 0.2s ease; }
+        .pc-drop:hover { background: #EEF5FF; }
+        .pc-drop:active { transform: scale(0.99); }
+        .pc-drop__ic { width: 56px; height: 56px; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #E1ECFF; color: var(--cr-blue); }
+        .pc-drop__ic .cr-i { width: 28px; height: 28px; }
+        .pc-drop__t { font-size: 18px; font-weight: 700; color: var(--cr-blue); }
+        .pc-drop__s { font-size: 14px; color: var(--cr-muted); }
+        .pc-drop.is-error { border-color: #F2A9A3; background: #FFF6F5; }
+        .pc-drop.is-analyzing { pointer-events: none; opacity: 0.85; }
+        .pc-drop.is-analyzing .pc-drop__ic { animation: crSpin 1s linear infinite; }
+        @keyframes crSpin { to { transform: rotate(360deg); } }
+        .pc-drop[hidden], .pc-alert[hidden], .pc-preview[hidden], .pc-danger[hidden] { display: none; }
+
+        .pc-alert { margin-top: 12px; display: flex; gap: 12px; padding: 14px; border-radius: 18px; background: #FFF1F0; border: 1px solid #FFC9C4; }
+        .pc-alert__ic { width: 34px; height: 34px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #E5484D; color: #fff; }
+        .pc-alert__ic .cr-i { width: 20px; height: 20px; stroke-width: 2.6; }
+        .pc-alert strong { display: block; font-size: 16px; font-weight: 800; color: #B42318; }
+        .pc-alert p { margin-top: 3px; font-size: 14px; line-height: 1.45; color: #7A271A; }
+        .pc-alert .pc-tip { margin-top: 6px; font-weight: 600; }
+
+        .pc-preview { position: relative; border-radius: 20px; overflow: hidden; background: #0B1D3A; }
+        .pc-preview img { display: block; width: 100%; max-height: 260px; object-fit: cover; }
+        .pc-ok { position: absolute; left: 10px; bottom: 10px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 8px; border-radius: 999px; background: rgba(21, 128, 61, 0.92); color: #fff; font-size: 13px; font-weight: 700; }
+        .pc-ok .cr-i { width: 18px; height: 18px; stroke-width: 2.8; }
+        .pc-change { position: absolute; right: 10px; bottom: 10px; min-height: 38px; padding: 0 14px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.95); color: var(--cr-navy); font-size: 13px; font-weight: 700; cursor: pointer; }
+        .remove-media-btn { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(11, 29, 58, 0.7); color: #fff; font-size: 22px; line-height: 1; cursor: pointer; }
+
+        /* package type grid */
+        .ty-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+        .ty { position: relative; display: block; cursor: pointer; margin: 0; }
+        .ty input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; padding: 0; border: 0; }
+        .ty__in { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 2px; height: 100%; min-height: 96px; padding: 8px 3px 8px; border: 1.5px solid var(--cr-line); border-radius: 16px; background: #fff; text-align: center; transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, transform 0.15s ease; }
+        .ty:active .ty__in { transform: scale(0.97); }
+        .ty__in img { display: block; width: 100%; max-width: 64px; height: 46px; object-fit: contain; mix-blend-mode: multiply; }
+        .ty__t { font-size: 11.5px; font-weight: 700; line-height: 1.2; letter-spacing: -0.1px; color: var(--cr-navy); overflow-wrap: break-word; hyphens: auto; -webkit-hyphens: auto; }
+        .ty__ck { position: absolute; top: 5px; right: 5px; width: 17px; height: 17px; display: flex; align-items: center; justify-content: center; border: 1.5px solid #C9D3E3; border-radius: 6px; background: #fff; color: transparent; transition: all 0.2s ease; }
+        .ty__ck .cr-i { width: 11px; height: 11px; stroke-width: 3.2; }
+        .ty input:checked + .ty__in { border: 2px solid var(--cr-blue); background: #F3F7FF; box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.12); padding: 7.5px 2.5px 7.5px; }
+        .ty input:checked + .ty__in .ty__ck { background: var(--cr-blue); border-color: var(--cr-blue); color: #fff; }
+        .ty input:focus-visible + .ty__in { outline: 2px solid var(--cr-blue); outline-offset: 2px; }
+        .ty[hidden] { display: none; }
+        .ty-more { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; min-height: 44px; margin-top: 8px; border: 0; background: none; color: var(--cr-blue); font-size: 15px; font-weight: 700; cursor: pointer; }
+        .ty-more .cr-i { width: 18px; height: 18px; transition: transform 0.2s ease; }
+        .ty-more[aria-expanded="true"] .cr-i { transform: rotate(180deg); }
+        .pc-danger { margin-top: 10px; padding: 12px 14px; border-radius: 16px; background: #FFF6E5; border: 1px solid #FFE0A3; font-size: 13.5px; line-height: 1.45; color: #7A4B00; }
+
+        /* weight stepper */
+        .wt { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid var(--cr-line); border-radius: 20px; }
+        .wt__ic { width: 40px; height: 40px; color: #4B5B78; }
+        .wt__btn { width: 48px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: #E9EEF5; color: #4B5B78; cursor: pointer; transition: transform 0.15s ease, background 0.2s ease; }
+        .wt__btn .cr-i { width: 24px; height: 24px; stroke-width: 2.6; }
+        .wt__btn:active:not(:disabled) { transform: scale(0.92); }
+        .wt__btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .wt__btn--plus { background: var(--cr-blue); color: #fff; box-shadow: 0 8px 18px rgba(47, 107, 255, 0.35); }
+        .wt__val { flex: 1; min-width: 0; display: flex; align-items: baseline; justify-content: center; gap: 6px; padding: 6px 8px; border-radius: 14px; background: #F4F8FD; }
+        input.wt__in, input.wt__in:focus { width: 72px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; outline: none; text-align: center; font-size: 30px; font-weight: 800; color: var(--cr-navy); -moz-appearance: textfield; appearance: textfield; }
+        input.wt__in::placeholder { color: #B6C2D6; font-weight: 700; }
+        input.wt__in::-webkit-outer-spin-button, input.wt__in::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .wt__unit { font-size: 18px; font-weight: 600; color: var(--cr-muted); }
+
+        /* description (text / audio) on a light card */
+        .cr-card .description-container textarea { border: 1.5px solid #D5DEEA; background: #F8FAFD; color: var(--cr-navy); }
+        .cr-card .char-counter { color: var(--cr-muted); }
+        .cr-card #charCount { color: var(--cr-blue); }
+        .cr-card .voice-btn { background: linear-gradient(135deg, #2F6BFF, #7C5CFF); box-shadow: 0 6px 14px rgba(47, 107, 255, 0.35); }
+        .cr-card .voice-icon { filter: grayscale(1) brightness(3); }
+
+        .cr-card:focus-within { box-shadow: 0 10px 30px rgba(11, 29, 58, 0.07); }
+        .cr-focus:focus-visible, .pc-drop:focus-visible, .wt__btn:focus-visible, .ty-more:focus-visible, .back-btn:focus-visible, .btn:focus-visible { outline: 2px solid var(--cr-blue); outline-offset: 2px; }
 
         .form-group {
             margin-bottom: 20px;
@@ -1789,65 +1751,157 @@
         /* Bottom Actions */
         .bottom-actions {
             position: absolute;
-            bottom: 0;
+            bottom: var(--cr-banner-h, 0px);
             left: 0;
             right: 0;
-            padding: 15px 20px 20px;
-            background: linear-gradient(180deg, rgba(15, 12, 41, 0.95) 0%, rgba(26, 22, 48, 0.98) 100%);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 20;
+            padding: 22px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+            background: linear-gradient(180deg, rgba(244, 248, 253, 0) 0%, #F4F8FD 42%);
         }
 
         .button-group {
             display: flex;
-            gap: 12px;
+            gap: 10px;
+            max-width: 480px;
+            margin: 0 auto;
         }
 
         .btn {
             flex: 1;
-            padding: 15px;
-            border-radius: 14px;
-            font-size: 15px;
-            font-weight: 700;
+            min-height: 58px;
+            padding: 0 18px;
+            border-radius: 999px;
+            font-size: 18px;
+            font-weight: 800;
             border: none;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.15s ease, filter 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
             font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
+
+        .ds .bottom-actions .btn { border-radius: 999px; letter-spacing: 0; }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
+            flex: 0 0 34%;
+            background: #fff;
+            color: var(--cr-navy);
+            border: 1.5px solid #D5DEEA;
+            box-shadow: 0 6px 16px rgba(11, 29, 58, 0.06);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
-            color: #1a1a2e;
-            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+            background: var(--cr-grad);
+            color: #fff;
+            box-shadow: 0 12px 28px rgba(59, 111, 250, 0.38);
+        }
+        .btn-primary .cr-i { width: 24px; height: 24px; stroke-width: 2.6; }
+
+        .btn:active:not(:disabled) { transform: scale(0.985); filter: brightness(0.96); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* The PWA install banner (pwa.js) is fixed at the bottom: keep it compact and keep the action bar above it */
+        #sengp-install-banner {
+            bottom: 8px !important;
+            padding: 8px 12px !important;
+            gap: 10px !important;
+            font-size: 12px !important;
+            line-height: 1.3 !important;
+            border-radius: 14px !important;
+        }
+        #sengp-install-banner img { width: 34px !important; height: 34px !important; }
+        #sengp-install-banner strong { font-size: 13px !important; }
+
+        @media (max-width: 359px) {
+            .content { padding-left: 10px; padding-right: 10px; }
+            .cr-card { padding: 12px; border-radius: 22px; }
+            .ty-grid { gap: 6px; }
+            .ty__t { font-size: 10.5px; }
+            .header-title h1 { font-size: 22px; }
+            .step-label { font-size: 12px; }
+            .pc-box { width: 104px; }
+            .wt { gap: 6px; padding: 8px; }
+            .wt__ic { display: none; }
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+        /* ============================================
+           STEP 2 (destinataire / retrait) + stepper + sheets
+           ============================================ */
+
+        /* stepper: green = done, orange = current (latest mockup) */
+        .cr-hero { height: calc(176px + env(safe-area-inset-top, 0px)); }
+        .cr-hero img { object-position: 72% 40%; }
+        .stepper::before { background: rgba(255, 255, 255, 0.42); }
+        .stepper-progress { background: linear-gradient(90deg, #FFB347, #FFD866); box-shadow: 0 0 10px rgba(255, 190, 80, 0.75); }
+        .step-circle { width: 36px; height: 36px; background: rgba(110, 120, 140, 0.5); border-color: rgba(255, 255, 255, 0.78); color: #fff; }
+        .step.active .step-circle { background: linear-gradient(135deg, #FF8A3D 0%, #FFC247 100%); border-color: #FFE08A; box-shadow: 0 0 0 4px rgba(255, 194, 71, 0.4), 0 6px 16px rgba(255, 138, 61, 0.5); transform: none; }
+        .step.completed .step-circle { background: #22C55E; border-color: #fff; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.45); }
+        .step.active .step-label { color: #FFE08A; font-weight: 700; }
+        .step.completed .step-label { color: #4ADE80; font-weight: 700; }
+
+        .btn-secondary { flex: 0 0 38%; background: #EAEFF7; border: 0; box-shadow: none; }
+
+        /* cards of step 2 */
+        .fd-head { display: flex; align-items: center; gap: 14px; }
+        .fd-tile { width: 60px; height: 60px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 20px; }
+        .fd-tile .cr-i { width: 32px; height: 32px; }
+        .fd-tile--peach { background: linear-gradient(145deg, #FFE5DC, #FFEFD6); color: #FF8A3D; }
+        .fd-tile--blue { background: linear-gradient(145deg, #DDEBFF, #E8F1FF); color: #2F6BFF; }
+        .fd-head h2 { font-size: 23px; font-weight: 800; letter-spacing: -0.3px; color: var(--cr-navy); }
+        .fd-head p { margin-top: 4px; font-size: 15px; line-height: 1.4; color: var(--cr-muted); }
+
+        .fd { margin-top: 18px; }
+        .fd__label { display: block; margin: 0 0 8px; font-size: 17px; font-weight: 800; line-height: 1.3; color: var(--cr-navy); }
+        .fd__box { width: 100%; display: flex; align-items: center; gap: 12px; min-height: 62px; padding: 0 16px; border: 1.5px solid var(--cr-line); border-radius: 18px; background: #fff; box-shadow: 0 4px 14px rgba(11, 29, 58, 0.05); text-align: left; cursor: text; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+        .fd__box:focus-within { border-color: #FF9A3D; box-shadow: 0 0 0 3px rgba(255, 154, 61, 0.2); }
+        .fd__ic { width: 26px; height: 26px; color: #4B5B78; }
+        .ds .fd__box input, .ds .fd__box input:focus { flex: 1; min-width: 0; width: 100%; min-height: 58px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; outline: none; font: inherit; font-size: 17px; color: var(--cr-navy); }
+        .fd__box input::placeholder { color: #9AA8BF; opacity: 1; }
+        .fd__box input[type="date"] { appearance: none; -webkit-appearance: none; }
+
+        .fd__pick { cursor: pointer; }
+        .fd__flag { font-size: 32px; line-height: 1; flex-shrink: 0; }
+        .fd__txt { flex: 1; min-width: 0; font-size: 18px; font-weight: 500; color: var(--cr-navy); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .fd__pick:not(.is-filled) .fd__txt { color: #9AA8BF; }
+        .fd__chev { width: 22px; height: 22px; color: var(--cr-navy); }
+
+        .fd__phone { padding-left: 14px; }
+        .fd__code { display: flex; align-items: center; gap: 8px; min-height: 58px; padding: 0; border: 0; background: none; font-size: 18px; font-weight: 600; color: var(--cr-navy); cursor: pointer; }
+        .fd__code .selected-flag { font-size: 28px; }
+        .fd__code .selected-code { flex: none; font-size: 18px; font-weight: 600; color: var(--cr-navy); }
+        .fd__sep { width: 1px; height: 34px; flex-shrink: 0; background: #DCE4EF; }
+
+        .fd__box:focus-visible, .fd__code:focus-visible { outline: 2px solid #FF9A3D; outline-offset: 2px; }
+
+        /* location / country-code pickers: light bottom sheets (modals are moved out of the scroller) */
+        .modal { background: rgba(7, 20, 47, 0.52); align-items: flex-end; -webkit-backdrop-filter: none; backdrop-filter: none; }
+        .modal-content { display: flex; flex-direction: column; width: 100%; max-width: 480px; max-height: 88dvh; border-radius: 28px 28px 0 0; background: #fff; box-shadow: 0 -12px 40px rgba(7, 20, 47, 0.25); }
+        .modal-header { padding: 18px 20px 8px; border-bottom: 0; }
+        .modal-header h3 { font-size: 20px; font-weight: 800; color: var(--cr-navy); }
+        .modal-close { width: 40px; height: 40px; background: #EDF1F7; color: var(--cr-navy); }
+        .modal-close:hover { background: #E1E8F2; transform: none; }
+        .search-box { padding: 4px 20px 12px; border-bottom: 0; }
+        .ds .search-box input, .ds .search-box input:focus { min-height: 50px; padding: 0 16px; border: 1.5px solid #D5DEEA; border-radius: 14px; background: #F4F8FD; color: var(--cr-navy); font-size: 16px; box-shadow: none; outline: none; }
+        .ds .search-box input:focus { border-color: #FF9A3D; box-shadow: 0 0 0 3px rgba(255, 154, 61, 0.2); }
+        .search-box input::placeholder { color: #8A97AD; }
+        .locations-list { max-height: none; flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 0 12px calc(16px + env(safe-area-inset-bottom, 0px)); }
+        .location-item { min-height: 56px; background: transparent; border-radius: 14px; margin-bottom: 2px; }
+        .location-item:hover, .location-item:active { background: #F1F5FA; transform: none; }
+        .location-item-flag { width: 44px; text-align: center; }
+        .location-item-country { color: var(--cr-navy); font-weight: 700; }
+        .location-item-city { color: var(--cr-muted); }
+
+        @media (max-width: 359px) {
+            .fd-head h2 { font-size: 20px; }
+            .fd-tile { width: 52px; height: 52px; }
+            .fd__label { font-size: 16px; }
+            .fd__box { padding: 0 12px; gap: 10px; }
+            .fd__flag { font-size: 28px; }
         }
 
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        @media (max-width: 375px) {
-            .mobile-frame {
-                border-radius: 0;
-                height: 100vh;
-            }
-        }
             /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
@@ -1867,67 +1921,134 @@
 </head>
 <body class="ds">
     <div class="mobile-frame">
+        <div class="cr-scroll" id="crScroll">
 
-        <!-- Header -->
-        <div class="header">
-            <button class="back-btn" onclick="goBack()">←</button>
-            <div class="header-title">
-                <h1>Créer un envoi</h1>
-                <p id="stepDescription">Détails du colis</p>
-            </div>
-        </div>
+            <!-- Header + Progress Stepper -->
+            <header class="cr-hero">
+                <picture>
+                    <source type="image/webp" srcset="im/sengp-create-background.webp">
+                    <img src="im/sengp-create-background.jpg" alt="" width="1400" height="788" decoding="async">
+                </picture>
+                <div class="cr-hero__in">
+                    <div class="header">
+                        <button type="button" class="back-btn" onclick="goBack()" aria-label="Retour">
+                            <svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                        </button>
+                        <div class="header-title">
+                            <h1>Créer un envoi</h1>
+                            <p id="stepDescription">Détails du colis</p>
+                        </div>
+                    </div>
 
-        <!-- Progress Stepper -->
-        <div class="progress-container">
-            <div class="stepper">
-                <div class="stepper-progress" id="stepperProgress" style="width: 25%;"></div>
-                
-                <div class="step active" data-step="1">
-                    <div class="step-circle">1</div>
-                    <div class="step-label">Colis</div>
-                </div>
-                
-                <div class="step" data-step="2">
-                    <div class="step-circle">2</div>
-                    <div class="step-label">Adresses</div>
-                </div>
-                
-                <div class="step" data-step="3">
-                    <div class="step-circle">3</div>
-                    <div class="step-label">GP</div>
-                </div>
-                
-                <div class="step" data-step="4">
-                    <div class="step-circle">4</div>
-                    <div class="step-label">Paiement</div>
-                </div>
-            </div>
-        </div>
+                    <div class="stepper">
+                        <div class="stepper-progress" id="stepperProgress" style="width: 10%;"></div>
 
-        <!-- Content -->
-        <div class="content">
+                        <div class="step active" data-step="1">
+                            <div class="step-circle">1</div>
+                            <div class="step-label">Colis</div>
+                        </div>
+
+                        <div class="step" data-step="2">
+                            <div class="step-circle">2</div>
+                            <div class="step-label">Adresses</div>
+                        </div>
+
+                        <div class="step" data-step="3">
+                            <div class="step-circle">3</div>
+                            <div class="step-label">GP</div>
+                        </div>
+
+                        <div class="step" data-step="4">
+                            <div class="step-circle">4</div>
+                            <div class="step-label">Paiement</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content">
             <!-- Step 1: Package Details -->
             <div class="step-content active" data-step="1">
-                <div class="form-group">
-                    <label>Type de colis <span class="required">*</span></label>
-                    <select id="packageType" onchange="validateForm()">
+
+                <!-- Photo (quality-checked) -->
+                <section class="cr-card" aria-labelledby="pcTitle">
+                    <div class="pc-top">
+                        <picture>
+                            <source type="image/webp" srcset="im/sengp-box-3d.webp">
+                            <img class="pc-box" src="im/sengp-box-3d.png" alt="" width="378" height="255" decoding="async">
+                        </picture>
+                        <div>
+                            <h2 id="pcTitle">Votre colis</h2>
+                            <p>Prenez une photo de votre colis pour un traitement plus rapide.</p>
+                        </div>
+                    </div>
+
+                    <input type="file" accept="image/*" id="mediaInput" hidden onchange="handleMediaUpload(event)" />
+
+                    <button type="button" class="pc-drop" id="mediaUploadSection" onclick="document.getElementById('mediaInput').click()">
+                        <span class="pc-drop__ic"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></span>
+                        <span class="pc-drop__t" id="dropTitle">Prendre une photo du colis</span>
+                        <span class="pc-drop__s" id="dropSub">Une seule photo (max 50MB)</span>
+                    </button>
+
+                    <div class="pc-alert" id="photoAlert" role="alert" hidden>
+                        <span class="pc-alert__ic"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5"/><path d="M12 17h.01"/></svg></span>
+                        <div>
+                            <strong id="photoAlertTitle"></strong>
+                            <p id="photoAlertMsg"></p>
+                            <p class="pc-tip" id="photoAlertTip"></p>
+                        </div>
+                    </div>
+
+                    <div class="pc-preview" id="mediaPreview" hidden>
+                        <div id="previewContent"></div>
+                        <span class="pc-ok"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Photo validée</span>
+                        <button type="button" class="pc-change" onclick="removeMedia(); document.getElementById('mediaInput').click()">Changer</button>
+                        <button type="button" class="remove-media-btn" onclick="removeMedia()" aria-label="Supprimer la photo">×</button>
+                    </div>
+                </section>
+
+                <!-- Package type -->
+                <fieldset class="cr-card">
+                    <legend>Type de colis <span class="cr-req">*</span></legend>
+                    <div class="ty-grid" id="tyGrid" role="radiogroup" aria-label="Type de colis"></div>
+                    <button type="button" class="ty-more" id="tyMore" aria-expanded="false" onclick="toggleMoreTypes()">
+                        <span id="tyMoreLabel">Voir tous les types</span>
+                        <svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="pc-danger" id="dangerNote" role="note" hidden>
+                        ⚠️ Les matières dangereuses (inflammables, explosifs, batteries au lithium…) sont soumises à des règles strictes de transport aérien. Indiquez précisément le contenu dans la description.
+                    </div>
+                    <!-- Kept for the existing form logic (summary, validation) -->
+                    <select id="packageType" hidden onchange="validateForm()" tabindex="-1" aria-hidden="true">
                         <option value="">Sélectionner...</option>
-                        <option value="documents">📄 Documents</option>
-                        <option value="clothes">👕 Vêtements</option>
-                        <option value="electronics">📱 Électronique</option>
-                        <option value="food">🍽️ Alimentaire</option>
-                        <option value="fragile">⚠️ Fragile</option>
-                        <option value="other">📦 Autre</option>
                     </select>
-                </div>
+                </fieldset>
 
-                <div class="form-group">
-                    <label>Poids du colis (kg) <span class="required">*</span></label>
-                    <input type="number" id="packageWeight" min="0.1" step="0.1" placeholder="Ex: 3" oninput="validateForm()" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:15px;" />
-                </div>
+                <!-- Weight -->
+                <section class="cr-card" aria-labelledby="wtTitle">
+                    <h2 id="wtTitle" style="margin-bottom: 12px;">Poids du colis <span class="cr-req">*</span></h2>
+                    <div class="wt">
+                        <svg class="cr-i wt__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 8h11a2 2 0 0 1 1.95 1.55l1.5 8A2 2 0 0 1 18.98 20H5.02a2 2 0 0 1-1.97-2.45l1.5-8A2 2 0 0 1 6.5 8z"/><circle cx="12" cy="5" r="2.2"/><text x="12" y="17" text-anchor="middle" font-size="6.5" font-weight="700" fill="currentColor" stroke="none" font-family="Inter, sans-serif">kg</text></svg>
+                        <button type="button" class="wt__btn" id="wtMinus" onclick="stepWeight(-1)" aria-label="Diminuer le poids" disabled>
+                            <svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
+                        </button>
+                        <div class="wt__val">
+                            <input type="number" class="wt__in" id="packageWeight" min="0.1" step="0.1" inputmode="decimal" placeholder="0" aria-label="Poids du colis en kilogrammes" oninput="onWeightInput()" />
+                            <span class="wt__unit">kg</span>
+                        </div>
+                        <button type="button" class="wt__btn wt__btn--plus" id="wtPlus" onclick="stepWeight(1)" aria-label="Augmenter le poids">
+                            <svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        </button>
+                    </div>
+                </section>
 
-                <div class="form-group">
-                    <label>Description du colis (texte ou audio)</label>
+                <!-- Description (text or audio) -->
+                <section class="cr-card" aria-labelledby="descTitle">
+                    <h2 id="descTitle">Description du colis</h2>
+                    <p class="cr-sub">Texte ou audio : décrivez le contenu (photo, texte ou audio suffit pour continuer).</p>
+                    <div class="form-group" style="margin: 12px 0 0;">
                     <div class="description-container">
                         <textarea
                             id="description"
@@ -1987,128 +2108,100 @@
                             </button>
                         </div>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Photo ou vidéo du colis (optionnel)</label>
-                    <input type="file" accept="image/*,video/*" id="mediaInput" style="display: none;" onchange="handleMediaUpload(event)" />
-
-                    <div class="media-upload-section" id="mediaUploadSection" onclick="document.getElementById('mediaInput').click()">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-title">Ajouter une photo ou vidéo</div>
-                        <div class="upload-subtitle">Une seule image ou vidéo (max 50MB)</div>
                     </div>
-
-                    <div class="media-preview" id="mediaPreview">
-                        <div id="previewContent"></div>
-                        <button type="button" class="remove-media-btn" onclick="removeMedia()">×</button>
-                    </div>
-                </div>
+                </section>
             </div>
-
-            <!-- Step 2: Addresses -->
+            <!-- Step 2: Recipient + pickup -->
             <div class="step-content" data-step="2">
-                <div class="form-group">
-                    <label>Pays et ville de départ <span class="required">*</span></label>
-                    <div class="location-picker" id="departureLocation" onclick="openLocationModal('departure')">
-                        <span class="location-flag" id="departureFlag">🌍</span>
-                        <div class="location-info">
-                            <div class="location-label">Départ</div>
-                            <div class="location-name" id="departureName">Sélectionner...</div>
+
+                <!-- Recipient -->
+                <section class="cr-card" aria-labelledby="rcTitle">
+                    <div class="fd-head">
+                        <span class="fd-tile fd-tile--peach" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+                        <div>
+                            <h2 id="rcTitle">Destinataire</h2>
+                            <p>Renseignez les informations du destinataire de votre colis.</p>
                         </div>
-                        <span class="chevron">›</span>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label>Adresse de ramassage <span class="required">*</span></label>
-                    <input type="text" id="pickupAddress" placeholder="Adresse complète de ramassage" oninput="validateStep2()" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:15px;" />
-                </div>
+                    <div class="fd">
+                        <span class="fd__label" id="arrivalLabel">Pays et ville du destinataire <span class="cr-req">*</span></span>
+                        <button type="button" class="fd__box fd__pick" id="arrivalLocation" onclick="openLocationModal('arrival')" aria-labelledby="arrivalLabel arrivalName">
+                            <span class="fd__flag" id="arrivalFlag">🌍</span>
+                            <span class="fd__txt" id="arrivalName">Sélectionner...</span>
+                            <svg class="cr-i fd__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                    </div>
 
-                <div class="form-group">
-                    <label>Pays et ville d'arrivée <span class="required">*</span></label>
-                    <div class="location-picker" id="arrivalLocation" onclick="openLocationModal('arrival')">
-                        <span class="location-flag" id="arrivalFlag">🌍</span>
-                        <div class="location-info">
-                            <div class="location-label">Arrivée</div>
-                            <div class="location-name" id="arrivalName">Sélectionner...</div>
+                    <div class="fd">
+                        <label class="fd__label" for="receiverName">Nom du destinataire <span class="cr-req">*</span></label>
+                        <div class="fd__box">
+                            <svg class="cr-i fd__ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+                            <input type="text" id="receiverName" placeholder="Ex: Awa Ndiaye" autocomplete="name" oninput="validateStep2()" />
                         </div>
-                        <span class="chevron">›</span>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label>Adresse de livraison <span class="required">*</span></label>
-                    <input type="text" id="deliveryAddress" placeholder="Adresse complète de livraison" oninput="validateStep2()" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:15px;" />
-                </div>
-
-                <div class="form-group">
-                    <label>Date de départ souhaitée <span class="required">*</span></label>
-                    <input type="date" id="desiredDepartureDate" oninput="validateStep2()" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:15px;" />
-                </div>
-
-                <div class="form-group">
-                    <label>Nom du destinataire <span class="required">*</span></label>
-                    <input type="text" id="receiverName" placeholder="Ex: Awa Ndiaye" oninput="validateStep2()" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;font-size:15px;" />
-                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 6px;">
-                        👤 La personne qui recevra le colis (figurera sur l'étiquette)
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Contact destinataire <span class="required">*</span></label>
-                    <div class="phone-input-container">
-                        <div class="country-code-selector" id="countryCodeBtn" onclick="openCountryCodeModal()">
-                            <span class="selected-flag" id="selectedFlag">🇸🇳</span>
-                            <span class="selected-code" id="selectedCode">+221</span>
-                            <span class="dropdown-arrow">▼</span>
+                    <div class="fd">
+                        <label class="fd__label" for="receiverPhone">Numéro de téléphone du destinataire <span class="cr-req">*</span></label>
+                        <div class="fd__box fd__phone">
+                            <button type="button" class="fd__code" id="countryCodeBtn" onclick="openCountryCodeModal()" aria-label="Choisir l'indicatif du pays">
+                                <span class="selected-flag" id="selectedFlag">🇸🇳</span>
+                                <span class="selected-code" id="selectedCode">+221</span>
+                                <svg class="cr-i fd__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                            </button>
+                            <span class="fd__sep" aria-hidden="true"></span>
+                            <svg class="cr-i fd__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            <input type="tel" id="receiverPhone" placeholder="77 123 45 67" inputmode="tel" autocomplete="tel-national" oninput="validateStep2()" />
                         </div>
-                        <input type="tel" id="receiverPhone" placeholder="77 123 45 67" oninput="validateStep2()" />
                     </div>
-                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 6px;">
-                        📞 Téléphone du destinataire pour la livraison
+
+                    <div class="fd" style="margin-bottom: 4px;">
+                        <label class="fd__label" for="deliveryAddress">Adresse de livraison <span class="cr-req">*</span></label>
+                        <div class="fd__box">
+                            <svg class="cr-i fd__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <input type="text" id="deliveryAddress" placeholder="Adresse complète de livraison" autocomplete="street-address" oninput="validateStep2()" />
+                        </div>
                     </div>
-                </div>
+                </section>
+
+                <!-- Pickup + departure -->
+                <section class="cr-card" aria-labelledby="pkTitle">
+                    <div class="fd-head">
+                        <span class="fd-tile fd-tile--blue" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
+                        <div>
+                            <h2 id="pkTitle">Retrait et départ</h2>
+                            <p>Où récupérer votre colis et quand le faire partir.</p>
+                        </div>
+                    </div>
+
+                    <div class="fd">
+                        <span class="fd__label" id="departureLabel">Pays et ville de départ <span class="cr-req">*</span></span>
+                        <button type="button" class="fd__box fd__pick" id="departureLocation" onclick="openLocationModal('departure')" aria-labelledby="departureLabel departureName">
+                            <span class="fd__flag" id="departureFlag">🌍</span>
+                            <span class="fd__txt" id="departureName">Sélectionner...</span>
+                            <svg class="cr-i fd__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="fd">
+                        <label class="fd__label" for="pickupAddress">Adresse de ramassage <span class="cr-req">*</span></label>
+                        <div class="fd__box">
+                            <svg class="cr-i fd__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg>
+                            <input type="text" id="pickupAddress" placeholder="Adresse complète de ramassage" autocomplete="street-address" oninput="validateStep2()" />
+                        </div>
+                    </div>
+
+                    <div class="fd" style="margin-bottom: 4px;">
+                        <label class="fd__label" for="desiredDepartureDate">Date de départ souhaitée <span class="cr-req">*</span></label>
+                        <div class="fd__box">
+                            <svg class="cr-i fd__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+                            <input type="date" id="desiredDepartureDate" oninput="validateStep2()" onchange="validateStep2()" />
+                        </div>
+                    </div>
+                </section>
             </div>
-
-            <!-- Location Selection Modal -->
-            <div class="modal" id="locationModal" onclick="closeLocationModal(event)">
-                <div class="modal-content location-modal-content" onclick="event.stopPropagation()">
-                    <div class="modal-header">
-                        <h3 id="modalTitle">Sélectionner le lieu</h3>
-                        <button class="modal-close" onclick="closeLocationModal()">×</button>
-                    </div>
-
-                    <div class="search-box">
-                        <input type="text" id="locationSearch" placeholder="🔍 Rechercher un pays ou une ville..." onkeyup="filterLocations()" />
-                    </div>
-
-                    <div class="locations-list" id="locationsList">
-                        <!-- Locations will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Country Code Selection Modal -->
-            <div class="modal" id="countryCodeModal" onclick="closeCountryCodeModal(event)">
-                <div class="modal-content location-modal-content" onclick="event.stopPropagation()">
-                    <div class="modal-header">
-                        <h3>Sélectionner l'indicatif</h3>
-                        <button class="modal-close" onclick="closeCountryCodeModal()">×</button>
-                    </div>
-
-                    <div class="search-box">
-                        <input type="text" id="countryCodeSearch" placeholder="🔍 Rechercher un pays..." onkeyup="filterCountryCodes()" />
-                    </div>
-
-                    <div class="locations-list" id="countryCodesList">
-                        <!-- Country codes will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-
             <!-- Step 3: Select GP -->
-            <div class="step-content" data-step="3">
+            <div class="step-content dark-panel" data-step="3">
                 <!-- Filters -->
                 <div class="filters-container">
                     <div class="filter-group">
@@ -2288,7 +2381,7 @@
             </div>
 
             <!-- Step 4: Payment -->
-            <div class="step-content" data-step="4">
+            <div class="step-content dark-panel" data-step="4">
                 <!-- Order Summary -->
                 <div class="summary-card" id="orderSummary">
                     <div class="summary-header">
@@ -2505,6 +2598,8 @@
             </div>
         </div>
 
+        </div><!-- /cr-scroll -->
+
         <!-- Bottom Actions -->
         <div class="bottom-actions">
             <div class="button-group">
@@ -2512,10 +2607,48 @@
                     Retour
                 </button>
                 <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">
-                    Suivant
+                    <span id="nextLabel">Suivant</span>
+                    <svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </button>
             </div>
         </div>
+
+        <!-- Location + country code pickers (bottom sheets) -->
+            <!-- Location Selection Modal -->
+            <div class="modal" id="locationModal" onclick="closeLocationModal(event)">
+                <div class="modal-content location-modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h3 id="modalTitle">Sélectionner le lieu</h3>
+                        <button class="modal-close" onclick="closeLocationModal()">×</button>
+                    </div>
+
+                    <div class="search-box">
+                        <input type="text" id="locationSearch" placeholder="🔍 Rechercher un pays ou une ville..." onkeyup="filterLocations()" />
+                    </div>
+
+                    <div class="locations-list" id="locationsList">
+                        <!-- Locations will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Country Code Selection Modal -->
+            <div class="modal" id="countryCodeModal" onclick="closeCountryCodeModal(event)">
+                <div class="modal-content location-modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h3>Sélectionner l'indicatif</h3>
+                        <button class="modal-close" onclick="closeCountryCodeModal()">×</button>
+                    </div>
+
+                    <div class="search-box">
+                        <input type="text" id="countryCodeSearch" placeholder="🔍 Rechercher un pays..." onkeyup="filterCountryCodes()" />
+                    </div>
+
+                    <div class="locations-list" id="countryCodesList">
+                        <!-- Country codes will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
     </div>
 
     <!-- QR Code Success Modal -->
@@ -2563,7 +2696,7 @@
 
         const stepDescriptions = {
             1: 'Détails du colis',
-            2: 'Adresses de retrait et livraison',
+            2: 'Destinataire, retrait et départ',
             3: 'Sélection du Gros Porteur',
             4: 'Paiement et confirmation'
         };
@@ -2573,8 +2706,8 @@
             document.getElementById('stepDescription').textContent = stepDescriptions[currentStep];
 
             // Update stepper progress
-            const progress = (currentStep / totalSteps) * 100;
-            document.getElementById('stepperProgress').style.width = progress + '%';
+            const progress = Math.min(1, ((currentStep - 1) + 0.4) / (totalSteps - 1));
+            document.getElementById('stepperProgress').style.width = (75 * progress) + '%';
 
             // Update step circles
             document.querySelectorAll('.step').forEach((step, index) => {
@@ -2599,8 +2732,9 @@
             document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.add('active');
 
             // Update buttons
-            document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
-            document.getElementById('nextBtn').textContent = currentStep === totalSteps ? 'Confirmer' : 'Suivant';
+            document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'flex';
+            setNextLabel(currentStep === totalSteps ? 'Confirmer' : 'Suivant');
+            document.getElementById('crScroll').scrollTo({ top: 0, behavior: 'smooth' });
 
             // Load available GP trips when entering step 3 (selection is optional —
             // the mission is created open, so any GP can accept it).
@@ -3006,60 +3140,274 @@
             }, 1000);
         }
 
-        // === Media Upload System ===
-        function handleMediaUpload(event) {
-            const file = event.target.files[0];
+        // === Photo du colis : contrôle de qualité (netteté, luminosité, résolution) ===
+        let uploadedPhotoBlob = null;       // JPEG compressé (≤ 1600 px) envoyé à la création de l'envoi
+        let photoPreviewUrl = null;
 
+        // Seuils calibrés sur des photos nettes / floutées / assombries / surexposées (voir design-assets/create-screen/README.md)
+        const PHOTO_RULES = {
+            maxBytes: 50 * 1024 * 1024,
+            minSide: 480,                         // px, côté le plus court
+            dark: { mean: 50, p95: 90 },          // luminance moyenne ou 95e centile trop bas
+            bright: { clip: 0.35, mean: 195 },    // part de pixels brûlés (≥250) et image claire
+            flat: { std: 12 },                    // contraste quasi nul : objectif masqué / colis absent
+            blur: { minStd: 25, lapVar: 30, lapP99: 30 }  // variance du laplacien : peu de bords nets
+        };
+
+        function photoError(code, cause, message, tip) {
+            return { ok: false, code, title: 'Photo refusée : ' + cause, message, tip };
+        }
+
+        async function decodePhoto(file) {
+            if (window.createImageBitmap) {
+                try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch (e) { /* repli ci-dessous */ }
+            }
+            return await new Promise((resolve, reject) => {
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+                img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode')); };
+                img.src = url;
+            });
+        }
+
+        // Mesures sur une version réduite (≤ 1024 px) : luminance, contraste, bords nets
+        function measurePhoto(source, sw, sh) {
+            const scale = Math.min(1, 1024 / Math.max(sw, sh));
+            const w = Math.max(1, Math.round(sw * scale));
+            const h = Math.max(1, Math.round(sh * scale));
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            const ctx = c.getContext('2d', { willReadFrequently: true });
+            ctx.drawImage(source, 0, 0, w, h);
+            const d = ctx.getImageData(0, 0, w, h).data;
+            const n = w * h;
+            const g = new Float32Array(n);
+            const hist = new Uint32Array(256);
+            let sum = 0, sumSq = 0, clip = 0;
+            for (let i = 0, p = 0; i < n; i++, p += 4) {
+                const v = 0.299 * d[p] + 0.587 * d[p + 1] + 0.114 * d[p + 2];
+                g[i] = v; sum += v; sumSq += v * v;
+                const b = v | 0;
+                hist[b > 255 ? 255 : b]++;
+                if (v >= 250) clip++;
+            }
+            const mean = sum / n;
+            const std = Math.sqrt(Math.max(0, sumSq / n - mean * mean));
+            let acc = 0, p95 = 255;
+            for (let b = 0; b < 256; b++) { acc += hist[b]; if (acc >= 0.95 * n) { p95 = b; break; } }
+
+            // Laplacien 3×3 : une image nette a beaucoup de bords forts, une image floue presque aucun
+            const lh = new Uint32Array(1021);
+            let lsum = 0, lsq = 0, cnt = 0;
+            for (let y = 1; y < h - 1; y++) {
+                let i = y * w + 1;
+                for (let x = 1; x < w - 1; x++, i++) {
+                    const l = 4 * g[i] - g[i - 1] - g[i + 1] - g[i - w] - g[i + w];
+                    lsum += l; lsq += l * l; cnt++;
+                    const a = Math.abs(l) | 0;
+                    lh[a > 1020 ? 1020 : a]++;
+                }
+            }
+            const lmean = cnt ? lsum / cnt : 0;
+            const lapVar = cnt ? lsq / cnt - lmean * lmean : 0;
+            let lacc = 0, lapP99 = 0;
+            for (let b = 0; b <= 1020; b++) { lacc += lh[b]; if (lacc >= 0.99 * cnt) { lapP99 = b; break; } }
+            return { mean, std, p95, clip: clip / n, lapVar, lapP99 };
+        }
+
+        async function analyzePhoto(file) {
+            const R = PHOTO_RULES;
+            if (!file.type || !file.type.startsWith('image/')) {
+                return photoError('type', 'format non accepté', 'Seules les photos sont acceptées (ni vidéo, ni document).', 'Prenez une photo du colis avec l’appareil photo.');
+            }
+            if (file.size > R.maxBytes) {
+                return photoError('size', 'fichier trop lourd', 'Le fichier dépasse 50 Mo.', 'Choisissez une photo plus légère ou réduisez la qualité de l’appareil photo.');
+            }
+            let bmp;
+            try { bmp = await decodePhoto(file); }
+            catch (e) { return photoError('decode', 'image illisible', 'Cette image ne peut pas être lue (format non pris en charge ou fichier abîmé).', 'Utilisez une photo au format JPEG ou PNG.'); }
+
+            const sw = bmp.width, sh = bmp.height;
+            if (Math.min(sw, sh) < R.minSide) {
+                return photoError('small', 'résolution trop faible', `La photo fait seulement ${sw} × ${sh} px : trop petite pour distinguer le colis.`, 'Reprenez la photo avec l’appareil photo en qualité normale, sans zoom numérique.');
+            }
+            const m = measurePhoto(bmp, sw, sh);
+            if (m.mean < R.dark.mean || m.p95 < R.dark.p95) {
+                return photoError('dark', 'trop sombre', 'Le colis est difficilement visible : l’image est trop sombre (ou l’objectif est masqué).', 'Prenez la photo dans un endroit mieux éclairé, ou activez le flash.');
+            }
+            if (m.clip >= R.bright.clip && m.mean >= R.bright.mean) {
+                return photoError('bright', 'surexposée', 'Il y a trop de lumière : les détails du colis sont effacés.', 'Évitez le contre-jour, les reflets directs et un flash trop proche.');
+            }
+            if (m.std < R.flat.std) {
+                return photoError('flat', 'colis non visible', 'L’image est presque uniforme : on ne distingue pas le colis.', 'Vérifiez que l’objectif n’est pas masqué et cadrez le colis en entier.');
+            }
+            if (m.std >= R.blur.minStd && m.lapVar < R.blur.lapVar && m.lapP99 < R.blur.lapP99) {
+                return photoError('blur', 'floue', 'Le colis n’est pas net : l’image est floue (bougé ou mise au point manquée).', 'Tenez le téléphone stable, rapprochez-vous un peu et attendez la mise au point avant de photographier.');
+            }
+            return { ok: true, metrics: m, bitmap: bmp };
+        }
+
+        function compressPhoto(bmp) {
+            const scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+            const c = document.createElement('canvas');
+            c.width = Math.round(bmp.width * scale);
+            c.height = Math.round(bmp.height * scale);
+            c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+            return new Promise(resolve => c.toBlob(b => resolve(b), 'image/jpeg', 0.82));
+        }
+
+        function setPhotoState(state) {
+            const drop = document.getElementById('mediaUploadSection');
+            const preview = document.getElementById('mediaPreview');
+            drop.classList.toggle('is-analyzing', state === 'analyzing');
+            drop.classList.toggle('is-error', state === 'error');
+            document.getElementById('dropTitle').textContent =
+                state === 'analyzing' ? 'Analyse de la photo…' : (state === 'error' ? 'Reprendre une photo' : 'Prendre une photo du colis');
+            document.getElementById('dropSub').textContent =
+                state === 'analyzing' ? 'Vérification de la netteté et de la luminosité' : 'Une seule photo (max 50MB)';
+            drop.hidden = state === 'ok';
+            preview.hidden = state !== 'ok';
+        }
+
+        function showPhotoAlert(res) {
+            document.getElementById('photoAlertTitle').textContent = res.title;
+            document.getElementById('photoAlertMsg').textContent = res.message;
+            document.getElementById('photoAlertTip').textContent = res.tip ? 'Conseil : ' + res.tip : '';
+            const el = document.getElementById('photoAlert');
+            el.hidden = false;
+            try { el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+        }
+        function hidePhotoAlert() { document.getElementById('photoAlert').hidden = true; }
+
+        function clearPhoto() {
+            uploadedMedia = null;
+            uploadedPhotoBlob = null;
+            if (photoPreviewUrl) { URL.revokeObjectURL(photoPreviewUrl); photoPreviewUrl = null; }
+            document.getElementById('previewContent').innerHTML = '';
+        }
+
+        async function handleMediaUpload(event) {
+            const input = event.target;
+            const file = input.files && input.files[0];
             if (!file) return;
 
-            // Check file size (max 50MB)
-            const maxSize = 50 * 1024 * 1024; // 50MB
-            if (file.size > maxSize) {
-                alert('Le fichier est trop volumineux. Taille maximale : 50MB');
-                event.target.value = '';
+            clearPhoto();
+            hidePhotoAlert();
+            setPhotoState('analyzing');
+
+            let res;
+            try { res = await analyzePhoto(file); }
+            catch (e) { res = photoError('decode', 'image illisible', 'Cette image ne peut pas être analysée.', 'Essayez une autre photo (JPEG ou PNG).'); }
+            input.value = '';   // permet de re-choisir le même fichier après un refus
+
+            if (!res.ok) {
+                setPhotoState('error');
+                showPhotoAlert(res);
+                validateForm();
+                return;
+            }
+
+            const blob = await compressPhoto(res.bitmap);
+            if (!blob) {
+                setPhotoState('error');
+                showPhotoAlert(photoError('decode', 'image illisible', 'Cette image ne peut pas être préparée pour l’envoi.', 'Essayez une autre photo (JPEG ou PNG).'));
+                validateForm();
                 return;
             }
 
             uploadedMedia = file;
-
-            // Show preview
-            const preview = document.getElementById('mediaPreview');
-            const previewContent = document.getElementById('previewContent');
-
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    previewContent.innerHTML = `<img src="${e.target.result}" alt="Preview" />`;
-                    preview.classList.add('active');
-                    document.getElementById('mediaUploadSection').classList.add('disabled');
-                    validateForm();
-                };
-                reader.readAsDataURL(file);
-            } else if (file.type.startsWith('video/')) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    previewContent.innerHTML = `<video src="${e.target.result}" controls></video>`;
-                    preview.classList.add('active');
-                    document.getElementById('mediaUploadSection').classList.add('disabled');
-                    validateForm();
-                };
-                reader.readAsDataURL(file);
-            }
+            uploadedPhotoBlob = blob;
+            photoPreviewUrl = URL.createObjectURL(blob);
+            document.getElementById('previewContent').innerHTML = `<img src="${photoPreviewUrl}" alt="Aperçu de la photo du colis" />`;
+            setPhotoState('ok');
+            validateForm();
         }
 
         function removeMedia() {
-            uploadedMedia = null;
-
-            const preview = document.getElementById('mediaPreview');
-            const previewContent = document.getElementById('previewContent');
-
-            preview.classList.remove('active');
-            previewContent.innerHTML = '';
+            clearPhoto();
+            hidePhotoAlert();
             document.getElementById('mediaInput').value = '';
-            document.getElementById('mediaUploadSection').classList.remove('disabled');
-
+            setPhotoState('idle');
             validateForm();
         }
+
+        // === Type de colis (grille d'illustrations) ===
+        const PACKAGE_TYPES = [
+            ['carton', 'Carton'], ['enveloppe', 'Enveloppe'], ['colis-souple', 'Colis souple'], ['caisse', 'Caisse'],
+            ['bagage', 'Bagage'], ['palette', 'Palette'], ['tube', 'Tube'], ['autre', 'Autre'],
+            ['volumineux', 'Colis volumineux'], ['refrigere', 'Colis réfrigéré'], ['dangereux', 'Colis dangereux'], ['documents', 'Documents'],
+            ['electronique', 'Appareil électronique'], ['fragile', 'Objet fragile'], ['textile', 'Textile'], ['materiau', 'Matériau / Pièce']
+        ];
+        const TYPES_VISIBLE = 8;
+
+        function buildTypeGrid() {
+            const grid = document.getElementById('tyGrid');
+            const select = document.getElementById('packageType');
+            PACKAGE_TYPES.forEach(([id, label], i) => {
+                select.add(new Option(label, id));
+                const el = document.createElement('label');
+                el.className = 'ty';
+                if (i >= TYPES_VISIBLE) el.hidden = true;
+                el.innerHTML =
+                    `<input type="radio" name="pkgType" value="${id}">` +
+                    `<span class="ty__in"><span class="ty__ck"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>` +
+                    `<img src="im/types/${id}.webp" alt="" width="200" height="160" loading="lazy" decoding="async">` +
+                    `<span class="ty__t">${label}</span></span>`;
+                grid.appendChild(el);
+            });
+            grid.addEventListener('change', e => { if (e.target.name === 'pkgType') selectType(e.target.value); });
+        }
+
+        function selectType(id) {
+            document.getElementById('packageType').value = id;
+            document.getElementById('dangerNote').hidden = id !== 'dangereux';
+            validateForm();
+        }
+
+        function toggleMoreTypes() {
+            const btn = document.getElementById('tyMore');
+            const expand = btn.getAttribute('aria-expanded') !== 'true';
+            document.querySelectorAll('#tyGrid .ty').forEach((el, i) => { if (i >= TYPES_VISIBLE) el.hidden = !expand; });
+            btn.setAttribute('aria-expanded', String(expand));
+            document.getElementById('tyMoreLabel').textContent = expand ? 'Voir moins' : 'Voir tous les types';
+        }
+
+        // === Poids (− / +) ===
+        function syncWeightButtons() {
+            const v = parseFloat(document.getElementById('packageWeight').value);
+            document.getElementById('wtMinus').disabled = !(v > 0.5);
+        }
+        function onWeightInput() { syncWeightButtons(); validateForm(); }
+        function stepWeight(dir) {
+            const el = document.getElementById('packageWeight');
+            let v = parseFloat(el.value);
+            if (!(v > 0)) v = 0;
+            const step = (dir > 0 ? v >= 5 : v > 5) ? 1 : 0.5;
+            v = (v === 0 && dir > 0) ? 1 : v + dir * step;
+            v = Math.min(100, Math.max(0.5, Math.round(v * 10) / 10));
+            el.value = v;
+            onWeightInput();
+        }
+
+        function setNextLabel(text) { document.getElementById('nextLabel').textContent = text; }
+
+        // Réserve la place de la bannière d'installation PWA (pwa.js) sous la barre d'actions
+        (function trackInstallBanner() {
+            const root = document.documentElement;
+            let ro = null;
+            const sync = () => {
+                const b = document.getElementById('sengp-install-banner');
+                root.style.setProperty('--cr-banner-h', b ? (b.offsetHeight + 8) + 'px' : '0px');
+                if (b && !ro && window.ResizeObserver) { ro = new ResizeObserver(sync); ro.observe(b); }
+                if (!b && ro) { ro.disconnect(); ro = null; }
+            };
+            new MutationObserver(sync).observe(document.body, { childList: true });
+            sync();
+        })();
+
+        buildTypeGrid();
+        syncWeightButtons();
 
         // === Country Codes System ===
         let selectedCountryCode = { flag: '🇸🇳', code: '+221', country: 'Sénégal' };
@@ -3252,10 +3600,12 @@
                 selectedDeparture = location;
                 document.getElementById('departureFlag').textContent = location.flag;
                 document.getElementById('departureName').textContent = `${location.city}, ${location.country}`;
+                document.getElementById('departureLocation').classList.add('is-filled');
             } else {
                 selectedArrival = location;
                 document.getElementById('arrivalFlag').textContent = location.flag;
                 document.getElementById('arrivalName').textContent = `${location.city}, ${location.country}`;
+                document.getElementById('arrivalLocation').classList.add('is-filled');
             }
 
             closeLocationModal();
@@ -3410,7 +3760,23 @@
 
             const nextBtn = document.getElementById('nextBtn');
             nextBtn.disabled = true;
-            nextBtn.textContent = 'Traitement en cours...';
+            setNextLabel('Traitement en cours...');
+
+            // Photo du colis (facultative) : envoyée vers le stockage ; en cas d'échec, l'envoi est créé sans photo.
+            let photoKey = null;
+            if (uploadedPhotoBlob) {
+                try {
+                    setNextLabel('Envoi de la photo...');
+                    const fd = new FormData();
+                    fd.append('file', uploadedPhotoBlob, 'colis.jpg');
+                    const up = await fetch(`${window.API_BASE_URL}/uploads`, {
+                        method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: fd
+                    });
+                    const uj = await up.json();
+                    if (up.ok && uj.success && uj.data && uj.data.key) photoKey = uj.data.key;
+                } catch (e) { /* photo facultative */ }
+                setNextLabel('Traitement en cours...');
+            }
 
             const recipientName = (document.getElementById('receiverName') ? document.getElementById('receiverName').value.trim() : '') || null;
             const recipientPhone = ((document.getElementById('selectedCode') ? document.getElementById('selectedCode').textContent : '') + ' ' + (document.getElementById('receiverPhone') ? document.getElementById('receiverPhone').value.trim() : '')).trim() || null;
@@ -3429,6 +3795,7 @@
                         delivery_address: delivery,
                         package_weight: weight,
                         package_description: description || packageTypeText,
+                        ...(photoKey ? { package_photos: [photoKey] } : {}),
                         desired_departure_date: date,
                         offered_price: offered,
                         is_price_negotiable: true,
@@ -3477,7 +3844,7 @@
                 if (!redirectUrl) {
                     alert('Mission créée, mais aucune URL de paiement n\'a été reçue.');
                     nextBtn.disabled = false;
-                    nextBtn.textContent = 'Confirmer';
+                    setNextLabel('Confirmer');
                     return;
                 }
 
@@ -3516,7 +3883,7 @@
                 console.error('Payment flow error:', error);
                 alert('Erreur: ' + error.message);
                 nextBtn.disabled = false;
-                nextBtn.textContent = 'Confirmer';
+                setNextLabel('Confirmer');
             }
         }
 
