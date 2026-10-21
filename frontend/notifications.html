@@ -5,403 +5,176 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEN GP - Notifications</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html { background: #F4F8FD; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #F4F8FD;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            color: #0B1D3A;
         }
+        :root { --nt-navy: #0B1D3A; --nt-muted: #6B7A93; }
 
-        .mobile-frame {
-            width: 100%;
-            max-width: 375px;
-            height: 667px;
-            background: linear-gradient(135deg, rgba(15, 12, 41, 0.95) 0%, rgba(48, 43, 99, 0.95) 50%, rgba(36, 36, 62, 0.95) 100%);
-            border-radius: 40px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            overflow: hidden;
-            position: relative;
-        }
+        /* ============================================
+           NOTIFICATIONS
+           ============================================ */
+        .mobile-frame { position: relative; width: 100%; overflow: hidden; background: #F4F8FD; }
+        .mobile-frame::before { content: ""; position: absolute; inset: 0; z-index: 0; background: #F4F8FD; }
+        .nt-screen { position: absolute; inset: 0; z-index: 1; }
+        .nt-i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+        button { font: inherit; -webkit-tap-highlight-color: transparent; }
 
-        .status-bar {
-            height: 44px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .time { color: #fff; }
-        .indicators {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-        .signal, .wifi, .battery {
-            width: 18px;
-            height: 12px;
-            background: rgba(255,255,255,0.8);
-            border-radius: 2px;
-        }
-
-        /* Header */
-        .header {
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            flex: 1;
-        }
-
-        .back-btn {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateX(-3px);
-        }
-
-        .header-title {
-            flex: 1;
-        }
-
-        .header-title h1 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .header-title p {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .mark-all-btn {
-            padding: 8px 16px;
-            background: rgba(78, 205, 196, 0.2);
-            color: #4ECDC4;
-            border: 1px solid rgba(78, 205, 196, 0.3);
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .mark-all-btn:hover {
-            background: rgba(78, 205, 196, 0.3);
-            transform: translateY(-2px);
-        }
-
-        /* Content */
-        .content {
-            height: calc(100% - 44px - 85px - 73px);
+        .nt-scroll {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+            overflow-x: hidden;
             overflow-y: auto;
-            padding: 20px;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .nt-scroll::-webkit-scrollbar { display: none; }
+
+        /* ---- hero ---- */
+        .nt-hero { position: relative; height: calc(192px + env(safe-area-inset-top, 0px)); overflow: hidden; background: linear-gradient(180deg, #0B1D3A, #2B4A7A); }
+        .nt-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 72% 40%; }
+        .nt-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7, 20, 47, 0.5) 0%, rgba(7, 20, 47, 0.12) 55%, rgba(244, 248, 253, 0) 70%), linear-gradient(180deg, rgba(244, 248, 253, 0) 74%, #F4F8FD 100%); }
+        .nt-hero__in { position: absolute; z-index: 2; left: 0; right: 0; top: env(safe-area-inset-top, 0px); max-width: 480px; margin: 0 auto; padding: 22px 18px 0; }
+        .nt-hero__row { display: flex; align-items: center; gap: 14px; }
+        .nt-back { width: 46px; height: 46px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(255, 255, 255, 0.2); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff; cursor: pointer; }
+        .nt-back .nt-i { width: 22px; height: 22px; }
+        .nt-back:active { transform: scale(0.95); }
+        .nt-hero h1 { font-size: 27px; font-weight: 800; line-height: 1.1; letter-spacing: -0.3px; color: #fff; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55); }
+        .nt-hero p { margin-top: 3px; font-size: 15px; line-height: 1.3; color: #E8EEF8; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6); }
+        .nt-markall { position: absolute; right: 18px; top: 88px; min-height: 44px; padding: 0 20px; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.96); color: #1E6FEA; font-size: 17px; font-weight: 700; box-shadow: 0 8px 22px rgba(11, 29, 58, 0.25); cursor: pointer; }
+        .nt-markall .nt-i { width: 22px; height: 22px; stroke-width: 2.6; }
+        .nt-markall:active { transform: scale(0.97); }
+        .nt-markall[hidden] { display: none; }
+
+        .nt-body { position: relative; z-index: 3; max-width: 480px; margin: -36px auto 0; padding: 0 14px 28px; }
+
+        /* ---- tabs ---- */
+        .nt-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 6px; background: #fff; border-radius: 26px; box-shadow: 0 10px 30px rgba(11, 29, 58, 0.1); }
+        .nt-tab { min-width: 0; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 0 8px; border: 0; border-radius: 20px; background: #F1F5FA; color: #3E4C66; font-size: 18px; font-weight: 600; cursor: pointer; transition: background 0.2s ease, color 0.2s ease; white-space: nowrap; }
+        .nt-tab .nt-i { width: 26px; height: 26px; }
+        .nt-tab.active { background: linear-gradient(90deg, #06B6F4, #3B6FFA 60%, #8B5CF5); color: #fff; font-weight: 700; box-shadow: 0 8px 18px rgba(59, 111, 250, 0.3); }
+
+        /* ---- list ---- */
+        #notifList { margin-top: 16px; display: flex; flex-direction: column; gap: 14px; }
+        .nt-card { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) 34px; gap: 14px; align-items: start; padding: 16px 12px 16px 16px; background: #fff; border-radius: 26px; border: 1.5px solid transparent; box-shadow: 0 8px 26px rgba(11, 29, 58, 0.06); cursor: pointer; transition: transform 0.15s ease, border-color 0.2s ease; }
+        .nt-card:active { transform: scale(0.992); }
+        .nt-card.unread { border-color: #D4E4FF; }
+        .nt-card:focus-visible, .nt-del:focus-visible, .nt-markall:focus-visible, .nt-back:focus-visible, .nt-tab:focus-visible, .nt-nav__item:focus-visible, .ma-btn:focus-visible { outline: 2px solid #2F6BFF; outline-offset: 2px; }
+
+        .nt-ic { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .nt-ic .nt-i { width: 28px; height: 28px; }
+        .nt-ic--green { background: #DDF5E7; color: #17A34A; }
+        .nt-ic--blue { background: #E1EEFF; color: #2F6BFF; }
+        .nt-ic--purple { background: #EFE8FF; color: #7C5CFF; }
+        .nt-ic--orange { background: #FFF1D6; color: #F59E0B; }
+        .nt-ic--red { background: #FFE6E6; color: #EF4444; }
+        .nt-ic--cyan { background: #DDF2FB; color: #0891B2; }
+        .nt-ic--yellow { background: #FFF6D6; color: #D9A400; }
+
+        .nt-main { min-width: 0; }
+        .nt-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 10px; }
+        .nt-title { flex: 1 1 auto; min-width: 0; font-size: 18px; font-weight: 800; line-height: 1.3; letter-spacing: -0.1px; color: var(--nt-navy); overflow-wrap: break-word; }
+        .nt-meta { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; font-size: 14.5px; color: var(--nt-muted); white-space: nowrap; }
+        .nt-dot { width: 13px; height: 13px; border-radius: 50%; background: #2F6BFF; box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.18); }
+        .nt-msg { margin-top: 6px; font-size: 16px; line-height: 1.45; color: #5B6B85; overflow-wrap: break-word; }
+        .nt-side { align-self: stretch; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding-top: 6px; color: #6B7A93; }
+        .nt-side > .nt-i { width: 24px; height: 24px; margin-top: 14px; }
+        .nt-del { width: 40px; height: 40px; margin-right: -4px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 12px; background: none; color: #A3AFC2; cursor: pointer; }
+        .nt-del .nt-i { width: 20px; height: 20px; }
+        .nt-del:active { background: #FDECEC; color: #EF4444; }
+
+        .nt-route { grid-column: 1 / -1; margin: 2px 4px 2px 0; padding-top: 12px; border-top: 1px solid #EEF2F8; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+        .nt-place { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .nt-place--r { flex-direction: row-reverse; text-align: right; }
+        .nt-flag { font-size: 28px; line-height: 1; flex-shrink: 0; }
+        .nt-place b { display: block; font-size: 16px; font-weight: 700; color: var(--nt-navy); overflow-wrap: anywhere; }
+        .nt-place small { display: none; }
+        .nt-line { display: flex; align-items: center; gap: 3px; min-width: 0; overflow: hidden; }
+        .nt-line .dash { flex: 1; min-width: 0; border-top: 2px dashed #B7C4D8; }
+        .nt-line .dot { width: 9px; height: 9px; flex-shrink: 0; border-radius: 50%; }
+        .nt-line .dot.g { background: #22C55E; }
+        .nt-line .dot.r { background: #EF4444; }
+        .nt-line img { width: 24px; height: auto; flex-shrink: 0; display: block; }
+
+        .nt-empty { padding: 52px 20px; text-align: center; color: var(--nt-muted); font-size: 16px; line-height: 1.5; background: #fff; border-radius: 28px; box-shadow: 0 10px 30px rgba(11, 29, 58, 0.07); }
+        .nt-empty .nt-i { width: 52px; height: 52px; color: #3B6FFA; margin-bottom: 8px; }
+
+        /* ---- GP: mission assigned by the admin ---- */
+        .nt-card.ma { display: block; padding: 18px 16px; cursor: default; }
+        .ma-head { display: flex; align-items: center; gap: 12px; }
+        .ma-badge { width: 52px; height: 52px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #E1EEFF; color: #2F6BFF; }
+        .ma-badge .nt-i { width: 26px; height: 26px; }
+        .ma-title { font-size: 18px; font-weight: 800; line-height: 1.25; color: var(--nt-navy); overflow-wrap: anywhere; }
+        .ma-sub { margin-top: 3px; font-size: 14px; color: var(--nt-muted); }
+        .ma-sub b { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #FFF1CF; color: #B87500; font-size: 11.5px; letter-spacing: 0.04em; }
+        .ma-route { margin: 14px 0 12px; font-size: 19px; font-weight: 800; color: var(--nt-navy); }
+        .ma-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .ma-cell { padding: 12px 14px; border-radius: 16px; background: #F4F8FD; border: 1px solid #E8EEF6; min-width: 0; }
+        .ma-label { display: flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--nt-muted); }
+        .ma-label .nt-i { width: 16px; height: 16px; }
+        .ma-value { margin-top: 3px; font-size: 17px; font-weight: 700; color: var(--nt-navy); overflow-wrap: anywhere; }
+        .ma-actions { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .ma-btn { min-height: 54px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 16px; font-size: 17px; font-weight: 800; cursor: pointer; }
+        .ma-btn .nt-i { width: 20px; height: 20px; stroke-width: 2.8; }
+        .ma-btn:active { transform: scale(0.98); }
+        .ma-accept { background: linear-gradient(135deg, #22C55E, #16A34A); color: #fff; box-shadow: 0 8px 18px rgba(34, 197, 94, 0.3); }
+        .ma-decline { background: #FFEDED; color: #D92D2D; }
+        .ma-state { margin-top: 14px; padding: 12px 14px; border-radius: 16px; font-size: 15px; line-height: 1.45; font-weight: 600; }
+        .ma-state.ok { background: #E3F7EA; color: #13803F; }
+        .ma-state.no { background: #FFF1F0; color: #B42318; }
+
+        /* ---- bottom nav ---- */
+        .nt-nav { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; height: calc(76px + env(safe-area-inset-bottom, 0px)); padding: 6px 4px env(safe-area-inset-bottom, 0px); display: flex; gap: 2px; background: rgba(255, 255, 255, 0.97); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid #E3EAF3; box-shadow: 0 -8px 24px rgba(11, 29, 58, 0.06); }
+        .nt-nav__item { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; border-radius: 18px; background: none; color: var(--nt-muted); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+        .nt-nav__item[aria-current="page"] { background: #E8F1FF; color: #1E6FEA; font-weight: 700; }
+        .nt-nav__icon { position: relative; display: flex; }
+        .nt-nav__icon .nt-i { width: 26px; height: 26px; }
+        .nt-dotbadge { position: absolute; top: -2px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: #EF4444; border: 2px solid #fff; }
+        .nt-dotbadge.hidden { display: none; }
+        .lbl-short { display: none; }
+        @media (max-width: 460px) { .lbl-long { display: none; } .lbl-short { display: inline; } .nt-nav__item { font-size: 11.5px; } }
+
+        /* PWA install banner (pwa.js): keep it compact */
+        #sengp-install-banner { bottom: 8px !important; padding: 8px 12px !important; gap: 10px !important; font-size: 12px !important; line-height: 1.3 !important; border-radius: 14px !important; }
+        #sengp-install-banner img { width: 34px !important; height: 34px !important; }
+        #sengp-install-banner strong { font-size: 13px !important; }
+
+        .nt-reveal { animation: ntReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 55ms); }
+        @keyframes ntReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+        @media (prefers-reduced-motion: reduce) { .nt-reveal { animation: none; } * { transition-duration: 0.01ms !important; } }
+
+        @media (max-width: 400px) {
+            .nt-tab { font-size: 16px; gap: 8px; }
+            .nt-tab .nt-i { width: 22px; height: 22px; }
+            .nt-markall { font-size: 16px; padding: 0 16px; }
+            .nt-title { font-size: 17px; }
+            .nt-msg { font-size: 15.5px; }
+        }
+        @media (max-width: 359px) {
+            .nt-body { padding-left: 10px; padding-right: 10px; }
+            .nt-tab .nt-i { display: none; }
+            .nt-card { grid-template-columns: 46px minmax(0, 1fr) 30px; gap: 10px; padding: 14px 8px 14px 12px; }
+            .nt-ic { width: 46px; height: 46px; }
+            .nt-ic .nt-i { width: 24px; height: 24px; }
+            .ma-grid, .ma-actions { grid-template-columns: 1fr; }
+            .nt-route { grid-template-columns: 1fr; justify-items: center; gap: 8px; }
+            .nt-place--r { flex-direction: row; text-align: left; }
+            .nt-line { width: 100%; }
         }
 
-        .content::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .content::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 6px;
-            border-radius: 16px;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 10px 16px;
-            background: transparent;
-            border: none;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.6);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .tab.active {
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
-            color: #1a1a2e;
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
-        }
-
-        /* Notification Cards */
-        .notif-section {
-            margin-bottom: 24px;
-        }
-
-        .section-date {
-            font-size: 12px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.5);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
-
-        .notif-card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .notif-card.unread {
-            background: rgba(78, 205, 196, 0.12);
-            border-color: rgba(78, 205, 196, 0.3);
-        }
-
-        .notif-card.unread::before {
-            content: '';
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 8px;
-            height: 8px;
-            background: #4ECDC4;
-            border-radius: 50%;
-            box-shadow: 0 0 10px rgba(78, 205, 196, 0.6);
-        }
-
-        .notif-card:hover {
-            transform: translateX(5px);
-            background: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .notif-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-
-        .notif-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            flex-shrink: 0;
-        }
-
-        .notif-icon.success {
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.3) 0%, rgba(76, 175, 80, 0.2) 100%);
-        }
-
-        .notif-icon.info {
-            background: linear-gradient(135deg, rgba(78, 205, 196, 0.3) 0%, rgba(78, 205, 196, 0.2) 100%);
-        }
-
-        .notif-icon.warning {
-            background: linear-gradient(135deg, rgba(255, 230, 109, 0.3) 0%, rgba(255, 230, 109, 0.2) 100%);
-        }
-
-        .notif-icon.alert {
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.3) 0%, rgba(255, 107, 107, 0.2) 100%);
-        }
-
-        .notif-content {
-            flex: 1;
-            padding-left: 12px;
-        }
-
-        .notif-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 6px;
-            line-height: 1.3;
-        }
-
-        .notif-message {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.5;
-            margin-bottom: 8px;
-        }
-
-        .notif-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .notif-time {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .notif-category {
-            padding: 4px 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.7);
-            text-transform: uppercase;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 80px 20px;
-        }
-
-        .empty-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-
-        .empty-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 12px;
-        }
-
-        .empty-description {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
-            line-height: 1.6;
-            max-width: 280px;
-            margin: 0 auto;
-        }
-
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 65px;
-            background: linear-gradient(180deg, rgba(15, 12, 41, 0.95) 0%, rgba(26, 22, 48, 0.98) 100%);
-            backdrop-filter: blur(30px);
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            padding: 6px 10px;
-            border-radius: 12px;
-            flex: 1;
-            max-width: 70px;
-            position: relative;
-        }
-
-        .nav-item.active { color:#FF6B6B; }
-        .nav-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; }
-        .nav-icon svg { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
-        .nav-item.active::after { content:''; position:absolute; top:-9px; left:50%; transform:translateX(-50%); width:26px; height:3px; border-radius:0 0 3px 3px; background:linear-gradient(90deg,#FF6B6B,#FFE66D); }
-        .nav-label { font-size:10px; font-weight:600; color:inherit; }
-        .nav-badge {
-            position:absolute; top:0px; left:calc(50% + 5px); min-width:17px; height:17px;
-            background:#FF4757; border:1.5px solid #121024; border-radius:9px;
-            display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; color:#fff; padding:0 4px;
-        }
-        .nav-badge.hidden { display:none; }
-        /* notif extras */
-        .notif-card { position:relative; }
-        .notif-del { position:absolute; top:10px; right:10px; background:rgba(255,107,107,.15); color:#ff8f8f; border:none;
-            border-radius:8px; width:28px; height:28px; font-size:13px; cursor:pointer; }
-        .notif-empty { text-align:center; padding:50px 20px; color:rgba(255,255,255,.5); }
-        .notif-empty .ic { font-size:46px; margin-bottom:10px; }
-        /* Mission-assignment card (admin → GP) */
-        .mission-assign-card { display:block; padding:16px; border:1px solid rgba(255,215,0,.45);
-            background:linear-gradient(135deg,rgba(255,215,0,.10),rgba(255,165,0,.06)); border-radius:16px; margin-bottom:12px; }
-        .ma-head { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
-        .ma-badge { width:42px; height:42px; border-radius:12px; flex-shrink:0; font-size:21px;
-            background:linear-gradient(135deg,rgba(255,215,0,.3),rgba(255,165,0,.2)); display:flex; align-items:center; justify-content:center; }
-        .ma-title { font-size:14px; font-weight:800; color:#FFD700; }
-        .ma-sub { font-size:11px; color:rgba(255,255,255,.5); }
-        .ma-route { background:rgba(255,255,255,.06); border-radius:10px; padding:10px 12px; margin-bottom:8px; font-size:14px; font-weight:700; color:#fff; }
-        .ma-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
-        .ma-cell { background:rgba(255,255,255,.06); border-radius:10px; padding:9px 12px; }
-        .ma-label { font-size:10px; color:rgba(255,255,255,.5); text-transform:uppercase; letter-spacing:.3px; margin-bottom:3px; }
-        .ma-value { font-size:13px; font-weight:700; color:#fff; }
-        .ma-actions { display:flex; gap:10px; }
-        .ma-btn { flex:1; padding:12px; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; border:none; transition:all .2s ease; }
-        .ma-accept { background:linear-gradient(135deg,#4CAF50,#43A047); color:#fff; box-shadow:0 4px 12px rgba(76,175,80,.4); }
-        .ma-decline { background:rgba(255,107,107,.1); border:2px solid rgba(255,107,107,.4); color:#FF6B6B; }
-        .ma-state { border-radius:12px; padding:12px 14px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:8px; }
-        .ma-state.ok { background:rgba(76,175,80,.15); border:1px solid rgba(76,175,80,.4); color:#4CAF50; }
-        .ma-state.no { background:rgba(255,107,107,.1); border:1px solid rgba(255,107,107,.3); color:#FF6B6B; }
-            /* sengp-responsive-override */
+        /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
-        </style>
+    </style>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -416,44 +189,53 @@
     <script src="pwa.js" defer></script>
 </head>
 <body class="ds">
-    <div class="mobile-frame">
+<div class="mobile-frame">
+  <div class="nt-screen">
 
-        <!-- Header -->
-        <div class="header">
-            <div class="header-left">
-                <button class="back-btn" onclick="goBack()">←</button>
-                <div class="header-title">
-                    <h1>Notifications</h1>
-                    <p>5 non lues</p>
-                </div>
+    <!-- Scrollable content (pull-to-refresh attaches to .content) -->
+    <div class="content nt-scroll" id="scroller">
+      <header class="nt-hero">
+        <picture>
+          <source type="image/webp" srcset="im/sengp-create-background.webp">
+          <img src="im/sengp-create-background.jpg" alt="" width="1400" height="788" decoding="async">
+        </picture>
+        <div class="nt-hero__in">
+          <div class="nt-hero__row">
+            <button type="button" class="nt-back" onclick="goBack()" aria-label="Retour">
+              <svg class="nt-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            </button>
+            <div>
+              <h1>Notifications</h1>
+              <p id="heroSub">Restez informé de vos envois</p>
             </div>
-            <button class="mark-all-btn" onclick="markAllAsRead()">Tout marquer lu</button>
+          </div>
+          <button type="button" class="nt-markall" id="markAllBtn" onclick="markAllAsRead()" hidden>
+            <svg class="nt-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Tout marquer lu
+          </button>
+        </div>
+      </header>
+
+      <div class="nt-body">
+        <div class="nt-tabs nt-reveal" style="--i:0" role="tablist" aria-label="Filtrer les notifications">
+          <button type="button" class="nt-tab active" id="tab-all" role="tab" aria-selected="true" onclick="switchTab('all')">
+            <svg class="nt-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+            <span>Toutes (<span id="cnt-all">0</span>)</span>
+          </button>
+          <button type="button" class="nt-tab" id="tab-unread" role="tab" aria-selected="false" onclick="switchTab('unread')">
+            <svg class="nt-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+            <span>Non lues (<span id="cnt-unread">0</span>)</span>
+          </button>
         </div>
 
-        <!-- Content -->
-        <div class="content">
-            <!-- Tabs -->
-            <div class="tabs">
-                <button class="tab active" id="tab-all" onclick="switchTab('all',this)">Toutes (0)</button>
-                <button class="tab" id="tab-unread" onclick="switchTab('unread',this)">Non lues (0)</button>
-            </div>
-
-            <div class="notif-section" id="notifList">
-                <div class="notif-empty">Chargement…</div>
-            </div>
-        </div>
-
-        <!-- Bottom Navigation (expediteur default; replaced for GP in JS) -->
-        <div class="bottom-nav" id="bottomNav">
-            <div class="nav-item" onclick="navigateTo('home')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div><div class="nav-label">Accueil</div></div>
-            <div class="nav-item" onclick="navigateTo('reclamation')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10.3 4 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div><div class="nav-label">Réclamation</div></div>
-            <div class="nav-item" onclick="navigateTo('tracking')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="nav-label">Suivi</div></div>
-            <div class="nav-item active" onclick="navigateTo('notifications')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><div class="nav-label">Notifications</div><div class="nav-badge hidden" id="notifNavBadge">0</div></div>
-            <div class="nav-item" onclick="navigateTo('profile')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div><div class="nav-label">Profil</div></div>
-        </div>
+        <div id="notifList"><div class="nt-empty">Chargement…</div></div>
+      </div>
     </div>
 
-    <script>
+    <!-- Bottom navigation (expéditeur by default; replaced for GP in JS) -->
+    <nav class="nt-nav" id="bottomNav" aria-label="Navigation principale"></nav>
+  </div>
+</div>
+<script>
         const API_BASE_URL = window.API_BASE_URL;
         function getAuthToken() { return localStorage.getItem('authToken'); }
 
@@ -466,34 +248,80 @@
             window.location.href = userType === 'gp' ? 'dashgp.html' : 'dashexpediteur.html';
         }
 
+        const P = (d) => '<svg class="nt-i" viewBox="0 0 24 24" aria-hidden="true">' + d + '</svg>';
+        const ICON = {
+            bell: P('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>'),
+            home: P('<path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/>'),
+            box: P('<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/>'),
+            alert: P('<path d="M10.3 4 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),
+            pin: P('<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>'),
+            user: P('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>'),
+            search: P('<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>'),
+            plane: P('<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>'),
+            truck: P('<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>'),
+            doc: P('<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>'),
+            check: P('<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>'),
+            checkOnly: P('<path d="M20 6 9 17l-5-5"/>'),
+            coins: P('<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/>'),
+            star: P('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'),
+            chat: P('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'),
+            target: P('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'),
+            chev: P('<path d="m9 18 6-6-6-6"/>'),
+            trash: P('<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>'),
+            cal: P('<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/>'),
+            clock: P('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
+            x: P('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>')
+        };
+        const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        // ---- bottom navigation (expéditeur: 6 tabs like the rest of the redesigned app)
+        const NAV = {
+            expediteur: [
+                ['home', 'Accueil', null, ICON.home], ['orders', 'Envois', null, ICON.box], ['reclamation', 'Alertes', null, ICON.alert],
+                ['tracking', 'Suivi', null, ICON.pin], ['notifications', 'Notifications', 'Notifs', ICON.bell], ['profile', 'Profil', null, ICON.user]
+            ],
+            gp: [
+                ['home', 'Accueil', null, ICON.home], ['missions', 'Missions', null, ICON.search], ['trips', 'Trajets', null, ICON.plane],
+                ['notifications', 'Notifs', null, ICON.bell], ['profile', 'Profil', null, ICON.user]
+            ]
+        };
         function buildNav() {
-            if (userType !== 'gp') return; // expéditeur nav is the static default in the HTML
-            document.getElementById('bottomNav').innerHTML =
-                '<div class="nav-item" onclick="navigateTo(\'home\')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div><div class="nav-label">Accueil</div></div>'
-              + '<div class="nav-item" onclick="navigateTo(\'missions\')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div><div class="nav-label">Missions</div></div>'
-              + '<div class="nav-item" onclick="navigateTo(\'trips\')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M2 16 22 6 12 22l-2-7-8-2z"/></svg></div><div class="nav-label">Trajets</div></div>'
-              + '<div class="nav-item active" onclick="navigateTo(\'notifications\')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><div class="nav-label">Notifs</div><div class="nav-badge hidden" id="notifNavBadge">0</div></div>'
-              + '<div class="nav-item" onclick="navigateTo(\'profile\')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div><div class="nav-label">Profil</div></div>';
+            document.getElementById('bottomNav').innerHTML = (NAV[userType === 'gp' ? 'gp' : 'expediteur']).map(([key, label, short, icon]) => {
+                const cur = key === 'notifications';
+                const text = short ? `<span class="lbl-long">${label}</span><span class="lbl-short">${short}</span>` : `<span>${label}</span>`;
+                const dot = key === 'notifications' ? '<span class="nt-dotbadge hidden" id="notifNavBadge" aria-label="Notifications non lues"></span>' : '';
+                return `<button type="button" class="nt-nav__item"${cur ? ' aria-current="page"' : ''} onclick="navigateTo('${key}')"><span class="nt-nav__icon">${icon}${dot}</span>${text}</button>`;
+            }).join('');
+            if (userType === 'gp') document.getElementById('heroSub').textContent = 'Restez informé de vos missions';
         }
 
         let allNotifs = [];
         let currentTab = 'all';
+        let firstRender = true;
         // Local response state for assigned missions, keyed by notification id.
         const missionStates = {};
-        const IC = (p) => '<svg class="ic" viewBox="0 0 24 24">' + p + '</svg>';
-        const ICONS = {
-            delivery: IC('<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/>'),
-            tracking: IC('<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>'),
-            payment: IC('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'),
-            support: IC('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'),
-            promo: IC('<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>'),
-            feedback: IC('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'),
-            mission_assigned: IC('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'),
-            mission_matched: IC('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'),
-            mission_accepted: IC('<path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/>'),
-            mission_delivered: IC('<path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/>')
-        };
-        const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+        // notification type (+ keywords) -> icon and colour
+        function kindOf(n) {
+            const t = n.notification_type || '', text = ((n.title || '') + ' ' + (n.message || '')).toLowerCase();
+            if (/probl[eè]me|échou|echou|échec|refus|litige|annul/.test(text)) return ['alert', 'red'];
+            if (/document|facture/.test(text)) return ['doc', 'orange'];
+            switch (t) {
+                case 'mission_transit': return ['plane', 'green'];
+                case 'mission_matched': case 'mission_assigned': case 'mission_accepted': return ['truck', 'blue'];
+                case 'mission_pickup': return ['box', 'purple'];
+                case 'mission_delivered': return ['check', 'blue'];
+                case 'payment_received': return ['coins', 'cyan'];
+                case 'claim_created': case 'claim_resolved': return ['chat', 'orange'];
+                case 'review_received': return ['star', 'yellow'];
+                case 'account_verified': return ['checkOnly', 'green'];
+                case 'system_alert': return ['alert', 'orange'];
+                default: return ['bell', 'blue'];
+            }
+        }
+
+        const FLAGS = {'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱','Algérie':'🇩🇿','Tunisie':'🇹🇳','Côte d\'Ivoire':'🇨🇮','Belgique':'🇧🇪','Suisse':'🇨🇭'};
+        const flag = c => FLAGS[c] || '🌍';
 
         async function loadUserNotifications() {
             const token = getAuthToken();
@@ -507,24 +335,26 @@
                 updateCounts();
                 render();
             } catch (e) {
-                document.getElementById('notifList').innerHTML = '<div class="notif-empty">Erreur de chargement.</div>';
+                document.getElementById('notifList').innerHTML = '<div class="nt-empty">' + ICON.alert + '<div>Erreur de chargement.</div></div>';
             }
         }
 
         function updateCounts() {
             const unread = allNotifs.filter(n => !n.is_read).length;
-            document.querySelector('.header-title p').textContent = unread + ' non lue' + (unread > 1 ? 's' : '');
-            document.getElementById('tab-all').textContent = 'Toutes (' + allNotifs.length + ')';
-            document.getElementById('tab-unread').textContent = 'Non lues (' + unread + ')';
+            document.getElementById('cnt-all').textContent = allNotifs.length;
+            document.getElementById('cnt-unread').textContent = unread;
+            document.getElementById('markAllBtn').hidden = unread === 0;
             const nav = document.getElementById('notifNavBadge');
-            if (unread > 0) { nav.textContent = unread; nav.classList.remove('hidden'); }
-            else { nav.classList.add('hidden'); }
+            if (nav) nav.classList.toggle('hidden', unread === 0);
         }
 
-        function switchTab(tab, el) {
+        function switchTab(tab) {
             currentTab = tab;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            if (el) el.classList.add('active');
+            ['all', 'unread'].forEach(t => {
+                const b = document.getElementById('tab-' + t);
+                b.classList.toggle('active', t === tab);
+                b.setAttribute('aria-selected', String(t === tab));
+            });
             render();
         }
 
@@ -532,27 +362,37 @@
             const list = currentTab === 'unread' ? allNotifs.filter(n => !n.is_read) : allNotifs;
             const box = document.getElementById('notifList');
             if (!list.length) {
-                box.innerHTML = '<div class="notif-empty"><div class="ic">' + IC('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>') + '</div>' +
-                    (currentTab === 'unread' ? 'Aucune notification non lue.' : 'Aucune notification pour le moment.') + '</div>';
+                box.innerHTML = '<div class="nt-empty">' + ICON.bell + '<div>' +
+                    (currentTab === 'unread' ? 'Aucune notification non lue.' : 'Aucune notification pour le moment.') + '</div></div>';
                 return;
             }
-            box.innerHTML = list.map(card).join('');
+            box.innerHTML = list.map((n, i) => card(n, i)).join('');
+            firstRender = false;
         }
 
-        function card(n) {
-            if (n.notification_type === 'mission_assigned' || n.notification_type === 'mission_matched') {
+        function routeStrip(md) {
+            if (!md || !md.departure_city || !md.arrival_city) return '';
+            return '<div class="nt-route"><div class="nt-place"><span class="nt-flag">' + flag(md.departure_country) + '</span><div><b>' + esc(md.departure_city) + '</b><small></small></div></div>'
+                + '<div class="nt-line" aria-hidden="true"><i class="dot g"></i><span class="dash"></span><img src="im/sengp-plane.png" alt="" width="192" height="142"><span class="dash"></span><i class="dot r"></i></div>'
+                + '<div class="nt-place nt-place--r"><span class="nt-flag">' + flag(md.arrival_country) + '</span><div><b>' + esc(md.arrival_city) + '</b><small></small></div></div></div>';
+        }
+
+        function card(n, i) {
+            if (userType === 'gp' && (n.notification_type === 'mission_assigned' || n.notification_type === 'mission_matched')) {
                 return missionCard(n);
             }
-            return '<div class="notif-card ' + (!n.is_read ? 'unread' : '') + '" onclick="viewNotif(\'' + n.notification_id + '\')">'
-                + '<div class="notif-icon">' + (ICONS[n.type] || ICONS[n.notification_type] || IC('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>')) + '</div>'
-                + '<div class="notif-content">'
-                + '<div class="notif-title">' + esc(n.title) + '</div>'
-                + '<div class="notif-message">' + esc(n.message) + '</div>'
-                + '<div class="notif-time">' + formatTime(n.created_at) + '</div>'
+            const [icon, color] = kindOf(n);
+            const anim = firstRender && i < 6 ? ' nt-reveal' : '';
+            const id = esc(n.notification_id);
+            return '<article class="nt-card' + (!n.is_read ? ' unread' : '') + anim + '" style="--i:' + (i + 1) + '" data-id="' + id + '" role="button" tabindex="0">'
+                + '<span class="nt-ic nt-ic--' + color + '" aria-hidden="true">' + ICON[icon] + '</span>'
+                + '<div class="nt-main">'
+                + '<div class="nt-top"><h3 class="nt-title">' + esc(n.title) + '</h3><span class="nt-meta"><span>' + esc(formatTime(n.created_at)) + '</span>' + (!n.is_read ? '<i class="nt-dot" aria-label="Non lue"></i>' : '') + '</span></div>'
+                + '<p class="nt-msg">' + esc(n.message) + '</p>'
                 + '</div>'
-                + (!n.is_read ? '<div class="unread-dot"></div>' : '')
-                + '<button class="notif-del" onclick="delNotif(event,\'' + n.notification_id + '\')">' + IC('<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>') + '</button>'
-                + '</div>';
+                + '<div class="nt-side">' + ICON.chev + '<button type="button" class="nt-del" data-del="' + id + '" aria-label="Supprimer la notification">' + ICON.trash + '</button></div>'
+                + routeStrip(n.metadata)
+                + '</article>';
         }
 
         function formatFCFA(v) {
@@ -575,6 +415,7 @@
             const weight = (md.package_weight != null) ? md.package_weight + ' kg' : '—';
             const price = (md.price != null) ? formatFCFA(md.price) : '—';
             const state = missionStates[n.notification_id];
+            const nid = esc(n.notification_id), mid = esc(missionId);
 
             let action;
             if (state === 'accepted') {
@@ -585,27 +426,27 @@
                 action = '<div class="ma-state no">⚠️ Détails de mission indisponibles.</div>';
             } else {
                 action = '<div class="ma-actions">'
-                    + '<button class="ma-btn ma-accept" onclick="handleMissionResponse(\'' + n.notification_id + '\',\'' + missionId + '\',\'accept\')">' + IC('<polyline points="20 6 9 17 4 12"/>') + ' Accepter</button>'
-                    + '<button class="ma-btn ma-decline" onclick="handleMissionResponse(\'' + n.notification_id + '\',\'' + missionId + '\',\'decline\')">' + IC('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>') + ' Décliner</button>'
+                    + '<button type="button" class="ma-btn ma-accept" data-resp="accept" data-nid="' + nid + '" data-mid="' + mid + '">' + ICON.checkOnly + 'Accepter</button>'
+                    + '<button type="button" class="ma-btn ma-decline" data-resp="decline" data-nid="' + nid + '" data-mid="' + mid + '">' + ICON.x + 'Décliner</button>'
                     + '</div>';
             }
 
-            return '<div class="notif-card mission-assign-card ' + (!n.is_read ? 'unread' : '') + '" id="notif-card-' + n.notification_id + '">'
+            return '<article class="nt-card ma' + (!n.is_read ? ' unread' : '') + '" id="notif-card-' + nid + '">'
                 + '<div class="ma-head">'
-                + '<div class="ma-badge">' + IC('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>') + '</div>'
-                + '<div style="flex:1;"><div class="ma-title">Mission assignée' + (code ? ' — ' + esc(code) : '') + '</div>'
-                + '<div class="ma-sub">' + formatTime(n.created_at) + ' · <span style="color:#FFD700;">PAR L\'ADMIN</span></div></div>'
-                + '<button class="notif-del" style="position:static;" onclick="delNotif(event,\'' + n.notification_id + '\')">' + IC('<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>') + '</button>'
+                + '<div class="ma-badge">' + ICON.target + '</div>'
+                + '<div style="flex:1;min-width:0;"><div class="ma-title">Mission assignée' + (code ? ' — ' + esc(code) : '') + '</div>'
+                + '<div class="ma-sub">' + esc(formatTime(n.created_at)) + ' · <b>PAR L\'ADMIN</b></div></div>'
+                + '<button type="button" class="nt-del" data-del="' + nid + '" aria-label="Supprimer la notification">' + ICON.trash + '</button>'
                 + '</div>'
                 + '<div class="ma-route">' + esc(route) + '</div>'
                 + '<div class="ma-grid">'
-                + '<div class="ma-cell"><div class="ma-label">' + IC('<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/>') + ' Date</div><div class="ma-value">' + esc(date) + '</div></div>'
-                + '<div class="ma-cell"><div class="ma-label">' + IC('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>') + ' Heure</div><div class="ma-value">' + esc(time) + '</div></div>'
-                + '<div class="ma-cell"><div class="ma-label">⚖️ Poids</div><div class="ma-value">' + esc(weight) + '</div></div>'
-                + '<div class="ma-cell"><div class="ma-label">' + IC('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>') + ' Rémunération</div><div class="ma-value" style="color:#FFD700;">' + esc(price) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">' + ICON.cal + ' Date</div><div class="ma-value">' + esc(date) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">' + ICON.clock + ' Heure</div><div class="ma-value">' + esc(time) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">' + ICON.box + ' Poids</div><div class="ma-value">' + esc(weight) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">' + ICON.coins + ' Rémunération</div><div class="ma-value">' + esc(price) + '</div></div>'
                 + '</div>'
                 + action
-                + '</div>';
+                + '</article>';
         }
 
         async function handleMissionResponse(notifId, missionId, action) {
@@ -648,13 +489,21 @@
         }
 
         function formatTime(dateString) {
-            const date = new Date(dateString), now = new Date();
-            const m = Math.floor((now - date) / 60000), h = Math.floor((now - date) / 3600000), d = Math.floor((now - date) / 86400000);
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return '';
+            const diff = Date.now() - date.getTime();
+            const m = Math.floor(diff / 60000), h = Math.floor(diff / 3600000), d = Math.floor(diff / 86400000);
             if (m < 1) return "À l'instant";
             if (m < 60) return 'Il y a ' + m + ' min';
             if (h < 24) return 'Il y a ' + h + ' h';
-            if (d < 7) return 'Il y a ' + d + ' j';
+            if (d < 7) return 'Il y a ' + d + (d > 1 ? ' jours' : ' jour');
             return date.toLocaleDateString('fr-FR');
+        }
+
+        // The old shipment detail page is replaced by "Mes envois"
+        function targetUrl(url) {
+            const m = /^detailenvoi\.html\?id=(.+)$/.exec(url || '');
+            return m ? 'envois.html?open=' + m[1] : url;
         }
 
         async function viewNotif(id) {
@@ -668,7 +517,7 @@
             if (n) n.is_read = true;
             updateCounts();
             // Redirige vers l'élément concerné si la notification a une cible.
-            const url = n && n.action_url;
+            const url = n && targetUrl(n.action_url);
             if (url) {
                 if (/^https?:\/\//i.test(url)) window.open(url, '_blank');
                 else window.location.href = url;
@@ -677,8 +526,7 @@
             render();
         }
 
-        async function delNotif(ev, id) {
-            ev.stopPropagation();
+        async function delNotif(id) {
             const token = getAuthToken();
             try {
                 await fetch(`${API_BASE_URL}/notifications/${id}`, {
@@ -701,10 +549,24 @@
             } catch (e) { console.error(e); }
         }
 
+        // ---- list interactions (event delegation)
+        document.getElementById('notifList').addEventListener('click', e => {
+            const del = e.target.closest('[data-del]');
+            if (del) { e.stopPropagation(); delNotif(del.dataset.del); return; }
+            const resp = e.target.closest('[data-resp]');
+            if (resp) { e.stopPropagation(); handleMissionResponse(resp.dataset.nid, resp.dataset.mid, resp.dataset.resp); return; }
+            const card = e.target.closest('.nt-card[data-id]');
+            if (card) viewNotif(card.dataset.id);
+        });
+        document.getElementById('notifList').addEventListener('keydown', e => {
+            if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.nt-card[data-id]')) { e.preventDefault(); viewNotif(e.target.dataset.id); }
+        });
+
         function navigateTo(section) {
             const gp = { home:'dashgp.html', missions:'missions.html', trips:'trajets.html', notifications:'notifications.html', profile:'profilegp.html' };
-            const exp = { home:'dashexpediteur.html', reclamation:'reclamation.html', tracking:'suivi.html', notifications:'notifications.html', profile:'profile.html' };
+            const exp = { home:'dashexpediteur.html', orders:'envois.html', reclamation:'reclamation.html', tracking:'suivi.html', notifications:'notifications.html', profile:'profile.html' };
             const pages = userType === 'gp' ? gp : exp;
+            if (section === 'notifications') { document.getElementById('scroller').scrollTo({ top: 0, behavior: 'smooth' }); return; }
             if (pages[section]) window.location.href = pages[section];
         }
 
