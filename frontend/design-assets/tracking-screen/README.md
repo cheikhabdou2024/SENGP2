@@ -1,0 +1,8 @@
+# Suivi en temps réel (suivi.html)
+
+- Maquette : `reference-mockup-tracking.png`. Images réutilisées : fond `../../im/sengp-create-background.*`, colis 3D `../../im/sengp-box-3d.*`, avion `../../im/sengp-plane.*`.
+- Correctif : l'onglet « En cours » ne comptait que `picked_up / in_transit / in_customs / out_for_delivery`. Un envoi tout juste créé (`pending`) tombait dans « À venir », donc « En cours » restait vide. Maintenant : **En cours** = `pending`, `picked_up`, `in_transit`, `in_customs`, `out_for_delivery` ; **À venir** = `matched`, `accepted` (GP trouvé, départ à venir) ; **Livrés** = `delivered`. Au chargement, l'onglet affiché est le premier non vide.
+- Page : recherche par n° de colis (un colis à soi ouvre sa carte, sinon page publique `/t/<n°>`), onglets avec compteurs, cartes dépliables (la première ouverte) avec code copiable, état, description, poids, prix, route, chronologie en 5 étapes, position GPS du GP (si disponible), date d'envoi / départ souhaité / destinataire, Partager (feuille du bas), Appeler le GP, « Voir les détails du suivi » → `envois.html?open=<id>`.
+- Chronologie : « Pris en charge par le GP » → « Colis récupéré » → « En transit » → « Arrivé à destination » → « Livré » (ordre réel : un GP prend en charge avant la récupération). Dates et lieux lus dans `GET /missions/:id/tracking` (événement le plus ancien de chaque statut), avec repli sur `actual_pickup_date` / `actual_delivery_date`.
+- Pas de « type de colis » (non enregistré par le serveur) : la maquette est adaptée avec le prix et le destinataire.
+- Actualisation automatique toutes les 45 s et par tirer-pour-actualiser.

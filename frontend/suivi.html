@@ -5,74 +5,245 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SEN GP - Suivi</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-    background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%); min-height:100vh; display:flex; justify-content:center; color:#fff; }
-  .mobile-frame { width:100%; max-width:480px; min-height:100vh; min-height:100dvh; position:relative;
-    background:linear-gradient(135deg, rgba(15,12,41,.95), rgba(36,36,62,.95)); padding-bottom:78px; }
-  .header { padding:18px 18px 14px; background:rgba(255,255,255,.03); border-bottom:1px solid rgba(255,255,255,.1);
-    position:sticky; top:0; z-index:6; backdrop-filter:blur(10px); }
-  .header h1 { font-size:20px; margin-bottom:2px; }
-  .header p { font-size:12px; color:rgba(255,255,255,.6); margin-bottom:12px; }
-  .track-bar { display:flex; gap:8px; }
-  .track-bar input { flex:1; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,.18);
-    background:rgba(255,255,255,.08); color:#fff; font-size:14px; }
-  .track-bar button { padding:11px 14px; border:none; border-radius:11px; background:#FF6B6B; color:#fff; font-weight:700; font-size:13px; cursor:pointer; }
-  .content { padding:16px 18px; }
-  .tabs { display:flex; gap:8px; margin-bottom:16px; background:rgba(255,255,255,.05); padding:6px; border-radius:14px; }
-  .tab { flex:1; padding:9px; border:none; border-radius:10px; background:transparent; color:rgba(255,255,255,.6); font-weight:600; font-size:13px; cursor:pointer; }
-  .tab.active { background:linear-gradient(135deg,#FF6B6B,#FFE66D); color:#1a1a2e; }
-  .card { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:16px; margin-bottom:14px; }
-  .row { display:flex; justify-content:space-between; align-items:flex-start; }
-  .code { font-size:12px; color:rgba(255,255,255,.5); }
-  .ptype { font-weight:700; font-size:15px; }
-  .badge { padding:4px 10px; border-radius:8px; font-size:11px; font-weight:700; }
-  .b-yellow{background:rgba(255,215,0,.18);color:#FFD700}.b-blue{background:rgba(78,205,196,.2);color:#4ECDC4}
-  .b-green{background:rgba(76,175,80,.2);color:#7ee081}.b-red{background:rgba(255,107,107,.2);color:#ff8f8f}.b-gray{background:rgba(255,255,255,.12);color:#ccc}
-  .route { display:flex; align-items:center; gap:8px; font-size:14px; margin:10px 0; }
-  .route .flag{font-size:20px} .route .arrow{color:rgba(255,255,255,.4)}
-  /* étapes */
-  .steps { display:flex; align-items:center; margin:14px 0 4px; }
-  .step { flex:1; text-align:center; position:relative; }
-  .step .dot { width:14px; height:14px; border-radius:50%; background:rgba(255,255,255,.18); margin:0 auto; }
-  .step.done .dot { background:#4ECDC4; box-shadow:0 0 0 3px rgba(78,205,196,.2); }
-  .step .lbl { font-size:8.5px; color:rgba(255,255,255,.5); margin-top:5px; text-transform:uppercase; letter-spacing:.2px; }
-  .step.done .lbl { color:#4ECDC4; }
-  .step .bar { position:absolute; top:6px; left:-50%; width:100%; height:2px; background:rgba(255,255,255,.15); z-index:-1; }
-  .step.done .bar { background:#4ECDC4; }
-  .steps { position:relative; z-index:0; }
-  iframe.map { width:100%; height:150px; border:0; border-radius:12px; margin-top:6px; background:rgba(255,255,255,.04); }
-  .map-ph { width:100%; height:60px; border-radius:12px; background:rgba(255,255,255,.04); display:flex; align-items:center; justify-content:center; font-size:12px; color:rgba(255,255,255,.5); margin-top:6px; }
-  .meta { display:flex; justify-content:space-between; font-size:12px; color:rgba(255,255,255,.6); margin-top:10px; }
-  .actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
-  .btn { flex:1; min-width:96px; padding:10px; border:none; border-radius:10px; font-size:12.5px; font-weight:700; cursor:pointer; text-decoration:none; text-align:center; }
-  .btn-d{background:rgba(255,255,255,.1);color:#fff}.btn-call{background:rgba(76,175,80,.22);color:#7ee081}.btn-share{background:rgba(78,205,196,.2);color:#4ECDC4}
-  .ico { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; flex:none; }
-  .alert { font-size:12px; padding:8px 10px; border-radius:10px; margin-top:10px; display:flex; align-items:center; gap:6px; }
-  .alert .ico { width:14px; height:14px; }
-  .alert-warn{background:rgba(255,215,0,.12);color:#FFD700}.alert-ok{background:rgba(76,175,80,.15);color:#7ee081}
-  .loading,.empty { text-align:center; padding:50px 20px; color:rgba(255,255,255,.55); }
-  .empty .ic{display:flex;justify-content:center;margin-bottom:12px;opacity:.85}
-  .empty .ic .ico{width:50px;height:50px;stroke-width:1.4}
-  .empty .cta{display:inline-block;margin-top:14px;padding:11px 18px;border-radius:12px;background:linear-gradient(135deg,#FF6B6B,#FFE66D);color:#1a1a2e;font-weight:700;text-decoration:none}
-  /* bottom nav */
-  .bottom-nav{position:absolute;bottom:0;left:0;right:0;background:rgba(18,16,36,.92);backdrop-filter:blur(24px);border-top:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-around;align-items:stretch;padding:9px 6px calc(9px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px rgba(0,0,0,.35)}
-  .nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;flex:1;position:relative;padding:6px 0;border-radius:14px;color:rgba(255,255,255,.5);-webkit-tap-highlight-color:transparent}
-  .nav-icon-wrapper{position:relative;display:flex;align-items:center;justify-content:center;width:24px;height:24px}
-  .nav-icon svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-  .nav-label{font-size:10px;font-weight:600}
-  .nav-item.active{color:#FF6B6B}
-  .nav-item.active::after{content:'';position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:26px;height:3px;border-radius:0 0 3px 3px;background:linear-gradient(90deg,#FF6B6B,#FFE66D)}
-  /* bottom sheet */
-  .sheet-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
-  .sheet-ov.open{opacity:1;pointer-events:auto}
-  .sheet{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:#1d1b34;border-radius:22px 22px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);z-index:51}
-  .sheet-ov.open .sheet{transform:translateY(0)}
-  .sheet-grip{width:42px;height:5px;border-radius:3px;background:rgba(255,255,255,.25);margin:6px auto 14px}
-  .sheet h3{font-size:16px;margin-bottom:12px}
-  .share-opt{display:flex;align-items:center;gap:14px;width:100%;padding:14px;border:none;border-radius:14px;background:rgba(255,255,255,.06);color:#fff;font-size:15px;font-weight:600;margin-bottom:10px;cursor:pointer;text-align:left}
-  .share-opt .ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px}
-  .ic-wa{background:#25D366}.ic-mail{background:#EA4335}.ic-copy{background:rgba(255,255,255,.15)}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { background: #F4F8FD; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #F4F8FD;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            color: #0B1D3A;
+        }
+        :root { --sv-navy: #0B1D3A; --sv-muted: #6B7A93; }
+
+        /* ============================================
+           SUIVI EN TEMPS RÉEL
+           ============================================ */
+        .mobile-frame { position: relative; width: 100%; overflow: hidden; background: #F4F8FD; }
+        .mobile-frame::before { content: ""; position: absolute; inset: 0; z-index: 0; background: #F4F8FD; }
+        .sv-screen { position: absolute; inset: 0; z-index: 1; }
+        .sv-i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+        button, input { font: inherit; -webkit-tap-highlight-color: transparent; }
+
+        .sv-scroll {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+            overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .sv-scroll::-webkit-scrollbar { display: none; }
+        .sv-scroll.is-locked { overflow: hidden; }
+
+        /* ---- hero ---- */
+        .sv-hero { position: relative; height: calc(170px + env(safe-area-inset-top, 0px)); overflow: hidden; background: linear-gradient(180deg, #0B1D3A, #2B4A7A); }
+        .sv-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 72% 40%; }
+        .sv-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7, 20, 47, 0.5) 0%, rgba(7, 20, 47, 0.12) 55%, rgba(244, 248, 253, 0) 70%), linear-gradient(180deg, rgba(244, 248, 253, 0) 74%, #F4F8FD 100%); }
+        .sv-hero__row { position: absolute; z-index: 2; left: 0; right: 0; top: env(safe-area-inset-top, 0px); max-width: 480px; margin: 0 auto; padding: 22px 18px 0; display: flex; align-items: center; gap: 14px; }
+        .sv-back { width: 46px; height: 46px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(255, 255, 255, 0.2); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff; cursor: pointer; }
+        .sv-back .sv-i { width: 22px; height: 22px; }
+        .sv-back:active { transform: scale(0.95); }
+        .sv-hero h1 { font-size: 25px; font-weight: 800; line-height: 1.1; letter-spacing: -0.3px; color: #fff; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55); }
+        .sv-hero p { margin-top: 3px; font-size: 14.5px; line-height: 1.3; color: #E8EEF8; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6); }
+
+        .sv-body { position: relative; z-index: 3; max-width: 480px; margin: -50px auto 0; padding: 0 14px 28px; }
+
+        /* ---- search ---- */
+        .sv-search { display: flex; align-items: center; gap: 8px; padding: 8px; background: #fff; border-radius: 26px; box-shadow: 0 10px 30px rgba(11, 29, 58, 0.12); }
+        .sv-search__box { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 14px; border-radius: 18px; background: #F4F8FD; color: #4B5B78; }
+        .sv-search__box:focus-within { box-shadow: 0 0 0 2px #FF9A3D; }
+        .sv-search__box .sv-i { width: 26px; height: 26px; }
+        .ds .sv-search input, .ds .sv-search input:focus { flex: 1; min-width: 0; width: 100%; border: 0; border-radius: 0; background: transparent; box-shadow: none; outline: none; color: var(--sv-navy); font-size: 16px; padding: 0; }
+        .sv-search input::placeholder { color: #8A97AD; opacity: 1; }
+        .sv-go { min-height: 52px; padding: 0 22px; border: 0; border-radius: 18px; background: linear-gradient(90deg, #06B6F4, #3B6FFA 60%, #7B5CF5); color: #fff; font-size: 17px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 18px rgba(59, 111, 250, 0.35); }
+        .sv-go:active { transform: scale(0.97); }
+
+        /* ---- tabs ---- */
+        .sv-tabs { margin-top: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 6px; background: #fff; border-radius: 26px; box-shadow: 0 10px 30px rgba(11, 29, 58, 0.08); }
+        .sv-tab { min-width: 0; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; padding: 0 6px; border: 0; border-radius: 20px; background: none; color: #4B5B78; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s ease, color 0.2s ease; white-space: nowrap; }
+        .sv-tab .sv-i { width: 26px; height: 26px; }
+        .sv-tab.active { background: linear-gradient(90deg, #06B6F4, #3B6FFA 60%, #8B5CF5); color: #fff; box-shadow: 0 8px 18px rgba(59, 111, 250, 0.3); }
+
+        /* ---- shipment cards ---- */
+        #list { margin-top: 16px; display: flex; flex-direction: column; gap: 16px; }
+        .sv-card { background: #fff; border-radius: 28px; box-shadow: 0 10px 30px rgba(11, 29, 58, 0.07); overflow: hidden; }
+        .sv-head { position: relative; width: 100%; display: grid; grid-template-columns: minmax(84px, 34%) minmax(0, 1fr); gap: 12px; align-items: center; padding: 16px 16px 4px; border: 0; background: none; text-align: left; cursor: pointer; color: inherit; }
+        .sv-head:focus-visible, .sv-btn:focus-visible, .sv-detail:focus-visible, .sv-tab:focus-visible, .sv-go:focus-visible, .sv-back:focus-visible, .sv-nav__item:focus-visible, .sv-copy:focus-visible { outline: 2px solid #2F6BFF; outline-offset: 2px; }
+        .sv-box { display: block; width: 100%; max-width: 150px; height: auto; }
+        .sv-main { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+        .sv-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 8px; }
+        .sv-code { display: inline-flex; align-items: center; gap: 8px; min-width: 0; font-size: 17px; font-weight: 800; letter-spacing: -0.2px; color: var(--sv-navy); overflow-wrap: anywhere; }
+        .sv-copy { width: 36px; height: 36px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 10px; background: #EEF3FA; color: #4B5B78; cursor: pointer; }
+        .sv-copy .sv-i { width: 18px; height: 18px; }
+        .sv-pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 12px; border-radius: 999px; font-size: 15px; font-weight: 700; white-space: nowrap; }
+        .sv-pill::before { content: ""; width: 11px; height: 11px; border-radius: 50%; background: currentColor; }
+        .sv-pill--green { background: #DDF5E7; color: #13803F; }
+        .sv-pill--blue { background: #E1EFFF; color: #1767C8; }
+        .sv-pill--yellow { background: #FFF1CF; color: #B87500; }
+        .sv-pill--orange { background: #FFE9D6; color: #C2570C; }
+        .sv-desc { display: flex; align-items: center; gap: 10px; font-size: 16px; color: #3E4C66; min-width: 0; }
+        .sv-desc > span { flex: 1; }
+        .sv-desc .sv-i { width: 24px; height: 24px; color: #4B5B78; }
+        .sv-desc span { min-width: 0; overflow-wrap: anywhere; }
+
+        .sv-stats { display: grid; grid-template-columns: 1fr 1fr; padding: 4px 16px 4px; }
+        .sv-stat { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 8px 8px 8px 0; }
+        .sv-stat + .sv-stat { padding-left: 14px; border-left: 1px solid #E3EAF3; }
+        .sv-ic { width: 46px; height: 46px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #EEF2F7; color: #4B5B78; }
+        .sv-ic .sv-i { width: 24px; height: 24px; }
+        .sv-ic--blue { background: #E3EEFF; color: #2F6BFF; }
+        .sv-k { display: block; font-size: 14px; color: var(--sv-muted); }
+        .sv-v { display: block; margin-top: 1px; font-size: 16px; font-weight: 700; line-height: 1.25; color: var(--sv-navy); overflow-wrap: break-word; }
+
+        .sv-route { display: grid; grid-template-columns: auto minmax(40px, 1fr) auto; align-items: center; gap: 10px; padding: 12px 16px 16px; }
+        .sv-place { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .sv-place--r { flex-direction: row-reverse; text-align: right; }
+        .sv-flag { font-size: 34px; line-height: 1; flex-shrink: 0; }
+        .sv-place b { display: block; font-size: 17px; font-weight: 800; color: var(--sv-navy); overflow-wrap: anywhere; }
+        .sv-place small { display: block; margin-top: 1px; font-size: 14px; color: var(--sv-muted); }
+        .sv-line { display: flex; align-items: center; gap: 4px; min-width: 0; }
+        .sv-line .dash { flex: 1; min-width: 6px; border-top: 2px dashed #B7C4D8; }
+        .sv-line .dot { width: 11px; height: 11px; flex-shrink: 0; border-radius: 50%; }
+        .sv-line .dot.g { background: #22C55E; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2); }
+        .sv-line .dot.r { background: #EF4444; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2); }
+        .sv-line img { width: 28px; height: auto; flex-shrink: 0; display: block; }
+
+        /* ---- expandable part ---- */
+        .sv-panel { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows 0.32s ease, visibility 0s linear 0.32s; }
+        .sv-card.open .sv-panel { grid-template-rows: 1fr; visibility: visible; transition: grid-template-rows 0.32s ease, visibility 0s; }
+        .sv-panel__in { min-height: 0; overflow: hidden; padding: 0 16px; }
+        .sv-card.open .sv-panel__in { padding-bottom: 18px; }
+        .sv-chev { width: 24px; height: 24px; margin-left: auto; color: #6B7A93; transition: transform 0.3s ease; }
+        .sv-card.open .sv-chev { transform: rotate(180deg); }
+
+        /* ---- timeline ---- */
+        .sv-tl { list-style: none; padding: 16px 12px; border-radius: 22px; background: #F6F9FD; border: 1px solid #E8EEF6; }
+        .sv-st { position: relative; display: grid; grid-template-columns: 40px 46px minmax(0, 1fr); gap: 12px; align-items: start; padding-bottom: 22px; }
+        .sv-st:last-child { padding-bottom: 0; }
+        .sv-st::before { content: ""; position: absolute; left: 19px; top: 40px; bottom: 0; width: 3px; border-radius: 2px; background: #D5DCE8; }
+        .sv-st:last-child::before { display: none; }
+        .sv-st.is-done::before { background: #22C55E; }
+        .sv-st.is-now::before { background: linear-gradient(180deg, #3B6FFA, #D5DCE8); }
+        .sv-dot { position: relative; z-index: 1; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #DCE3EE; color: #8A97AD; border: 3px solid #fff; box-shadow: 0 0 0 1px #D5DCE8; }
+        .sv-dot .sv-i { width: 20px; height: 20px; }
+        .is-done .sv-dot { background: #22C55E; color: #fff; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4); }
+        .is-done .sv-dot .sv-i { stroke-width: 3; }
+        .is-now .sv-dot { background: #2F6BFF; color: #fff; box-shadow: 0 0 0 4px rgba(47, 107, 255, 0.2), 0 6px 16px rgba(47, 107, 255, 0.45); }
+        .sv-st .sv-ic { width: 46px; height: 46px; background: #EAF0F8; }
+        .sv-st__t { min-width: 0; padding-top: 1px; }
+        .sv-st__t b { display: block; font-size: 17px; font-weight: 800; line-height: 1.25; color: var(--sv-navy); }
+        .sv-st__d { display: block; margin-top: 2px; font-size: 15px; color: var(--sv-muted); }
+        .sv-st__p { display: flex; align-items: flex-start; gap: 6px; margin-top: 6px; font-size: 14.5px; line-height: 1.35; color: #4B5B78; }
+        .sv-st__p .sv-i { width: 17px; height: 17px; margin-top: 1px; color: #6B8AD8; }
+        .is-todo .sv-st__t b { color: #5B6B85; }
+
+        .sv-live { margin-top: 14px; border-radius: 20px; overflow: hidden; background: #F6F9FD; border: 1px solid #E8EEF6; }
+        .sv-live iframe { display: block; width: 100%; height: 170px; border: 0; }
+        .sv-live p { display: flex; align-items: center; gap: 6px; padding: 10px 14px; font-size: 14px; color: var(--sv-muted); }
+        .sv-live p .sv-i { width: 16px; height: 16px; color: #E5484D; }
+        .sv-alert { margin-top: 12px; display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 16px; font-size: 15px; line-height: 1.4; font-weight: 600; }
+        .sv-alert .sv-i { width: 20px; height: 20px; }
+        .sv-alert--warn { background: #FFF6E5; color: #7A4B00; border: 1px solid #FFE0A3; }
+
+        .sv-sum { margin-top: 16px; display: grid; grid-template-columns: 1fr; }
+        .sv-sum .sv-stat { padding: 12px 0; }
+        .sv-sum .sv-stat + .sv-stat { padding-left: 0; border-left: 0; border-top: 1px solid #E3EAF3; }
+        @media (min-width: 440px) {
+            .sv-sum { grid-template-columns: repeat(3, 1fr); }
+            .sv-sum .sv-stat { padding: 4px 8px 4px 0; }
+            .sv-sum .sv-stat + .sv-stat { padding-left: 12px; border-top: 0; border-left: 1px solid #E3EAF3; }
+        }
+
+        .sv-acts { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .sv-btn { min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid #D5DEEA; border-radius: 16px; background: #fff; color: var(--sv-navy); font-size: 16px; font-weight: 700; text-decoration: none; cursor: pointer; }
+        .sv-btn .sv-i { width: 20px; height: 20px; }
+        .sv-btn:active { transform: scale(0.98); }
+        .sv-btn--call { color: #13803F; border-color: #BFE7CD; background: #F3FBF6; }
+        .sv-acts:has(.sv-btn:only-child) { grid-template-columns: 1fr; }
+        .sv-detail { margin-top: 12px; width: 100%; min-height: 64px; display: flex; align-items: center; gap: 14px; padding: 0 16px 0 12px; border: 1.5px solid #D5E3F8; border-radius: 20px; background: linear-gradient(90deg, #EAF2FF, #F2F6FF); color: var(--sv-navy); font-size: 18px; font-weight: 800; text-decoration: none; text-align: left; }
+        .sv-detail .sv-ic { background: #DDEAFF; color: #2F6BFF; }
+        .sv-detail > span:nth-child(2) { flex: 1; }
+        .sv-detail > .sv-i { width: 24px; height: 24px; color: #2F6BFF; }
+        .sv-detail:active { filter: brightness(0.97); }
+
+        .sv-empty { padding: 48px 20px; text-align: center; color: var(--sv-muted); font-size: 16px; line-height: 1.5; background: #fff; border-radius: 28px; box-shadow: 0 10px 30px rgba(11, 29, 58, 0.07); }
+        .sv-empty .sv-i { width: 52px; height: 52px; color: #E8890C; margin-bottom: 8px; }
+        .sv-empty a { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; margin-top: 14px; padding: 0 26px; border-radius: 999px; background: linear-gradient(90deg, #06B6F4, #3B6FFA 60%, #8B5CF5); color: #fff; font-size: 16px; font-weight: 800; text-decoration: none; box-shadow: 0 8px 18px rgba(59, 111, 250, 0.3); }
+        .sv-loading { padding: 56px 20px; text-align: center; color: var(--sv-muted); }
+
+        /* ---- bottom nav ---- */
+        .sv-nav { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; height: calc(76px + env(safe-area-inset-bottom, 0px)); padding: 6px 8px env(safe-area-inset-bottom, 0px); display: flex; gap: 4px; background: rgba(255, 255, 255, 0.97); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid #E3EAF3; box-shadow: 0 -8px 24px rgba(11, 29, 58, 0.06); }
+        .sv-nav__item { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; border-radius: 20px; background: none; color: var(--sv-muted); font-size: 13px; font-weight: 600; cursor: pointer; }
+        .sv-nav__item[aria-current="page"] { background: #E8F1FF; color: #1E6FEA; font-weight: 700; }
+        .sv-nav__icon { position: relative; display: flex; }
+        .sv-nav__icon .sv-i { width: 27px; height: 27px; }
+        .sv-dotbadge { position: absolute; top: -2px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: #EF4444; border: 2px solid #fff; }
+        .sv-dotbadge.hidden { display: none; }
+
+        /* ---- share sheet ---- */
+        .sv-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; background: rgba(7, 20, 47, 0.52); opacity: 0; pointer-events: none; transition: opacity 0.28s ease; }
+        .sv-overlay.show { opacity: 1; pointer-events: auto; }
+        .sv-sheet { width: 100%; max-width: 480px; max-height: 88dvh; display: flex; flex-direction: column; background: #fff; border-radius: 28px 28px 0 0; box-shadow: 0 -12px 40px rgba(7, 20, 47, 0.25); transform: translateY(100%); transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1); }
+        .sv-overlay.show .sv-sheet { transform: none; }
+        .sv-sheet__grab { padding: 10px 0 2px; display: flex; justify-content: center; }
+        .sv-sheet__grab i { width: 44px; height: 5px; border-radius: 3px; background: #D5DCE8; }
+        .sv-sheet__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 8px 20px 4px; }
+        .sv-sheet__head h3 { font-size: 21px; font-weight: 800; }
+        .sv-sheet__head p { margin-top: 3px; font-size: 14px; color: var(--sv-muted); }
+        .sv-close { width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: #EDF1F7; color: var(--sv-navy); cursor: pointer; }
+        .sv-close .sv-i { width: 20px; height: 20px; }
+        .sv-sheet__body { overflow-y: auto; padding: 14px 20px calc(22px + env(safe-area-inset-bottom, 0px)); }
+        .sv-linkbox { display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 14px; border-radius: 16px; background: #F1F5FA; border: 1px solid #E3EAF3; }
+        .sv-linkbox span { flex: 1; min-width: 0; font-size: 14px; color: #3E4C66; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sv-linkbox button { min-height: 40px; padding: 0 14px; border: 0; border-radius: 12px; background: var(--sv-navy); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; }
+        .sv-nets { margin-top: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px 8px; }
+        .sv-net { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0; border: 0; background: none; font-size: 13px; font-weight: 600; color: #3E4C66; cursor: pointer; }
+        .sv-net__ic { width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 26px; font-weight: 800; box-shadow: 0 6px 16px rgba(11, 29, 58, 0.16); }
+        .sv-net:active .sv-net__ic { transform: scale(0.92); }
+        .sv-net__ic .sv-i { width: 26px; height: 26px; }
+        .sv-toast { margin-top: 16px; min-height: 22px; text-align: center; font-size: 14px; font-weight: 600; color: #13803F; }
+
+        /* PWA install banner (pwa.js): keep it compact so it hides little of the page */
+        #sengp-install-banner { bottom: 8px !important; padding: 8px 12px !important; gap: 10px !important; font-size: 12px !important; line-height: 1.3 !important; border-radius: 14px !important; }
+        #sengp-install-banner img { width: 34px !important; height: 34px !important; }
+        #sengp-install-banner strong { font-size: 13px !important; }
+
+        .sv-reveal { animation: svReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 60ms); }
+        @keyframes svReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+        @media (prefers-reduced-motion: reduce) { .sv-reveal { animation: none; } * { transition-duration: 0.01ms !important; } }
+
+        @media (max-width: 400px) {
+            .sv-tab { font-size: 15px; gap: 6px; }
+            .sv-tab .sv-i { width: 22px; height: 22px; }
+            .sv-nav { padding-left: 2px; padding-right: 2px; gap: 2px; }
+            .sv-nav__item { font-size: 12px; white-space: nowrap; }
+            .sv-nets { gap: 16px 4px; }
+            .sv-net__ic { width: 54px; height: 54px; }
+        }
+        @media (max-width: 359px) {
+            .sv-body { padding-left: 10px; padding-right: 10px; }
+            .sv-tab .sv-i { display: none; }
+            .sv-head { grid-template-columns: 76px minmax(0, 1fr); padding: 12px 12px 2px; }
+            .sv-stats, .sv-route { padding-left: 12px; padding-right: 12px; }
+            .sv-panel__in { padding: 0 12px; }
+            .sv-st { grid-template-columns: 36px minmax(0, 1fr); }
+            .sv-st .sv-ic { display: none; }
+            .sv-st::before { left: 17px; }
+            .sv-route { grid-template-columns: 1fr; justify-items: center; gap: 12px; }
+            .sv-place--r { flex-direction: row; text-align: left; }
+            .sv-line { width: 100%; }
+            .sv-go { padding: 0 14px; }
+            .sv-acts { grid-template-columns: 1fr; }
+        }
+
+        /* sengp-responsive-override */
+        .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
+        body{padding:0!important;}
 </style>
 <script src="config.js"></script>
 <link rel="stylesheet" href="theme.css">
@@ -89,179 +260,445 @@
 </head>
 <body class="ds">
 <div class="mobile-frame">
-  <div class="header">
-    <h1>Suivi en temps réel</h1>
-    <p>Localisez vos colis en cours d'acheminement</p>
-    <div class="track-bar">
-      <input id="trackInput" placeholder="Suivre par n° de colis…">
-      <button onclick="trackByCode()">Suivre</button>
+  <div class="sv-screen">
+
+    <!-- Scrollable content (pull-to-refresh attaches to .content) -->
+    <div class="content sv-scroll" id="scroller">
+      <header class="sv-hero">
+        <picture>
+          <source type="image/webp" srcset="im/sengp-create-background.webp">
+          <img src="im/sengp-create-background.jpg" alt="" width="1400" height="788" decoding="async">
+        </picture>
+        <div class="sv-hero__row">
+          <button type="button" class="sv-back" onclick="goBack()" aria-label="Retour">
+            <svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          </button>
+          <div>
+            <h1>Suivi en temps réel</h1>
+            <p>Localisez vos colis en cours d'acheminement</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="sv-body">
+        <form class="sv-search sv-reveal" style="--i:0" onsubmit="trackByCode(event)" role="search">
+          <label class="sv-search__box">
+            <svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
+            <input id="trackInput" type="search" placeholder="Suivre par n° de colis…" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Numéro de colis">
+          </label>
+          <button type="submit" class="sv-go">Suivre</button>
+        </form>
+
+        <div class="sv-tabs sv-reveal" style="--i:1" role="tablist" aria-label="Filtrer les colis">
+          <button type="button" class="sv-tab active" id="t-encours" role="tab" aria-selected="true" onclick="setTab('encours')">
+            <svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
+            <span>En cours (<span id="cnt-encours">0</span>)</span>
+          </button>
+          <button type="button" class="sv-tab" id="t-avenir" role="tab" aria-selected="false" onclick="setTab('avenir')">
+            <svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span>À venir (<span id="cnt-avenir">0</span>)</span>
+          </button>
+          <button type="button" class="sv-tab" id="t-livres" role="tab" aria-selected="false" onclick="setTab('livres')">
+            <svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            <span>Livrés (<span id="cnt-livres">0</span>)</span>
+          </button>
+        </div>
+
+        <div id="list"><div class="sv-loading">Chargement…</div></div>
+      </div>
+    </div>
+
+    <!-- Bottom navigation -->
+    <nav class="sv-nav" aria-label="Navigation principale">
+      <button type="button" class="sv-nav__item" onclick="navigateTo('home')">
+        <span class="sv-nav__icon"><svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span>
+        <span>Accueil</span>
+      </button>
+      <button type="button" class="sv-nav__item" onclick="navigateTo('orders')">
+        <span class="sv-nav__icon"><svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
+        <span>Mes envois</span>
+      </button>
+      <button type="button" class="sv-nav__item" aria-current="page" onclick="navigateTo('tracking')">
+        <span class="sv-nav__icon"><svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+        <span>Suivi</span>
+      </button>
+      <button type="button" class="sv-nav__item" onclick="navigateTo('notifications')">
+        <span class="sv-nav__icon">
+          <svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="sv-dotbadge hidden" id="notifDot" aria-label="Notifications non lues"></span>
+        </span>
+        <span>Notifications</span>
+      </button>
+      <button type="button" class="sv-nav__item" onclick="navigateTo('profile')">
+        <span class="sv-nav__icon"><svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+        <span>Profil</span>
+      </button>
+    </nav>
+
+    <!-- Share sheet -->
+    <div class="sv-overlay" id="shareOverlay" onclick="if (event.target === this) closeShare()">
+      <div class="sv-sheet" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+        <div class="sv-sheet__grab"><i></i></div>
+        <div class="sv-sheet__head">
+          <div><h3 id="shareTitle">Partager le suivi</h3><p>Envoyez le lien de suivi à votre destinataire</p></div>
+          <button type="button" class="sv-close" id="shareClose" onclick="closeShare()" aria-label="Fermer"><svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        </div>
+        <div class="sv-sheet__body" id="shareBody"></div>
+      </div>
     </div>
   </div>
-
-  <div class="content">
-    <div class="tabs">
-      <button class="tab active" id="t-encours" onclick="setTab('encours',this)">En cours</button>
-      <button class="tab" id="t-avenir" onclick="setTab('avenir',this)">À venir</button>
-      <button class="tab" id="t-livres" onclick="setTab('livres',this)">Livrés</button>
-    </div>
-    <div id="list"><div class="loading">Chargement…</div></div>
-  </div>
-
-  <!-- Bottom nav (expéditeur) -->
-  <div class="bottom-nav">
-    <div class="nav-item" onclick="navigateTo('home')"><div class="nav-icon-wrapper"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div></div><div class="nav-label">Accueil</div></div>
-    <div class="nav-item" onclick="navigateTo('reclamation')"><div class="nav-icon-wrapper"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10.3 4 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div></div><div class="nav-label">Réclamation</div></div>
-    <div class="nav-item active" onclick="navigateTo('tracking')"><div class="nav-icon-wrapper"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div></div><div class="nav-label">Suivi</div></div>
-    <div class="nav-item" onclick="navigateTo('notifications')"><div class="nav-icon-wrapper"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div></div><div class="nav-label">Notifications</div></div>
-    <div class="nav-item" onclick="navigateTo('profile')"><div class="nav-icon-wrapper"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div></div><div class="nav-label">Profil</div></div>
-  </div>
 </div>
-
-<!-- Bottom sheet partage -->
-<div class="sheet-ov" id="shareSheet" onclick="if(event.target===this)closeShareSheet()">
-  <div class="sheet">
-    <div class="sheet-grip"></div>
-    <h3>Partager le suivi</h3>
-    <button class="share-opt" id="waBtn"><span class="ic ic-wa"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.54-3.87c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 0 0 1.523 5.26l-.999 3.648 3.965-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg></span> WhatsApp</button>
-    <button class="share-opt" id="mailBtn"><span class="ic ic-mail"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span> Email / Gmail</button>
-    <button class="share-opt" id="copyBtn"><span class="ic ic-copy"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span> Copier le lien</button>
-  </div>
-</div>
-
 <script>
   const API = window.API_BASE_URL;
   const token = localStorage.getItem('authToken');
 
-  // Icônes inline (style Lucide, alignées sur la nav) pour le contenu généré.
-  const svg = (p, sz=14) => `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex:none">${p}</svg>`;
-  const IC = {
-    pin:    svg('<path d="M20 10c0 4.4-5.4 9-8 11-2.6-2-8-6.6-8-11a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>'),
-    user:   svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>'),
-    truck:  svg('<path d="M10 17h4V5H2v12h3"/><path d="M14 9h4l4 4v4h-3"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>'),
-    calendar: svg('<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>'),
-    phone:  svg('<path d="M13.83 19.42a16 16 0 0 1-7.4-7.4l1.74-2.45a1.5 1.5 0 0 0 .12-1.45l-1-2.3A1.5 1.5 0 0 0 5.9 4.5H3.6A1.6 1.6 0 0 0 2 6.2 14 14 0 0 0 16 20.2a1.6 1.6 0 0 0 1.7-1.6v-2.3a1.5 1.5 0 0 0-1.32-1.49l-2.3-1a1.5 1.5 0 0 0-1.45.12z"/>', 14),
-    check:  svg('<path d="M21.8 10A10 10 0 1 1 17 3.34"/><path d="m9 11 3 3L22 4"/>'),
-    customs: svg('<path d="m12 2 8 5H4z"/><path d="M4 11h16"/><path d="M6 11v7"/><path d="M10 11v7"/><path d="M14 11v7"/><path d="M18 11v7"/><path d="M3 22h18"/>'),
-    clock:  svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
-    package: svg('<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>', 50)
-  };
   let all = [];
   let tab = 'encours';
+  let tabChosen = false;           // once the user picks a tab we stop auto-selecting
+  let openId = null;               // card currently expanded
+  let firstRender = true;
+  const trackingCache = {};        // mission id -> tracking events (newest first)
 
+  // En cours = created and waiting for a GP, or picked up / in transit / in customs / out for delivery
+  // À venir  = a GP is assigned (matched / accepted), departure still to come
   const BUCKETS = {
-    encours: ['picked_up','in_transit','in_customs','out_for_delivery'],
-    avenir: ['pending','matched','accepted'],
+    encours: ['pending', 'picked_up', 'in_transit', 'in_customs', 'out_for_delivery'],
+    avenir: ['matched', 'accepted'],
     livres: ['delivered']
   };
-  const FLAGS={'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱'};
-  const flag=c=>FLAGS[c]||'🌍';
-  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  const dt=d=>d?new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):'—';
-  function timeAgo(d){ if(!d) return ''; const m=Math.floor((Date.now()-new Date(d))/60000); if(m<1)return "à l'instant"; if(m<60)return 'il y a '+m+' min'; const h=Math.floor(m/60); if(h<24)return 'il y a '+h+' h'; return 'il y a '+Math.floor(h/24)+' j'; }
-  const STATUS={pending:['En attente','b-yellow'],matched:['Pris en charge','b-yellow'],accepted:['Accepté','b-blue'],picked_up:['Récupéré','b-blue'],in_transit:['En transit','b-blue'],in_customs:['En douane','b-blue'],out_for_delivery:['En livraison','b-blue'],delivered:['Livré','b-green'],cancelled:['Annulé','b-red']};
-  function badge(s){var m=STATUS[String(s||'').toLowerCase()]||[s,'b-gray'];return '<span class="badge '+m[1]+'">'+esc(m[0])+'</span>';}
-  function stepIndex(s){ return {picked_up:1,in_transit:2,in_customs:3,out_for_delivery:4,delivered:5}[String(s||'').toLowerCase()]||0; }
-  const STEP_LABELS=['Récupéré','Transit','Douane','Livraison','Livré'];
 
-  function originBase(){ return API.replace(/\/api\/v1\/?$/,''); }
-  function publicUrl(m){ return originBase()+'/t/'+encodeURIComponent(m.tracking_number||m.mission_code||''); }
-
-  function navigateTo(section){
-    const pages={home:'dashexpediteur.html',reclamation:'reclamation.html',tracking:'suivi.html',notifications:'notifications.html',profile:'profile.html'};
-    if(pages[section]) window.location.href=pages[section];
-  }
-  function trackByCode(){
-    const v=(document.getElementById('trackInput').value||'').trim();
-    if(!v) return;
-    // S'il correspond à un de mes colis -> détails, sinon page publique.
-    const mine=all.find(m=>String(m.tracking_number||'').toLowerCase()===v.toLowerCase()||String(m.mission_code||'').toLowerCase()===v.toLowerCase());
-    if(mine){ window.location.href='detailenvoi.html?id='+mine.id; }
-    else { window.open(originBase()+'/t/'+encodeURIComponent(v),'_blank'); }
+  const FLAGS = {'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱','Algérie':'🇩🇿','Tunisie':'🇹🇳','Côte d\'Ivoire':'🇨🇮','Belgique':'🇧🇪','Suisse':'🇨🇭'};
+  const flag = c => FLAGS[c] || '🌍';
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const st = m => String(m.status || '').toLowerCase();
+  const validDate = d => { const x = d ? new Date(d) : null; return x && !isNaN(x.getTime()) ? x : null; };
+  const fmtDate = d => { const x = validDate(d); return x ? x.toLocaleDateString('fr-FR') : '—'; };
+  const fmtDateTime = d => { const x = validDate(d); return x ? x.toLocaleDateString('fr-FR') + ' · ' + x.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : ''; };
+  const fcfa = n => (Number(n) || 0).toLocaleString('fr-FR') + ' FCFA';
+  function timeAgo(d) {
+    const x = validDate(d); if (!x) return '';
+    const m = Math.floor((Date.now() - x.getTime()) / 60000);
+    if (m < 1) return "à l'instant"; if (m < 60) return 'il y a ' + m + ' min';
+    const h = Math.floor(m / 60); if (h < 24) return 'il y a ' + h + ' h';
+    return 'il y a ' + Math.floor(h / 24) + ' j';
   }
 
-  async function load(){
-    if(!token){ window.location.href='connexion.html'; return; }
-    try{
-      const res=await fetch(`${API}/missions/my-missions?limit=200`,{headers:{'Authorization':'Bearer '+token}});
-      if(!res.ok) throw new Error('Chargement impossible');
-      all=(await res.json()).data||[];
+  const IC = {
+    box: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>',
+    doc: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>',
+    weight: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 8h11a2 2 0 0 1 1.95 1.55l1.5 8A2 2 0 0 1 18.98 20H5.02a2 2 0 0 1-1.97-2.45l1.5-8A2 2 0 0 1 6.5 8z"/><circle cx="12" cy="5" r="2.2"/></svg>',
+    coins: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>',
+    cal: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>',
+    user: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+    pin: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    truck: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>',
+    plane: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>',
+    flagEnd: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>',
+    check: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
+    hourglass: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>',
+    copy: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',
+    chev: '<svg class="sv-i sv-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>',
+    go: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>',
+    share: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>',
+    phone: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+    alert: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><path d="M12 17h.01"/></svg>',
+    send: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>',
+    sms: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    mail: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+    link: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
+    more: '<svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>',
+    wa: '<svg viewBox="0 0 24 24" width="28" height="28" fill="#fff" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.54-3.87c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 0 0 1.523 5.26l-.999 3.648 3.965-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>'
+  };
+
+  const STATUS = {
+    pending: ['En attente', 'yellow'], matched: ['Pris en charge', 'blue'], accepted: ['Accepté', 'blue'],
+    picked_up: ['Récupéré', 'blue'], in_transit: ['En transit', 'green'], in_customs: ['En douane', 'orange'],
+    out_for_delivery: ['En livraison', 'green'], delivered: ['Livré', 'green']
+  };
+  const pill = m => { const s = STATUS[st(m)] || [m.status || '', 'blue']; return `<span class="sv-pill sv-pill--${s[1]}">${esc(s[0])}</span>`; };
+
+  const originBase = () => API.replace(/\/api\/v1\/?$/, '');
+  const publicUrl = m => originBase() + '/t/' + encodeURIComponent(m.tracking_number || m.mission_code || '');
+  const codeOf = m => m.tracking_number || m.mission_code || '';
+
+  // ---------------- navigation ----------------
+  function goBack() { location.href = 'dashexpediteur.html'; }
+  function navigateTo(section) {
+    const pages = { home: 'dashexpediteur.html', orders: 'envois.html', tracking: 'suivi.html', notifications: 'notifications.html', profile: 'profile.html' };
+    if (section === 'tracking') { document.getElementById('scroller').scrollTo({ top: 0, behavior: 'smooth' }); return; }
+    if (pages[section]) location.href = pages[section];
+  }
+
+  // ---------------- data ----------------
+  async function load() {
+    if (!token) { location.href = 'connexion.html'; return; }
+    try {
+      const res = await fetch(`${API}/missions/my-missions?limit=200`, { headers: { 'Authorization': 'Bearer ' + token } });
+      if (!res.ok) throw new Error('Chargement impossible');
+      all = (await res.json()).data || [];
+      updateCounts();
+      if (!tabChosen) tab = firstNonEmptyTab();
+      selectTabButton();
       render();
-    }catch(e){ document.getElementById('list').innerHTML='<div class="empty">Erreur: '+esc(e.message)+'</div>'; }
+    } catch (e) {
+      document.getElementById('list').innerHTML = `<div class="sv-empty">${IC.alert}<div>Erreur : ${esc(e.message)}</div></div>`;
+    }
+    loadUnread();
   }
-  function setTab(t,el){ tab=t; document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); render(); }
+  window.onPullRefresh = async () => { Object.keys(trackingCache).forEach(k => delete trackingCache[k]); await load(); return true; };
 
-  function render(){
-    const list=all.filter(m=>BUCKETS[tab].includes(String(m.status||'').toLowerCase()));
-    const box=document.getElementById('list');
-    if(!list.length){
-      box.innerHTML='<div class="empty"><div class="ic">'+IC.package+'</div>Aucun colis '+(tab==='encours'?'en cours':tab==='avenir'?'à venir':'livré')+'.'+
-        (tab==='encours'?'<br><a class="cta" href="creenvoi.html">Créer un envoi</a>':'')+'</div>';
+  async function loadUnread() {
+    try {
+      const r = await fetch(`${API}/notifications/my-notifications?limit=100`, { headers: { 'Authorization': 'Bearer ' + token } });
+      if (!r.ok) return;
+      const unread = ((await r.json()).data || []).filter(n => !n.is_read).length;
+      document.getElementById('notifDot').classList.toggle('hidden', unread === 0);
+    } catch (e) {}
+  }
+
+  const inTab = (m, t) => BUCKETS[t].includes(st(m));
+  const bucketOf = m => Object.keys(BUCKETS).find(t => inTab(m, t));
+  function updateCounts() { Object.keys(BUCKETS).forEach(t => { document.getElementById('cnt-' + t).textContent = all.filter(m => inTab(m, t)).length; }); }
+  function firstNonEmptyTab() { return ['encours', 'avenir', 'livres'].find(t => all.some(m => inTab(m, t))) || 'encours'; }
+  function selectTabButton() { ['encours', 'avenir', 'livres'].forEach(t => { const b = document.getElementById('t-' + t); b.classList.toggle('active', t === tab); b.setAttribute('aria-selected', String(t === tab)); }); }
+  function setTab(t) { tab = t; tabChosen = true; openId = null; selectTabButton(); render(); }
+
+  function visible() { return all.filter(m => inTab(m, tab)).sort((a, b) => (validDate(b.created_at) || 0) - (validDate(a.created_at) || 0)); }
+
+  // ---------------- timeline ----------------
+  // Steps follow the real order: a GP takes the parcel in charge before it is picked up.
+  const STEPS = [
+    { key: 'gp', title: 'Pris en charge par le GP', icon: IC.truck, statuses: ['matched', 'accepted'] },
+    { key: 'pickup', title: 'Colis récupéré', icon: IC.box, statuses: ['picked_up'] },
+    { key: 'transit', title: 'En transit', icon: IC.plane, statuses: ['in_transit'] },
+    { key: 'arrived', title: 'Arrivé à destination', icon: IC.pin, statuses: ['in_customs'] },
+    { key: 'delivered', title: 'Livré', icon: IC.flagEnd, statuses: ['out_for_delivery', 'delivered'] }
+  ];
+  // [steps done, current step (1-based, 0 = none)] per status
+  const PROGRESS = { pending: [0, 1], matched: [1, 2], accepted: [1, 2], picked_up: [2, 0], in_transit: [2, 3], in_customs: [3, 4], out_for_delivery: [4, 5], delivered: [5, 0] };
+
+  function eventDate(m, step, events) {
+    const find = sts => { const ev = (events || []).filter(e => sts.includes(String(e.status || '').toLowerCase())); return ev.length ? ev[ev.length - 1] : null; };   // earliest event for that status
+    let ev = find(step.statuses);
+    if (step.key === 'delivered') ev = find(['delivered']);
+    if (step.key === 'arrived' && !ev) ev = find(['in_customs', 'out_for_delivery']);
+    let date = ev && ev.created_at;
+    if (!date && step.key === 'pickup') date = m.actual_pickup_date;
+    if (!date && step.key === 'delivered' && st(m) === 'delivered') date = m.actual_delivery_date || m.completed_at;
+    return { date, place: ev && ev.location };
+  }
+
+  function stepTexts(m, step, isNow, ev) {
+    const from = [m.departure_city, m.departure_country].filter(Boolean).join(', ');
+    const to = [m.arrival_city, m.arrival_country].filter(Boolean).join(', ');
+    let place = ev.place, sub = '';
+    if (step.key === 'gp') { place = place || from; sub = m.gp_name ? 'GP : ' + m.gp_name : (st(m) === 'pending' ? "En attente d'un GP" : 'Centre de traitement'); }
+    else if (step.key === 'pickup') { place = place || from; sub = "Chez l'expéditeur"; }
+    else if (step.key === 'transit') { place = place || ('En route vers ' + (m.arrival_city || '—')); sub = isNow ? 'Vol en cours' : 'Départ à venir'; }
+    else if (step.key === 'arrived') { place = place || to; sub = st(m) === 'in_customs' ? 'En cours de dédouanement' : 'Centre de traitement'; }
+    else { place = place || (m.arrival_city || '—'); sub = st(m) === 'delivered' ? 'Remis au destinataire' : (isNow ? 'Livraison en cours' : 'Après vérification'); }
+    return { place, sub };
+  }
+
+  function timelineHtml(m, events) {
+    const [done, now] = PROGRESS[st(m)] || [0, 0];
+    return '<ol class="sv-tl">' + STEPS.map((step, i) => {
+      const n = i + 1;
+      const isDone = n <= done, isNow = n === now;
+      const ev = eventDate(m, step, events);
+      const t = stepTexts(m, step, isNow, ev);
+      const cls = isDone ? 'is-done' : (isNow ? 'is-now' : 'is-todo');
+      const dotIcon = isDone ? IC.check : (isNow ? (st(m) === 'pending' ? IC.hourglass : step.icon) : '');
+      const dateTxt = ev.date ? fmtDateTime(ev.date) : (isNow ? 'En cours' : 'En attente');
+      return `<li class="sv-st ${cls}"><span class="sv-dot">${dotIcon}</span><span class="sv-ic">${step.icon}</span>`
+        + `<span class="sv-st__t"><b>${esc(step.title)}</b><span class="sv-st__d">${esc(dateTxt)}</span><span class="sv-st__p">${IC.pin}<span>${esc(t.place)} — ${esc(t.sub)}</span></span></span></li>`;
+    }).join('') + '</ol>';
+  }
+
+  // ---------------- cards ----------------
+  function cardHtml(m, i) {
+    const open = String(m.id) === String(openId);
+    const id = esc(m.id);
+    const eta = m.desired_departure_date;
+    const phone = String(m.gp_phone || '').replace(/[^+\d]/g, '');
+    const late = ['pending', 'matched', 'accepted'].includes(st(m)) && validDate(eta) && validDate(eta) < new Date(new Date().toDateString());
+    return `
+    <article class="sv-card${open ? ' open' : ''}${firstRender && i < 4 ? ' sv-reveal' : ''}" style="--i:${i + 2}" data-id="${id}">
+      <button type="button" class="sv-head" data-act="toggle" aria-expanded="${open}" aria-controls="panel-${id}">
+        <picture><source type="image/webp" srcset="im/sengp-box-3d.webp"><img class="sv-box" src="im/sengp-box-3d.png" alt="" width="378" height="255" decoding="async"></picture>
+        <span class="sv-main">
+          <span class="sv-top"><span class="sv-code">#${esc(codeOf(m))}<span class="sv-copy" role="button" tabindex="0" data-act="copy" aria-label="Copier le numéro de suivi">${IC.copy}</span></span>${pill(m)}</span>
+          <span class="sv-desc">${IC.doc}<span>${esc(m.package_description || 'Colis')}</span>${IC.chev}</span>
+        </span>
+      </button>
+      <div class="sv-stats">
+        <div class="sv-stat"><span class="sv-ic">${IC.weight}</span><span><span class="sv-v">${esc(parseFloat(m.package_weight) || 0)} kg</span><span class="sv-k">Poids</span></span></div>
+        <div class="sv-stat"><span class="sv-ic">${IC.coins}</span><span><span class="sv-v">${esc(fcfa(m.offered_price || m.price))}</span><span class="sv-k">Prix</span></span></div>
+      </div>
+      <div class="sv-route">
+        <div class="sv-place"><span class="sv-flag">${flag(m.departure_country)}</span><div><b>${esc(m.departure_city || '—')}</b><small>${esc(m.departure_country || '')}</small></div></div>
+        <div class="sv-line" aria-hidden="true"><i class="dot g"></i><span class="dash"></span><img src="im/sengp-plane.png" alt="" width="192" height="142"><span class="dash"></span><i class="dot r"></i></div>
+        <div class="sv-place sv-place--r"><span class="sv-flag">${flag(m.arrival_country)}</span><div><b>${esc(m.arrival_city || '—')}</b><small>${esc(m.arrival_country || '')}</small></div></div>
+      </div>
+      <div class="sv-panel" id="panel-${id}"><div class="sv-panel__in">
+        <div id="tl-${id}">${timelineHtml(m, trackingCache[m.id])}</div>
+        <div id="live-${id}"></div>
+        ${late ? `<div class="sv-alert sv-alert--warn">${IC.alert}<span>La date de départ souhaitée est dépassée : votre envoi attend toujours un départ.</span></div>` : ''}
+        <div class="sv-sum">
+          <div class="sv-stat"><span class="sv-ic">${IC.cal}</span><span><span class="sv-k">Date d'envoi</span><span class="sv-v">${esc(fmtDate(m.created_at))}</span></span></div>
+          <div class="sv-stat"><span class="sv-ic">${IC.plane}</span><span><span class="sv-k">Départ souhaité</span><span class="sv-v">${esc(fmtDate(eta))}</span></span></div>
+          <div class="sv-stat"><span class="sv-ic">${IC.user}</span><span><span class="sv-k">Destinataire</span><span class="sv-v">${esc(m.recipient_name || '—')}</span></span></div>
+        </div>
+        <div class="sv-acts">
+          <button type="button" class="sv-btn" data-act="share">${IC.share}Partager</button>
+          ${phone ? `<a class="sv-btn sv-btn--call" href="tel:${esc(phone)}">${IC.phone}Appeler le GP</a>` : ''}
+        </div>
+        <a class="sv-detail" href="envois.html?open=${encodeURIComponent(m.id)}"><span class="sv-ic">${IC.doc}</span><span>Voir les détails du suivi</span>${IC.go}</a>
+      </div></div>
+    </article>`;
+  }
+
+  function render() {
+    const list = visible();
+    const box = document.getElementById('list');
+    if (!list.length) {
+      const label = tab === 'encours' ? 'en cours' : (tab === 'avenir' ? 'à venir' : 'livré');
+      box.innerHTML = `<div class="sv-empty">${IC.box}<div>Aucun colis ${label}.</div>${tab === 'encours' ? '<a href="creenvoi.html">Créer un envoi</a>' : ''}</div>`;
       return;
     }
-    box.innerHTML=list.map(card).join('');
-    // Hydrater la carte live pour les colis en transit.
-    list.forEach(m=>{ if(['in_transit','in_customs','out_for_delivery','picked_up'].includes(String(m.status||'').toLowerCase())) hydrate(m.id); });
+    if (openId == null || !list.some(m => String(m.id) === String(openId))) openId = list[0].id;
+    box.innerHTML = list.map(cardHtml).join('');
+    firstRender = false;
+    const m = list.find(x => String(x.id) === String(openId));
+    if (m) hydrate(m);
   }
 
-  function card(m){
-    const si=stepIndex(m.status);
-    const steps=STEP_LABELS.map((lbl,idx)=>{ const n=idx+1; const done=si>=n?'done':''; return '<div class="step '+done+'">'+(idx>0?'<div class="bar"></div>':'')+'<div class="dot"></div><div class="lbl">'+lbl+'</div></div>'; }).join('');
-    const eta=m.desired_arrival_date||m.desired_departure_date;
-    const late=eta && new Date(eta)<new Date() && si<5;
-    const alert = String(m.status).toLowerCase()==='delivered' ? '<div class="alert alert-ok">'+IC.check+'Colis livré</div>'
-      : String(m.status).toLowerCase()==='in_customs' ? '<div class="alert alert-warn">'+IC.customs+'En cours de dédouanement</div>'
-      : late ? '<div class="alert alert-warn">'+IC.clock+'Arrivée prévue dépassée — en attente de mise à jour</div>' : '';
-    const gpPhone=(m.gp_phone||'').replace(/\s/g,'');
-    return '<div class="card">'
-      +'<div class="row"><div><div class="ptype">'+esc(m.package_description||'Colis')+'</div><div class="code">'+esc(m.tracking_number||m.mission_code||'')+'</div></div>'+badge(m.status)+'</div>'
-      +'<div class="route"><span class="flag">'+flag(m.departure_country)+'</span><span>'+esc(m.departure_city||'')+'</span><span class="arrow">→</span><span class="flag">'+flag(m.arrival_country)+'</span><span>'+esc(m.arrival_city||'')+'</span></div>'
-      +'<div class="steps">'+steps+'</div>'
-      +'<div id="map-'+m.id+'" class="map-ph">Localisation en cours…</div>'
-      +'<div class="meta"><span>'+IC.calendar+' Arrivée prévue : '+dt(eta)+'</span><span>'+IC.user+' '+esc(m.recipient_name||'—')+'</span></div>'
-      + (m.gp_name?'<div class="meta"><span>'+IC.truck+' '+esc(m.gp_name)+'</span><span id="upd-'+m.id+'"></span></div>':'')
-      + alert
-      +'<div class="actions">'
-      +'<a class="btn btn-d" href="detailenvoi.html?id='+m.id+'">Détails</a>'
-      +(gpPhone?'<a class="btn btn-call" href="tel:'+esc(gpPhone)+'">'+IC.phone+' GP</a>':'')
-      +'<button class="btn btn-share" onclick="openShareSheet(\''+esc(publicUrl(m))+'\')">Partager</button>'
-      +'</div></div>';
-  }
-
-  async function hydrate(id){
-    try{
-      const res=await fetch(`${API}/missions/${id}/tracking`,{headers:{'Authorization':'Bearer '+token}});
-      if(!res.ok) return;
-      const tr=(await res.json()).data||[];
-      const gps=tr.find(t=>t.latitude&&t.longitude);
-      const mapEl=document.getElementById('map-'+id);
-      if(gps && mapEl){
-        const la=Number(gps.latitude),lo=Number(gps.longitude),d=0.05;
-        const ifr=document.createElement('iframe');
-        ifr.className='map'; ifr.loading='lazy';
-        ifr.src='https://www.openstreetmap.org/export/embed.html?bbox='+(lo-d)+'%2C'+(la-d)+'%2C'+(lo+d)+'%2C'+(la+d)+'&layer=mapnik&marker='+la+'%2C'+lo;
-        mapEl.replaceWith(ifr);
-        const upd=document.getElementById('upd-'+id); if(upd) upd.innerHTML=IC.pin+' '+timeAgo(gps.created_at);
-      } else if(mapEl){
-        mapEl.textContent='Position GPS pas encore disponible';
+  // Tracking events (dates, places, live GPS) for the expanded shipment
+  async function hydrate(m) {
+    try {
+      let events = trackingCache[m.id];
+      if (!events) {
+        const res = await fetch(`${API}/missions/${encodeURIComponent(m.id)}/tracking`, { headers: { 'Authorization': 'Bearer ' + token } });
+        if (!res.ok) return;
+        events = ((await res.json()).data || []);
+        trackingCache[m.id] = events;
       }
-    }catch(e){}
+      const tl = document.getElementById('tl-' + m.id);
+      if (tl) tl.innerHTML = timelineHtml(m, events);
+      const gps = events.find(e => e.latitude && e.longitude);
+      const live = document.getElementById('live-' + m.id);
+      if (live && gps && !['delivered'].includes(st(m))) {
+        const la = Number(gps.latitude), lo = Number(gps.longitude), d = 0.05;
+        live.innerHTML = `<div class="sv-live"><iframe loading="lazy" title="Position du GP" src="https://www.openstreetmap.org/export/embed.html?bbox=${lo - d}%2C${la - d}%2C${lo + d}%2C${la + d}&layer=mapnik&marker=${la}%2C${lo}"></iframe><p>${IC.pin}Dernière position du GP · ${esc(timeAgo(gps.created_at))}</p></div>`;
+      }
+    } catch (e) { /* timeline stays on mission data */ }
   }
 
-  // Bottom sheet partage
-  let _shareUrl='';
-  function openShareSheet(url){
-    _shareUrl=url;
-    const text='Suivez votre colis SEN GP en temps réel : '+url;
-    document.getElementById('waBtn').onclick=()=>{ window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank'); closeShareSheet(); };
-    document.getElementById('mailBtn').onclick=()=>{ window.location.href='mailto:?subject='+encodeURIComponent('Suivi de votre colis SEN GP')+'&body='+encodeURIComponent(text); closeShareSheet(); };
-    document.getElementById('copyBtn').onclick=async()=>{ try{ await navigator.clipboard.writeText(url); alert('Lien copié !'); }catch(e){ alert(url); } closeShareSheet(); };
-    document.getElementById('shareSheet').classList.add('open');
-  }
-  function closeShareSheet(){ document.getElementById('shareSheet').classList.remove('open'); }
+  // ---------------- interactions ----------------
+  document.getElementById('list').addEventListener('click', e => {
+    const el = e.target.closest('[data-act]');
+    if (!el) return;
+    const card = el.closest('.sv-card'); if (!card) return;
+    const m = all.find(x => String(x.id) === card.dataset.id); if (!m) return;
+    const act = el.dataset.act;
+    if (act === 'copy') { e.stopPropagation(); e.preventDefault(); copyCode(m, el); }
+    else if (act === 'share') openShare(m);
+    else if (act === 'toggle') toggleCard(card, m);
+  });
+  document.getElementById('list').addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-act="copy"]')) { e.preventDefault(); e.target.click(); }
+  });
 
-  window.onPullRefresh = async () => { await load(); return true; };
+  function toggleCard(card, m) {
+    const willOpen = !card.classList.contains('open');
+    document.querySelectorAll('.sv-card.open').forEach(c => { c.classList.remove('open'); c.querySelector('.sv-head').setAttribute('aria-expanded', 'false'); });
+    openId = willOpen ? m.id : null;
+    if (willOpen) {
+      card.classList.add('open');
+      card.querySelector('.sv-head').setAttribute('aria-expanded', 'true');
+      hydrate(m);
+      setTimeout(() => card.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 340);
+    }
+  }
+
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+    try { const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return ok; } catch (e) { return false; }
+  }
+  async function copyCode(m, el) {
+    const ok = await copyText(codeOf(m));
+    el.innerHTML = ok ? IC.check : IC.copy;
+    setTimeout(() => { el.innerHTML = IC.copy; }, 1400);
+  }
+
+  function trackByCode(e) {
+    if (e) e.preventDefault();
+    const v = (document.getElementById('trackInput').value || '').trim().replace(/^#/, '');
+    if (!v) return;
+    const mine = all.find(m => String(m.tracking_number || '').toLowerCase() === v.toLowerCase() || String(m.mission_code || '').toLowerCase() === v.toLowerCase());
+    if (mine) {
+      tab = bucketOf(mine) || tab; tabChosen = true; openId = mine.id;
+      selectTabButton(); render();
+      const card = document.querySelector(`.sv-card[data-id="${CSS.escape(String(mine.id))}"]`);
+      if (card) setTimeout(() => card.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+    } else {
+      window.open(originBase() + '/t/' + encodeURIComponent(v), '_blank');
+    }
+  }
+
+  // ---------------- share sheet ----------------
+  let shareMission = null;
+  function openShare(m) {
+    shareMission = m;
+    const url = publicUrl(m);
+    const nets = [
+      ['wa', 'WhatsApp', '#25D366', IC.wa], ['tg', 'Telegram', '#229ED9', IC.send], ['fb', 'Facebook', '#1877F2', 'f'], ['x', 'X', '#111111', '𝕏'],
+      ['sms', 'SMS', '#34C759', IC.sms], ['mail', 'Email', '#EA4335', IC.mail], ['copy', 'Copier', '#6B7A93', IC.link], ['more', 'Plus', '#0B1D3A', IC.more]
+    ];
+    document.getElementById('shareBody').innerHTML =
+      `<div class="sv-linkbox"><span>${esc(url)}</span><button type="button" data-net="copy">Copier</button></div>`
+      + `<div class="sv-nets">${nets.map(n => `<button type="button" class="sv-net" data-net="${n[0]}"><span class="sv-net__ic" style="background:${n[2]}">${n[3]}</span>${n[1]}</button>`).join('')}</div>`
+      + '<div class="sv-toast" id="shareToast" role="status" aria-live="polite"></div>';
+    document.getElementById('shareOverlay').classList.add('show');
+    document.getElementById('scroller').classList.add('is-locked');
+    setTimeout(() => document.getElementById('shareClose').focus({ preventScroll: true }), 50);
+  }
+  function closeShare() {
+    document.getElementById('shareOverlay').classList.remove('show');
+    document.getElementById('scroller').classList.remove('is-locked');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeShare(); });
+
+  function toast(msg) { const t = document.getElementById('shareToast'); if (t) { t.textContent = msg; setTimeout(() => { if (t.textContent === msg) t.textContent = ''; }, 2500); } }
+
+  async function shareNative(m) {
+    const P = window.Capacitor && window.Capacitor.Plugins;
+    const url = publicUrl(m);
+    try {
+      if (P && P.Share && P.Share.share) { await P.Share.share({ title: 'Suivi de votre colis SEN GP', text: 'Suivez votre colis SEN GP en temps réel : ' + url, url, dialogTitle: 'Partager le suivi' }); return true; }
+      if (navigator.share) { await navigator.share({ title: 'Suivi de votre colis SEN GP', text: 'Suivez votre colis SEN GP en temps réel', url }); return true; }
+    } catch (e) { return true; }
+    return false;
+  }
+
+  document.getElementById('shareBody').addEventListener('click', async e => {
+    const b = e.target.closest('[data-net]');
+    if (!b || !shareMission) return;
+    const m = shareMission, url = publicUrl(m), text = 'Suivez votre colis SEN GP en temps réel : ' + url, net = b.dataset.net;
+    const open = u => window.open(u, '_blank');
+    if (net === 'wa') open('https://wa.me/?text=' + encodeURIComponent(text));
+    else if (net === 'tg') open('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent('Suivez votre colis SEN GP en temps réel'));
+    else if (net === 'fb') open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url));
+    else if (net === 'x') open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Suivez votre colis SEN GP en temps réel') + '&url=' + encodeURIComponent(url));
+    else if (net === 'sms') location.href = 'sms:?&body=' + encodeURIComponent(text);
+    else if (net === 'mail') location.href = 'mailto:?subject=' + encodeURIComponent('Suivi de votre colis SEN GP') + '&body=' + encodeURIComponent(text);
+    else if (net === 'copy') toast((await copyText(url)) ? 'Lien copié ✓' : 'Copie impossible — copiez le lien ci-dessus');
+    else if (net === 'more') { if (!(await shareNative(m))) toast((await copyText(url)) ? 'Lien copié ✓' : 'Partage indisponible'); }
+  });
+
   load();
-  setInterval(()=>{ if(!document.hidden) load(); }, 45000);
+  // Live refresh (position + statuses) while the page is visible
+  setInterval(() => { if (!document.hidden) { Object.keys(trackingCache).forEach(k => delete trackingCache[k]); load(); } }, 45000);
 </script>
 <script src="ptr.js"></script>
 </body>
