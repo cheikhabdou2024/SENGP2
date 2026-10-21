@@ -5,388 +5,273 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEN GP - Connexion</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html { background: #07142F; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #07142F;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            color: #F8FAFF;
         }
 
-        .mobile-frame {
-            width: 100%;
-            max-width: 375px;
-            height: 667px;
-            background: linear-gradient(135deg, rgba(15, 12, 41, 0.95) 0%, rgba(48, 43, 99, 0.95) 50%, rgba(36, 36, 62, 0.95) 100%);
-            border-radius: 40px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            overflow: hidden;
-            position: relative;
+        /* ============================================
+           LOGIN SCREEN
+           ============================================ */
+        .mobile-frame { position: relative; width: 100%; overflow: hidden; background: #07142F; }
+
+        .lg-bg { position: absolute; inset: 0; z-index: 0; }
+        .lg-bg img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; }
+        .lg-bg::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                rgba(7, 20, 47, 0.1) 0%,
+                rgba(7, 20, 47, 0.42) 30%,
+                rgba(7, 20, 47, 0.76) 56%,
+                rgba(7, 20, 47, 0.92) 100%);
         }
 
-        .status-bar {
-            height: 44px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .time { color: #fff; }
-        .indicators { 
-            display: flex; 
-            gap: 5px;
-            align-items: center;
-        }
-        .signal, .wifi, .battery { 
-            width: 18px; 
-            height: 12px; 
-            background: rgba(255,255,255,0.8);
-            border-radius: 2px;
-        }
-
-        .content {
-            padding: 0 30px;
-            height: calc(100% - 44px);
+        .lg-scroll {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+            padding: calc(env(safe-area-inset-top, 0px) + 16px) 20px calc(env(safe-area-inset-bottom, 0px) + 24px);
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            align-items: center;
         }
+        .lg-wrap { width: 100%; max-width: 420px; display: flex; flex-direction: column; align-items: center; margin: auto 0; }
 
-        .logo-container {
-            text-align: center;
-            margin-bottom: 40px;
-            animation: fadeInDown 0.8s ease-out;
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .logo-img {
-            width: 140px;
-            height: 140px;
-            object-fit: contain;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 20px rgba(255, 107, 107, 0.2);
-            margin-bottom: 16px;
-            animation: float 4s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-        }
-
-        .welcome-text h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 8px;
-        }
-
-        .welcome-text p {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .form-container {
-            animation: fadeInUp 0.8s ease-out 0.2s backwards;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 8px;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        input {
-            width: 100%;
-            padding: 14px 16px;
-            background: #ffffff;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
-            font-size: 15px;
-            color: #1a1a2e;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
-        }
-
-        input::placeholder {
-            color: rgba(26, 26, 46, 0.4);
-        }
-
-        input:focus {
-            outline: none;
-            background: #ffffff;
-            border-color: #4ECDC4;
-            box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.15);
-        }
-
-        .password-toggle {
+        .back-to-choice {
             position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            font-size: 18px;
-            padding: 5px;
-            transition: color 0.3s ease;
-        }
-
-        .password-toggle:hover {
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .form-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-
-        .custom-checkbox {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 5px;
+            top: calc(env(safe-area-inset-top, 0px) + 14px);
+            left: 16px;
+            z-index: 3;
+            width: 46px;
+            height: 46px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(7, 20, 47, 0.55);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            color: #F8FAFF;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .back-to-choice .lg-i { width: 22px; height: 22px; }
+        .back-to-choice:active { transform: scale(0.96); }
+
+        .lg-i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+        .lg-logo {
+            display: block;
+            width: clamp(84px, 14dvh, 124px);
+            height: auto;
+            aspect-ratio: 1;
+            margin-top: clamp(26px, 4dvh, 40px);
+            border-radius: 22%;
+            box-shadow: 0 0 0 1px rgba(255, 194, 71, 0.38), 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 34px rgba(255, 106, 36, 0.22);
         }
 
-        .custom-checkbox.checked {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-            border-color: #4CAF50;
+        .lg-title {
+            margin-top: clamp(12px, 2.4dvh, 22px);
+            font-size: clamp(30px, 4.6dvh, 38px);
+            font-weight: 800;
+            line-height: 1.15;
+            text-align: center;
+            color: #F8FAFF;
+            text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+        }
+        .lg-title span {
+            background: linear-gradient(90deg, #FF8A2B, #FFC247);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: #FFC247;
+        }
+        .lg-sub { margin-top: 8px; max-width: 300px; text-align: center; font-size: 15px; line-height: 1.45; color: #D2DBEC; text-shadow: 0 1px 10px rgba(7, 20, 47, 0.95); }
+
+        .lg-card {
+            width: 100%;
+            margin-top: clamp(18px, 3dvh, 28px);
+            padding: 16px;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 160, 70, 0.45);
+            background: linear-gradient(160deg, rgba(16, 41, 75, 0.62), rgba(7, 20, 47, 0.8));
+            -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(14px);
+            box-shadow: 0 0 0 1px rgba(255, 140, 50, 0.1), 0 0 40px rgba(255, 106, 36, 0.16), 0 22px 50px rgba(0, 0, 0, 0.45);
         }
 
-        .custom-checkbox::before {
-            content: '✓';
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .custom-checkbox.checked::before {
-            opacity: 1;
-        }
-
-        .remember-label {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .forgot-password {
-            font-size: 13px;
-            color: #FFE66D;
-            text-decoration: none;
+        .social-buttons { margin-bottom: 4px; }
+        .social-btn {
+            position: relative;
+            width: 100%;
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            border: 0;
+            border-radius: 999px;
+            font: inherit;
+            font-size: 16px;
             font-weight: 600;
-            transition: color 0.3s ease;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
+        .social-btn-google { background: #F8FAFF; color: #0B1D3A; padding: 0 44px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25); }
+        .social-btn-google .lg-chevron { position: absolute; right: 18px; width: 20px; height: 20px; color: #4A5878; }
+        .social-btn-google > svg:first-child { position: absolute; left: 18px; }
+        .social-btn:active { transform: scale(0.985); }
 
-        .forgot-password:hover {
-            color: #FF6B6B;
+        .divider { display: flex; align-items: center; gap: 12px; margin: 14px 0; }
+        .divider-line { flex: 1; height: 1px; background: rgba(170, 184, 208, 0.28); }
+        .divider-text { font-size: 14px; color: #C3CEE2; white-space: nowrap; }
+
+        .lg-field {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-height: 62px;
+            padding: 6px 16px;
+            margin-bottom: 12px;
+            border-radius: 18px;
+            border: 1px solid rgba(170, 184, 208, 0.3);
+            background: rgba(255, 255, 255, 0.06);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
         }
+        .lg-field:focus-within { border-color: #FFC247; background: rgba(255, 255, 255, 0.09); box-shadow: 0 0 0 3px rgba(255, 194, 71, 0.18); }
+        .lg-field__icon { width: 24px; height: 24px; color: #E4EAF6; }
+        .lg-field__body { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+        .lg-field label { font-size: 14px; font-weight: 600; color: #E4EAF6; line-height: 1.2; }
+        .ds .lg-field input,
+        .ds .lg-field input:focus {
+            width: 100%;
+            padding: 2px 0;
+            border: 0;
+            border-radius: 0;
+            outline: none;
+            box-shadow: none;
+            background: transparent;
+            color: #F8FAFF;
+            font: inherit;
+            font-size: 16px;
+            line-height: 1.3;
+            text-overflow: ellipsis;
+        }
+        .lg-field input::placeholder { color: #93A3C0; opacity: 1; font-size: 14px; }
+        .lg-eye {
+            width: 44px;
+            height: 44px;
+            margin-right: -8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            border-radius: 12px;
+            background: transparent;
+            color: #E4EAF6;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .lg-eye .lg-i { width: 24px; height: 24px; }
+        .lg-eye .lg-eye__off { display: none; }
+        .lg-eye.is-visible .lg-eye__on { display: none; }
+        .lg-eye.is-visible .lg-eye__off { display: inline; }
+
+        .form-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2px 12px; margin: 0 0 12px; }
+        .remember-me { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; cursor: pointer; font-size: 14px; color: #E4EAF6; -webkit-tap-highlight-color: transparent; }
+        .ds .remember-me input { position: static; }
+        .remember-me input {
+            -webkit-appearance: none;
+            appearance: none;
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            margin: 0;
+            border-radius: 7px;
+            border: 2px solid rgba(228, 234, 246, 0.6);
+            background: transparent;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+        .remember-me input::after { content: ""; width: 12px; height: 7px; border-left: 3px solid #07142F; border-bottom: 3px solid #07142F; transform: rotate(-45deg) translate(1px, -1px) scale(0); transition: transform 0.15s ease; }
+        .remember-me input:checked { background: #F8FAFF; border-color: #F8FAFF; }
+        .remember-me input:checked::after { transform: rotate(-45deg) translate(1px, -1px) scale(1); }
+        .forgot-password { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; font-weight: 700; color: #FFC247; text-decoration: none; }
+        .forgot-password:hover { color: #FF8B2E; }
 
         .login-btn {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
-            color: #1a1a2e;
-            border: none;
-            border-radius: 16px;
-            font-size: 16px;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 0;
+            border-radius: 18px;
+            font: inherit;
+            font-size: 18px;
             font-weight: 700;
+            color: #07142F;
+            background: linear-gradient(90deg, #FF6A24, #FFC247);
+            box-shadow: 0 10px 26px rgba(255, 106, 36, 0.35);
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
-            margin-bottom: 24px;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(255, 107, 107, 0.5);
-        }
-
-        .login-btn:active {
-            transform: translateY(0);
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin: 24px 0;
-        }
-
-        .divider-line {
-            flex: 1;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .divider-text {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 500;
-        }
-
-        .social-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .social-btn {
-            width: 100%;
-            padding: 14px 20px;
-            background: #ffffff;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 15px;
-            font-weight: 600;
-            color: #1a1a2e;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .social-btn-google {
-            border-color: #4285F4;
-        }
-
-        .social-btn-google:hover {
-            background: #f8f9fa;
-            border-color: #4285F4;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
-        }
-
-        .social-btn-facebook {
-            border-color: #1877F2;
-        }
-
-        .social-btn-facebook:hover {
-            background: #f0f4ff;
-            border-color: #1877F2;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
-        }
-
-        .social-btn:active {
-            transform: translateY(0);
-        }
-
-        .signup-link {
-            text-align: center;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-            animation: fadeIn 0.8s ease-out 0.4s backwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .signup-link a {
-            color: #FFE66D;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .signup-link a:hover {
-            color: #FF6B6B;
-        }
-
-        @media (max-width: 375px) {
-            .mobile-frame {
-                border-radius: 0;
-                height: 100vh;
-            }
-        }
-        .back-to-choice {
-            position: absolute;
-            top: 18px;
-            left: 18px;
-            z-index: 10;
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 20px;
-            color: rgba(255, 255, 255, 0.85);
-            transition: all 0.3s ease;
             -webkit-tap-highlight-color: transparent;
+            transition: transform 0.15s ease, filter 0.2s ease, opacity 0.2s ease;
         }
-        .back-to-choice:hover { background: rgba(255, 255, 255, 0.16); transform: translateX(-2px); }
-            /* sengp-responsive-override */
+        .login-btn .lg-i { width: 22px; height: 22px; stroke-width: 2.6; }
+        .login-btn:not(:disabled):active { transform: scale(0.985); filter: brightness(0.94); }
+        .login-btn:disabled { opacity: 0.65; cursor: progress; }
+
+        .signup-link { display: flex; align-items: center; gap: 12px; margin-top: 8px; font-size: 15px; color: #C3CEE2; }
+        .signup-link .divider-line { flex: 1; }
+        .signup-link > span:not(.divider-line) { text-align: center; }
+        .signup-link a { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 2px; font-weight: 700; color: #FFC247; text-decoration: none; }
+        .signup-link a .lg-i { width: 18px; height: 18px; }
+        .signup-link a:hover { color: #FF8B2E; }
+
+        .back-to-choice:focus-visible, .lg-eye:focus-visible, .login-btn:focus-visible, .social-btn:focus-visible,
+        .forgot-password:focus-visible, .signup-link a:focus-visible, .remember-me input:focus-visible { outline: 2px solid #F8FAFF; outline-offset: 3px; }
+
+        .lg-reveal { animation: lgReveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 80ms + 100ms); }
+        @keyframes lgReveal { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+        @media (prefers-reduced-motion: reduce) {
+            .lg-reveal { animation: none; }
+            * { transition-duration: 0.01ms !important; }
+        }
+
+        @media (max-width: 359px) {
+            .lg-scroll { padding-left: 14px; padding-right: 14px; }
+            .lg-card { padding: 14px; border-radius: 24px; }
+            .lg-field { gap: 10px; padding: 8px 12px; }
+            .lg-title { font-size: 28px; }
+            .signup-link { font-size: 14px; }
+        }
+        @media (max-height: 640px) {
+            .lg-logo { width: 76px; }
+            .lg-sub { display: none; }
+            .lg-field { min-height: 60px; margin-bottom: 10px; }
+        }
+
+        /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
-        </style>
+    </style>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -403,111 +288,124 @@
 </head>
 <body class="ds">
     <div class="mobile-frame">
+        <div class="lg-bg" aria-hidden="true">
+            <picture>
+                <source type="image/webp" srcset="im/sengp-auth-background.webp">
+                <img src="im/sengp-auth-background.jpg" alt="" width="941" height="1672" decoding="async">
+            </picture>
+        </div>
 
         <!-- Back to account-type choice -->
-        <button class="back-to-choice" onclick="window.location.href='index.html'" aria-label="Retour au choix du compte">←</button>
+        <button type="button" class="back-to-choice" onclick="window.location.href='index.html'" aria-label="Retour au choix du compte">
+            <svg class="lg-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        </button>
 
-        <!-- Content -->
-        <div class="content">
-            <!-- Logo -->
-            <div class="logo-container">
-                <img src="im/sengp-logo.jpg" class="logo-img" alt="SENGP Logo">
-                <div class="welcome-text">
-                    <h1>Bon retour !</h1>
-                    <p>Connectez-vous à votre compte</p>
-                </div>
-            </div>
+        <div class="lg-scroll">
+            <div class="lg-wrap">
+                <picture class="lg-reveal" style="--i:0">
+                    <source type="image/webp" srcset="im/sengp-logo-square.webp">
+                    <img class="lg-logo" src="im/sengp-logo-square.png" alt="SENGP" width="288" height="288" decoding="async">
+                </picture>
 
-            <!-- Form -->
-            <div class="form-container">
-                <form id="loginForm">
-                    <!-- Social Login Buttons (Top) -->
-                    <div class="social-buttons" style="margin-bottom: 24px;">
-                        <button type="button" class="social-btn social-btn-google" onclick="socialLogin('google')">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M19.6 10.23c0-.82-.07-1.43-.21-2.05H10v3.72h5.51c-.11.92-.72 2.31-2.08 3.24l-.02.13 3.03 2.34.21.02c1.92-1.77 3.03-4.38 3.03-7.4z" fill="#4285F4"/>
-                                <path d="M10 20c2.7 0 4.96-.88 6.62-2.39l-3.22-2.49c-.85.58-1.98 1-3.4 1-2.61 0-4.82-1.74-5.61-4.13l-.12.01-3.14 2.42-.04.11C2.61 17.91 6.08 20 10 20z" fill="#34A853"/>
-                                <path d="M4.39 11.99c-.2-.58-.32-1.2-.32-1.84 0-.64.11-1.26.31-1.84l-.01-.14-3.18-2.46-.1.05C.41 7.43 0 8.68 0 10c0 1.32.41 2.57 1.1 3.58l3.29-2.59z" fill="#FBBC05"/>
-                                <path d="M10 3.88c1.85 0 3.1.8 3.81 1.47l2.8-2.73C14.96.88 12.7 0 10 0 6.08 0 2.61 2.09 1.1 5.17l3.29 2.59c.79-2.39 3-4.13 5.61-4.13z" fill="#EB4335"/>
-                            </svg>
-                            <span>Continuer avec Google</span>
+                <h1 class="lg-title lg-reveal" style="--i:1">Bon <span>retour&nbsp;!</span></h1>
+                <p class="lg-sub lg-reveal" style="--i:1">Connectez-vous à votre compte pour continuer votre expérience SENGP.</p>
+
+                <div class="lg-card lg-reveal" style="--i:2">
+                    <form id="loginForm">
+                        <!-- Social Login Buttons (Top) -->
+                        <div class="social-buttons">
+                            <button type="button" class="social-btn social-btn-google" onclick="socialLogin('google')">
+                                <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                                    <path d="M19.6 10.23c0-.82-.07-1.43-.21-2.05H10v3.72h5.51c-.11.92-.72 2.31-2.08 3.24l-.02.13 3.03 2.34.21.02c1.92-1.77 3.03-4.38 3.03-7.4z" fill="#4285F4"/>
+                                    <path d="M10 20c2.7 0 4.96-.88 6.62-2.39l-3.22-2.49c-.85.58-1.98 1-3.4 1-2.61 0-4.82-1.74-5.61-4.13l-.12.01-3.14 2.42-.04.11C2.61 17.91 6.08 20 10 20z" fill="#34A853"/>
+                                    <path d="M4.39 11.99c-.2-.58-.32-1.2-.32-1.84 0-.64.11-1.26.31-1.84l-.01-.14-3.18-2.46-.1.05C.41 7.43 0 8.68 0 10c0 1.32.41 2.57 1.1 3.58l3.29-2.59z" fill="#FBBC05"/>
+                                    <path d="M10 3.88c1.85 0 3.1.8 3.81 1.47l2.8-2.73C14.96.88 12.7 0 10 0 6.08 0 2.61 2.09 1.1 5.17l3.29 2.59c.79-2.39 3-4.13 5.61-4.13z" fill="#EB4335"/>
+                                </svg>
+                                <span>Continuer avec Google</span>
+                                <svg class="lg-i lg-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                            </button>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="divider">
+                            <div class="divider-line"></div>
+                            <span class="divider-text">Ou avec email/téléphone</span>
+                            <div class="divider-line"></div>
+                        </div>
+
+                        <!-- Email / Phone -->
+                        <div class="lg-field">
+                            <svg class="lg-i lg-field__icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                            <div class="lg-field__body">
+                                <label for="identifier">Email ou téléphone</label>
+                                <input
+                                    type="text"
+                                    id="identifier"
+                                    name="identifier"
+                                    placeholder="votre@email.com ou +221 77 123 45 67"
+                                    autocomplete="username"
+                                    autocapitalize="none"
+                                    autocorrect="off"
+                                    spellcheck="false"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="lg-field">
+                            <svg class="lg-i lg-field__icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <div class="lg-field__body">
+                                <label for="password">Mot de passe</label>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    placeholder="••••••••"
+                                    autocomplete="current-password"
+                                    required
+                                />
+                            </div>
+                            <button type="button" class="lg-eye" onclick="togglePassword(this)" aria-label="Afficher le mot de passe" aria-pressed="false">
+                                <svg class="lg-i lg-eye__on" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg class="lg-i lg-eye__off" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+                            </button>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="form-footer">
+                            <label class="remember-me">
+                                <input type="checkbox" id="rememberCheckbox">
+                                <span class="remember-label">Se souvenir de moi</span>
+                            </label>
+                            <a href="#" class="forgot-password" onclick="goToForgotPassword()">Mot de passe oublié ?</a>
+                        </div>
+
+                        <!-- Login Button -->
+                        <button type="submit" class="login-btn">
+                            <span class="btn-label">Se connecter</span>
+                            <svg class="lg-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                         </button>
-                    </div>
 
-                    <!-- Divider -->
-                    <div class="divider" style="margin: 24px 0;">
-                        <div class="divider-line"></div>
-                        <span class="divider-text">Ou avec email/téléphone</span>
-                        <div class="divider-line"></div>
-                    </div>
-
-                    <!-- Email / Phone -->
-                    <div class="form-group">
-                        <label for="identifier">Email ou téléphone</label>
-                        <input
-                            type="text"
-                            id="identifier"
-                            name="identifier"
-                            placeholder="votre@email.com ou +221 77 123 45 67"
-                            required
-                        />
-                    </div>
-
-                    <!-- Password -->
-                    <div class="form-group">
-                        <label for="password">Mot de passe</label>
-                        <div class="input-wrapper">
-                            <input 
-                                type="password" 
-                                id="password" 
-                                name="password"
-                                placeholder="••••••••"
-                                required
-                            />
-                            <button type="button" class="password-toggle" onclick="togglePassword()"><svg class="ic" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                        <!-- Signup Link -->
+                        <div class="signup-link">
+                            <span class="divider-line"></span>
+                            <span>Pas encore de compte ? <a href="#" onclick="goToSignup()">S'inscrire <svg class="lg-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a></span>
+                            <span class="divider-line"></span>
                         </div>
-                    </div>
-
-                    <!-- Footer -->
-                    <div class="form-footer">
-                        <div class="remember-me" onclick="toggleRemember()">
-                            <div class="custom-checkbox" id="rememberCheckbox"></div>
-                            <span class="remember-label">Se souvenir</span>
-                        </div>
-                        <a href="#" class="forgot-password" onclick="goToForgotPassword()">Mot de passe oublié ?</a>
-                    </div>
-
-                    <!-- Login Button -->
-                    <button type="submit" class="login-btn">
-                        Se connecter
-                    </button>
-
-                    <!-- Signup Link -->
-                    <div class="signup-link">
-                        Pas encore de compte ? <a href="#" onclick="goToSignup()">S'inscrire</a>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-
     <script>
-        function togglePassword() {
+        function togglePassword(btn) {
             const input = document.getElementById('password');
-            const button = event.currentTarget;
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                button.textContent = '<svg class="ic" viewBox="0 0 24 24"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>';
-            } else {
-                input.type = 'password';
-                button.textContent = '<svg class="ic" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
-            }
-        }
-
-        function toggleRemember() {
-            const checkbox = document.getElementById('rememberCheckbox');
-            checkbox.classList.toggle('checked');
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            btn.classList.toggle('is-visible', show);
+            btn.setAttribute('aria-pressed', String(show));
+            btn.setAttribute('aria-label', show ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
         }
 
         function goToForgotPassword() {
@@ -642,8 +540,9 @@
                 try {
                     // Afficher un loader
                     const submitButton = document.querySelector('button[type="submit"]');
-                    const originalText = submitButton.textContent;
-                    submitButton.textContent = 'Connexion en cours...';
+                    const labelEl = submitButton.querySelector('.btn-label');
+                    const originalText = labelEl.textContent;
+                    labelEl.textContent = 'Connexion en cours...';
                     submitButton.disabled = true;
 
                     // Appeler l'API de connexion
@@ -672,7 +571,7 @@
                         const user = result.data.user;
 
                         if (!enforceAccountType(user)) {
-                            submitButton.textContent = originalText;
+                            labelEl.textContent = originalText;
                             submitButton.disabled = false;
                             return;
                         }
@@ -704,7 +603,7 @@
                     } else {
                         // Afficher l'erreur (inclut le refus de type de compte côté serveur)
                         alert('Erreur de connexion:\n\n' + (result.error || result.message || 'Email ou mot de passe incorrect'));
-                        submitButton.textContent = originalText;
+                        labelEl.textContent = originalText;
                         submitButton.disabled = false;
                     }
                 } catch (error) {
@@ -713,20 +612,10 @@
 
                     // Réactiver le bouton
                     const submitButton = document.querySelector('button[type="submit"]');
-                    submitButton.textContent = 'Se connecter';
+                    submitButton.querySelector('.btn-label').textContent = 'Se connecter';
                     submitButton.disabled = false;
                 }
             }
-        });
-
-        // Animation on load
-        window.addEventListener('load', () => {
-            document.querySelector('.content').style.opacity = '0';
-            
-            setTimeout(() => {
-                document.querySelector('.content').style.transition = 'opacity 0.8s ease';
-                document.querySelector('.content').style.opacity = '1';
-            }, 100);
         });
     </script>
 </body>
