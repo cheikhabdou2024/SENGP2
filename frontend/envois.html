@@ -362,10 +362,13 @@
         const token = localStorage.getItem('authToken');
         let all = [];
         const byId = {};
-        let tab = new URLSearchParams(location.search).get('status') || 'all';
+        const qs = new URLSearchParams(location.search);
+        let tab = qs.get('status') || 'all';
+        const openParam = qs.get('open');   // ?open=<id> : expand and scroll to that shipment
         if (!['all', 'active', 'delivered'].includes(tab)) tab = 'all';
-        let openId = null;          // card currently expanded
+        let openId = openParam;     // card currently expanded
         let firstRender = true;
+        let scrolledToOpen = false;
         const ACTIVE = ['pending','matched','accepted','picked_up','in_transit','in_customs','out_for_delivery'];
 
         const FLAGS = {'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱','Algérie':'🇩🇿','Tunisie':'🇹🇳','Côte d\'Ivoire':'🇨🇮','Belgique':'🇧🇪','Suisse':'🇨🇭'};
@@ -558,6 +561,11 @@
             if (openId == null || !list.some(m => String(m.id) === String(openId))) openId = list[0].id;   // first card open, like the mockup
             box.innerHTML = list.map(cardHtml).join('');
             firstRender = false;
+            if (openParam && !scrolledToOpen) {
+                scrolledToOpen = true;
+                const target = box.querySelector(`.ev-card[data-id="${CSS.escape(String(openParam))}"]`);
+                if (target) setTimeout(() => target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 450);
+            }
         }
 
         // ---- list interactions (event delegation)

@@ -548,7 +548,7 @@
         function createMissionCard(mission) {
             const card = document.createElement('a');
             card.className = 'hm-card hm-ship';
-            card.href = `detailenvoi.html?id=${encodeURIComponent(mission.id)}`;
+            card.href = `envois.html?open=${encodeURIComponent(mission.id)}`;
 
             const statusClass = getStatusClass(mission.status);
             const statusText = getStatusText(mission.status);

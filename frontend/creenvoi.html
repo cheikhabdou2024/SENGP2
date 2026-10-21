@@ -3454,8 +3454,8 @@
                         'Paiement : à la livraison (espèces)\n' +
                         'Suivi n° : ' + (mission.tracking_number || mission.mission_code || '')
                     );
-                    // Ouvre le détail de l'envoi : le QR y est généré automatiquement.
-                    window.location.href = 'detailenvoi.html?id=' + encodeURIComponent(mission.id);
+                    // Ouvre « Mes envois » sur cet envoi (le QR est disponible via la tuile « QR code »).
+                    window.location.href = 'envois.html?open=' + encodeURIComponent(mission.id);
                     return;
                 }
 
@@ -3503,8 +3503,8 @@
                         } else {
                             alert('Paiement en cours de validation. Votre envoi apparaîtra dès confirmation.');
                         }
-                        // Ouvre le détail de l'envoi : le QR y est généré automatiquement.
-                        window.location.href = 'detailenvoi.html?id=' + encodeURIComponent(mission.id);
+                        // Ouvre « Mes envois » sur cet envoi (le QR est disponible via la tuile « QR code »).
+                        window.location.href = 'envois.html?open=' + encodeURIComponent(mission.id);
                     };
                     try { await Browser.addListener('browserFinished', onFinish); } catch (e) {}
                     await Browser.open({ url: redirectUrl, presentationStyle: 'popover' });
