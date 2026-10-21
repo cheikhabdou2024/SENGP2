@@ -34,6 +34,7 @@
             overscroll-behavior-y: contain;
             -webkit-overflow-scrolling: touch;
         }
+        .ev-scroll.is-locked { overflow: hidden; }
 
         /* ---- hero ---- */
         .ev-hero { position: relative; height: calc(190px + env(safe-area-inset-top, 0px)); overflow: hidden; background: linear-gradient(180deg, #0B1D3A, #2B4A7A); }
@@ -43,7 +44,7 @@
             position: absolute;
             inset: 0;
             background:
-                linear-gradient(180deg, rgba(7, 20, 47, 0.55) 0%, rgba(7, 20, 47, 0.1) 52%, rgba(244, 248, 253, 0) 62%),
+                linear-gradient(180deg, rgba(7, 20, 47, 0.5) 0%, rgba(7, 20, 47, 0.08) 52%, rgba(244, 248, 253, 0) 62%),
                 linear-gradient(180deg, rgba(244, 248, 253, 0) 62%, #F4F8FD 100%);
         }
         .ev-hero__row { position: absolute; z-index: 2; left: 0; right: 0; top: env(safe-area-inset-top, 0px); max-width: 480px; margin: 0 auto; padding: 22px 20px 0; display: flex; align-items: center; gap: 16px; }
@@ -53,7 +54,7 @@
         .ev-hero h1 { font-size: 28px; font-weight: 800; line-height: 1.1; letter-spacing: -0.3px; color: #fff; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5); }
         .ev-hero p { margin-top: 3px; font-size: 15px; color: #E8EEF8; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6); }
 
-        .ev-body { position: relative; z-index: 3; max-width: 480px; margin: -52px auto 0; padding: 0 16px 20px; }
+        .ev-body { position: relative; z-index: 3; max-width: 480px; margin: -52px auto 0; padding: 0 16px 28px; }
 
         /* ---- tabs ---- */
         .ev-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 6px; background: #fff; border-radius: 26px; box-shadow: 0 10px 30px rgba(11, 29, 58, 0.1); }
@@ -68,27 +69,16 @@
         .ev-tab[data-tab="active"].active { color: #E8890C; }
         .ev-tab[data-tab="delivered"].active { background: linear-gradient(160deg, #E8FAEF, #D4F3E0); color: #17A34A; box-shadow: inset 0 0 0 1px rgba(23, 163, 74, 0.2); }
 
-        /* ---- search + sort ---- */
-        .ev-tools { margin-top: 14px; display: flex; gap: 10px; }
-        .ev-search { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 16px; background: #fff; border-radius: 18px; box-shadow: 0 6px 20px rgba(11, 29, 58, 0.06); color: #6B7A93; }
-        .ev-search:focus-within { box-shadow: 0 0 0 2px #E8890C, 0 6px 20px rgba(11, 29, 58, 0.06); }
-        .ev-search .ev-i { width: 22px; height: 22px; }
-        .ds .ev-search input, .ds .ev-search input:focus { flex: 1; min-width: 0; border: 0; border-radius: 0; outline: none; box-shadow: none; background: transparent; color: #0B1D3A; font: inherit; font-size: 16px; text-overflow: ellipsis; }
-        .ev-search input::placeholder { color: #8A97AD; opacity: 1; font-size: 15px; }
-        .ev-sort { width: 52px; height: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 18px; background: #fff; color: #0B1D3A; box-shadow: 0 6px 20px rgba(11, 29, 58, 0.06); cursor: pointer; }
-        .ev-sort .ev-i { width: 24px; height: 24px; }
-        .ev-sort:active { transform: scale(0.95); }
-
         /* ---- list ---- */
-        #list { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
-        .ev-card { position: relative; display: block; padding: 12px; background: #fff; border-radius: 24px; box-shadow: 0 8px 26px rgba(11, 29, 58, 0.07); color: inherit; text-decoration: none; transition: transform 0.15s ease; }
-        .ev-card:active { transform: scale(0.992); }
-        .ev-card__main { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; }
-        .ev-thumb { width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(160deg, #F7F1E8, #F1E7D8); display: flex; align-items: center; justify-content: center; overflow: hidden; align-self: start; }
+        #list { margin-top: 16px; display: flex; flex-direction: column; gap: 14px; }
+        .ev-card { background: #fff; border-radius: 26px; box-shadow: 0 8px 26px rgba(11, 29, 58, 0.07); overflow: hidden; }
+        .ev-card__head { position: relative; width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 14px; border: 0; background: none; text-align: left; cursor: pointer; }
+        .ev-card__head:active { background: #F8FAFD; }
+        .ev-thumb { width: 76px; height: 76px; border-radius: 18px; background: linear-gradient(160deg, #F7F1E8, #F1E7D8); display: flex; align-items: center; justify-content: center; overflow: hidden; align-self: start; }
         .ev-thumb img { width: 86%; height: auto; display: block; }
         .ev-info { min-width: 0; padding-right: 22px; display: flex; flex-direction: column; gap: 4px; }
         .ev-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 4px 8px; }
-        .code { font-size: 16px; font-weight: 800; color: #0B1D3A; overflow-wrap: anywhere; }
+        .code { font-size: 17px; font-weight: 800; color: #0B1D3A; overflow-wrap: anywhere; }
         .price { font-size: 16px; font-weight: 700; color: #C58A00; }
         .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; margin-right: -22px; }
         .badge .ev-i { width: 16px; height: 16px; }
@@ -100,35 +90,58 @@
         .route { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 8px; font-size: 15px; color: #3E4C66; }
         .route .flag { font-size: 20px; line-height: 1; }
         .route .plane { display: inline-flex; align-items: center; gap: 3px; color: #B9C6DA; }
-        .route .plane i { display: block; width: 16px; border-top: 2px dashed #C7D3E5; }
+        .route .plane i { display: block; width: 14px; border-top: 2px dashed #C7D3E5; }
         .route .plane img { width: 20px; height: auto; display: block; }
-        .meta { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 8px; font-size: 14px; color: #6B7A93; }
-        .meta .ev-i { width: 18px; height: 18px; color: #4B9BEA; }
-        .ev-go { position: absolute; right: 10px; top: 46px; width: 20px; height: 20px; color: #8A97AD; }
-        .ev-deliv { margin-top: 2px; font-size: 14px; line-height: 1.3; color: #6B7A93; text-align: right; }
-        .ev-deliv strong { display: block; font-size: 15px; font-weight: 600; color: #3E4C66; }
-        .ev-side { display: flex; flex-direction: column; align-items: flex-end; }
+        .meta { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; line-height: 1.3; color: #6B7A93; }
+        .meta .ev-i { width: 18px; height: 18px; margin-top: 1px; color: #4B9BEA; }
+        .ev-chev { position: absolute; right: 12px; top: 50px; width: 22px; height: 22px; color: #6B7A93; transition: transform 0.3s ease; }
+        .ev-card.open .ev-chev { transform: rotate(-90deg); }
 
-        /* ---- 4-step tracker ---- */
-        .ev-steps { list-style: none; margin-top: 12px; padding: 0 2px; display: grid; grid-template-columns: repeat(4, 1fr); }
-        .ev-step { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 0; }
-        .ev-step::before { content: ""; position: absolute; top: 17px; right: 50%; width: 100%; border-top: 2px dashed #CFD9E8; }
+        /* ---- expandable panel ---- */
+        .ev-panel { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows 0.32s ease, visibility 0s linear 0.32s; }
+        .ev-card.open .ev-panel { grid-template-rows: 1fr; visibility: visible; transition: grid-template-rows 0.32s ease, visibility 0s; }
+        .ev-panel__inner { min-height: 0; overflow: hidden; padding: 0 14px; }
+        .ev-card.open .ev-panel__inner { padding-bottom: 14px; }
+
+        .ev-track { margin-top: 2px; padding: 14px 12px 12px; border-radius: 20px; background: #F4F8FD; border: 1px solid #E8EEF6; }
+        .ev-track__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+        .ev-track__title { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 800; color: #0B1D3A; }
+        .ev-track__title .ev-i { width: 24px; height: 24px; color: #0B1D3A; }
+        .ev-map { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 12px; border-radius: 999px; background: #E3EFFF; color: #1767C8; font-size: 12.5px; font-weight: 700; text-decoration: none; }
+        .ev-map .ev-i { width: 18px; height: 18px; }
+        .ev-map:active { background: #D2E5FF; }
+
+        .ev-steps { list-style: none; margin-top: 14px; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); }
+        .ev-step { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 0; padding: 0 2px; }
+        .ev-step::before { content: ""; position: absolute; top: 18px; right: 50%; width: 100%; border-top: 2px dashed #CFD9E8; }
         .ev-step:first-child::before { display: none; }
         .ev-step.is-on::before { border-top: 2px solid #1E6FEA; }
-        .ev-step.is-warm::before { border-top: 2px solid #F59E0B; }
-        .ev-dot { position: relative; z-index: 1; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #E9EEF5; color: #8A97AD; }
-        .ev-dot .ev-i { width: 18px; height: 18px; }
-        .ev-dot img { width: 20px; height: auto; display: block; filter: grayscale(1) opacity(0.55); }
+        .ev-dot { position: relative; z-index: 1; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #E3E9F1; color: #8A97AD; }
+        .ev-dot .ev-i { width: 19px; height: 19px; }
+        .ev-dot img { width: 21px; height: auto; display: block; filter: grayscale(1) opacity(0.55); }
         .is-on .ev-dot { background: #1E6FEA; color: #fff; }
         .is-on .ev-dot .ev-i { stroke-width: 2.6; }
         .is-warm .ev-dot { background: #F59E0B; color: #fff; }
         .is-warm .ev-dot .ev-i { stroke-width: 2.6; }
         .is-now .ev-dot { box-shadow: 0 0 0 4px rgba(30, 111, 234, 0.16); }
         .is-now .ev-dot img { filter: brightness(0) invert(1); }
-        .ev-step__label { margin-top: 6px; max-width: 100%; font-size: 12px; font-weight: 600; line-height: 1.2; color: #6B7A93; overflow-wrap: anywhere; }
+        .ev-step__label { margin-top: 8px; max-width: 100%; font-size: 13px; font-weight: 700; line-height: 1.2; color: #3E4C66; overflow-wrap: break-word; }
         .is-on .ev-step__label { color: #1E6FEA; }
         .is-warm .ev-step__label { color: #D98200; }
-        .ev-step__date { margin-top: 2px; font-size: 12px; color: #8A97AD; }
+        .ev-step__date { margin-top: 3px; font-size: 12px; line-height: 1.3; color: #6B7A93; }
+
+        /* ---- 4 action tiles ---- */
+        .ev-tiles { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .ev-tile { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px; min-height: 84px; padding: 12px 30px 12px 12px; border: 0; border-radius: 20px; text-align: left; cursor: pointer; transition: transform 0.15s ease, filter 0.2s ease; }
+        .ev-tile:active { transform: scale(0.975); filter: brightness(0.97); }
+        .ev-tile .ev-i.ev-tile__ico { width: 34px; height: 34px; }
+        .ev-tile__go { position: absolute; right: 8px; top: 50%; margin-top: -9px; width: 18px; height: 18px; }
+        .ev-tile__t { display: block; font-size: 15px; font-weight: 800; line-height: 1.2; color: #0B1D3A; }
+        .ev-tile__s { display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.3; color: #5B6B85; }
+        .ev-tile--share { background: #E9F2FF; color: #1E6FEA; }
+        .ev-tile--qr { background: #E3F7EB; color: #17A34A; }
+        .ev-tile--pkg { background: #FFF3DD; color: #E8890C; }
+        .ev-tile--more { background: #ECE9FF; color: #4F46E5; }
 
         .loading, .empty { padding: 56px 20px; text-align: center; color: #6B7A93; font-size: 15px; }
         .empty .ev-i { width: 44px; height: 44px; color: #E8890C; margin-bottom: 8px; }
@@ -142,22 +155,78 @@
         .ev-dotbadge { position: absolute; top: -2px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: #EF4444; border: 2px solid #fff; }
         .ev-dotbadge.hidden { display: none; }
 
-        /* ---- sort sheet ---- */
-        .ev-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; background: rgba(7, 20, 47, 0.5); opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+        /* ---- bottom sheet ---- */
+        .ev-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; background: rgba(7, 20, 47, 0.52); opacity: 0; pointer-events: none; transition: opacity 0.28s ease; }
         .ev-overlay.show { opacity: 1; pointer-events: auto; }
-        .ev-sheet { width: 100%; max-width: 480px; background: #fff; border-radius: 26px 26px 0 0; padding: 16px 16px calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateY(24px); transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
-        .ev-overlay.show .ev-sheet { transform: none; }
-        .ev-sheet h3 { padding: 4px 6px 10px; font-size: 19px; font-weight: 800; }
-        .ev-opt { width: 100%; min-height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 12px; border: 0; border-radius: 14px; background: none; font-size: 16px; font-weight: 600; text-align: left; cursor: pointer; color: #0B1D3A; }
-        .ev-opt:hover, .ev-opt:active { background: #F1F5FA; }
-        .ev-opt .ev-i { width: 22px; height: 22px; color: #E8890C; visibility: hidden; }
-        .ev-opt[aria-checked="true"] .ev-i { visibility: visible; }
+        .ev-sheet { width: 100%; max-width: 480px; max-height: 88dvh; display: flex; flex-direction: column; background: #fff; border-radius: 28px 28px 0 0; box-shadow: 0 -12px 40px rgba(7, 20, 47, 0.25); transform: translateY(100%); transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1); will-change: transform; }
+        .ev-overlay.show .ev-sheet { transform: translateY(var(--drag, 0px)); }
+        .ev-sheet.is-dragging { transition: none; }
+        .ev-sheet__grab { padding: 10px 0 2px; display: flex; justify-content: center; touch-action: none; cursor: grab; }
+        .ev-sheet__grab i { width: 44px; height: 5px; border-radius: 3px; background: #D5DCE8; }
+        .ev-sheet__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 8px 20px 4px; touch-action: none; }
+        .ev-sheet__head h3 { font-size: 21px; font-weight: 800; letter-spacing: -0.2px; color: #0B1D3A; }
+        .ev-sheet__head p { margin-top: 3px; font-size: 14px; color: #6B7A93; }
+        .ev-close { width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: #EDF1F7; color: #0B1D3A; cursor: pointer; }
+        .ev-close .ev-i { width: 20px; height: 20px; }
+        .ev-sheet__body { overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 14px 20px calc(22px + env(safe-area-inset-bottom, 0px)); }
 
-        .ev-back:focus-visible, .ev-tab:focus-visible, .ev-sort:focus-visible, .ev-card:focus-visible, .ev-nav__item:focus-visible, .ev-opt:focus-visible { outline: 2px solid #E8890C; outline-offset: 2px; }
+        /* share */
+        .ev-linkbox { display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 14px; border-radius: 16px; background: #F1F5FA; border: 1px solid #E3EAF3; }
+        .ev-linkbox span { flex: 1; min-width: 0; font-size: 14px; color: #3E4C66; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .ev-linkbox button { min-height: 40px; padding: 0 14px; border: 0; border-radius: 12px; background: #0B1D3A; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; }
+        .ev-nets { margin-top: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px 8px; }
+        .ev-net { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0; border: 0; background: none; font-size: 13px; font-weight: 600; color: #3E4C66; cursor: pointer; }
+        .ev-net__ic { width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 26px; font-weight: 800; box-shadow: 0 6px 16px rgba(11, 29, 58, 0.16); transition: transform 0.15s ease; }
+        .ev-net:active .ev-net__ic { transform: scale(0.92); }
+        .ev-net__ic .ev-i { width: 26px; height: 26px; }
+        .ev-toast { margin-top: 16px; min-height: 22px; text-align: center; font-size: 14px; font-weight: 600; color: #13803F; }
+
+        /* qr */
+        .ev-qrcard { padding: 18px 16px; border-radius: 22px; background: #fff; border: 1px solid #E3EAF3; box-shadow: 0 8px 26px rgba(11, 29, 58, 0.08); text-align: center; }
+        .ev-qrcard__brand { font-size: 15px; font-weight: 800; letter-spacing: 0.14em; color: #0B1D3A; }
+        .ev-qrcard__for { margin-top: 6px; font-size: 15px; color: #3E4C66; }
+        .ev-qrcard__route { margin-top: 2px; font-size: 13px; color: #6B7A93; }
+        .ev-qrcard img { display: block; width: min(230px, 62vw); height: auto; aspect-ratio: 1; margin: 14px auto 10px; }
+        .ev-qrcard__num { font-size: 15px; font-weight: 800; letter-spacing: 0.1em; color: #0B1D3A; }
+        .ev-qrskel { width: min(230px, 62vw); aspect-ratio: 1; margin: 14px auto 10px; border-radius: 16px; background: linear-gradient(100deg, #EEF2F8 30%, #F8FAFD 50%, #EEF2F8 70%); background-size: 200% 100%; animation: evShimmer 1.2s linear infinite; }
+        @keyframes evShimmer { to { background-position: -200% 0; } }
+        .ev-wa { margin-top: 14px; width: 100%; min-height: 56px; display: flex; align-items: center; justify-content: center; gap: 10px; border: 0; border-radius: 18px; background: linear-gradient(135deg, #25D366, #128C7E); color: #fff; font-size: 16px; font-weight: 700; box-shadow: 0 10px 24px rgba(18, 140, 126, 0.3); cursor: pointer; }
+        .ev-wa:active { transform: scale(0.985); }
+        .ev-wa svg { width: 24px; height: 24px; fill: #fff; }
+        .ev-hint { margin-top: 12px; text-align: center; font-size: 13px; line-height: 1.45; color: #6B7A93; }
+        .ev-retry { margin-top: 12px; min-height: 48px; padding: 0 20px; border: 0; border-radius: 14px; background: #FFF1CF; color: #B87500; font-weight: 700; cursor: pointer; }
+        .ev-msg { padding: 28px 8px; text-align: center; color: #6B7A93; font-size: 15px; line-height: 1.5; }
+
+        /* details rows */
+        .ev-rows { display: flex; flex-direction: column; gap: 10px; }
+        .ev-rows--grid { display: grid; grid-template-columns: 1fr 1fr; }
+        .ev-row { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 18px; background: #F5F8FC; border: 1px solid #EAEFF6; min-width: 0; }
+        .ev-row__ic { width: 42px; height: 42px; flex-shrink: 0; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: #E3EFFF; color: #1E6FEA; }
+        .ev-row__ic .ev-i { width: 22px; height: 22px; }
+        .ev-row__ic img { width: 24px; height: auto; display: block; }
+        .ev-row__ic--o { background: #FFF1D6; color: #E8890C; }
+        .ev-row__ic--g { background: #DDF5E7; color: #17A34A; }
+        .ev-row__ic--v { background: #ECE9FF; color: #4F46E5; }
+        .ev-row__txt { min-width: 0; flex: 1; }
+        .ev-row__k { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #6B7A93; }
+        .ev-row__v { display: block; margin-top: 2px; font-size: 16px; font-weight: 700; line-height: 1.3; color: #0B1D3A; overflow-wrap: anywhere; }
+        .ev-row__v small { font-size: 13px; font-weight: 500; color: #6B7A93; }
+        .ev-row__act { flex-shrink: 0; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 14px; background: #fff; color: #1E6FEA; box-shadow: 0 2px 8px rgba(11, 29, 58, 0.08); text-decoration: none; cursor: pointer; }
+        .ev-row__act .ev-i { width: 20px; height: 20px; }
+        .ev-rows--grid .ev-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+        .ev-full { margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 54px; border-radius: 18px; background: #0B1D3A; color: #fff; font-size: 16px; font-weight: 700; text-decoration: none; box-shadow: 0 10px 24px rgba(11, 29, 58, 0.25); }
+        .ev-full .ev-i { width: 20px; height: 20px; }
+
+        .ev-back:focus-visible, .ev-tab:focus-visible, .ev-card__head:focus-visible, .ev-tile:focus-visible, .ev-nav__item:focus-visible, .ev-net:focus-visible, .ev-close:focus-visible,
+        .ev-map:focus-visible, .ev-wa:focus-visible, .ev-full:focus-visible, .ev-row__act:focus-visible, .ev-linkbox button:focus-visible { outline: 2px solid #E8890C; outline-offset: 2px; }
 
         .ev-reveal { animation: evReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 60ms); }
         @keyframes evReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-        @media (prefers-reduced-motion: reduce) { .ev-reveal { animation: none; } * { transition-duration: 0.01ms !important; } }
+        @media (prefers-reduced-motion: reduce) {
+            .ev-reveal { animation: none; }
+            .ev-qrskel { animation: none; }
+            * { transition-duration: 0.01ms !important; }
+        }
 
         @media (max-width: 400px) {
             .ev-nav { padding-left: 2px; padding-right: 2px; gap: 2px; }
@@ -165,15 +234,23 @@
             .ev-tab { gap: 6px; padding: 10px 4px; }
             .ev-tab .ev-i { width: 24px; height: 24px; }
             .ev-tab__label, .ev-tab__count { font-size: 15px; }
+            .ev-tile { gap: 8px; padding-left: 10px; }
+            .ev-tile .ev-i.ev-tile__ico { width: 30px; height: 30px; }
+            .ev-tile__t { font-size: 14px; }
+            .ev-step__label { font-size: 12px; }
+            .ev-nets { gap: 16px 4px; }
+            .ev-net__ic { width: 54px; height: 54px; }
         }
         @media (max-width: 359px) {
             .ev-body { padding-left: 10px; padding-right: 10px; }
             .ev-tab .ev-i { display: none; }
             .ev-tab { flex-direction: column; text-align: center; }
             .ev-tab__txt { align-items: center; }
-            .ev-card { padding: 10px; }
+            .ev-card__head { padding: 10px; gap: 10px; }
             .ev-thumb { width: 60px; height: 60px; }
+            .ev-tiles { grid-template-columns: 1fr; }
             .ev-step__label { font-size: 11px; }
+            .ev-rows--grid { grid-template-columns: 1fr; }
         }
 
         /* sengp-responsive-override */
@@ -198,7 +275,7 @@
         <div class="ev-screen">
 
             <!-- Scrollable content (pull-to-refresh attaches to .content) -->
-            <div class="content ev-scroll">
+            <div class="content ev-scroll" id="scroller">
                 <header class="ev-hero">
                     <picture>
                         <source type="image/webp" srcset="im/sengp-home-background.webp">
@@ -217,27 +294,17 @@
 
                 <div class="ev-body">
                     <div class="ev-tabs ev-reveal" style="--i:0" role="tablist" aria-label="Filtrer les envois">
-                        <button type="button" class="ev-tab active" id="t-all" data-tab="all" role="tab" aria-selected="true" onclick="setTab('all',this)">
+                        <button type="button" class="ev-tab active" id="t-all" data-tab="all" role="tab" aria-selected="true" onclick="setTab('all')">
                             <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
                             <span class="ev-tab__txt"><span class="ev-tab__label">Tous</span><span class="ev-tab__count" id="cnt-all">–</span></span>
                         </button>
-                        <button type="button" class="ev-tab" id="t-active" data-tab="active" role="tab" aria-selected="false" onclick="setTab('active',this)">
+                        <button type="button" class="ev-tab" id="t-active" data-tab="active" role="tab" aria-selected="false" onclick="setTab('active')">
                             <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                             <span class="ev-tab__txt"><span class="ev-tab__label">En cours</span><span class="ev-tab__count" id="cnt-active">–</span></span>
                         </button>
-                        <button type="button" class="ev-tab" id="t-delivered" data-tab="delivered" role="tab" aria-selected="false" onclick="setTab('delivered',this)">
+                        <button type="button" class="ev-tab" id="t-delivered" data-tab="delivered" role="tab" aria-selected="false" onclick="setTab('delivered')">
                             <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
                             <span class="ev-tab__txt"><span class="ev-tab__label">Livrés</span><span class="ev-tab__count" id="cnt-delivered">–</span></span>
-                        </button>
-                    </div>
-
-                    <div class="ev-tools ev-reveal" style="--i:1">
-                        <label class="ev-search">
-                            <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                            <input type="search" id="searchInput" placeholder="Rechercher un envoi, un numéro…" autocomplete="off" aria-label="Rechercher un envoi" oninput="render()">
-                        </label>
-                        <button type="button" class="ev-sort" onclick="openSort()" aria-label="Trier les envois">
-                            <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
                         </button>
                     </div>
 
@@ -272,16 +339,20 @@
                 </button>
             </nav>
 
-            <!-- Sort sheet -->
-            <div class="ev-overlay" id="sortModal" role="dialog" aria-modal="true" aria-labelledby="sortTitle" onclick="if (event.target === this) closeSort()">
-                <div class="ev-sheet">
-                    <h3 id="sortTitle">Trier par</h3>
-                    <div role="radiogroup" aria-labelledby="sortTitle">
-                        <button type="button" class="ev-opt" role="radio" data-sort="recent" aria-checked="true" onclick="setSort('recent')"><span>Plus récents</span><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
-                        <button type="button" class="ev-opt" role="radio" data-sort="oldest" aria-checked="false" onclick="setSort('oldest')"><span>Plus anciens</span><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
-                        <button type="button" class="ev-opt" role="radio" data-sort="price_desc" aria-checked="false" onclick="setSort('price_desc')"><span>Prix décroissant</span><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
-                        <button type="button" class="ev-opt" role="radio" data-sort="price_asc" aria-checked="false" onclick="setSort('price_asc')"><span>Prix croissant</span><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+            <!-- Bottom sheet (share / QR / package / more details) -->
+            <div class="ev-overlay" id="sheetOverlay" onclick="if (event.target === this) closeSheet()">
+                <div class="ev-sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+                    <div class="ev-sheet__grab" id="sheetGrab"><i></i></div>
+                    <div class="ev-sheet__head" id="sheetHead">
+                        <div>
+                            <h3 id="sheetTitle"></h3>
+                            <p id="sheetSub"></p>
+                        </div>
+                        <button type="button" class="ev-close" id="sheetClose" onclick="closeSheet()" aria-label="Fermer">
+                            <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                        </button>
                     </div>
+                    <div class="ev-sheet__body" id="sheetBody"></div>
                 </div>
             </div>
         </div>
@@ -290,9 +361,10 @@
         const API = window.API_BASE_URL;
         const token = localStorage.getItem('authToken');
         let all = [];
+        const byId = {};
         let tab = new URLSearchParams(location.search).get('status') || 'all';
         if (!['all', 'active', 'delivered'].includes(tab)) tab = 'all';
-        let sortBy = 'recent';
+        let openId = null;          // card currently expanded
         let firstRender = true;
         const ACTIVE = ['pending','matched','accepted','picked_up','in_transit','in_customs','out_for_delivery'];
 
@@ -302,11 +374,10 @@
         const fcfa = n => (Number(n)||0).toLocaleString('fr-FR')+' FCFA';
         const validDate = d => { const x = d ? new Date(d) : null; return x && !isNaN(x.getTime()) ? x : null; };
         const fmtFull = d => { const x = validDate(d); return x ? x.toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' }) : '—'; };
-        const fmtDay = d => { const x = validDate(d); return x ? x.toLocaleDateString('fr-FR', { day:'numeric', month:'long' }) : '—'; };
         const fmtTime = d => { const x = validDate(d); return x ? x.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }) : ''; };
-        const norm = s => String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
         const STATUS = { pending:['En attente','b-yellow'],matched:['Correspondance','b-yellow'],accepted:['Accepté','b-blue'],picked_up:['Récupéré','b-blue'],in_transit:['En transit','b-blue'],in_customs:['En douane','b-blue'],out_for_delivery:['En livraison','b-blue'],delivered:['Livré','b-green'],cancelled:['Annulé','b-red'],disputed:['Litige','b-red'] };
+        const st = m => String(m.status||'').toLowerCase();
         const IC = {
             clock: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
             check: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',
@@ -315,8 +386,30 @@
             pin: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>',
             box: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>',
             cal: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>',
-            go: '<svg class="ev-i ev-go" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>',
-            plane: '<img src="im/sengp-plane.png" alt="" width="192" height="142" decoding="async">'
+            chev: '<svg class="ev-i ev-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>',
+            go: '<svg class="ev-i ev-tile__go" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>',
+            truck: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>',
+            share: '<svg class="ev-i ev-tile__ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>',
+            qr: '<svg class="ev-i ev-tile__ico" viewBox="0 0 24 24" aria-hidden="true"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>',
+            pkg: '<svg class="ev-i ev-tile__ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>',
+            doc: '<svg class="ev-i ev-tile__ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>',
+            link: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
+            mail: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+            sms: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+            send: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>',
+            copy: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',
+            more: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>',
+            home: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg>',
+            hash: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>',
+            user: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+            phone: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+            shield: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>',
+            weight: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="3"/><path d="M6.5 8a2 2 0 0 0-1.9 1.46L2.1 18.5A2 2 0 0 0 4 21h16a2 2 0 0 0 1.9-2.5l-2.5-9.04A2 2 0 0 0 17.5 8z"/></svg>',
+            ruler: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>',
+            tag: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg>',
+            text: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6.1H3"/><path d="M21 12.1H3"/><path d="M15.1 18H3"/></svg>',
+            plane: '<img src="im/sengp-plane.png" alt="" width="192" height="142" decoding="async">',
+            wa: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.54-3.87c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 0 0 1.523 5.26l-.999 3.648 3.965-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>'
         };
 
         function badge(s){
@@ -333,7 +426,7 @@
 
         function navigateTo(section) {
             const pages = { home:'dashexpediteur.html', orders:'envois.html', tracking:'suivi.html', notifications:'notifications.html', profile:'profile.html' };
-            if (section === 'orders') { document.querySelector('.ev-scroll').scrollTo({ top: 0, behavior: 'smooth' }); return; }
+            if (section === 'orders') { document.getElementById('scroller').scrollTo({ top: 0, behavior: 'smooth' }); return; }
             if (pages[section]) location.href = pages[section];
         }
 
@@ -352,6 +445,7 @@
                 const res = await fetch(`${API}/missions/my-missions?limit=200`, { headers:{ 'Authorization':'Bearer '+token } });
                 if (!res.ok) throw new Error('Chargement impossible');
                 all = (await res.json()).data || [];
+                all.forEach(m => { byId[m.id] = m; });
                 selectTabButton(tab);
                 updateCounts();
                 render();
@@ -360,8 +454,8 @@
         }
         window.onPullRefresh = load;
 
-        function isActive(m){ return ACTIVE.includes(String(m.status||'').toLowerCase()); }
-        function isDelivered(m){ return String(m.status||'').toLowerCase()==='delivered'; }
+        const isActive = m => ACTIVE.includes(st(m));
+        const isDelivered = m => st(m) === 'delivered';
 
         function updateCounts(){
             document.getElementById('cnt-all').textContent = all.length;
@@ -376,98 +470,329 @@
                 x.setAttribute('aria-selected', String(on));
             });
         }
-        function setTab(t, el){ tab = t; selectTabButton(t); render(); }
+        function setTab(t){ tab = t; openId = null; selectTabButton(t); render(); }
 
         function visible(){
             let list = all;
             if (tab==='active') list = all.filter(isActive);
             else if (tab==='delivered') list = all.filter(isDelivered);
-
-            const q = norm(document.getElementById('searchInput').value.trim());
-            if (q) {
-                list = list.filter(m => norm([m.mission_code, m.tracking_number, m.departure_city, m.departure_country, m.arrival_city, m.arrival_country, (STATUS[String(m.status||'').toLowerCase()]||[m.status])[0]].join(' ')).includes(q));
-            }
-
-            const time = m => { const d = validDate(m.created_at); return d ? d.getTime() : 0; };
-            const price = m => Number(m.offered_price || m.price) || 0;
-            const sorted = list.slice();
-            if (sortBy === 'oldest') sorted.sort((a, b) => time(a) - time(b));
-            else if (sortBy === 'price_desc') sorted.sort((a, b) => price(b) - price(a));
-            else if (sortBy === 'price_asc') sorted.sort((a, b) => price(a) - price(b));
-            else sorted.sort((a, b) => time(b) - time(a));
-            return sorted;
+            return list.slice().sort((a, b) => (validDate(b.created_at) || 0) - (validDate(a.created_at) || 0));
         }
 
-        // ---- sort sheet
-        function openSort(){ document.getElementById('sortModal').classList.add('show'); }
-        function closeSort(){ document.getElementById('sortModal').classList.remove('show'); }
-        function setSort(s){
-            sortBy = s;
-            document.querySelectorAll('.ev-opt').forEach(o => o.setAttribute('aria-checked', String(o.dataset.sort === s)));
-            closeSort();
-            render();
-        }
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSort(); });
-
-        // ---- 4-step tracker (shown on the "En cours" tab)
-        function stepsHtml(m){
-            const status = String(m.status||'').toLowerCase();
-            const reached = { pending:0, matched:0, accepted:0, picked_up:1, in_transit:2, in_customs:3, out_for_delivery:4 }[status];
+        // ---- 4-step tracker ("Suivi de votre colis")
+        function stepDate(d){ return d ? `${esc(fmtFull(d))}<br>${esc(fmtTime(d))}` : '—'; }
+        function trackerHtml(m){
+            const s = st(m);
+            const reachedMap = { pending:0, matched:0, accepted:0, picked_up:1, in_transit:2, in_customs:3, out_for_delivery:4, delivered:5 };
+            const reached = reachedMap[s];
             if (reached === undefined) return '';
-            const warm = reached === 0;
-            const cur = Math.max(reached, 1);
+            const done = reached === 5;                 // delivered: everything is done
+            const warm = reached === 0;                 // waiting for pick-up
+            const cur = done ? 5 : Math.max(reached, 1);
+            const doneAt = m.actual_delivery_date || m.completed_at || m.updated_at;
             const dates = [
                 warm ? m.created_at : (m.actual_pickup_date || m.created_at),
                 reached === 2 ? m.updated_at : null,
                 reached === 3 ? m.updated_at : null,
-                reached === 4 ? m.updated_at : null
+                done ? doneAt : (reached === 4 ? m.updated_at : null)
             ];
-            const labels = [warm ? 'En préparation' : 'Collecté', 'En transit', 'Arrivée pays', 'Livraison'];
+            const labels = [warm ? 'En préparation' : 'Colis pris en charge', 'En transit', 'Arrivée pays', 'Livraison'];
             const icons = [IC.checkOnly, IC.plane, IC.pin, IC.box];
-            return '<ol class="ev-steps">' + labels.map((label, i) => {
+            const steps = labels.map((label, i) => {
                 const n = i + 1;
                 let cls = 'ev-step';
                 if (warm) { if (n === 1) cls += ' is-warm is-now'; }
                 else {
                     if (n <= cur) cls += ' is-on';
-                    if (n === cur) cls += ' is-now';
+                    if (n === cur && !done) cls += ' is-now';
                 }
-                const icon = (!warm && n < cur) || n === 1 ? IC.checkOnly : icons[i];
-                const date = dates[i] ? fmtDay(dates[i]) : '—';
-                return `<li class="${cls}"><span class="ev-dot">${icon}</span><span class="ev-step__label">${label}</span><span class="ev-step__date">${esc(date)}</span></li>`;
-            }).join('') + '</ol>';
+                const icon = (done || (!warm && n < cur) || n === 1) ? IC.checkOnly : icons[i];
+                return `<li class="${cls}"><span class="ev-dot">${icon}</span><span class="ev-step__label">${label}</span><span class="ev-step__date">${stepDate(dates[i])}</span></li>`;
+            }).join('');
+            const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent((m.departure_city||'')+', '+(m.departure_country||''))}&destination=${encodeURIComponent((m.arrival_city||'')+', '+(m.arrival_country||''))}`;
+            return `<div class="ev-track">
+                <div class="ev-track__head">
+                    <span class="ev-track__title">${IC.truck}Suivi de votre colis</span>
+                    <a class="ev-map" href="${mapsUrl}" target="_blank" rel="noopener">${IC.pin}Voir sur la carte</a>
+                </div>
+                <ol class="ev-steps">${steps}</ol>
+            </div>`;
+        }
+
+        function tilesHtml(){
+            return `<div class="ev-tiles">
+                <button type="button" class="ev-tile ev-tile--share" data-act="share">${IC.share}<span><span class="ev-tile__t">Partager le suivi</span><span class="ev-tile__s">WhatsApp, Telegram, etc.</span></span>${IC.go}</button>
+                <button type="button" class="ev-tile ev-tile--qr" data-act="qr">${IC.qr}<span><span class="ev-tile__t">QR code</span><span class="ev-tile__s">Preuve de livraison</span></span>${IC.go}</button>
+                <button type="button" class="ev-tile ev-tile--pkg" data-act="pkg">${IC.pkg}<span><span class="ev-tile__t">Détails du colis</span><span class="ev-tile__s">Poids, dimensions, assurance</span></span>${IC.go}</button>
+                <button type="button" class="ev-tile ev-tile--more" data-act="more">${IC.doc}<span><span class="ev-tile__t">Plus de détails</span><span class="ev-tile__s">Référence, dates, destinataire</span></span>${IC.go}</button>
+            </div>`;
+        }
+
+        function cardHtml(m, i){
+            const id = esc(m.id);
+            const open = String(m.id) === String(openId);
+            const created = `${fmtFull(m.created_at)}${fmtTime(m.created_at) ? ' • ' + fmtTime(m.created_at) : ''}`;
+            return `
+            <article class="ev-card${open ? ' open' : ''}${firstRender && i < 6 ? ' ev-reveal' : ''}" style="--i:${i + 1}" data-id="${id}">
+                <button type="button" class="ev-card__head" data-act="toggle" aria-expanded="${open}" aria-controls="panel-${id}">
+                    <span class="ev-thumb" aria-hidden="true"><picture><source type="image/webp" srcset="im/sengp-package-thumb.webp"><img src="im/sengp-package-thumb.png" alt="" width="372" height="282" loading="lazy" decoding="async"></picture></span>
+                    <span class="ev-info">
+                        <span class="ev-top"><span class="code">${esc(m.mission_code||m.tracking_number||'')}</span>${badge(m.status)}</span>
+                        <span class="price">${fcfa(m.offered_price||m.price)}</span>
+                        <span class="route"><span class="flag">${flag(m.departure_country)}</span><span>${esc(m.departure_city||'—')}</span><span class="plane"><i></i>${IC.plane}<i></i></span><span class="flag">${flag(m.arrival_country)}</span><span>${esc(m.arrival_city||'—')}</span></span>
+                        <span class="meta">${IC.cal}<span>Créé le ${esc(created)}</span></span>
+                    </span>
+                    ${IC.chev}
+                </button>
+                <div class="ev-panel" id="panel-${id}" role="region" aria-label="Actions de l'envoi ${esc(m.mission_code||'')}"><div class="ev-panel__inner">${trackerHtml(m)}${tilesHtml()}</div></div>
+            </article>`;
         }
 
         function render(){
             const list = visible();
             const box = document.getElementById('list');
             if (!list.length){
-                box.innerHTML = `<div class="empty">${IC.box}<div>${document.getElementById('searchInput').value.trim() ? 'Aucun envoi ne correspond à votre recherche.' : 'Aucun envoi dans cette catégorie.'}</div></div>`;
+                box.innerHTML = `<div class="empty">${IC.box}<div>Aucun envoi dans cette catégorie.</div></div>`;
                 return;
             }
-            const anim = firstRender;
+            if (openId == null || !list.some(m => String(m.id) === String(openId))) openId = list[0].id;   // first card open, like the mockup
+            box.innerHTML = list.map(cardHtml).join('');
             firstRender = false;
-            box.innerHTML = list.map((m, i) => {
-                const delivered = isDelivered(m);
-                const doneAt = m.actual_delivery_date || m.completed_at || m.updated_at;
-                const deliveredLine = (tab === 'delivered' && delivered)
-                    ? `<span class="meta">${IC.check.replace('class="ev-i"', 'class="ev-i" style="color:#17A34A"')}<span>Livré le ${esc(fmtFull(doneAt))}${fmtTime(doneAt) ? ' à ' + esc(fmtTime(doneAt)) : ''}</span></span>` : '';
-                return `
-                <a class="ev-card${anim && i < 6 ? ' ev-reveal' : ''}" style="--i:${i + 2}" href="detailenvoi.html?id=${encodeURIComponent(m.id)}">
-                    <span class="ev-card__main">
-                        <span class="ev-thumb" aria-hidden="true"><picture><source type="image/webp" srcset="im/sengp-package-thumb.webp"><img src="im/sengp-package-thumb.png" alt="" width="372" height="282" loading="lazy" decoding="async"></picture></span>
-                        <span class="ev-info">
-                            <span class="ev-top"><span class="code">${esc(m.mission_code||m.tracking_number||'')}</span>${badge(m.status)}</span>
-                            <span class="price">${fcfa(m.offered_price||m.price)}</span>
-                            <span class="route"><span class="flag">${flag(m.departure_country)}</span><span>${esc(m.departure_city||'—')}</span><span class="plane"><i></i>${IC.plane}<i></i></span><span class="flag">${flag(m.arrival_country)}</span><span>${esc(m.arrival_city||'—')}</span></span>
-                            <span class="meta">${IC.cal}<span>Créé le ${esc(fmtFull(m.created_at))}</span></span>
-                            ${deliveredLine}
-                        </span>
-                    </span>
-                    ${tab === 'active' ? stepsHtml(m) : ''}
-                    ${IC.go}
-                </a>`;
-            }).join('');
+        }
+
+        // ---- list interactions (event delegation)
+        document.getElementById('list').addEventListener('click', e => {
+            const btn = e.target.closest('[data-act]');
+            if (!btn) return;
+            const card = btn.closest('.ev-card');
+            if (!card) return;
+            const id = card.dataset.id;
+            const act = btn.dataset.act;
+            if (act === 'toggle') toggleCard(card, id);
+            else openSheet(act, byId[id], btn);
+        });
+
+        function toggleCard(card, id){
+            const willOpen = !card.classList.contains('open');
+            document.querySelectorAll('.ev-card.open').forEach(c => {
+                c.classList.remove('open');
+                c.querySelector('.ev-card__head').setAttribute('aria-expanded', 'false');
+            });
+            openId = willOpen ? id : null;
+            if (willOpen) {
+                card.classList.add('open');
+                card.querySelector('.ev-card__head').setAttribute('aria-expanded', 'true');
+                setTimeout(() => card.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 340);
+            }
+        }
+
+        // =====================================================================
+        // Bottom sheets
+        // =====================================================================
+        let sheetMission = null;
+        let lastFocus = null;
+        const qrCache = {};
+
+        const trackUrl = m => API.replace(/\/api\/v1\/?$/, '') + '/t/' + encodeURIComponent(m.tracking_number || m.mission_code || '');
+        const shareText = m => `Suivez votre colis SEN GP en temps réel : ${trackUrl(m)}`;
+
+        function openSheet(type, m, trigger){
+            if (!m) return;
+            sheetMission = m;
+            lastFocus = trigger || document.activeElement;
+            const title = document.getElementById('sheetTitle');
+            const sub = document.getElementById('sheetSub');
+            const body = document.getElementById('sheetBody');
+            body.scrollTop = 0;
+            if (type === 'share') { title.textContent = 'Partager le suivi'; sub.textContent = 'Envoyez le lien de suivi à votre destinataire'; body.innerHTML = shareHtml(m); }
+            else if (type === 'qr') { title.textContent = 'QR code de livraison'; sub.textContent = 'À montrer au livreur (GP) à la réception'; body.innerHTML = '<div class="ev-qrcard"><div class="ev-qrskel"></div></div>'; loadQr(m); }
+            else if (type === 'pkg') { title.textContent = 'Détails du colis'; sub.textContent = m.mission_code || ''; body.innerHTML = pkgHtml(m); }
+            else { title.textContent = 'Plus de détails'; sub.textContent = 'Enlèvement, livraison et suivi'; body.innerHTML = moreHtml(m); }
+            document.getElementById('sheetOverlay').classList.add('show');
+            document.getElementById('scroller').classList.add('is-locked');
+            setTimeout(() => document.getElementById('sheetClose').focus({ preventScroll: true }), 50);
+        }
+
+        function closeSheet(){
+            document.getElementById('sheetOverlay').classList.remove('show');
+            document.getElementById('scroller').classList.remove('is-locked');
+            const sheet = document.getElementById('sheet');
+            sheet.classList.remove('is-dragging');
+            sheet.style.removeProperty('--drag');
+            if (lastFocus && lastFocus.focus) { try { lastFocus.focus({ preventScroll: true }); } catch (e) {} }
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+        // drag the handle / header down to close
+        (function () {
+            const sheet = document.getElementById('sheet');
+            let startY = null, dy = 0;
+            ['sheetGrab', 'sheetHead'].forEach(id => {
+                const el = document.getElementById(id);
+                el.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; startY = e.clientY; dy = 0; sheet.classList.add('is-dragging'); el.setPointerCapture(e.pointerId); });
+                el.addEventListener('pointermove', e => { if (startY === null) return; dy = Math.max(0, e.clientY - startY); sheet.style.setProperty('--drag', dy + 'px'); });
+                const end = () => { if (startY === null) return; const far = dy > 110; startY = null; sheet.classList.remove('is-dragging'); if (far) closeSheet(); else sheet.style.removeProperty('--drag'); };
+                el.addEventListener('pointerup', end);
+                el.addEventListener('pointercancel', end);
+            });
+        })();
+
+        // ---- 1) share
+        function shareHtml(m){
+            const nets = [
+                ['wa', 'WhatsApp', '#25D366', IC.wa.replace('<svg ', '<svg width="28" height="28" fill="#fff" ')],
+                ['tg', 'Telegram', '#229ED9', IC.send],
+                ['fb', 'Facebook', '#1877F2', 'f'],
+                ['x', 'X', '#111111', '𝕏'],
+                ['sms', 'SMS', '#34C759', IC.sms],
+                ['mail', 'Email', '#EA4335', IC.mail],
+                ['copy', 'Copier', '#6B7A93', IC.link],
+                ['more', 'Plus', '#0B1D3A', IC.more]
+            ];
+            return `<div class="ev-linkbox"><span id="shareUrl">${esc(trackUrl(m))}</span><button type="button" data-net="copy">Copier</button></div>
+                <div class="ev-nets">${nets.map(n => `<button type="button" class="ev-net" data-net="${n[0]}"><span class="ev-net__ic" style="background:${n[2]}">${n[3]}</span>${n[1]}</button>`).join('')}</div>
+                <div class="ev-toast" id="sheetToast" role="status" aria-live="polite"></div>`;
+        }
+
+        function toast(msg){ const t = document.getElementById('sheetToast'); if (t) { t.textContent = msg; setTimeout(() => { if (t.textContent === msg) t.textContent = ''; }, 2500); } }
+
+        async function copyText(text){
+            try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+            try { const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return ok; } catch (e) { return false; }
+        }
+
+        async function shareNative(m){
+            const P = window.Capacitor && window.Capacitor.Plugins;
+            const data = { title: 'Suivi de votre colis SEN GP', text: shareText(m), url: trackUrl(m) };
+            try {
+                if (P && P.Share && P.Share.share) { await P.Share.share({ title: data.title, text: data.text, url: data.url, dialogTitle: 'Partager le suivi' }); return true; }
+                if (navigator.share) { await navigator.share(data); return true; }
+            } catch (e) { return true; }     // dismissed by the user
+            return false;
+        }
+
+        document.getElementById('sheetBody').addEventListener('click', async e => {
+            const b = e.target.closest('[data-net]');
+            if (!b || !sheetMission) return;
+            const m = sheetMission, url = trackUrl(m), text = shareText(m), net = b.dataset.net;
+            const open = u => window.open(u, '_blank');
+            if (net === 'wa') open('https://wa.me/?text=' + encodeURIComponent(text));
+            else if (net === 'tg') open('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent('Suivez votre colis SEN GP en temps réel'));
+            else if (net === 'fb') open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url));
+            else if (net === 'x') open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Suivez votre colis SEN GP en temps réel') + '&url=' + encodeURIComponent(url));
+            else if (net === 'sms') location.href = 'sms:?&body=' + encodeURIComponent(text);
+            else if (net === 'mail') location.href = 'mailto:?subject=' + encodeURIComponent('Suivi de votre colis SEN GP') + '&body=' + encodeURIComponent(text);
+            else if (net === 'copy') { toast((await copyText(url)) ? 'Lien copié ✓' : 'Copie impossible — copiez le lien ci-dessus'); }
+            else if (net === 'more') { if (!(await shareNative(m))) toast((await copyText(url)) ? 'Lien copié ✓' : 'Partage indisponible'); }
+        });
+
+        // ---- 2) QR code
+        async function loadQr(m){
+            const body = document.getElementById('sheetBody');
+            const draw = html => { if (sheetMission === m) body.innerHTML = html; };
+            try {
+                let qrUrl = qrCache[m.id];
+                if (!qrUrl) {
+                    const res = await fetch(`${API}/missions/${encodeURIComponent(m.id)}/qr-code`, { method:'POST', headers:{ 'Authorization':'Bearer '+token } });
+                    const j = await res.json();
+                    qrUrl = (j.data && j.data.qr_code_url) || j.qr_code_url;
+                    if (!res.ok || !qrUrl) throw new Error(j.error || j.message || 'QR indisponible');
+                    qrCache[m.id] = qrUrl;
+                }
+                const recip = m.recipient_name ? esc(m.recipient_name) : 'Destinataire';
+                draw(`<div class="ev-qrcard">
+                        <div class="ev-qrcard__brand">SEN GP</div>
+                        <div class="ev-qrcard__for">Pour : <b>${recip}</b></div>
+                        <div class="ev-qrcard__route">${esc(m.departure_city||'')} → ${esc(m.arrival_city||'')}</div>
+                        <img id="qrImg" src="${esc(qrUrl)}" alt="QR code du colis ${esc(m.tracking_number||m.mission_code||'')}">
+                        <div class="ev-qrcard__num">${esc(m.tracking_number || m.mission_code || '')}</div>
+                    </div>
+                    <button type="button" class="ev-wa" onclick="shareQrWhatsApp()">${IC.wa}Partager via WhatsApp</button>
+                    <p class="ev-hint">Le destinataire montre ce QR au livreur (GP) à la réception du colis.</p>`);
+            } catch (e) {
+                draw(`<div class="ev-msg">QR indisponible pour le moment.<br><button type="button" class="ev-retry" onclick="retryQr()">Réessayer</button></div>`);
+            }
+        }
+        function retryQr(){ if (sheetMission) { document.getElementById('sheetBody').innerHTML = '<div class="ev-qrcard"><div class="ev-qrskel"></div></div>'; loadQr(sheetMission); } }
+
+        // Send the actual QR IMAGE via WhatsApp (native share in the app, Web Share with file, then fallbacks) — same behaviour as detailenvoi.html
+        async function shareQrWhatsApp(){
+            const m = sheetMission || {};
+            const trackingNum = m.tracking_number || m.mission_code || '';
+            const caption =
+                `🎁 SEN GP — Votre colis est en route !\n\n` +
+                `📦 Numéro de suivi : ${trackingNum}\n\n` +
+                `À la livraison, montrez CE QR code au livreur (GP) SEN GP. ` +
+                `Il le scannera pour confirmer la remise de votre colis.\n\n` +
+                `SEN GP — La livraison collaborative`;
+            const img = document.getElementById('qrImg');
+            const dataUrl = img && img.src;
+            const hasData = dataUrl && dataUrl.indexOf('data:') === 0;
+
+            const P = window.Capacitor && window.Capacitor.Plugins;
+            if (P && P.Share && P.Filesystem && hasData){
+                try {
+                    const base64 = dataUrl.split(',')[1];
+                    const fileName = `sengp-qr-${trackingNum || Date.now()}.png`;
+                    let uri;
+                    try {
+                        const w = await P.Filesystem.writeFile({ path: fileName, data: base64, directory: 'CACHE' });
+                        uri = w && w.uri;
+                    } catch (e) { /* getUri below */ }
+                    if (!uri){ const g = await P.Filesystem.getUri({ path: fileName, directory: 'CACHE' }); uri = g && g.uri; }
+                    await P.Share.share({ title: 'QR de livraison SEN GP', text: caption, files: [uri] });
+                    return;
+                } catch (e) {
+                    const msg = String((e && (e.message || e.errorMessage)) || '').toLowerCase();
+                    if (msg.includes('cancel') || msg.includes('abort')) return;
+                }
+            }
+
+            let file = null;
+            if (hasData){
+                try { const blob = await (await fetch(dataUrl)).blob(); file = new File([blob], `sengp-qr-${trackingNum}.png`, { type:'image/png' }); } catch(e){}
+            }
+            if (file && navigator.canShare && navigator.canShare({ files:[file] })){
+                try { await navigator.share({ files:[file], text: caption, title:'QR de livraison SEN GP' }); return; }
+                catch(e){ if (e && e.name === 'AbortError') return; }
+            }
+
+            if (dataUrl){ try { const a=document.createElement('a'); a.href=dataUrl; a.download=`sengp-qr-${trackingNum}.png`; document.body.appendChild(a); a.click(); a.remove(); } catch(e){} }
+            window.open('https://wa.me/?text=' + encodeURIComponent(caption + `\n\n(QR code enregistré dans vos images — joignez-le à ce message.)`), '_blank');
+        }
+
+        // ---- 3) package details
+        function row(icon, cls, k, v, extra){
+            return `<div class="ev-row"><span class="ev-row__ic ${cls || ''}">${icon}</span><span class="ev-row__txt"><span class="ev-row__k">${k}</span><span class="ev-row__v">${v}</span></span>${extra || ''}</div>`;
+        }
+        function pkgHtml(m){
+            const dims = [m.package_length, m.package_width, m.package_height].every(x => x != null) ? `${m.package_length} × ${m.package_width} × ${m.package_height} cm` : 'Non communiquées';
+            const weight = parseFloat(m.package_weight || m.weight);
+            const insured = m.is_insured ? `Oui${m.insurance_cost ? ` <small>· ${esc(fcfa(m.insurance_cost))}</small>` : ''}` : 'Non';
+            return `<div class="ev-rows">
+                ${row(IC.weight, '', 'Poids', weight ? esc(weight) + ' kg' : '—')}
+                ${row(IC.ruler, 'ev-row__ic--o', 'Dimensions', esc(dims))}
+                ${row(IC.tag, 'ev-row__ic--g', 'Valeur déclarée', m.package_value ? esc(fcfa(m.package_value)) : '—')}
+                ${row(IC.shield, 'ev-row__ic--v', 'Assurance', insured)}
+                ${m.package_description ? row(IC.text, '', 'Description', esc(m.package_description)) : ''}
+            </div>`;
+        }
+
+        // ---- 4) more details
+        function moreHtml(m){
+            const gp = m.gp_name && String(m.gp_name).trim() ? esc(m.gp_name) : 'En recherche…';
+            const call = m.gp_phone ? `<a class="ev-row__act" href="tel:${esc(String(m.gp_phone).replace(/[^+\d]/g, ''))}" aria-label="Appeler le GP">${IC.phone}</a>` : '';
+            const desired = m.desired_departure_date ? fmtFull(m.desired_departure_date) : '—';
+            const created = `${fmtFull(m.created_at)}${fmtTime(m.created_at) ? ' à ' + fmtTime(m.created_at) : ''}`;
+            return `<div class="ev-rows">
+                ${row(IC.home, '', 'Enlèvement', esc(m.pickup_address || '—'))}
+                ${row(IC.pin, 'ev-row__ic--o', 'Livraison', esc(m.delivery_address || '—'))}
+                ${row(IC.plane, 'ev-row__ic--g', 'Départ souhaité', esc(desired))}
+                ${row(IC.hash, 'ev-row__ic--v', 'Numéro de suivi', esc(m.tracking_number || m.mission_code || '—'))}
+                ${row(IC.user, '', 'GP', gp, call)}
+                ${row(IC.cal, 'ev-row__ic--o', 'Date de création', esc(created))}
+            </div>
+            <a class="ev-full" href="detailenvoi.html?id=${encodeURIComponent(m.id)}">${IC.doc.replace(' ev-tile__ico', '')}Ouvrir la fiche complète</a>`;
         }
 
         load();
