@@ -5,39 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEN GP - Mes envois</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { background: #F4F8FD; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);
-            min-height:100vh; display:flex; justify-content:center; color:#fff;
+            background: #F4F8FD;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            color: #0B1D3A;
         }
-        .mobile-frame { width:100%; max-width:480px; min-height:100vh; min-height:100dvh; position:relative;
-            background: linear-gradient(135deg, rgba(15,12,41,.95), rgba(36,36,62,.95)); }
-        .header { display:flex; align-items:center; gap:14px; padding:18px 20px;
-            border-bottom:1px solid rgba(255,255,255,.1); position:sticky; top:0;
-            background:rgba(20,18,40,.85); backdrop-filter:blur(10px); z-index:5; }
-        .back-btn { width:38px; height:38px; border:none; border-radius:11px; cursor:pointer;
-            background:rgba(255,255,255,.1); color:#fff; font-size:18px; }
-        .header h1 { font-size:18px; }
-        .content { padding:18px; }
-        .tabs { display:flex; gap:8px; margin-bottom:16px; background:rgba(255,255,255,.05); padding:6px; border-radius:14px; }
-        .tab { flex:1; padding:9px; border:none; border-radius:10px; background:transparent; color:rgba(255,255,255,.6);
-            font-weight:600; font-size:13px; cursor:pointer; }
-        .tab.active { background:linear-gradient(135deg,#FF6B6B,#FFE66D); color:#1a1a2e; }
-        .card { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.1); border-radius:16px;
-            padding:16px; margin-bottom:12px; cursor:pointer; transition:all .2s; }
-        .card:hover { transform:translateX(4px); background:rgba(255,255,255,.12); }
-        .top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
-        .code { font-size:13px; font-weight:700; }
-        .price { font-size:13px; color:#FFD700; font-weight:700; }
-        .badge { padding:4px 10px; border-radius:8px; font-size:11px; font-weight:700; }
-        .b-yellow{background:rgba(255,215,0,.18);color:#FFD700;} .b-blue{background:rgba(78,205,196,.2);color:#4ECDC4;}
-        .b-green{background:rgba(76,175,80,.2);color:#7ee081;} .b-red{background:rgba(255,107,107,.2);color:#ff8f8f;}
-        .route { display:flex; align-items:center; gap:8px; font-size:13px; }
-        .route .flag{font-size:18px;} .route .arrow{color:rgba(255,255,255,.4);}
-        .meta { font-size:11px; color:rgba(255,255,255,.5); margin-top:8px; display:flex; justify-content:space-between; }
-        .loading,.empty { text-align:center; padding:50px 20px; color:rgba(255,255,255,.5); }
-        .empty .ic{font-size:44px;margin-bottom:10px;}
+
+        /* ============================================
+           MES ENVOIS
+           ============================================ */
+        .mobile-frame { position: relative; width: 100%; overflow: hidden; background: #F4F8FD; }
+        .ev-screen { position: absolute; inset: 0; background: #F4F8FD; }
+        .ev-i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+        button { font: inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
+
+        .ev-scroll {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+            overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ---- hero ---- */
+        .ev-hero { position: relative; height: calc(190px + env(safe-area-inset-top, 0px)); overflow: hidden; background: linear-gradient(180deg, #0B1D3A, #2B4A7A); }
+        .ev-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 72% 26%; }
+        .ev-hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(7, 20, 47, 0.55) 0%, rgba(7, 20, 47, 0.1) 52%, rgba(244, 248, 253, 0) 62%),
+                linear-gradient(180deg, rgba(244, 248, 253, 0) 62%, #F4F8FD 100%);
+        }
+        .ev-hero__row { position: absolute; z-index: 2; left: 0; right: 0; top: env(safe-area-inset-top, 0px); max-width: 480px; margin: 0 auto; padding: 22px 20px 0; display: flex; align-items: center; gap: 16px; }
+        .ev-back { width: 46px; height: 46px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(255, 255, 255, 0.2); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff; cursor: pointer; }
+        .ev-back .ev-i { width: 22px; height: 22px; }
+        .ev-back:active { transform: scale(0.95); }
+        .ev-hero h1 { font-size: 28px; font-weight: 800; line-height: 1.1; letter-spacing: -0.3px; color: #fff; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5); }
+        .ev-hero p { margin-top: 3px; font-size: 15px; color: #E8EEF8; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6); }
+
+        .ev-body { position: relative; z-index: 3; max-width: 480px; margin: -52px auto 0; padding: 0 16px 20px; }
+
+        /* ---- tabs ---- */
+        .ev-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 6px; background: #fff; border-radius: 26px; box-shadow: 0 10px 30px rgba(11, 29, 58, 0.1); }
+        .ev-tab { position: relative; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 6px; border: 0; border-radius: 20px; background: none; text-align: left; cursor: pointer; color: #5B6B85; transition: background 0.2s ease; }
+        .ev-tab + .ev-tab::before { content: ""; position: absolute; left: -1px; top: 22%; bottom: 22%; width: 1px; background: #E3EAF3; }
+        .ev-tab.active + .ev-tab::before, .ev-tab + .ev-tab.active::before { display: none; }
+        .ev-tab .ev-i { width: 28px; height: 28px; }
+        .ev-tab__txt { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+        .ev-tab__label { font-size: 16px; font-weight: 700; color: #0B1D3A; }
+        .ev-tab__count { font-size: 16px; color: #5B6B85; }
+        .ev-tab.active { background: linear-gradient(160deg, #FFF6DF, #FFEBC2); color: #D98A00; box-shadow: inset 0 0 0 1px rgba(232, 165, 30, 0.25); }
+        .ev-tab[data-tab="active"].active { color: #E8890C; }
+        .ev-tab[data-tab="delivered"].active { background: linear-gradient(160deg, #E8FAEF, #D4F3E0); color: #17A34A; box-shadow: inset 0 0 0 1px rgba(23, 163, 74, 0.2); }
+
+        /* ---- search + sort ---- */
+        .ev-tools { margin-top: 14px; display: flex; gap: 10px; }
+        .ev-search { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 16px; background: #fff; border-radius: 18px; box-shadow: 0 6px 20px rgba(11, 29, 58, 0.06); color: #6B7A93; }
+        .ev-search:focus-within { box-shadow: 0 0 0 2px #E8890C, 0 6px 20px rgba(11, 29, 58, 0.06); }
+        .ev-search .ev-i { width: 22px; height: 22px; }
+        .ds .ev-search input, .ds .ev-search input:focus { flex: 1; min-width: 0; border: 0; border-radius: 0; outline: none; box-shadow: none; background: transparent; color: #0B1D3A; font: inherit; font-size: 16px; text-overflow: ellipsis; }
+        .ev-search input::placeholder { color: #8A97AD; opacity: 1; font-size: 15px; }
+        .ev-sort { width: 52px; height: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 18px; background: #fff; color: #0B1D3A; box-shadow: 0 6px 20px rgba(11, 29, 58, 0.06); cursor: pointer; }
+        .ev-sort .ev-i { width: 24px; height: 24px; }
+        .ev-sort:active { transform: scale(0.95); }
+
+        /* ---- list ---- */
+        #list { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+        .ev-card { position: relative; display: block; padding: 12px; background: #fff; border-radius: 24px; box-shadow: 0 8px 26px rgba(11, 29, 58, 0.07); color: inherit; text-decoration: none; transition: transform 0.15s ease; }
+        .ev-card:active { transform: scale(0.992); }
+        .ev-card__main { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; }
+        .ev-thumb { width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(160deg, #F7F1E8, #F1E7D8); display: flex; align-items: center; justify-content: center; overflow: hidden; align-self: start; }
+        .ev-thumb img { width: 86%; height: auto; display: block; }
+        .ev-info { min-width: 0; padding-right: 22px; display: flex; flex-direction: column; gap: 4px; }
+        .ev-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 4px 8px; }
+        .code { font-size: 16px; font-weight: 800; color: #0B1D3A; overflow-wrap: anywhere; }
+        .price { font-size: 16px; font-weight: 700; color: #C58A00; }
+        .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; margin-right: -22px; }
+        .badge .ev-i { width: 16px; height: 16px; }
+        .badge img { width: 18px; height: auto; display: block; }
+        .b-yellow { background: #FFF1CF; color: #B87500; }
+        .b-blue { background: #E1EFFF; color: #1767C8; }
+        .b-green { background: #DAF5E5; color: #13803F; }
+        .b-red { background: #FFE3E0; color: #C0392B; }
+        .route { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 8px; font-size: 15px; color: #3E4C66; }
+        .route .flag { font-size: 20px; line-height: 1; }
+        .route .plane { display: inline-flex; align-items: center; gap: 3px; color: #B9C6DA; }
+        .route .plane i { display: block; width: 16px; border-top: 2px dashed #C7D3E5; }
+        .route .plane img { width: 20px; height: auto; display: block; }
+        .meta { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 8px; font-size: 14px; color: #6B7A93; }
+        .meta .ev-i { width: 18px; height: 18px; color: #4B9BEA; }
+        .ev-go { position: absolute; right: 10px; top: 46px; width: 20px; height: 20px; color: #8A97AD; }
+        .ev-deliv { margin-top: 2px; font-size: 14px; line-height: 1.3; color: #6B7A93; text-align: right; }
+        .ev-deliv strong { display: block; font-size: 15px; font-weight: 600; color: #3E4C66; }
+        .ev-side { display: flex; flex-direction: column; align-items: flex-end; }
+
+        /* ---- 4-step tracker ---- */
+        .ev-steps { list-style: none; margin-top: 12px; padding: 0 2px; display: grid; grid-template-columns: repeat(4, 1fr); }
+        .ev-step { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 0; }
+        .ev-step::before { content: ""; position: absolute; top: 17px; right: 50%; width: 100%; border-top: 2px dashed #CFD9E8; }
+        .ev-step:first-child::before { display: none; }
+        .ev-step.is-on::before { border-top: 2px solid #1E6FEA; }
+        .ev-step.is-warm::before { border-top: 2px solid #F59E0B; }
+        .ev-dot { position: relative; z-index: 1; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #E9EEF5; color: #8A97AD; }
+        .ev-dot .ev-i { width: 18px; height: 18px; }
+        .ev-dot img { width: 20px; height: auto; display: block; filter: grayscale(1) opacity(0.55); }
+        .is-on .ev-dot { background: #1E6FEA; color: #fff; }
+        .is-on .ev-dot .ev-i { stroke-width: 2.6; }
+        .is-warm .ev-dot { background: #F59E0B; color: #fff; }
+        .is-warm .ev-dot .ev-i { stroke-width: 2.6; }
+        .is-now .ev-dot { box-shadow: 0 0 0 4px rgba(30, 111, 234, 0.16); }
+        .is-now .ev-dot img { filter: brightness(0) invert(1); }
+        .ev-step__label { margin-top: 6px; max-width: 100%; font-size: 12px; font-weight: 600; line-height: 1.2; color: #6B7A93; overflow-wrap: anywhere; }
+        .is-on .ev-step__label { color: #1E6FEA; }
+        .is-warm .ev-step__label { color: #D98200; }
+        .ev-step__date { margin-top: 2px; font-size: 12px; color: #8A97AD; }
+
+        .loading, .empty { padding: 56px 20px; text-align: center; color: #6B7A93; font-size: 15px; }
+        .empty .ev-i { width: 44px; height: 44px; color: #E8890C; margin-bottom: 8px; }
+
+        /* ---- bottom nav ---- */
+        .ev-nav { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; height: calc(76px + env(safe-area-inset-bottom, 0px)); padding: 6px 8px env(safe-area-inset-bottom, 0px); display: flex; gap: 4px; background: rgba(255, 255, 255, 0.97); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid #E3EAF3; box-shadow: 0 -8px 24px rgba(11, 29, 58, 0.06); }
+        .ev-nav__item { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; border-radius: 20px; background: none; color: #6B7A93; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .ev-nav__item[aria-current="page"] { background: #E8F1FF; color: #1E6FEA; font-weight: 700; }
+        .ev-nav__icon { position: relative; display: flex; }
+        .ev-nav__icon .ev-i { width: 27px; height: 27px; }
+        .ev-dotbadge { position: absolute; top: -2px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: #EF4444; border: 2px solid #fff; }
+        .ev-dotbadge.hidden { display: none; }
+
+        /* ---- sort sheet ---- */
+        .ev-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; background: rgba(7, 20, 47, 0.5); opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+        .ev-overlay.show { opacity: 1; pointer-events: auto; }
+        .ev-sheet { width: 100%; max-width: 480px; background: #fff; border-radius: 26px 26px 0 0; padding: 16px 16px calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateY(24px); transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+        .ev-overlay.show .ev-sheet { transform: none; }
+        .ev-sheet h3 { padding: 4px 6px 10px; font-size: 19px; font-weight: 800; }
+        .ev-opt { width: 100%; min-height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 12px; border: 0; border-radius: 14px; background: none; font-size: 16px; font-weight: 600; text-align: left; cursor: pointer; color: #0B1D3A; }
+        .ev-opt:hover, .ev-opt:active { background: #F1F5FA; }
+        .ev-opt .ev-i { width: 22px; height: 22px; color: #E8890C; visibility: hidden; }
+        .ev-opt[aria-checked="true"] .ev-i { visibility: visible; }
+
+        .ev-back:focus-visible, .ev-tab:focus-visible, .ev-sort:focus-visible, .ev-card:focus-visible, .ev-nav__item:focus-visible, .ev-opt:focus-visible { outline: 2px solid #E8890C; outline-offset: 2px; }
+
+        .ev-reveal { animation: evReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 60ms); }
+        @keyframes evReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+        @media (prefers-reduced-motion: reduce) { .ev-reveal { animation: none; } * { transition-duration: 0.01ms !important; } }
+
+        @media (max-width: 400px) {
+            .ev-nav { padding-left: 2px; padding-right: 2px; gap: 2px; }
+            .ev-nav__item { font-size: 12px; white-space: nowrap; }
+            .ev-tab { gap: 6px; padding: 10px 4px; }
+            .ev-tab .ev-i { width: 24px; height: 24px; }
+            .ev-tab__label, .ev-tab__count { font-size: 15px; }
+        }
+        @media (max-width: 359px) {
+            .ev-body { padding-left: 10px; padding-right: 10px; }
+            .ev-tab .ev-i { display: none; }
+            .ev-tab { flex-direction: column; text-align: center; }
+            .ev-tab__txt { align-items: center; }
+            .ev-card { padding: 10px; }
+            .ev-thumb { width: 60px; height: 60px; }
+            .ev-step__label { font-size: 11px; }
+        }
+
+        /* sengp-responsive-override */
+        .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
+        body{padding:0!important;}
     </style>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
@@ -54,36 +195,156 @@
 </head>
 <body class="ds">
     <div class="mobile-frame">
-        <div class="header">
-            <button class="back-btn" onclick="goBack()">←</button>
-            <h1>Mes envois</h1>
-        </div>
-        <div class="content">
-            <div class="tabs">
-                <button class="tab active" id="t-all" onclick="setTab('all',this)">Tous</button>
-                <button class="tab" id="t-active" onclick="setTab('active',this)">En cours</button>
-                <button class="tab" id="t-delivered" onclick="setTab('delivered',this)">Livrés</button>
+        <div class="ev-screen">
+
+            <!-- Scrollable content (pull-to-refresh attaches to .content) -->
+            <div class="content ev-scroll">
+                <header class="ev-hero">
+                    <picture>
+                        <source type="image/webp" srcset="im/sengp-home-background.webp">
+                        <img src="im/sengp-home-background.jpg" alt="" width="941" height="1672" decoding="async">
+                    </picture>
+                    <div class="ev-hero__row">
+                        <button type="button" class="ev-back" onclick="goBack()" aria-label="Retour">
+                            <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                        </button>
+                        <div>
+                            <h1>Mes envois</h1>
+                            <p>Suivez tous vos colis en temps réel</p>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="ev-body">
+                    <div class="ev-tabs ev-reveal" style="--i:0" role="tablist" aria-label="Filtrer les envois">
+                        <button type="button" class="ev-tab active" id="t-all" data-tab="all" role="tab" aria-selected="true" onclick="setTab('all',this)">
+                            <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
+                            <span class="ev-tab__txt"><span class="ev-tab__label">Tous</span><span class="ev-tab__count" id="cnt-all">–</span></span>
+                        </button>
+                        <button type="button" class="ev-tab" id="t-active" data-tab="active" role="tab" aria-selected="false" onclick="setTab('active',this)">
+                            <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            <span class="ev-tab__txt"><span class="ev-tab__label">En cours</span><span class="ev-tab__count" id="cnt-active">–</span></span>
+                        </button>
+                        <button type="button" class="ev-tab" id="t-delivered" data-tab="delivered" role="tab" aria-selected="false" onclick="setTab('delivered',this)">
+                            <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                            <span class="ev-tab__txt"><span class="ev-tab__label">Livrés</span><span class="ev-tab__count" id="cnt-delivered">–</span></span>
+                        </button>
+                    </div>
+
+                    <div class="ev-tools ev-reveal" style="--i:1">
+                        <label class="ev-search">
+                            <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                            <input type="search" id="searchInput" placeholder="Rechercher un envoi, un numéro…" autocomplete="off" aria-label="Rechercher un envoi" oninput="render()">
+                        </label>
+                        <button type="button" class="ev-sort" onclick="openSort()" aria-label="Trier les envois">
+                            <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+                        </button>
+                    </div>
+
+                    <div id="list"><div class="loading">Chargement…</div></div>
+                </div>
             </div>
-            <div id="list"><div class="loading">Chargement…</div></div>
+
+            <!-- Bottom navigation -->
+            <nav class="ev-nav" aria-label="Navigation principale">
+                <button type="button" class="ev-nav__item" onclick="navigateTo('home')">
+                    <span class="ev-nav__icon"><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span>
+                    <span>Accueil</span>
+                </button>
+                <button type="button" class="ev-nav__item" aria-current="page" onclick="navigateTo('orders')">
+                    <span class="ev-nav__icon"><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
+                    <span>Mes envois</span>
+                </button>
+                <button type="button" class="ev-nav__item" onclick="navigateTo('tracking')">
+                    <span class="ev-nav__icon"><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+                    <span>Suivi</span>
+                </button>
+                <button type="button" class="ev-nav__item" onclick="navigateTo('notifications')">
+                    <span class="ev-nav__icon">
+                        <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+                        <span class="ev-dotbadge hidden" id="notifDot" aria-label="Notifications non lues"></span>
+                    </span>
+                    <span>Notifications</span>
+                </button>
+                <button type="button" class="ev-nav__item" onclick="navigateTo('profile')">
+                    <span class="ev-nav__icon"><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+                    <span>Profil</span>
+                </button>
+            </nav>
+
+            <!-- Sort sheet -->
+            <div class="ev-overlay" id="sortModal" role="dialog" aria-modal="true" aria-labelledby="sortTitle" onclick="if (event.target === this) closeSort()">
+                <div class="ev-sheet">
+                    <h3 id="sortTitle">Trier par</h3>
+                    <div role="radiogroup" aria-labelledby="sortTitle">
+                        <button type="button" class="ev-opt" role="radio" data-sort="recent" aria-checked="true" onclick="setSort('recent')"><span>Plus récents</span><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+                        <button type="button" class="ev-opt" role="radio" data-sort="oldest" aria-checked="false" onclick="setSort('oldest')"><span>Plus anciens</span><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+                        <button type="button" class="ev-opt" role="radio" data-sort="price_desc" aria-checked="false" onclick="setSort('price_desc')"><span>Prix décroissant</span><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+                        <button type="button" class="ev-opt" role="radio" data-sort="price_asc" aria-checked="false" onclick="setSort('price_asc')"><span>Prix croissant</span><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
     <script>
         const API = window.API_BASE_URL;
         const token = localStorage.getItem('authToken');
         let all = [];
         let tab = new URLSearchParams(location.search).get('status') || 'all';
+        if (!['all', 'active', 'delivered'].includes(tab)) tab = 'all';
+        let sortBy = 'recent';
+        let firstRender = true;
         const ACTIVE = ['pending','matched','accepted','picked_up','in_transit','in_customs','out_for_delivery'];
 
-        const FLAGS = {'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱'};
+        const FLAGS = {'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱','Algérie':'🇩🇿','Tunisie':'🇹🇳','Côte d\'Ivoire':'🇨🇮','Belgique':'🇧🇪','Suisse':'🇨🇭'};
         const flag = c => FLAGS[c] || '🌍';
-        const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         const fcfa = n => (Number(n)||0).toLocaleString('fr-FR')+' FCFA';
-        const dt = d => d ? new Date(d).toLocaleDateString('fr-FR') : '—';
+        const validDate = d => { const x = d ? new Date(d) : null; return x && !isNaN(x.getTime()) ? x : null; };
+        const fmtFull = d => { const x = validDate(d); return x ? x.toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' }) : '—'; };
+        const fmtDay = d => { const x = validDate(d); return x ? x.toLocaleDateString('fr-FR', { day:'numeric', month:'long' }) : '—'; };
+        const fmtTime = d => { const x = validDate(d); return x ? x.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }) : ''; };
+        const norm = s => String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
         const STATUS = { pending:['En attente','b-yellow'],matched:['Correspondance','b-yellow'],accepted:['Accepté','b-blue'],picked_up:['Récupéré','b-blue'],in_transit:['En transit','b-blue'],in_customs:['En douane','b-blue'],out_for_delivery:['En livraison','b-blue'],delivered:['Livré','b-green'],cancelled:['Annulé','b-red'],disputed:['Litige','b-red'] };
-        function badge(s){ const m=STATUS[String(s||'').toLowerCase()]||[s,'b-yellow']; return `<span class="badge ${m[1]}">${esc(m[0])}</span>`; }
+        const IC = {
+            clock: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+            check: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',
+            checkOnly: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
+            alert: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>',
+            pin: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+            box: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>',
+            cal: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>',
+            go: '<svg class="ev-i ev-go" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>',
+            plane: '<img src="im/sengp-plane.png" alt="" width="192" height="142" decoding="async">'
+        };
+
+        function badge(s){
+            const key = String(s||'').toLowerCase();
+            const m = STATUS[key] || [s, 'b-yellow'];
+            let icon = IC.plane;
+            if (key === 'pending' || key === 'matched') icon = IC.clock;
+            else if (key === 'delivered') icon = IC.check;
+            else if (key === 'cancelled' || key === 'disputed') icon = IC.alert;
+            return `<span class="badge ${m[1]}">${icon}${esc(m[0])}</span>`;
+        }
 
         function goBack(){ location.href='dashexpediteur.html'; }
+
+        function navigateTo(section) {
+            const pages = { home:'dashexpediteur.html', orders:'envois.html', tracking:'suivi.html', notifications:'notifications.html', profile:'profile.html' };
+            if (section === 'orders') { document.querySelector('.ev-scroll').scrollTo({ top: 0, behavior: 'smooth' }); return; }
+            if (pages[section]) location.href = pages[section];
+        }
+
+        async function loadUnreadNotifCount() {
+            try {
+                const r = await fetch(`${API}/notifications/my-notifications?limit=100`, { headers: { 'Authorization': 'Bearer ' + token } });
+                if (!r.ok) return;
+                const unread = ((await r.json()).data || []).filter(n => !n.is_read).length;
+                document.getElementById('notifDot').classList.toggle('hidden', unread === 0);
+            } catch (e) {}
+        }
 
         async function load(){
             if (!token){ location.href='connexion.html'; return; }
@@ -91,39 +352,122 @@
                 const res = await fetch(`${API}/missions/my-missions?limit=200`, { headers:{ 'Authorization':'Bearer '+token } });
                 if (!res.ok) throw new Error('Chargement impossible');
                 all = (await res.json()).data || [];
-                // sélectionner l'onglet initial
-                const el = document.getElementById('t-'+(tab==='all'?'all':tab));
-                if (el){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); }
+                selectTabButton(tab);
+                updateCounts();
                 render();
-            } catch(e){ document.getElementById('list').innerHTML = `<div class="empty">Erreur: ${esc(e.message)}</div>`; }
+            } catch(e){ document.getElementById('list').innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`; }
+            loadUnreadNotifCount();
+        }
+        window.onPullRefresh = load;
+
+        function isActive(m){ return ACTIVE.includes(String(m.status||'').toLowerCase()); }
+        function isDelivered(m){ return String(m.status||'').toLowerCase()==='delivered'; }
+
+        function updateCounts(){
+            document.getElementById('cnt-all').textContent = all.length;
+            document.getElementById('cnt-active').textContent = all.filter(isActive).length;
+            document.getElementById('cnt-delivered').textContent = all.filter(isDelivered).length;
         }
 
-        function setTab(t, el){ tab=t; document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); el.classList.add('active'); render(); }
+        function selectTabButton(t){
+            document.querySelectorAll('.ev-tab').forEach(x => {
+                const on = x.dataset.tab === t;
+                x.classList.toggle('active', on);
+                x.setAttribute('aria-selected', String(on));
+            });
+        }
+        function setTab(t, el){ tab = t; selectTabButton(t); render(); }
 
         function visible(){
-            if (tab==='active') return all.filter(m=>ACTIVE.includes(String(m.status||'').toLowerCase()));
-            if (tab==='delivered') return all.filter(m=>String(m.status||'').toLowerCase()==='delivered');
-            return all;
+            let list = all;
+            if (tab==='active') list = all.filter(isActive);
+            else if (tab==='delivered') list = all.filter(isDelivered);
+
+            const q = norm(document.getElementById('searchInput').value.trim());
+            if (q) {
+                list = list.filter(m => norm([m.mission_code, m.tracking_number, m.departure_city, m.departure_country, m.arrival_city, m.arrival_country, (STATUS[String(m.status||'').toLowerCase()]||[m.status])[0]].join(' ')).includes(q));
+            }
+
+            const time = m => { const d = validDate(m.created_at); return d ? d.getTime() : 0; };
+            const price = m => Number(m.offered_price || m.price) || 0;
+            const sorted = list.slice();
+            if (sortBy === 'oldest') sorted.sort((a, b) => time(a) - time(b));
+            else if (sortBy === 'price_desc') sorted.sort((a, b) => price(b) - price(a));
+            else if (sortBy === 'price_asc') sorted.sort((a, b) => price(a) - price(b));
+            else sorted.sort((a, b) => time(b) - time(a));
+            return sorted;
+        }
+
+        // ---- sort sheet
+        function openSort(){ document.getElementById('sortModal').classList.add('show'); }
+        function closeSort(){ document.getElementById('sortModal').classList.remove('show'); }
+        function setSort(s){
+            sortBy = s;
+            document.querySelectorAll('.ev-opt').forEach(o => o.setAttribute('aria-checked', String(o.dataset.sort === s)));
+            closeSort();
+            render();
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSort(); });
+
+        // ---- 4-step tracker (shown on the "En cours" tab)
+        function stepsHtml(m){
+            const status = String(m.status||'').toLowerCase();
+            const reached = { pending:0, matched:0, accepted:0, picked_up:1, in_transit:2, in_customs:3, out_for_delivery:4 }[status];
+            if (reached === undefined) return '';
+            const warm = reached === 0;
+            const cur = Math.max(reached, 1);
+            const dates = [
+                warm ? m.created_at : (m.actual_pickup_date || m.created_at),
+                reached === 2 ? m.updated_at : null,
+                reached === 3 ? m.updated_at : null,
+                reached === 4 ? m.updated_at : null
+            ];
+            const labels = [warm ? 'En préparation' : 'Collecté', 'En transit', 'Arrivée pays', 'Livraison'];
+            const icons = [IC.checkOnly, IC.plane, IC.pin, IC.box];
+            return '<ol class="ev-steps">' + labels.map((label, i) => {
+                const n = i + 1;
+                let cls = 'ev-step';
+                if (warm) { if (n === 1) cls += ' is-warm is-now'; }
+                else {
+                    if (n <= cur) cls += ' is-on';
+                    if (n === cur) cls += ' is-now';
+                }
+                const icon = (!warm && n < cur) || n === 1 ? IC.checkOnly : icons[i];
+                const date = dates[i] ? fmtDay(dates[i]) : '—';
+                return `<li class="${cls}"><span class="ev-dot">${icon}</span><span class="ev-step__label">${label}</span><span class="ev-step__date">${esc(date)}</span></li>`;
+            }).join('') + '</ol>';
         }
 
         function render(){
             const list = visible();
             const box = document.getElementById('list');
-            if (!list.length){ box.innerHTML = '<div class="empty"><div class="ic"><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></div>Aucun envoi dans cette catégorie.</div>'; return; }
-            box.innerHTML = list.map(m=>`
-                <div class="card" onclick="location.href='detailenvoi.html?id=${m.id}'">
-                    <div class="top">
-                        <div><div class="code">${esc(m.mission_code||m.tracking_number||'')}</div>
-                        <div class="price">${fcfa(m.offered_price||m.price)}</div></div>
-                        ${badge(m.status)}
-                    </div>
-                    <div class="route">
-                        <span class="flag">${flag(m.departure_country)}</span><span>${esc(m.departure_city||'—')}</span>
-                        <span class="arrow">→</span>
-                        <span class="flag">${flag(m.arrival_country)}</span><span>${esc(m.arrival_city||'—')}</span>
-                    </div>
-                    <div class="meta"><span>Créé: ${dt(m.created_at)}</span><span>${m.gp_id?'GP assigné':'Recherche GP…'}</span></div>
-                </div>`).join('');
+            if (!list.length){
+                box.innerHTML = `<div class="empty">${IC.box}<div>${document.getElementById('searchInput').value.trim() ? 'Aucun envoi ne correspond à votre recherche.' : 'Aucun envoi dans cette catégorie.'}</div></div>`;
+                return;
+            }
+            const anim = firstRender;
+            firstRender = false;
+            box.innerHTML = list.map((m, i) => {
+                const delivered = isDelivered(m);
+                const doneAt = m.actual_delivery_date || m.completed_at || m.updated_at;
+                const deliveredLine = (tab === 'delivered' && delivered)
+                    ? `<span class="meta">${IC.check.replace('class="ev-i"', 'class="ev-i" style="color:#17A34A"')}<span>Livré le ${esc(fmtFull(doneAt))}${fmtTime(doneAt) ? ' à ' + esc(fmtTime(doneAt)) : ''}</span></span>` : '';
+                return `
+                <a class="ev-card${anim && i < 6 ? ' ev-reveal' : ''}" style="--i:${i + 2}" href="detailenvoi.html?id=${encodeURIComponent(m.id)}">
+                    <span class="ev-card__main">
+                        <span class="ev-thumb" aria-hidden="true"><picture><source type="image/webp" srcset="im/sengp-package-thumb.webp"><img src="im/sengp-package-thumb.png" alt="" width="372" height="282" loading="lazy" decoding="async"></picture></span>
+                        <span class="ev-info">
+                            <span class="ev-top"><span class="code">${esc(m.mission_code||m.tracking_number||'')}</span>${badge(m.status)}</span>
+                            <span class="price">${fcfa(m.offered_price||m.price)}</span>
+                            <span class="route"><span class="flag">${flag(m.departure_country)}</span><span>${esc(m.departure_city||'—')}</span><span class="plane"><i></i>${IC.plane}<i></i></span><span class="flag">${flag(m.arrival_country)}</span><span>${esc(m.arrival_city||'—')}</span></span>
+                            <span class="meta">${IC.cal}<span>Créé le ${esc(fmtFull(m.created_at))}</span></span>
+                            ${deliveredLine}
+                        </span>
+                    </span>
+                    ${tab === 'active' ? stepsHtml(m) : ''}
+                    ${IC.go}
+                </a>`;
+            }).join('');
         }
 
         load();
