@@ -1373,9 +1373,9 @@
         /* ============================================
            STEP 4 : Récapitulatif (step 3 "GP" removed: missions are open to all GPs)
            ============================================ */
-        .stepper[data-current="4"] .stepper-progress { background: linear-gradient(90deg, #22C55E 0%, #22C55E 66%, #3B6FFA 100%); box-shadow: 0 0 10px rgba(34, 197, 94, 0.55); }
-        .stepper[data-current="4"] .step.active .step-circle { background: var(--cr-blue); border-color: #fff; box-shadow: 0 0 0 4px rgba(47, 107, 255, 0.4), 0 6px 18px rgba(47, 107, 255, 0.55); }
-        .stepper[data-current="4"] .step.active .step-label { color: #BBD6FF; }
+        .stepper[data-current="3"] .stepper-progress, .stepper[data-current="4"] .stepper-progress { background: linear-gradient(90deg, #22C55E 0%, #22C55E 60%, #3B6FFA 100%); box-shadow: 0 0 10px rgba(34, 197, 94, 0.55); }
+        .stepper[data-current="3"] .step.active .step-circle, .stepper[data-current="4"] .step.active .step-circle { background: var(--cr-blue); border-color: #fff; box-shadow: 0 0 0 4px rgba(47, 107, 255, 0.4), 0 6px 18px rgba(47, 107, 255, 0.55); }
+        .stepper[data-current="3"] .step.active .step-label, .stepper[data-current="4"] .step.active .step-label { color: #BBD6FF; }
 
         .rc-intro { padding: 6px 4px 18px; }
         .rc-intro h2 { font-size: 25px; font-weight: 800; line-height: 1.2; letter-spacing: -0.3px; color: var(--cr-navy); }
@@ -1448,6 +1448,7 @@
         .rc-total { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
         .rc-total span:first-child { font-size: 20px; font-weight: 800; color: var(--cr-navy); }
         .rc-total span:last-child { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: #2F4FE8; text-align: right; }
+        .rc-big { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; color: #2F4FE8; }
         .rc-pedit { margin-top: 16px; padding: 14px; border-radius: 18px; background: #F4F8FD; border: 1px solid #E3EAF3; }
         .rc-pedit[hidden] { display: none; }
         .rc-pedit label { display: block; margin: 0 0 8px; font-size: 15px; font-weight: 700; color: var(--cr-navy); }
@@ -1560,7 +1561,7 @@
 
                         <div class="step" data-step="3">
                             <div class="step-circle">3</div>
-                            <div class="step-label">GP</div>
+                            <div class="step-label">Récap</div>
                         </div>
 
                         <div class="step" data-step="4">
@@ -1805,8 +1806,8 @@
                     </div>
                 </section>
             </div>
-            <!-- Step 4: Récapitulatif + paiement (the former "GP" step is skipped: missions are open to all GPs) -->
-            <div class="step-content" data-step="4">
+            <!-- Step 3: Récapitulatif (replaces the former "GP" step: missions are open to all GPs) -->
+            <div class="step-content" data-step="3">
 
                 <div class="rc-intro">
                     <h2>Récapitulatif de votre envoi</h2>
@@ -1907,6 +1908,24 @@
                     </div>
                     <div class="rc-sep"></div>
                     <div class="rc-total"><span>Total à payer</span><span id="summaryTotal">0 FCFA</span></div>
+                </section>
+
+            </div>
+
+            <!-- Step 4: Paiement -->
+            <div class="step-content" data-step="4">
+
+                <div class="rc-intro">
+                    <h2>Paiement</h2>
+                    <p>Choisissez comment payer votre envoi.</p>
+                </div>
+
+                <section class="rc-card" aria-label="Montant à payer">
+                    <div class="rc-head">
+                        <span class="rc-ic rc-ic--purple" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
+                        <div class="rc-head__t"><span class="rc-k">Montant à payer</span><span class="rc-v rc-big" id="payTotal">0 FCFA</span></div>
+                        <button type="button" class="rc-edit" onclick="editStep(3)" aria-label="Revoir le récapitulatif">Revoir</button>
+                    </div>
                 </section>
 
                 <!-- Payment method -->
@@ -2055,7 +2074,7 @@
         const stepDescriptions = {
             1: 'Détails du colis',
             2: 'Destinataire, retrait et départ',
-            3: 'Sélection du Gros Porteur',
+            3: 'Récapitulatif de votre envoi',
             4: 'Paiement et confirmation'
         };
 
@@ -2095,7 +2114,11 @@
             setNextLabel(currentStep === totalSteps ? 'Confirmer et payer' : 'Suivant');
             document.getElementById('crScroll').scrollTo({ top: 0, behavior: 'smooth' });
 
-            // Update summary when entering step 4
+            // Recap (step 3) is built from the form; the payment step shows the total and gates the CTA
+            if (currentStep === 3) {
+                updateOrderSummary();
+                updateNextButton(true);
+            }
             if (currentStep === 4) {
                 updateOrderSummary();
                 togglePayButton();
@@ -2150,6 +2173,7 @@
             const txt = `${offered.toLocaleString('fr-FR')} FCFA`;
             document.getElementById('summaryTransport').textContent = txt;
             document.getElementById('summaryTotal').textContent = txt;
+            document.getElementById('payTotal').textContent = txt;
         }
 
         function togglePriceEdit() {
@@ -2159,11 +2183,9 @@
             btn.setAttribute('aria-expanded', String(!box.hidden));
             if (!box.hidden) { const i = document.getElementById('offeredPrice'); i.focus({ preventScroll: true }); i.select(); }
         }
-        const FLOW = [1, 2, 4];
-
         function nextStep() {
             if (currentStep < totalSteps) {
-                currentStep = FLOW[FLOW.indexOf(currentStep) + 1];
+                currentStep++;
                 updateStep();
             } else {
                 // Final step - Process payment
@@ -2177,7 +2199,7 @@
 
         function previousStep() {
             if (currentStep > 1) {
-                currentStep = FLOW[FLOW.indexOf(currentStep) - 1];
+                currentStep--;
                 updateStep();
             }
         }
