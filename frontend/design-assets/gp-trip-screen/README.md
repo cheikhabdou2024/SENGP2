@@ -8,5 +8,6 @@ de billet (SVG), bouton « Choisir un fichier », ligne « Prendre une photo »,
 - Formats : image (JPG/PNG…) ou PDF. **5 Mo max** (limite du serveur, `multer` dans `trip.routes.ts`) — la maquette indiquait 10 Mo.
 - L'appareil photo a son propre `<input capture>` (l'ancien code laissait `capture` collé sur l'input fichier).
 - Après sélection : aperçu de l'image (ou pastille PDF), nom du fichier, bouton « Changer de fichier ».
-- Étape 2 « Détails » : mêmes champs et même appel `POST /trips` (multipart `flight_ticket_photo`…), regroupés en cartes Départ / Arrivée / Capacité dans le nouveau style.
+- Étape 2 « Détails » (`reference-mockup-trip-step2.png`) : cartes **Trajet** (départ ⇄ arrivée, drapeaux SVG, bouton d'inversion), **Dates du voyage** (pastilles calendrier), **Poids disponible** (curseur 1–50 kg avec bulle, valise `im/sengp-suitcase.*`, capacité maximale, conseils). Un clic sur un lieu ouvre une feuille pays → ville ; un clic sur les dates, une feuille avec deux champs date/heure (arrivée obligatoirement après le départ). Même appel `POST /trips` qu'avant.
+- Écarts : « Algérie » ajoutée à la liste des pays (présente dans la maquette) ; la section « Informations complémentaires » est omise car le backend n'a aucune colonne pour une note ; départ/arrivée/dates vides par défaut, poids à 15 kg comme sur la maquette.
 - Testé Edge headless 320/360/390/430 px : pas de débordement, 0 erreur JS ; fichier .txt et fichier 6 Mo refusés ; payload vérifié.

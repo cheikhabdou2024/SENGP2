@@ -108,18 +108,113 @@
         .ct-secure { margin-top: 16px; display: flex; align-items: center; gap: 12px; padding: 0 6px; font-size: 15.5px; line-height: 1.35; color: var(--ct-muted); }
         .ct-secure .ct-i { width: 30px; height: 30px; color: var(--ct-blue); }
 
-        /* ---- step 2 form ---- */
-        .ct-card { margin-top: 18px; padding: 18px 16px 4px; background: #fff; border-radius: 26px; box-shadow: 0 8px 26px rgba(11, 29, 58, 0.06); }
-        .ct-card h3 { margin-bottom: 14px; display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 800; }
-        .ct-card h3 .ct-i { width: 24px; height: 24px; color: var(--ct-blue); }
-        .ct-field { margin-bottom: 16px; }
-        .ct-field label { display: block; margin-bottom: 8px; font-size: 15px; font-weight: 700; color: var(--ct-navy); }
-        .ds .ct-field select.ct-input, .ds .ct-field input.ct-input { width: 100%; min-height: 56px; padding: 0 16px; border: 1.5px solid #D5DEEA; border-radius: 16px; background: #F8FAFD; color: var(--ct-navy); font-size: 17px; box-shadow: none; outline: none; -webkit-appearance: none; appearance: none; }
-        .ds .ct-field select.ct-input { padding-right: 42px; background: #F8FAFD url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236B7A93' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center; }
-        .ds .ct-field select.ct-input option { color: #0B1D3A; background: #fff; }
-        .ds .ct-field .ct-input:focus { border-color: #3B6FFA; box-shadow: 0 0 0 3px rgba(59, 111, 250, 0.18); background-color: #fff; }
-        .ct-note { margin-top: 18px; display: flex; gap: 12px; padding: 14px 16px; border-radius: 18px; background: #EAF3FF; font-size: 15px; line-height: 1.45; color: #2B4673; }
-        .ct-note .ct-i { width: 24px; height: 24px; color: var(--ct-blue); margin-top: 1px; }
+        /* ============ ÉTAPE 2 : détails ============ */
+        .ct-grid2 { margin-top: 16px; display: grid; gap: 14px; grid-template-columns: 1fr; }
+        .ct-box { padding: 16px 16px 16px; background: #fff; border-radius: 26px; box-shadow: 0 8px 26px rgba(11, 29, 58, 0.06); }
+        .ct-box__h { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .ct-box__h h3 { font-size: 21px; font-weight: 800; letter-spacing: -0.2px; }
+        .ct-box__h .ct-i { width: 28px; height: 28px; }
+        .ct-ic-blue { color: #2F6BFF; }
+        .ct-route { display: flex; align-items: center; gap: 8px; }
+        .ct-place { flex: 1; min-width: 0; padding: 12px 12px; border: 0; border-radius: 18px; background: #EEF4FF; text-align: center; color: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .ct-place:active { background: #E2ECFD; }
+        .ct-place small { font-size: 14.5px; color: var(--ct-muted); }
+        .ct-place__main { display: flex; align-items: center; gap: 9px; max-width: 100%; }
+        .ct-place__main b { font-size: 21px; font-weight: 800; letter-spacing: -0.2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .ct-place.is-empty b { color: #9AA8C0; }
+        .ct-flag { width: 34px; height: 24px; flex-shrink: 0; border-radius: 5px; overflow: hidden; background: #DCE5F3; box-shadow: 0 0 0 1px rgba(11, 29, 58, 0.1); display: flex; }
+        .ct-flag:empty { display: none; }
+        .ct-flag svg { width: 100%; height: 100%; display: block; }
+        .ct-swap { width: 48px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: #E4ECFB; color: #1D3F7A; cursor: pointer; margin: 0 -4px; position: relative; z-index: 1; }
+        .ct-swap .ct-i { width: 22px; height: 22px; }
+        .ct-swap:active { transform: rotate(180deg); }
+        .ct-swap { transition: transform 0.25s ease; }
+
+        .ct-dates { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0; border: 0; background: none; text-align: left; color: inherit; cursor: pointer; }
+        .ct-date { padding: 10px 12px; border-radius: 18px; background: #EEF4FF; min-width: 0; }
+        .ct-date { display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; align-items: center; }
+        .ct-date > small { grid-column: 1 / -1; font-size: 14.5px; color: var(--ct-muted); }
+        .ct-cal { flex-shrink: 0; width: 54px; border: 2px solid #1D3F7A; border-radius: 10px; overflow: hidden; text-align: center; background: #fff; }
+        .ct-cal i { display: block; font-style: normal; font-size: 10px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; color: #fff; background: #2F6BFF; padding: 2px 0; }
+        .ct-cal b { display: block; font-size: 24px; font-weight: 800; line-height: 1.25; }
+        .ct-date__t { min-width: 0; }
+        .ct-date__t b { display: block; font-size: 16px; font-weight: 800; line-height: 1.2; }
+        .ct-date__t small { display: block; margin-top: 2px; font-size: 15px; color: var(--ct-muted); }
+        .ct-dates .lab { display: block; margin-bottom: 4px; font-size: 14px; color: var(--ct-muted); }
+
+        .ct-weight { margin-top: 14px; display: grid; grid-template-columns: 1fr; gap: 14px; }
+        .ct-weight__v { margin-top: -2px; font-size: 20px; font-weight: 700; color: var(--ct-navy); }
+        .ct-weight__v b { font-size: 36px; font-weight: 800; }
+        .ct-slider { position: relative; margin-top: 30px; padding: 0 2px; }
+        .ct-bubble { position: absolute; top: -40px; left: 0; transform: translateX(-50%); padding: 5px 12px; border-radius: 10px; background: #1D3F7A; color: #fff; font-size: 15px; font-weight: 800; white-space: nowrap; pointer-events: none; }
+        .ct-bubble::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; background: #1D3F7A; transform: translateX(-50%) rotate(45deg); }
+        .ct-slider input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 36px; background: transparent; outline: none; margin: 0; cursor: pointer; }
+        .ct-slider input[type=range]::-webkit-slider-runnable-track { height: 8px; border-radius: 4px; background: linear-gradient(90deg, #1E78F0 var(--pct, 30%), #E3EAF5 var(--pct, 30%)); }
+        .ct-slider input[type=range]::-moz-range-track { height: 8px; border-radius: 4px; background: #E3EAF5; }
+        .ct-slider input[type=range]::-moz-range-progress { height: 8px; border-radius: 4px; background: #1E78F0; }
+        .ct-slider input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; margin-top: -12px; border-radius: 50%; background: #1D3F7A; border: 5px solid #fff; box-shadow: 0 4px 12px rgba(11, 29, 58, 0.35); }
+        .ct-slider input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #1D3F7A; border: 5px solid #fff; box-shadow: 0 4px 12px rgba(11, 29, 58, 0.35); }
+        .ct-slider input[type=range]:focus-visible { outline: 2px solid #2F6BFF; outline-offset: 4px; border-radius: 8px; }
+        .ct-slider__ends { display: flex; justify-content: space-between; font-size: 15px; color: var(--ct-muted); }
+        .ct-weight__side { display: flex; align-items: center; gap: 12px; }
+        .ct-weight__side img { width: 38%; max-width: 150px; height: auto; flex-shrink: 0; filter: drop-shadow(0 10px 14px rgba(11, 29, 58, 0.18)); }
+        .ct-cap { flex: 1; min-width: 0; padding: 12px 14px; border-radius: 18px; background: #EEF4FF; }
+        .ct-cap small { display: block; font-size: 15px; font-weight: 700; color: #1D5FD6; }
+        .ct-cap b { display: block; margin-top: 2px; font-size: 26px; font-weight: 800; }
+        .ct-cap p { margin-top: 4px; font-size: 14px; line-height: 1.35; color: var(--ct-muted); }
+        .ct-tip { display: flex; gap: 12px; padding: 14px 16px; border-radius: 18px; background: #FFF4E4; }
+        .ct-tip .ct-i { width: 30px; height: 30px; color: #F59E0B; margin-top: 2px; }
+        .ct-tip b { display: block; font-size: 17px; font-weight: 800; color: #E8780C; }
+        .ct-tip p { margin-top: 2px; font-size: 15px; line-height: 1.4; color: #5B4B33; }
+
+        /* ---- sheets ---- */
+        .ct-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; background: rgba(7, 20, 47, 0.52); opacity: 0; pointer-events: none; transition: opacity 0.28s ease; }
+        .ct-overlay.show { opacity: 1; pointer-events: auto; }
+        .ct-sheet { width: 100%; max-width: 480px; max-height: 82dvh; display: flex; flex-direction: column; background: #fff; border-radius: 28px 28px 0 0; box-shadow: 0 -12px 40px rgba(7, 20, 47, 0.25); transform: translateY(100%); transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1); }
+        .ct-overlay.show .ct-sheet { transform: none; }
+        .ct-sheet__grab { padding: 10px 0 2px; display: flex; justify-content: center; }
+        .ct-sheet__grab i { width: 44px; height: 5px; border-radius: 3px; background: #D5DCE8; }
+        .ct-sheet__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 20px 8px; }
+        .ct-sheet__head h3 { font-size: 22px; font-weight: 800; letter-spacing: -0.2px; }
+        .ct-sheet__head p { margin-top: 2px; font-size: 14.5px; color: var(--ct-muted); }
+        .ct-close { width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: #EDF1F7; color: var(--ct-navy); cursor: pointer; }
+        .ct-close .ct-i { width: 20px; height: 20px; }
+        .ct-sheet__body { overflow-y: auto; overscroll-behavior: contain; padding: 6px 16px calc(20px + env(safe-area-inset-bottom, 0px)); }
+        .ct-opt { width: 100%; min-height: 62px; display: flex; align-items: center; gap: 14px; padding: 8px 12px; border: 0; border-radius: 16px; background: none; text-align: left; font-size: 18px; font-weight: 700; color: var(--ct-navy); cursor: pointer; }
+        .ct-opt + .ct-opt { border-top: 1px solid #EEF2F8; border-radius: 0; }
+        .ct-opt:active { background: #F4F8FD; }
+        .ct-opt.is-on { color: var(--ct-blue); }
+        .ct-opt .ct-flag { width: 40px; height: 28px; }
+        .ct-opt > .ct-i { margin-left: auto; width: 22px; height: 22px; color: #9AA8C0; }
+        .ct-crumb { margin: 2px 0 6px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px 8px 8px; border: 0; border-radius: 999px; background: #EEF4FF; color: #1D5FD6; font-size: 15px; font-weight: 700; cursor: pointer; }
+        .ct-crumb .ct-i { width: 18px; height: 18px; }
+        .ds .ct-dfield { margin-bottom: 14px; }
+        .ct-dfield label { display: block; margin-bottom: 8px; font-size: 15px; font-weight: 700; }
+        .ds .ct-dfield input { width: 100%; min-height: 56px; padding: 0 16px; border: 1.5px solid #D5DEEA; border-radius: 16px; background: #F8FAFD; color: var(--ct-navy); font-size: 17px; box-shadow: none; outline: none; }
+        .ds .ct-dfield input:focus { border-color: #3B6FFA; box-shadow: 0 0 0 3px rgba(59, 111, 250, 0.18); background: #fff; }
+        .ct-dmsg { min-height: 20px; margin: -4px 0 10px; font-size: 14.5px; font-weight: 600; color: #D12626; }
+        .ct-sheet .ct-next { width: 100%; margin-top: 4px; }
+
+        @media (min-width: 440px) {
+            .ct-weight { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 400px) {
+            .ct-place__main b { font-size: 18px; }
+            .ct-flag { width: 28px; height: 20px; }
+            .ct-date { padding: 8px 10px; gap: 10px; }
+            .ct-cal { width: 48px; }
+            .ct-date__t b { font-size: 15.5px; }
+        }
+        @media (max-width: 359px) {
+            .ct-route { flex-wrap: wrap; justify-content: center; }
+            .ct-place { flex: 1 1 100%; }
+            .ct-swap { margin: -6px 0; transform: rotate(90deg); }
+            .ct-dates { grid-template-columns: 1fr; }
+            .ct-weight__side img { width: 34%; }
+            .ct-actions .ct-next { padding: 0 14px; font-size: 16.5px; }
+            .ct-actions .ct-next span { white-space: nowrap; }
+            .ct-prev { padding: 0 14px; font-size: 16px; }
+        }
 
         /* ---- footer ---- */
         .ct-foot { position: absolute; left: 0; right: 0; bottom: var(--ct-banner-h); z-index: 20; padding: 14px 14px calc(12px + env(safe-area-inset-bottom, 0px)); background: rgba(255, 255, 255, 0.97); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid #E3EAF3; border-radius: 26px 26px 0 0; box-shadow: 0 -8px 24px rgba(11, 29, 58, 0.06); }
@@ -268,80 +363,59 @@
 
             <!-- Step 2: details -->
             <div class="ct-pane" id="content2">
-                <div class="ct-head">
-                    <span class="ct-head__ic"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 14h6"/><path d="M9 18h4"/></svg></span>
-                    <div>
-                        <h2>Détails du trajet</h2>
-                        <p>Complétez les informations de votre voyage.</p>
-                    </div>
+                <div class="ct-grid2">
+                    <!-- Trajet -->
+                    <section class="ct-box">
+                        <div class="ct-box__h"><svg class="ct-i ct-ic-blue" viewBox="0 0 24 24" aria-hidden="true" style="fill: currentColor; stroke: none;"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg><h3>Trajet</h3></div>
+                        <div class="ct-route">
+                            <button type="button" class="ct-place" id="placeDep" onclick="openPlaceSheet('dep')">
+                                <small>Départ</small>
+                                <span class="ct-place__main"><span class="ct-flag" id="flagDep"></span><b id="cityDep">Choisir</b></span>
+                                <small id="countryDep">Pays</small>
+                            </button>
+                            <button type="button" class="ct-swap" onclick="swapPlaces()" aria-label="Inverser départ et arrivée"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></svg></button>
+                            <button type="button" class="ct-place" id="placeArr" onclick="openPlaceSheet('arr')">
+                                <small>Arrivée</small>
+                                <span class="ct-place__main"><span class="ct-flag" id="flagArr"></span><b id="cityArr">Choisir</b></span>
+                                <small id="countryArr">Pays</small>
+                            </button>
+                        </div>
+                    </section>
+
+                    <!-- Dates -->
+                    <section class="ct-box">
+                        <div class="ct-box__h"><svg class="ct-i ct-ic-blue" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg><h3>Dates du voyage</h3></div>
+                        <button type="button" class="ct-dates" onclick="openDateSheet()">
+                            <span class="ct-date"><small>Départ</small><span class="ct-cal"><i>Jour</i><b id="dayDep">–</b></span><span class="ct-date__t"><b id="monthDep">Choisir</b><small id="timeDep"></small></span></span>
+                            <span class="ct-date"><small>Arrivée</small><span class="ct-cal"><i>Jour</i><b id="dayArr">–</b></span><span class="ct-date__t"><b id="monthArr">Choisir</b><small id="timeArr"></small></span></span>
+                        </button>
+                    </section>
                 </div>
 
-                <form id="tripForm" onsubmit="return false">
-                    <section class="ct-card">
-                        <h3><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 22h20"/><path d="M6.4 14.2 3 12l1.5-1.5 4.1.9L13 8 5 4l1.5-1.5 11.2 3.3a2 2 0 0 1 .6 3.5l-3.4 2.6 4.4 4.9-1.5 1.5-5.6-3.5z"/></svg>Départ</h3>
-                        <div class="ct-field">
-                            <label for="departureCountry">Pays de départ</label>
-                            <select class="ct-input" id="departureCountry" required onchange="updateDepartureCities()">
-                                <option value="">Sélectionnez le pays</option>
-                                <option value="Sénégal">🇸🇳 Sénégal</option>
-                                <option value="France">🇫🇷 France</option>
-                                <option value="Espagne">🇪🇸 Espagne</option>
-                                <option value="Italie">🇮🇹 Italie</option>
-                                <option value="USA">🇺🇸 États-Unis</option>
-                                <option value="Canada">🇨🇦 Canada</option>
-                            </select>
+                <!-- Poids -->
+                <section class="ct-box ct-weight">
+                    <div class="ct-weight__main">
+                        <div class="ct-box__h"><svg class="ct-i ct-ic-blue" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l2 13H4z"/><path d="M9 8a3 3 0 0 1 6 0"/><path d="M12 12v4"/></svg><h3>Poids disponible</h3></div>
+                        <div class="ct-weight__v"><b id="weightVal">15</b> kg</div>
+                        <div class="ct-slider">
+                            <span class="ct-bubble" id="weightBubble">15 kg</span>
+                            <input type="range" id="availableWeight" min="1" max="50" step="1" value="15" oninput="syncWeight()" aria-label="Poids disponible en kilos">
                         </div>
-                        <div class="ct-field">
-                            <label for="departureCity">Ville de départ</label>
-                            <select class="ct-input" id="departureCity" required>
-                                <option value="">Sélectionnez la ville</option>
-                            </select>
-                        </div>
-                        <div class="ct-field">
-                            <label for="departureDateTime">Date et heure de départ</label>
-                            <input type="datetime-local" class="ct-input" id="departureDateTime" required>
-                        </div>
-                    </section>
-
-                    <section class="ct-card">
-                        <h3><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>Arrivée</h3>
-                        <div class="ct-field">
-                            <label for="arrivalCountry">Pays d'arrivée</label>
-                            <select class="ct-input" id="arrivalCountry" required onchange="updateArrivalCities()">
-                                <option value="">Sélectionnez le pays</option>
-                                <option value="Sénégal">🇸🇳 Sénégal</option>
-                                <option value="France">🇫🇷 France</option>
-                                <option value="Espagne">🇪🇸 Espagne</option>
-                                <option value="Italie">🇮🇹 Italie</option>
-                                <option value="USA">🇺🇸 États-Unis</option>
-                                <option value="Canada">🇨🇦 Canada</option>
-                            </select>
-                        </div>
-                        <div class="ct-field">
-                            <label for="arrivalCity">Ville d'arrivée</label>
-                            <select class="ct-input" id="arrivalCity" required>
-                                <option value="">Sélectionnez la ville</option>
-                            </select>
-                        </div>
-                        <div class="ct-field">
-                            <label for="arrivalDateTime">Date et heure d'arrivée</label>
-                            <input type="datetime-local" class="ct-input" id="arrivalDateTime" required>
-                        </div>
-                    </section>
-
-                    <section class="ct-card">
-                        <h3><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>Capacité</h3>
-                        <div class="ct-field">
-                            <label for="availableWeight">Poids disponible (kg)</label>
-                            <input type="number" class="ct-input" id="availableWeight" placeholder="Ex : 15" min="1" max="50" inputmode="decimal" required>
-                        </div>
-                    </section>
-
-                    <div class="ct-note">
-                        <svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                        <span>Le poids disponible correspond à la capacité que vous pouvez transporter en plus de vos bagages personnels.</span>
+                        <div class="ct-slider__ends"><span>0 kg</span><span>50 kg</span></div>
                     </div>
-                </form>
+                    <div class="ct-weight__side">
+                        <img src="im/sengp-suitcase.webp" alt="" width="420" height="386">
+                        <div class="ct-cap">
+                            <small>Capacité maximale</small>
+                            <b>50 kg</b>
+                            <p>Poids que vous pouvez transporter en plus de vos bagages personnels.</p>
+                        </div>
+                    </div>
+                    <div class="ct-tip">
+                        <svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                        <div><b>Conseils</b><p>Vérifiez la limite de poids autorisée par la compagnie aérienne et gardez une marge pour vos bagages personnels.</p></div>
+                    </div>
+                </section>
             </div>
         </div>
     </div>
@@ -357,53 +431,201 @@
             <p id="footNote">Vous pourrez vérifier les informations à l'étape suivante.</p>
         </div>
     </div>
+
+    <!-- Bottom sheet : pays / ville / dates -->
+    <div class="ct-overlay" id="sheetOverlay" onclick="if (event.target === this) closeSheet()">
+        <div class="ct-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+            <div class="ct-sheet__grab"><i></i></div>
+            <div class="ct-sheet__head">
+                <div><h3 id="sheetTitle"></h3><p id="sheetSub"></p></div>
+                <button type="button" class="ct-close" onclick="closeSheet()" aria-label="Fermer"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+            </div>
+            <div class="ct-sheet__body" id="sheetBody"></div>
+        </div>
+    </div>
 </div>
 
     <script>
         let currentStep = 1;
         let uploadedFile = null;
 
-        // City data
+        function goBack() {
+            window.location.href = 'dashgp.html';
+        }
+
+        // Pays / villes proposés
         const cities = {
             'Sénégal': ['Dakar', 'Thiès', 'Saint-Louis', 'Kaolack', 'Ziguinchor'],
             'France': ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice'],
             'Espagne': ['Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Bilbao'],
             'Italie': ['Rome', 'Milan', 'Naples', 'Turin', 'Florence'],
             'USA': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Miami'],
-            'Canada': ['Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Ottawa']
+            'Canada': ['Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Ottawa'],
+            'Algérie': ['Alger', 'Oran', 'Constantine', 'Annaba', 'Tlemcen']
         };
+        const COUNTRY_LABEL = { 'USA': 'États-Unis' };
 
-        function goBack() {
-            window.location.href = 'dashgp.html';
+        // Drapeaux en SVG (les emoji drapeaux ne s'affichent pas sous Windows)
+        const FLAGS = {
+            'Sénégal': '<rect width="10" height="20" fill="#00853F"/><rect x="10" width="10" height="20" fill="#FDEF42"/><rect x="20" width="10" height="20" fill="#E31B23"/><path d="m15 6.5 1.2 3.6h3.8l-3.1 2.2 1.2 3.6-3.1-2.2-3.1 2.2 1.2-3.6L10 10.1h3.8z" fill="#00853F"/>',
+            'France': '<rect width="10" height="20" fill="#0055A4"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#EF4135"/>',
+            'Espagne': '<rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/>',
+            'Italie': '<rect width="10" height="20" fill="#009246"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#CE2B37"/>',
+            'USA': '<rect width="30" height="20" fill="#fff"/><g fill="#B22234"><rect width="30" height="1.6"/><rect y="3.1" width="30" height="1.6"/><rect y="6.2" width="30" height="1.6"/><rect y="9.2" width="30" height="1.6"/><rect y="12.3" width="30" height="1.6"/><rect y="15.4" width="30" height="1.6"/><rect y="18.4" width="30" height="1.6"/></g><rect width="13" height="10.8" fill="#3C3B6E"/>',
+            'Canada': '<rect width="30" height="20" fill="#fff"/><rect width="7.5" height="20" fill="#D52B1E"/><rect x="22.5" width="7.5" height="20" fill="#D52B1E"/><path d="m15 4 1.6 3.2 2.2-.8-.8 4 1.6-.4-3.4 4 .2 1.6h-3l.2-1.6-3.4-4 1.6.4-.8-4 2.2.8z" fill="#D52B1E"/>',
+            'Algérie': '<rect width="15" height="20" fill="#006233"/><rect x="15" width="15" height="20" fill="#fff"/><circle cx="15.4" cy="10" r="4.6" fill="#D21034"/><circle cx="16.6" cy="10" r="3.8" fill="#fff"/><path d="m17.8 8.2.6 1.7h1.8l-1.5 1.1.6 1.7-1.5-1.1-1.5 1.1.6-1.7-1.5-1.1h1.8z" fill="#D21034"/>'
+        };
+        function flagHTML(country) {
+            return FLAGS[country] ? '<svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + FLAGS[country] + '</svg>' : '';
+        }
+        const countryName = c => COUNTRY_LABEL[c] || c;
+
+        const trip = { dep: { country: '', city: '' }, arr: { country: '', city: '' }, depDT: '', arrDT: '' };
+
+        function renderPlace(side) {
+            const key = side === 'dep' ? 'Dep' : 'Arr';
+            const p = trip[side];
+            document.getElementById('flag' + key).innerHTML = flagHTML(p.country);
+            document.getElementById('city' + key).textContent = p.city || 'Choisir';
+            document.getElementById('country' + key).textContent = p.country ? countryName(p.country) : 'Pays';
+            document.getElementById('place' + key).classList.toggle('is-empty', !p.city);
         }
 
-        function updateDepartureCities() {
-            const country = document.getElementById('departureCountry').value;
-            const citySelect = document.getElementById('departureCity');
-            citySelect.innerHTML = '<option value="">Sélectionnez la ville</option>';
+        function swapPlaces() {
+            const t = trip.dep; trip.dep = trip.arr; trip.arr = t;
+            renderPlace('dep'); renderPlace('arr');
+        }
 
-            if (country && cities[country]) {
-                cities[country].forEach(city => {
-                    const option = document.createElement('option');
-                    option.value = city;
-                    option.textContent = city;
-                    citySelect.appendChild(option);
-                });
+        // ---------- feuille (pays → ville, dates) ----------
+        let sheetKind = null;
+        function openSheet(title, sub, html) {
+            document.getElementById('sheetTitle').textContent = title;
+            document.getElementById('sheetSub').textContent = sub || '';
+            document.getElementById('sheetSub').style.display = sub ? '' : 'none';
+            document.getElementById('sheetBody').innerHTML = html;
+            document.getElementById('sheetOverlay').classList.add('show');
+        }
+        function closeSheet() {
+            document.getElementById('sheetOverlay').classList.remove('show');
+            sheetKind = null;
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+        function openPlaceSheet(side, country) {
+            sheetKind = side;
+            const cur = trip[side];
+            const label = side === 'dep' ? 'Départ' : 'Arrivée';
+            const chevron = '<svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
+            if (!country) {
+                const rows = Object.keys(cities).map(c =>
+                    '<button type="button" class="ct-opt' + (c === cur.country ? ' is-on' : '') + '" onclick="openPlaceSheet(\'' + side + '\',\'' + c + '\')"><span class="ct-flag">' + flagHTML(c) + '</span>' + countryName(c) + chevron + '</button>').join('');
+                openSheet(side === 'dep' ? 'Pays de départ' : "Pays d'arrivée", 'Choisissez le pays', rows);
+            } else {
+                const rows = cities[country].map(city =>
+                    '<button type="button" class="ct-opt' + (country === cur.country && city === cur.city ? ' is-on' : '') + '" onclick="pickCity(\'' + side + '\',\'' + country + '\',\'' + city + '\')">' + city + '</button>').join('');
+                openSheet('Ville · ' + countryName(country), label, '<button type="button" class="ct-crumb" onclick="openPlaceSheet(\'' + side + '\')"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Changer de pays</button>' + rows);
             }
         }
+        function pickCity(side, country, city) {
+            trip[side] = { country: country, city: city };
+            renderPlace(side);
+            closeSheet();
+        }
 
-        function updateArrivalCities() {
-            const country = document.getElementById('arrivalCountry').value;
-            const citySelect = document.getElementById('arrivalCity');
-            citySelect.innerHTML = '<option value="">Sélectionnez la ville</option>';
+        // ---------- dates ----------
+        const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+        function renderDate(key, value) {
+            const d = value ? new Date(value) : null;
+            const ok = d && !isNaN(d);
+            document.getElementById('day' + key).textContent = ok ? d.getDate() : '–';
+            document.getElementById('month' + key).textContent = ok ? MONTHS[d.getMonth()] + ' ' + d.getFullYear() : 'Choisir';
+            document.getElementById('time' + key).textContent = ok ? String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') : '';
+        }
+        function localNow() {
+            const n = new Date(); n.setMinutes(n.getMinutes() - n.getTimezoneOffset());
+            return n.toISOString().slice(0, 16);
+        }
+        function openDateSheet() {
+            sheetKind = 'dates';
+            openSheet('Dates du voyage', 'Heure locale du vol', `
+                <div class="ct-dfield"><label for="depDT">Date et heure de départ</label><input type="datetime-local" id="depDT" min="${localNow()}" value="${trip.depDT}"></div>
+                <div class="ct-dfield"><label for="arrDT">Date et heure d'arrivée</label><input type="datetime-local" id="arrDT" min="${localNow()}" value="${trip.arrDT}"></div>
+                <div class="ct-dmsg" id="dateMsg" role="alert"></div>
+                <button type="button" class="ct-next" onclick="saveDates()"><span>Valider</span></button>`);
+        }
+        function saveDates() {
+            const dep = document.getElementById('depDT').value, arr = document.getElementById('arrDT').value;
+            const msg = document.getElementById('dateMsg');
+            if (!dep || !arr) { msg.textContent = 'Renseignez la date de départ et la date d\'arrivée.'; return; }
+            if (new Date(arr) <= new Date(dep)) { msg.textContent = 'L\'arrivée doit être après le départ.'; return; }
+            trip.depDT = dep; trip.arrDT = arr;
+            renderDate('Dep', dep); renderDate('Arr', arr);
+            closeSheet();
+        }
 
-            if (country && cities[country]) {
-                cities[country].forEach(city => {
-                    const option = document.createElement('option');
-                    option.value = city;
-                    option.textContent = city;
-                    citySelect.appendChild(option);
+        // ---------- poids ----------
+        function syncWeight() {
+            const r = document.getElementById('availableWeight');
+            const v = parseInt(r.value, 10) || 1;
+            const pct = (v - r.min) / (r.max - r.min);
+            document.getElementById('weightVal').textContent = v;
+            const b = document.getElementById('weightBubble');
+            b.textContent = v + ' kg';
+            // la pastille suit le curseur (rayon du pouce ≈ 16 px)
+            b.style.left = 'calc(' + (pct * 100) + '% + ' + (16 - pct * 32 + 2) + 'px)';
+            r.style.setProperty('--pct', (pct * 100) + '%');
+        }
+
+        // ---------- envoi ----------
+        async function submitTrip() {
+            if (!trip.dep.city || !trip.arr.city) { alert('Choisissez la ville de départ et la ville d\'arrivée.'); return; }
+            if (!trip.depDT || !trip.arrDT) { alert('Renseignez les dates du voyage.'); openDateSheet(); return; }
+            if (new Date(trip.arrDT) <= new Date(trip.depDT)) { alert('L\'arrivée doit être après le départ.'); openDateSheet(); return; }
+            const availableWeight = document.getElementById('availableWeight').value;
+
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) {
+                alert('Session expirée. Veuillez vous reconnecter.');
+                window.location.href = 'connexion.html';
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const label = submitBtn.querySelector('span');
+            try {
+                label.textContent = 'Création en cours...';
+                submitBtn.disabled = true;
+
+                const formData = new FormData();
+                formData.append('flight_ticket_photo', uploadedFile);
+                formData.append('departure_country', trip.dep.country);
+                formData.append('departure_city', trip.dep.city);
+                formData.append('arrival_country', trip.arr.country);
+                formData.append('arrival_city', trip.arr.city);
+                formData.append('departure_datetime', trip.depDT);
+                formData.append('arrival_datetime', trip.arrDT);
+                formData.append('available_weight', availableWeight);
+
+                const response = await fetch(`${window.API_BASE_URL}/trips`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}` },
+                    body: formData
                 });
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    alert('Trajet créé avec succès !\n\nVous pouvez maintenant voir les missions disponibles.');
+                    window.location.href = 'dashgp.html';
+                } else {
+                    alert('Erreur lors de la création du trajet:\n\n' + (result.message || 'Erreur inconnue'));
+                    label.textContent = 'Créer le trajet';
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error creating trip:', error);
+                alert('Erreur de connexion au serveur.\n\nVeuillez réessayer.');
+                label.textContent = 'Créer le trajet';
+                submitBtn.disabled = false;
             }
         }
 
@@ -504,6 +726,7 @@
             document.getElementById('footNote').style.display = currentStep === 1 ? '' : 'none';
             document.getElementById('scroller').scrollTop = 0;
             syncFootHeight();
+            if (currentStep === 2) syncWeight();
 
             if (currentStep === 2) {
                 nextBtn.style.display = 'none';
@@ -513,75 +736,6 @@
                 submitBtn.style.display = 'none';
             }
         }
-
-        async function submitTrip() {
-            // Validate form
-            const form = document.getElementById('tripForm');
-            if (!form.checkValidity()) {
-                alert('Veuillez remplir tous les champs requis');
-                return;
-            }
-
-            const departureCountry = document.getElementById('departureCountry').value;
-            const departureCity = document.getElementById('departureCity').value;
-            const arrivalCountry = document.getElementById('arrivalCountry').value;
-            const arrivalCity = document.getElementById('arrivalCity').value;
-            const departureDateTime = document.getElementById('departureDateTime').value;
-            const arrivalDateTime = document.getElementById('arrivalDateTime').value;
-            const availableWeight = document.getElementById('availableWeight').value;
-
-            // Get user token
-            const authToken = localStorage.getItem('authToken');
-            if (!authToken) {
-                alert('Session expirée. Veuillez vous reconnecter.');
-                window.location.href = 'connexion.html';
-                return;
-            }
-
-            try {
-                // Show loading
-                const submitBtn = document.getElementById('submitBtn');
-                submitBtn.querySelector('span').textContent = 'Création en cours...';
-                submitBtn.disabled = true;
-
-                // Prepare form data with file
-                const formData = new FormData();
-                formData.append('flight_ticket_photo', uploadedFile);
-                formData.append('departure_country', departureCountry);
-                formData.append('departure_city', departureCity);
-                formData.append('arrival_country', arrivalCountry);
-                formData.append('arrival_city', arrivalCity);
-                formData.append('departure_datetime', departureDateTime);
-                formData.append('arrival_datetime', arrivalDateTime);
-                formData.append('available_weight', availableWeight);
-
-                // API call to create trip
-                const response = await fetch(`${window.API_BASE_URL}/trips`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`
-                    },
-                    body: formData
-                });
-
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    alert('Trajet créé avec succès !\n\nVous pouvez maintenant voir les missions disponibles.');
-                    window.location.href = 'dashgp.html';
-                } else {
-                    alert('Erreur lors de la création du trajet:\n\n' + (result.message || 'Erreur inconnue'));
-                    submitBtn.querySelector('span').textContent = 'Créer le trajet';
-                    submitBtn.disabled = false;
-                }
-            } catch (error) {
-                console.error('Error creating trip:', error);
-                alert('Erreur de connexion au serveur.\n\nVeuillez réessayer.');
-                document.getElementById('submitBtn').querySelector('span').textContent = 'Créer le trajet';
-                document.getElementById('submitBtn').disabled = false;
-            }
-        }
-
 
         // Hauteur réelle du pied de page + place de la bannière d'installation PWA (pwa.js)
         function syncFootHeight() {
@@ -613,11 +767,7 @@
                 return;
             }
 
-            // Set minimum dates to today
-            const now = new Date();
-            const today = now.toISOString().slice(0, 16);
-            document.getElementById('departureDateTime').min = today;
-            document.getElementById('arrivalDateTime').min = today;
+            syncWeight();
         });
     </script>
 </body>
