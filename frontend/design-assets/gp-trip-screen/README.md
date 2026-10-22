@@ -19,3 +19,10 @@ Maquette `reference-mockup-trips-list.png`, fond de l'état vide `sengp-trips-em
 - État vide (illustration + CTA + conseil) et état d'erreur (« Réessayer »).
 - Navigation GP identique à l'accueil : Accueil, Trajets, Gains, Notifs (badge réel), Profil — la maquette montrait Accueil / Missions / Trajets / Profil.
 - Données : `GET /trips/my-trips` (inchangé). Testé Edge headless 320/360/390/430 px : pas de débordement, 0 erreur JS.
+
+### Liste avec trajets existants (`reference-mockup-trips-filled.png`)
+Trois sections « Trajets en cours / à venir / terminés » (2 cartes puis « Voir tout / Réduire »), les onglets font défiler jusqu'à leur section et suivent le défilement. Carte : vignette + badge de statut, villes avec drapeaux, date/heure, poids disponible, progression Billet ✓ → Détails ✓ → Actif / En attente / Terminé / Annulé (déduite du statut du trajet), « Voir détails » (feuille du bas) et menu « … » (≥ 400 px).
+- Pas de photos de villes fournies : 3 vignettes aéroport (`im/sengp-trip-thumb1-3.webp`, recadrées des fonds fournis) alternent selon la ville d'arrivée.
+
+## Accepter / décliner une mission (GP)
+Une mission assignée par l'admin a le statut `matched` ; seul le GP assigné peut l'accepter (`POST /missions/:id/accept`) ou la décliner (`/decline`, elle retourne au pool). Les boutons **Accepter / Décliner** apparaissent donc sur les cartes « À confirmer » du modal « Mes missions » (`dashgp.html`) et sur la page `detailmissiongp.html` ; ils existaient déjà dans Notifications. Le déclin demande confirmation.

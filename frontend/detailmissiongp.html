@@ -218,7 +218,11 @@
 
                 ${isPending ? `<div class="card" style="border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.06);">
                     <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>En attente</div>
-                    <div style="font-size:13px;color:rgba(255,255,255,.8);">Cette mission vous est assignée par l'administration. Confirmez votre acceptation depuis l'onglet <strong style="color:#FFD700">Notifications</strong> pour démarrer le suivi.</div>
+                    <div style="font-size:13px;color:rgba(255,255,255,.8);">${s==='matched'
+                        ? `Cette mission vous est assignée par l'administration. Acceptez-la pour démarrer le suivi, ou déclinez-la : elle sera ré-assignée à un autre GP.</div>
+                    <button class="btn btn-gold" onclick="respondMission('accept')">Accepter la mission</button>
+                    <button class="btn btn-ghost" onclick="respondMission('decline')">Décliner</button>`
+                        : `Cette mission est en attente d'assignation par l'administration.</div>`}
                 </div>` : ''}
 
                 ${(isActive && !isPending) ? `<div class="card">
@@ -291,6 +295,25 @@
         }
 
         // ---- Actions GP ----
+        // Le GP confirme ou décline une mission que l'admin lui a assignée ('matched').
+        async function respondMission(action){
+            if (action === 'decline'){
+                const ok = await sengpConfirm('Décliner cette mission ? Elle sera ré-assignée à un autre GP de votre catégorie.', { okLabel:'Décliner', cancelLabel:'Annuler' });
+                if (!ok) return;
+            }
+            try {
+                const res = await fetch(`${API}/missions/${missionId}/${action === 'accept' ? 'accept' : 'decline'}`, {
+                    method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' }, body:'{}'
+                });
+                if (!res.ok){
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.message || 'Action impossible');
+                }
+            } catch(e){ sengpAlert(e.message || 'Action impossible. Réessayez.'); return; }
+            if (action === 'accept'){ await sengpAlert('✅ Mission acceptée ! L’équipe SEN GP vous contactera pour organiser la remise du colis.'); load(); }
+            else { await sengpAlert('Mission déclinée. Elle sera ré-assignée à un autre GP.'); window.location.href = 'dashgp.html'; }
+        }
+
         async function advance(newStatus, confirmMsg){
             if (confirmMsg && confirmMsg !== 'null'){
                 const ok = await sengpConfirm(confirmMsg, { okLabel:'Confirmer', cancelLabel:'Annuler' });

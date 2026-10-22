@@ -95,6 +95,72 @@
         .tj-btn--ghost { background: #EAEFF7; color: var(--tj-navy); }
         .tj-btn--main { background: linear-gradient(90deg, #0A84FF, #6D4AF5); color: #fff; box-shadow: 0 10px 22px rgba(79, 70, 229, 0.28); }
 
+        /* ---- sections + cartes de trajet (liste) ---- */
+        .tj-sec { margin-top: 22px; scroll-margin-top: 12px; }
+        .tj-sec__h { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 4px 10px; }
+        .tj-sec__h h2 { font-size: 23px; font-weight: 800; letter-spacing: -0.3px; }
+        .tj-more { display: inline-flex; align-items: center; gap: 4px; padding: 6px 4px 6px 8px; border: 0; background: none; color: #F7931E; font-size: 16px; font-weight: 700; cursor: pointer; }
+        .tj-more .tj-i { width: 20px; height: 20px; }
+        .tj-sec__list { display: flex; flex-direction: column; gap: 14px; }
+        .tj-none { padding: 18px 16px; border-radius: 22px; background: #fff; color: var(--tj-muted); font-size: 16px; text-align: center; box-shadow: 0 8px 24px rgba(11, 29, 58, 0.05); }
+
+        .tj-t { padding: 12px; background: #fff; border-radius: 26px; box-shadow: 0 8px 26px rgba(11, 29, 58, 0.07); animation: tjIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 50ms); }
+        .tj-t__main { display: flex; gap: 12px; }
+        .tj-thumb { position: relative; width: 112px; min-height: 96px; flex-shrink: 0; border-radius: 18px; background: #CFE0F7 center / cover no-repeat; overflow: hidden; }
+        .tj-thumb::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7, 20, 47, 0.12), rgba(7, 20, 47, 0) 50%); }
+        .tj-badge { position: absolute; z-index: 1; left: 8px; top: 8px; padding: 4px 10px; border-radius: 10px; background: var(--tj-chipbg-solid, #2F6BFF); color: var(--tj-chipfg-solid, #fff); font-size: 13px; font-weight: 800; box-shadow: 0 4px 10px rgba(11, 29, 58, 0.2); }
+        .tj-t__info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
+        .tj-t__route { display: flex; align-items: flex-start; gap: 6px; }
+        .tj-place { display: flex; align-items: center; gap: 6px; min-width: 0; flex: 0 1 auto; }
+        .tj-place .tj-flag { width: 28px; height: 20px; }
+        .tj-place b { display: block; font-size: 16.5px; font-weight: 800; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .tj-place small { display: block; font-size: 13.5px; color: var(--tj-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .tj-place > span:last-child { min-width: 0; }
+        .tj-t__route > .tj-i { width: 16px; height: 16px; color: #B7C3D8; margin-top: 4px; }
+        .tj-t__route > .tj-i.plane { width: 22px; height: 22px; color: #44526B; transform: rotate(45deg); margin-top: 0; }
+        .tj-dots { margin-left: auto; width: 34px; height: 34px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: none; color: #44526B; cursor: pointer; }
+        .tj-dots .tj-i { width: 22px; height: 22px; stroke-width: 3; }
+        .tj-dots:active { background: #EEF2F8; }
+        .tj-t__meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .tj-mi { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .tj-mi > .tj-i { width: 24px; height: 24px; color: #6B7A93; }
+        .tj-mi b { display: block; font-size: 15.5px; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+        .tj-mi small { display: block; font-size: 13.5px; color: var(--tj-muted); }
+        .tj-t__foot { margin-top: 10px; display: flex; align-items: center; gap: 8px; }
+        .tj-prog { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 16px; background: #F4F7FB; overflow: hidden; }
+        .tj-ps { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; color: var(--tj-muted); white-space: nowrap; }
+        .tj-ps i { width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #C5D0E2; color: #9AA8C0; font-style: normal; }
+        .tj-ps i svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+        .tj-ps.done { color: var(--tj-navy); }
+        .tj-ps.done i { background: #17A34A; border-color: #17A34A; color: #fff; }
+        .tj-ps.now { color: #1D5FD6; }
+        .tj-ps.now i { border-color: #2F6BFF; color: #2F6BFF; background: #EAF2FF; }
+        .tj-ps.bad { color: #D12626; }
+        .tj-ps.bad i { border-color: #D12626; color: #D12626; background: #FFEDED; }
+        .tj-pl { flex: 1; min-width: 8px; height: 2px; background: #C5D0E2; }
+        .tj-pl.done { background: #17A34A; }
+        .tj-view { flex-shrink: 0; min-height: 44px; display: inline-flex; align-items: center; gap: 4px; padding: 0 14px; border: 0; border-radius: 14px; background: #E8F1FF; color: #1D5FD6; font-size: 15.5px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+        .tj-view .tj-i { width: 18px; height: 18px; stroke-width: 2.6; }
+        .tj-view:active { transform: scale(0.98); }
+        .tj-menu { display: flex; flex-direction: column; gap: 10px; }
+        .tj-menu .tj-btn { min-height: 56px; }
+
+        @media (max-width: 400px) {
+            .tj-thumb { width: 92px; }
+            .tj-place .tj-flag { width: 24px; height: 17px; }
+            .tj-place b { font-size: 15px; }
+            .tj-dots { display: none; }
+            .tj-ps .lb { display: none; }
+            .tj-ps:last-child .lb { display: inline; }
+            .tj-view { padding: 0 12px; font-size: 15px; }
+        }
+        @media (max-width: 359px) {
+            .tj-thumb { display: none; }
+            .tj-t__foot { flex-wrap: wrap; }
+            .tj-view { width: 100%; justify-content: center; }
+            .tj-sec__h h2 { font-size: 20px; }
+        }
+
         /* ---- empty / loading ---- */
         .tj-empty { margin-top: 16px; padding: 8px 14px 16px; background: #fff; border-radius: 28px; box-shadow: 0 8px 26px rgba(11, 29, 58, 0.06); text-align: center; }
         .tj-art { position: relative; height: 232px; margin: 0 -14px; overflow: hidden; border-radius: 28px 28px 0 0; }
@@ -307,6 +373,7 @@
             'Italie': '<rect width="10" height="20" fill="#009246"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#CE2B37"/>',
             'USA': '<rect width="30" height="20" fill="#fff"/><g fill="#B22234"><rect width="30" height="1.6"/><rect y="3.1" width="30" height="1.6"/><rect y="6.2" width="30" height="1.6"/><rect y="9.2" width="30" height="1.6"/><rect y="12.3" width="30" height="1.6"/><rect y="15.4" width="30" height="1.6"/><rect y="18.4" width="30" height="1.6"/></g><rect width="13" height="10.8" fill="#3C3B6E"/>',
             'Canada': '<rect width="30" height="20" fill="#fff"/><rect width="7.5" height="20" fill="#D52B1E"/><rect x="22.5" width="7.5" height="20" fill="#D52B1E"/><path d="m15 4 1.6 3.2 2.2-.8-.8 4 1.6-.4-3.4 4 .2 1.6h-3l.2-1.6-3.4-4 1.6.4-.8-4 2.2.8z" fill="#D52B1E"/>',
+            'Turquie': '<rect width="30" height="20" fill="#E30A17"/><circle cx="11.5" cy="10" r="5" fill="#fff"/><circle cx="12.9" cy="10" r="4" fill="#E30A17"/><path d="m17.5 7.8.7 2h2.1l-1.7 1.2.7 2-1.8-1.3-1.8 1.3.7-2-1.7-1.2h2.1z" fill="#fff"/>',
             'Algérie': '<rect width="15" height="20" fill="#006233"/><rect x="15" width="15" height="20" fill="#fff"/><circle cx="15.4" cy="10" r="4.6" fill="#D21034"/><circle cx="16.6" cy="10" r="3.8" fill="#fff"/><path d="m17.8 8.2.6 1.7h1.8l-1.5 1.1.6 1.7-1.5-1.1-1.5 1.1.6-1.7-1.5-1.1h1.8z" fill="#D21034"/>'
         };
         const FLAG_ALIAS = { 'Senegal': 'Sénégal', 'États-Unis': 'USA', 'Etats-Unis': 'USA' };
@@ -383,12 +450,6 @@
             ['active', 'upcoming', 'completed'].forEach(b => $('tab-' + b).setAttribute('aria-selected', String(b === currentBucket)));
         }
 
-        function switchTab(bucket) {
-            currentBucket = bucket;
-            renderTabs();
-            renderTrips();
-        }
-
         function tripCard(t, i, inSheet) {
             const st = statusMeta(t.status);
             const cap = `${t.current_packages || 0}/${t.max_packages || 0} colis`;
@@ -415,11 +476,87 @@
             </article>`;
         }
 
+        // ---------- liste par sections ----------
+        const SECTIONS = [
+            { key: 'active', title: 'Trajets en cours', none: 'Aucun trajet en cours.' },
+            { key: 'upcoming', title: 'Trajets à venir', none: 'Aucun trajet à venir.' },
+            { key: 'completed', title: 'Trajets terminés', none: 'Aucun trajet terminé.' }
+        ];
+        const expanded = { active: false, upcoming: false, completed: false };
+        const PREVIEW = 2;
+        const THUMBS = ['im/sengp-trip-thumb1.webp', 'im/sengp-trip-thumb2.webp', 'im/sengp-trip-thumb3.webp'];
+        function thumbFor(t) {
+            const k = String(t.arrival_city || t.arrival_country || '');
+            let h = 0;
+            for (let i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) >>> 0;
+            return THUMBS[h % THUMBS.length];
+        }
+        const BADGE_SOLID = {
+            active: ['#2F6BFF', '#fff'], published: ['#FFF1CF', '#9A6200'], draft: ['#EDF1F6', '#475569'],
+            completed: ['#17A34A', '#fff'], cancelled: ['#EDF1F6', '#475569']
+        };
+        const SVG = {
+            cal: '<svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>',
+            bag: '<svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l2 13H4z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>',
+            plane: '<svg class="tj-i plane" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>',
+            arrow: '<svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
+            chev: '<svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>',
+            dots: '<svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01"/><path d="M12 12h.01"/><path d="M19 12h.01"/></svg>',
+            check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
+            x: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+            pl: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>'
+        };
+
+        // Billet ✓ → Détails ✓ → état du trajet
+        function progressHTML(status) {
+            const step = (cls, icon, label) => '<span class="tj-ps ' + cls + '"><i>' + icon + '</i><span class="lb">' + label + '</span></span>';
+            const line = done => '<span class="tj-pl' + (done ? ' done' : '') + '"></span>';
+            const detailsDone = status !== 'draft';
+            let third;
+            if (status === 'active') third = step('now', SVG.pl, 'Actif');
+            else if (status === 'completed') third = step('done', SVG.check, 'Terminé');
+            else if (status === 'cancelled') third = step('bad', SVG.x, 'Annulé');
+            else third = step('', SVG.pl, 'En attente');
+            return step('done', SVG.check, 'Billet') + line(true) +
+                   step(detailsDone ? 'done' : '', detailsDone ? SVG.check : '', 'Détails') + line(detailsDone) + third;
+        }
+
+        function dateParts(d) {
+            const dt = d ? new Date(d) : null;
+            if (!dt || isNaN(dt)) return { day: '—', time: '' };
+            return {
+                day: dt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }),
+                time: dt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+            };
+        }
+
+        function tripRow(t, i) {
+            const st = statusMeta(t.status);
+            const bs = BADGE_SOLID[t.status] || ['#EDF1F6', '#475569'];
+            const dp = dateParts(t.departure_date);
+            const id = esc(t.id);
+            const place = (city, country) => '<div class="tj-place">' + flagFor(country) + '<span><b>' + esc(city || '—') + '</b><small>' + esc(country || '') + '</small></span></div>';
+            return '<article class="tj-t" style="--i:' + Math.min(i, 8) + ';--tj-chipbg-solid:' + bs[0] + ';--tj-chipfg-solid:' + bs[1] + '">' +
+                '<div class="tj-t__main">' +
+                    '<div class="tj-thumb" style="background-image:url(' + thumbFor(t) + ')"><span class="tj-badge">' + st.label + '</span></div>' +
+                    '<div class="tj-t__info">' +
+                        '<div class="tj-t__route">' + place(t.departure_city, t.departure_country) + SVG.plane + place(t.arrival_city, t.arrival_country) +
+                            '<button type="button" class="tj-dots" onclick="openTripMenu(\'' + id + '\')" aria-label="Plus d\'actions">' + SVG.dots + '</button></div>' +
+                        '<div class="tj-t__meta">' +
+                            '<div class="tj-mi">' + SVG.cal + '<span><b>' + dp.day + '</b><small>' + dp.time + '</small></span></div>' +
+                            '<div class="tj-mi">' + SVG.bag + '<span><b>' + (parseFloat(t.available_weight) || 0) + ' kg</b><small>disponible</small></span></div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="tj-t__foot"><div class="tj-prog">' + progressHTML(t.status) + '</div>' +
+                    '<button type="button" class="tj-view" onclick="viewTripDetails(\'' + id + '\')">Voir détails' + SVG.chev + '</button></div>' +
+            '</article>';
+        }
+
         function renderTrips() {
-            const list = bucketTrips(currentBucket);
             const container = $('tripsList');
             const empty = $('tripsEmpty');
-            if (loadFailed || list.length === 0) {
+            if (loadFailed || allTrips.length === 0) {
                 container.innerHTML = '';
                 if (loadFailed) {
                     $('emptyTitle').textContent = 'Impossible de charger vos trajets';
@@ -438,7 +575,62 @@
                 return;
             }
             empty.style.display = 'none';
-            container.innerHTML = list.map((t, i) => tripCard(t, i, false)).join('');
+            container.innerHTML = SECTIONS.map(sec => {
+                const list = bucketTrips(sec.key);
+                const shown = expanded[sec.key] ? list : list.slice(0, PREVIEW);
+                const more = list.length > PREVIEW
+                    ? '<button type="button" class="tj-more" onclick="toggleSection(\'' + sec.key + '\')">' + (expanded[sec.key] ? 'Réduire' : 'Voir tout') + SVG.chev + '</button>' : '';
+                return '<section class="tj-sec" id="sec-' + sec.key + '"><div class="tj-sec__h"><h2>' + sec.title + '</h2>' + more + '</div>' +
+                    '<div class="tj-sec__list">' + (shown.length ? shown.map(tripRow).join('') : '<div class="tj-none">' + sec.none + '</div>') + '</div></section>';
+            }).join('');
+        }
+
+        function toggleSection(key) {
+            expanded[key] = !expanded[key];
+            renderTrips();
+        }
+
+        // Les onglets font défiler jusqu'à leur section ; le défilement met l'onglet à jour.
+        let spyLock = false;
+        function switchTab(bucket) {
+            currentBucket = bucket;
+            renderTabs();
+            if (allTrips.length === 0) { renderTrips(); return; }
+            const sec = $('sec-' + bucket), sc = $('scroller');
+            if (!sec) return;
+            spyLock = true;
+            const top = sec.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 12;
+            sc.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+            setTimeout(() => { spyLock = false; }, 800);
+        }
+        (function spy() {
+            let raf = 0;
+            $('scroller').addEventListener('scroll', () => {
+                if (spyLock || raf) return;
+                raf = requestAnimationFrame(() => {
+                    raf = 0;
+                    const sc = $('scroller');
+                    if (sc.scrollTop < 24 || allTrips.length === 0) return;
+                    const line = sc.getBoundingClientRect().top + 200;
+                    let cur = null;
+                    SECTIONS.forEach(s => { const el = $('sec-' + s.key); if (el && el.getBoundingClientRect().top <= line) cur = s.key; });
+                    if (cur && cur !== currentBucket) { currentBucket = cur; renderTabs(); }
+                });
+            }, { passive: true });
+        })();
+
+        // Menu « … » : actions rapides sur un trajet
+        function openTripMenu(tripId) {
+            const t = allTrips.find(x => String(x.id) === String(tripId));
+            if (!t) return;
+            const open = t.status === 'published' || t.status === 'draft';
+            $('sheetTitle').textContent = (t.departure_city || '—') + ' → ' + (t.arrival_city || '—');
+            $('sheetSub').textContent = t.trip_code || '';
+            $('sheetBody').innerHTML = '<div class="tj-menu">' +
+                '<button type="button" class="tj-btn tj-btn--ghost" onclick="viewTripDetails(\'' + esc(t.id) + '\')">Voir les détails</button>' +
+                '<button type="button" class="tj-btn tj-btn--main" onclick="closeSheet();navigateTo(\'missions\')">' + (open ? 'Chercher des colis' : 'Voir les missions') + '</button></div>';
+            $('sheetOverlay').classList.add('show');
+            $('scroller').classList.add('is-locked');
         }
 
         function viewTripDetails(tripId) {

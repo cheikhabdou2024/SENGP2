@@ -160,6 +160,12 @@
         .gh-pill .gh-i { width: 16px; height: 16px; }
         .gh-price { margin-left: auto; font-size: 19px; font-weight: 800; color: #E8780C; white-space: nowrap; }
         .gh-price small { font-size: 12.5px; font-weight: 700; }
+        .gh-resp { margin-top: 12px; display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; }
+        .gh-resp button { min-height: 50px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 16px; font-size: 16px; font-weight: 800; cursor: pointer; transition: transform 0.15s ease; }
+        .gh-resp button:active { transform: scale(0.98); }
+        .gh-resp .gh-i { width: 20px; height: 20px; stroke-width: 2.6; }
+        .gh-resp__no { background: #FFEDED; color: #D92D2D; }
+        .gh-resp__yes { background: linear-gradient(135deg, #22C55E, #16A34A); color: #fff; box-shadow: 0 8px 18px rgba(34, 197, 94, 0.3); }
         .gh-empty { margin: 30px 10px; text-align: center; color: var(--gh-muted); font-size: 16px; line-height: 1.5; }
         .gh-empty .gh-i { width: 54px; height: 54px; margin-bottom: 10px; color: #B7C3D8; }
         .gh-more { margin-top: 2px; min-height: 54px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid #E0E7F2; border-radius: 18px; background: #fff; color: #2F6BFF; font-size: 16px; font-weight: 800; cursor: pointer; }
@@ -976,7 +982,7 @@
         };
         const STATUS_UI = {
             pending:          { label: 'À venir',        acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' },
-            matched:          { label: 'À venir',        acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' },
+            matched:          { label: 'À confirmer',    acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' },
             accepted:         { label: 'Confirmée',      acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' },
             picked_up:        { label: 'Récupéré',       acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' },
             in_transit:       { label: 'En transit',     acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' },
@@ -1030,7 +1036,14 @@
             const weight = m.package_weight != null ? m.package_weight : m.weight;
             const date = shortDate(m.departure_date);
             const price = parseFloat(m.price || 0);
-            return `<button type="button" class="gh-m" style="--i:${Math.min(i, 8)};--gh-acc:${ui.acc};--gh-chipbg:${ui.bg};--gh-chipfg:${ui.fg}" onclick="viewMissionDetails('${jEsc(m.id)}')">
+            const mid = jEsc(m.id);
+            // Mission assignée par l'admin et en attente de réponse : le GP l'accepte ou la décline.
+            const respond = String(m.status || '').toLowerCase() === 'matched'
+                ? `<div class="gh-resp">
+                    <button type="button" class="gh-resp__no" onclick="event.stopPropagation();respondToMission('${mid}','decline')"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>Décliner</button>
+                    <button type="button" class="gh-resp__yes" onclick="event.stopPropagation();respondToMission('${mid}','accept')"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Accepter</button>
+                </div>` : '';
+            return `<div class="gh-m" role="button" tabindex="0" style="--i:${Math.min(i, 8)};--gh-acc:${ui.acc};--gh-chipbg:${ui.bg};--gh-chipfg:${ui.fg}" onclick="viewMissionDetails('${mid}')" onkeydown="if(event.key==='Enter')viewMissionDetails('${mid}')">
                 <div class="gh-m__top"><span class="gh-chip">${ui.label}</span><span class="gh-code">${code}</span></div>
                 <div class="gh-route">
                     <div class="gh-city"><b>${jEsc(m.departure_city || '?')}</b><small>${getCountryFlag(m.departure_country)} ${jEsc(m.departure_country || '')}</small></div>
@@ -1041,8 +1054,40 @@
                     ${weight ? `<span class="gh-pill">${ICON.box}${jEsc(weight)} kg</span>` : ''}
                     ${date ? `<span class="gh-pill">${ICON.cal}${jEsc(date)}</span>` : ''}
                     ${price ? `<span class="gh-price">${price.toLocaleString('fr-FR')} <small>FCFA</small></span>` : ''}
-                </div>
-            </button>`;
+                </div>${respond}
+            </div>`;
+        }
+
+        let ghBusy = false;
+        async function respondToMission(id, action) {
+            if (ghBusy) return;
+            if (action === 'decline') {
+                const ok = await sengpConfirm('Décliner cette mission ? Elle sera ré-assignée à un autre GP de votre catégorie.', { okLabel: 'Décliner', cancelLabel: 'Annuler' });
+                if (!ok) return;
+            }
+            ghBusy = true;
+            try {
+                const res = await fetch(`${API_BASE_URL}/missions/${id}/${action === 'accept' ? 'accept' : 'decline'}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+                    body: '{}'
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.message || 'Action impossible');
+                }
+            } catch (e) {
+                ghBusy = false;
+                sengpAlert(e.message || 'Action impossible. Réessayez.');
+                return;
+            }
+            ghBusy = false;
+            await loadMissions();
+            if (document.getElementById('missionsOverlay').classList.contains('show')) renderMissionsSheet();
+            sengpAlert(action === 'accept'
+                ? '✅ Mission acceptée ! L’équipe SEN GP vous contactera pour organiser la remise du colis.'
+                : 'Mission déclinée. Elle sera ré-assignée à un autre GP.');
+            if (action === 'accept') initJourney();
         }
 
         function renderMissionsSheet() {
