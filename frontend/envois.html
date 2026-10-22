@@ -8,6 +8,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         html { background: #F4F8FD; }
+        html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #F4F8FD;
@@ -147,7 +148,7 @@
         .empty .ev-i { width: 44px; height: 44px; color: #E8890C; margin-bottom: 8px; }
 
         /* ---- bottom nav ---- */
-        .ev-nav { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; height: calc(76px + env(safe-area-inset-bottom, 0px)); padding: 6px 8px env(safe-area-inset-bottom, 0px); display: flex; gap: 4px; background: rgba(255, 255, 255, 0.97); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid #E3EAF3; box-shadow: 0 -8px 24px rgba(11, 29, 58, 0.06); }
+        .ev-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; height: calc(76px + env(safe-area-inset-bottom, 0px)); padding: 6px 8px env(safe-area-inset-bottom, 0px); display: flex; gap: 4px; background: rgba(255, 255, 255, 0.97); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid #E3EAF3; box-shadow: 0 -8px 24px rgba(11, 29, 58, 0.06); }
         .ev-nav__item { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; border-radius: 20px; background: none; color: #6B7A93; font-size: 13px; font-weight: 600; cursor: pointer; }
         .ev-nav__item[aria-current="page"] { background: #E8F1FF; color: #1E6FEA; font-weight: 700; }
         .ev-nav__icon { position: relative; display: flex; }
