@@ -5,694 +5,203 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEN GP - Dashboard Gros Porteur</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html { background: #F4F8FD; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #F4F8FD;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            color: #0B1D3A;
         }
+        :root { --gh-navy: #0B1D3A; --gh-muted: #6B7A93; --gh-orange: #F7931E; }
 
-        .mobile-frame {
-            width: 100%;
-            max-width: 375px;
-            height: 667px;
-            background: linear-gradient(135deg, rgba(15, 12, 41, 0.95) 0%, rgba(48, 43, 99, 0.95) 50%, rgba(36, 36, 62, 0.95) 100%);
-            border-radius: 40px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            overflow: hidden;
-            position: relative;
-        }
+        /* ============================================
+           ACCUEIL GROS PORTEUR
+           ============================================ */
+        .mobile-frame { position: relative; width: 100%; overflow: hidden; background: #F4F8FD; }
+        .mobile-frame::before { content: ""; position: absolute; inset: 0; background: #F4F8FD; }
+        .gh-i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+        button { font: inherit; -webkit-tap-highlight-color: transparent; }
 
-        .status-bar {
-            height: 44px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .time { color: #fff; }
-        .indicators {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-        .signal, .wifi, .battery {
-            width: 18px;
-            height: 12px;
-            background: rgba(255,255,255,0.8);
-            border-radius: 2px;
-        }
-
-        .content {
-            height: calc(100% - 44px - 85px);
+        .gh-scroll {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+            overflow-x: hidden;
             overflow-y: auto;
-            padding-bottom: 20px;
-        }
-
-        .content::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .content::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-
-        /* Header Section */
-        .header {
-            padding: 20px 20px 15px;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .greeting {
-            flex: 1;
-        }
-
-        .greeting h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .greeting p {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .header-bell {
-            position: relative;
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: #fff;
-            flex-shrink: 0;
-        }
-        .header-bell svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
-        .bell-badge {
-            position: absolute; top: -5px; right: -5px;
-            min-width: 18px; height: 18px; padding: 0 4px;
-            background: #FF4757; border: 2px solid #1a1430; border-radius: 9px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 10px; font-weight: 800; color: #fff;
-        }
-        .bell-badge.hidden { display: none; }
-
-        .profile-avatar {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            background-size: cover;
-            background-position: center;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: 800;
-            color: #1a1a2e;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.85);
-            overflow: hidden;
-        }
-
-        .profile-avatar.has-photo span {
-            display: none;
-        }
-
-        .profile-avatar:hover {
-            transform: scale(1.05);
-        }
-
-        /* Rating Badge */
-        .rating-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.2) 100%);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 12px;
-        }
-
-        .rating-badge .star {
-            font-size: 16px;
-        }
-
-        .rating-badge .rating {
-            font-size: 14px;
-            font-weight: 700;
-            color: #FFD700;
-        }
-
-        .rating-badge .reviews {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* Stats Section */
-        .stats-section {
-            padding: 20px 20px 10px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .stat-card.primary {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 165, 0, 0.15) 100%);
-            border-color: rgba(255, 215, 0, 0.3);
-        }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 500;
-        }
-
-        .stat-icon {
-            font-size: 18px;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .stat-change {
-            font-size: 11px;
-            color: #4CAF50;
-            font-weight: 600;
-        }
-
-        .stat-change.info {
-            color: #4ECDC4;
-        }
-
-        .stat-card[role="button"] { transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; }
-        .stat-card[role="button"]:active { transform: scale(0.98); }
-
-        .stat-eye {
-            width: 26px;
-            height: 26px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: rgba(255, 255, 255, 0.55);
-            border-radius: 8px;
-            transition: color 0.2s ease, background 0.2s ease;
-        }
-        .stat-eye:hover { color: #FFD700; background: rgba(255, 255, 255, 0.08); }
-        .stat-eye svg {
-            width: 20px; height: 20px;
-            fill: none; stroke: currentColor;
-            stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
-        }
-
-        /* Full Width Stat Card */
-        .stat-card-full {
-            grid-column: 1 / -1;
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(78, 205, 196, 0.15) 100%);
-            border-color: rgba(76, 175, 80, 0.3);
-        }
-
-        /* Quick Actions */
-        .quick-actions {
-            padding: 15px 20px;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .view-all {
-            font-size: 13px;
-            color: #FFE66D;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .view-all:hover {
-            color: #FFD700;
-        }
-
-        .action-button {
-            width: 100%;
-            padding: 18px 20px;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            border: none;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
-            margin-bottom: 15px;
-        }
-
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(255, 215, 0, 0.5);
-        }
-
-        .action-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .action-text {
-            flex: 1;
-            text-align: left;
-        }
-
-        .action-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 2px;
-        }
-
-        .action-subtitle {
-            font-size: 12px;
-            color: rgba(26, 26, 46, 0.7);
-        }
-
-        .action-arrow {
-            font-size: 20px;
-            color: #1a1a2e;
-        }
-
-        /* Action Button Variants */
-        .action-button-primary {
-            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
-            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.4);
-        }
-
-        .action-button-primary:hover {
-            box-shadow: 0 12px 28px rgba(78, 205, 196, 0.5);
-        }
-
-        .action-button-primary .action-title,
-        .action-button-primary .action-subtitle,
-        .action-button-primary .action-arrow {
-            color: #ffffff;
-        }
-
-        .action-button-secondary {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            box-shadow: none;
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        .action-button-secondary .action-title {
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .action-button-secondary .action-subtitle {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .action-button-secondary .action-arrow {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .action-button-secondary:hover {
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* Info Section */
-        .info-section {
-            padding: 15px 20px 20px;
-        }
-
-        .info-card {
-            background: linear-gradient(135deg, rgba(78, 205, 196, 0.1) 0%, rgba(68, 160, 141, 0.1) 100%);
-            border: 1px solid rgba(78, 205, 196, 0.2);
-            border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            gap: 16px;
-        }
-
-        .info-icon {
-            font-size: 32px;
-            flex-shrink: 0;
-        }
-
-        .info-content h3 {
-            font-size: 16px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 12px;
-        }
-
-        .info-content ol {
-            margin-left: 20px;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        .info-content ol li {
-            margin-bottom: 8px;
-        }
-
-        /* Mission Cards */
-        .missions-section {
-            padding: 15px 20px;
-        }
-
-        .mission-card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .mission-card:hover {
-            transform: translateX(5px);
-            background: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .mission-card.new {
-            border-color: rgba(255, 215, 0, 0.4);
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(255, 165, 0, 0.08) 100%);
-        }
-
-        .mission-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .mission-price {
-            font-size: 20px;
-            font-weight: 700;
-            color: #FFD700;
-        }
-
-        .mission-status {
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .status-new {
-            background: rgba(255, 215, 0, 0.2);
-            color: #FFD700;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            animation: pulse-new 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse-new {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .status-active {
-            background: rgba(78, 205, 196, 0.2);
-            color: #4ECDC4;
-            border: 1px solid rgba(78, 205, 196, 0.3);
-        }
-
-        .status-completed {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4CAF50;
-            border: 1px solid rgba(76, 175, 80, 0.3);
-        }
-
-        .mission-route {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .route-location {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 500;
-        }
-
-        .route-location .flag {
-            font-size: 24px;
-        }
-
-        .route-arrow {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .mission-details {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 10px;
-        }
-
-        .detail-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .mission-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .mission-date {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .mission-client {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .client-avatar {
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-        }
-
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(18, 16, 36, 0.92);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-top: 1px solid rgba(255, 255, 255, 0.07);
-            display: flex;
-            justify-content: space-around;
-            align-items: stretch;
-            padding: 9px 6px calc(9px + env(safe-area-inset-bottom));
-            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            cursor: pointer;
-            flex: 1;
-            position: relative;
-            padding: 6px 0;
-            border-radius: 14px;
-            color: rgba(255, 255, 255, 0.5);
-            transition: color 0.25s ease;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .nav-icon {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .nav-icon svg {
-            width: 24px;
-            height: 24px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.9;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: transform 0.25s ease;
-        }
-
-        .nav-label {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.2px;
-            color: inherit;
-        }
-
-        .nav-item.active {
-            color: #FFC107;
-        }
-
-        .nav-item.active .nav-icon svg {
-            transform: translateY(-1px) scale(1.06);
-        }
-
-        .nav-item.active::after {
-            content: '';
-            position: absolute;
-            top: -9px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 26px;
-            height: 3px;
-            border-radius: 0 0 3px 3px;
-            background: linear-gradient(90deg, #FFD700, #FFA500);
-        }
-
-        .nav-item:not(.active):active {
-            color: rgba(255, 255, 255, 0.85);
-        }
-
-        .nav-badge {
-            position: absolute;
-            top: 0px;
-            left: calc(50% + 5px);
-            min-width: 17px;
-            height: 17px;
-            background: #FF4757;
-            border: 1.5px solid #121024;
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            font-weight: 800;
-            color: white;
-            padding: 0 4px;
-        }
-
-        .nav-badge.new {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #1a1a2e;
-        }
-
-        .nav-badge.hidden {
-            display: none;
-        }
-
-        /* ============ Popup GPS obligatoire ============ */
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .gh-scroll::-webkit-scrollbar { display: none; }
+        .gh-scroll.is-locked { overflow: hidden; }
+
+        /* ---- hero ---- */
+        .gh-hero { position: relative; height: calc(318px + env(safe-area-inset-top, 0px)); overflow: hidden; background: linear-gradient(180deg, #0B1D3A, #2B4A7A); }
+        .gh-hero img.gh-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 40%; }
+        .gh-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7, 20, 47, 0.5) 0%, rgba(7, 20, 47, 0.12) 42%, rgba(7, 20, 47, 0.35) 72%, rgba(244, 248, 253, 0) 80%), linear-gradient(180deg, rgba(244, 248, 253, 0) 78%, #F4F8FD 100%); }
+        .gh-hero__top { position: absolute; z-index: 2; left: 0; right: 0; top: env(safe-area-inset-top, 0px); max-width: 480px; margin: 0 auto; padding: 22px 18px 0; display: flex; align-items: flex-start; justify-content: space-between; }
+        .gh-brand img { display: block; width: 132px; height: auto; filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45)); }
+        .gh-brand span { display: block; margin-top: 2px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.4px; color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7); white-space: nowrap; }
+        .gh-avatar { position: relative; width: 58px; height: 58px; flex-shrink: 0; border: 3px solid rgba(255, 255, 255, 0.85); border-radius: 50%; background: #9A6A4F center / cover no-repeat; color: #fff; font-size: 26px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); }
+        .gh-avatar.has-photo #profileInitials { display: none; }
+        .gh-avatar::after { content: ""; position: absolute; right: -2px; bottom: 0; width: 15px; height: 15px; border-radius: 50%; background: #22C55E; border: 2.5px solid #fff; }
+        .gh-hello { position: absolute; z-index: 2; left: 0; right: 0; bottom: 64px; max-width: 480px; margin: 0 auto; padding: 0 20px; }
+        .gh-hello h1 { font-size: 31px; font-weight: 800; line-height: 1.12; letter-spacing: -0.4px; color: #fff; text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6); }
+        .gh-hello h1 em { font-style: normal; color: #FFA52B; }
+        .gh-hello p { margin-top: 6px; font-size: 17px; color: #EEF3FB; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.65); }
+
+        .gh-body { position: relative; z-index: 3; max-width: 480px; margin: -44px auto 0; padding: 0 14px 28px; }
+
+        /* ---- Mes missions card ---- */
+        .gh-card { position: relative; overflow: hidden; padding: 22px 18px 18px; background: linear-gradient(135deg, #fff 45%, #FFF6EA 100%); border-radius: 30px; box-shadow: 0 14px 38px rgba(11, 29, 58, 0.12); }
+        .gh-card h2 { font-size: 31px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.1; }
+        .gh-card h2 em { font-style: normal; color: var(--gh-orange); }
+        .gh-card > p { margin-top: 8px; max-width: 58%; font-size: 17px; line-height: 1.35; color: var(--gh-muted); }
+        .gh-rows { position: relative; z-index: 2; margin-top: 12px; width: 56%; }
+        .gh-row { width: 100%; display: flex; align-items: center; gap: 12px; padding: 7px 0; border: 0; background: none; text-align: left; color: inherit; cursor: pointer; }
+        .gh-row__ic { width: 56px; height: 56px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .gh-row__ic .gh-i { width: 28px; height: 28px; }
+        .gh-row--o .gh-row__ic { background: #FFE9D2; color: #F7931E; }
+        .gh-row--b .gh-row__ic { background: #DDEBFF; color: #2F6BFF; }
+        .gh-row--g .gh-row__ic { background: #D9F5E6; color: #17A34A; }
+        .gh-row b { display: block; font-size: 26px; font-weight: 800; line-height: 1; color: var(--gh-navy); }
+        .gh-row span.l { display: block; margin-top: 3px; font-size: 16px; font-weight: 600; }
+        .gh-row--o span.l { color: #F7931E; }
+        .gh-row--b span.l { color: #2F6BFF; }
+        .gh-row--g span.l { color: #17A34A; }
+        .gh-row > .gh-i { width: 20px; height: 20px; margin-left: auto; color: #F7931E; }
+        .gh-art { position: absolute; right: -4px; top: 92px; width: 46%; max-width: 210px; aspect-ratio: 1; pointer-events: none; }
+        .gh-art .ring { position: absolute; inset: 6% 2%; border-radius: 50%; border: 5px solid transparent; border-top-color: #FFB02E; border-right-color: #FF8A1F; border-bottom-color: #2F6BFF; border-left-color: #60A5FA; transform: rotate(-24deg) scaleY(0.62); filter: drop-shadow(0 0 10px rgba(255, 160, 40, 0.55)); opacity: 0.9; }
+        .gh-art .ring.r2 { inset: 0 8%; transform: rotate(32deg) scaleY(0.5); opacity: 0.55; border-width: 3px; }
+        .gh-art .glow { position: absolute; inset: 14%; border-radius: 50%; background: radial-gradient(closest-side, rgba(96, 165, 250, 0.35), rgba(96, 165, 250, 0)); }
+        .gh-art img.box { position: absolute; left: 10%; top: 30%; width: 80%; height: auto; filter: drop-shadow(0 14px 12px rgba(11, 29, 58, 0.28)); }
+        .gh-art img.plane { position: absolute; right: 4%; top: 2%; width: 20%; height: auto; filter: drop-shadow(0 6px 8px rgba(47, 107, 255, 0.35)); transform: rotate(-12deg); }
+        .gh-cta { position: relative; z-index: 2; margin-top: 12px; width: 100%; min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 22px; border: 0; border-radius: 999px; background: linear-gradient(90deg, #FB923C, #FBBF24); color: var(--gh-navy); font-size: 19px; font-weight: 800; cursor: pointer; box-shadow: 0 12px 26px rgba(247, 147, 30, 0.35); transition: transform 0.15s ease; }
+        .gh-cta:active { transform: scale(0.985); }
+        .gh-cta .gh-i { width: 26px; height: 26px; }
+        .gh-cta span { flex: 1; text-align: center; }
+
+        /* ---- Créer un trajet ---- */
+        .gh-trip { margin-top: 18px; width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 16px 14px 8px; border: 0; border-radius: 28px; background: linear-gradient(135deg, #fff, #F1F5FF); text-align: left; color: inherit; cursor: pointer; box-shadow: 0 10px 28px rgba(11, 29, 58, 0.08); transition: transform 0.15s ease; }
+        .gh-trip:active { transform: scale(0.99); }
+        .gh-trip__map { width: 25%; max-width: 110px; flex-shrink: 0; }
+        .gh-trip__map svg { display: block; width: 100%; height: auto; overflow: visible; }
+        .gh-trip__t { flex: 1; min-width: 0; }
+        .gh-trip__t b { display: block; font-size: 22px; font-weight: 800; line-height: 1.15; letter-spacing: -0.3px; }
+        .gh-trip__t b em { font-style: normal; color: #2F6BFF; }
+        .gh-trip__t small { display: block; margin-top: 6px; font-size: 15.5px; line-height: 1.35; color: var(--gh-muted); }
+        .gh-trip__go { width: 60px; height: 60px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #2563EB, #7C3AED); color: #fff; box-shadow: 0 10px 24px rgba(79, 70, 229, 0.4); }
+        .gh-trip__go .gh-i { width: 30px; height: 30px; }
+
+        /* ---- position sharing ---- */
+        .gh-loc { margin-top: 14px; width: 100%; display: flex; align-items: center; gap: 14px; padding: 12px 16px; border: 1px solid #E3EAF3; border-radius: 22px; background: #fff; text-align: left; color: inherit; cursor: pointer; }
+        .gh-loc__ic { width: 46px; height: 46px; flex-shrink: 0; border-radius: 16px; display: flex; align-items: center; justify-content: center; background: #E3EEFF; color: #2F6BFF; }
+        .gh-loc__ic .ic { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .gh-loc__t { flex: 1; min-width: 0; }
+        .gh-loc__t b { display: block; font-size: 17px; font-weight: 800; }
+        .gh-loc__t small { display: block; margin-top: 1px; font-size: 14.5px; color: var(--gh-muted); }
+        .gh-loc__st { flex-shrink: 0; min-width: 52px; padding: 5px 10px; border-radius: 999px; background: #EEF2F7; color: var(--gh-muted); font-size: 12.5px; font-weight: 800; text-align: center; }
+        .gh-loc.on .gh-loc__st { background: #DDF5E7; color: #13803F; }
+        .gh-loc.on .gh-loc__ic { background: #DDF5E7; color: #17A34A; }
+
+        /* ---- bottom nav ---- */
+        .gh-nav { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; height: calc(76px + env(safe-area-inset-bottom, 0px)); padding: 6px 4px env(safe-area-inset-bottom, 0px); display: flex; gap: 2px; background: rgba(255, 255, 255, 0.97); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid #E3EAF3; box-shadow: 0 -8px 24px rgba(11, 29, 58, 0.06); }
+        .gh-nav__item { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; border-radius: 18px; background: none; color: var(--gh-muted); font-size: 12.5px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+        .gh-nav__item[aria-current="page"] { background: #FFF1DE; color: #E8780C; font-weight: 700; }
+        .gh-nav__icon { position: relative; display: flex; }
+        .gh-nav__icon .gh-i { width: 26px; height: 26px; }
+        .gh-nav .bell-badge { position: absolute; top: -6px; right: -9px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #EF4444; border: 2px solid #fff; color: #fff; font-size: 10.5px; font-weight: 800; line-height: 14px; text-align: center; }
+        .gh-nav .bell-badge.hidden { display: none; }
+        .lbl-short { display: none; }
+        @media (max-width: 460px) { .lbl-long { display: none; } .lbl-short { display: inline; } }
+
+        /* ---- bottom sheet : missions ---- */
+        .gh-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; background: rgba(7, 20, 47, 0.52); opacity: 0; pointer-events: none; transition: opacity 0.28s ease; }
+        .gh-overlay.show { opacity: 1; pointer-events: auto; }
+        .gh-sheet { width: 100%; max-width: 480px; height: 86dvh; max-height: 86vh; display: flex; flex-direction: column; background: #F4F8FD; border-radius: 30px 30px 0 0; box-shadow: 0 -12px 40px rgba(7, 20, 47, 0.28); transform: translateY(100%); transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1); }
+        .gh-overlay.show .gh-sheet { transform: none; }
+        .gh-sheet__grab { padding: 10px 0 2px; display: flex; justify-content: center; }
+        .gh-sheet__grab i { width: 44px; height: 5px; border-radius: 3px; background: #CBD4E3; }
+        .gh-sheet__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 8px 20px 4px; }
+        .gh-sheet__head h3 { font-size: 26px; font-weight: 800; letter-spacing: -0.3px; }
+        .gh-sheet__head h3 em { font-style: normal; color: var(--gh-orange); }
+        .gh-sheet__head p { margin-top: 3px; font-size: 15px; color: var(--gh-muted); }
+        .gh-close { width: 42px; height: 42px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: #E6ECF5; color: var(--gh-navy); cursor: pointer; }
+        .gh-close .gh-i { width: 20px; height: 20px; }
+        .gh-tabs { display: flex; gap: 8px; padding: 12px 20px 6px; overflow-x: auto; scrollbar-width: none; }
+        .gh-tabs::-webkit-scrollbar { display: none; }
+        .gh-tab { flex-shrink: 0; min-height: 42px; padding: 0 16px; border: 1.5px solid #E0E7F2; border-radius: 999px; background: #fff; color: #44526B; font-size: 15px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .gh-tab b { margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: #EEF2F8; font-size: 13px; }
+        .gh-tab[aria-selected="true"] { border-color: transparent; background: linear-gradient(90deg, #FB923C, #FBBF24); color: var(--gh-navy); box-shadow: 0 8px 18px rgba(247, 147, 30, 0.3); }
+        .gh-tab[aria-selected="true"] b { background: rgba(255, 255, 255, 0.55); }
+        .gh-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 10px 16px calc(24px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 14px; }
+
+        .gh-m { position: relative; flex-shrink: 0; display: block; width: 100%; padding: 16px 16px 14px; border: 0; border-radius: 26px; background: #fff; text-align: left; color: inherit; cursor: pointer; box-shadow: 0 8px 24px rgba(11, 29, 58, 0.07); overflow: hidden; animation: ghIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 45ms); }
+        .gh-m::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--gh-acc, #F7931E); }
+        .gh-m:active { transform: scale(0.985); }
+        .gh-m__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .gh-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: var(--gh-chipbg, #FFE9D2); color: var(--gh-chipfg, #C86A00); font-size: 13.5px; font-weight: 800; }
+        .gh-chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+        .gh-code { font-size: 13px; font-weight: 700; color: var(--gh-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .gh-route { margin-top: 14px; display: flex; align-items: center; gap: 8px; }
+        .gh-city { min-width: 0; flex: 0 1 auto; }
+        .gh-city b { display: block; font-size: 22px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.15; overflow-wrap: anywhere; }
+        .gh-city small { display: block; margin-top: 2px; font-size: 14px; color: var(--gh-muted); }
+        .gh-city:last-child { text-align: right; }
+        .gh-path { flex: 1; min-width: 34px; display: flex; align-items: center; color: var(--gh-acc, #F7931E); }
+        .gh-path::before, .gh-path::after { content: ""; flex: 1; height: 0; border-top: 2px dashed currentColor; opacity: 0.45; }
+        .gh-path .gh-i { width: 24px; height: 24px; margin: 0 4px; transform: rotate(45deg); }
+        .gh-meta { margin-top: 14px; padding-top: 12px; border-top: 1px dashed #E3EAF3; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .gh-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 12px; background: #F1F5FA; color: #44526B; font-size: 14px; font-weight: 600; }
+        .gh-pill .gh-i { width: 16px; height: 16px; }
+        .gh-price { margin-left: auto; font-size: 19px; font-weight: 800; color: #E8780C; white-space: nowrap; }
+        .gh-price small { font-size: 12.5px; font-weight: 700; }
+        .gh-empty { margin: 30px 10px; text-align: center; color: var(--gh-muted); font-size: 16px; line-height: 1.5; }
+        .gh-empty .gh-i { width: 54px; height: 54px; margin-bottom: 10px; color: #B7C3D8; }
+        .gh-more { margin-top: 2px; min-height: 54px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid #E0E7F2; border-radius: 18px; background: #fff; color: #2F6BFF; font-size: 16px; font-weight: 800; cursor: pointer; }
+        @keyframes ghIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+        .gh-reveal { animation: ghIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+        .gh-avatar:focus-visible, .gh-row:focus-visible, .gh-cta:focus-visible, .gh-trip:focus-visible, .gh-loc:focus-visible, .gh-nav__item:focus-visible, .gh-close:focus-visible, .gh-tab:focus-visible, .gh-m:focus-visible { outline: 2px solid #2F6BFF; outline-offset: 2px; }
+        @media (prefers-reduced-motion: reduce) { .gh-reveal, .gh-m { animation: none; } * { transition-duration: 0.01ms !important; } }
+
+        /* PWA install banner (pwa.js): keep it compact */
+        #sengp-install-banner { bottom: 8px !important; padding: 8px 12px !important; gap: 10px !important; font-size: 12px !important; line-height: 1.3 !important; border-radius: 14px !important; }
+        #sengp-install-banner img { width: 34px !important; height: 34px !important; }
+        #sengp-install-banner strong { font-size: 13px !important; }
+
+        @media (max-width: 400px) {
+            .gh-hello h1 { font-size: 28px; }
+            .gh-card h2 { font-size: 28px; }
+            .gh-row__ic { width: 52px; height: 52px; }
+            .gh-row b { font-size: 24px; }
+            .gh-trip__map { width: 32%; }
+            .gh-trip__go { width: 58px; height: 58px; }
+        }
+        @media (max-width: 359px) {
+            .gh-body { padding-left: 10px; padding-right: 10px; }
+            .gh-brand img { width: 112px; }
+            .gh-hello h1 { font-size: 25px; }
+            .gh-card h2 { font-size: 25px; }
+            .gh-card > p { font-size: 15px; max-width: 62%; }
+            .gh-cta { padding: 0 16px; font-size: 16.5px; }
+            .gh-cta span { white-space: nowrap; }
+            .gh-rows { width: 62%; }
+            .gh-row__ic { width: 46px; height: 46px; }
+            .gh-row__ic .gh-i { width: 23px; height: 23px; }
+            .gh-row span.l { font-size: 14.5px; }
+            .gh-art { width: 42%; opacity: 0.9; }
+            .gh-trip__t b { font-size: 21px; }
+            .gh-trip__t small { font-size: 14px; }
+            .gh-trip__map { display: none; }
+            .gh-trip { padding-left: 16px; }
+            .gh-city b { font-size: 19px; }
+        }
+/* ============ Popup GPS obligatoire ============ */
         .gps-gate {
             position: fixed;
             inset: 0;
@@ -859,7 +368,7 @@
         .jm-btn.jm-scan { background:linear-gradient(135deg,#4ECDC4,#44A08D); color:#06231f; box-shadow:0 12px 26px rgba(78,205,196,.42); }
         .jm-wait { font-size:13.5px; line-height:1.6; color:#FFD27A; background:rgba(255,215,0,.1); border:1px solid rgba(255,215,0,.3); border-radius:14px; padding:14px; display:flex; align-items:center; gap:10px; text-align:left; }
         .jm-wait svg { width:22px; height:22px; flex-shrink:0; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-        </style>
+    </style>
     <script src="config.js"></script>
     <script src="ui.js"></script>
     <link rel="stylesheet" href="theme.css">
@@ -874,159 +383,120 @@
     <script src="pwa.js" defer></script>
 </head>
 <body class="ds">
-    <div class="mobile-frame">
+<div class="mobile-frame">
 
-        <!-- Content -->
-        <div class="content">
-            <!-- Header -->
-            <div class="header">
-                <div class="header-top">
-                    <div class="greeting">
-                        <h1>Bonjour, GP 👋</h1>
-                        <p>Prêt pour une nouvelle mission ?</p>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:12px;">
-                        <button class="header-bell" id="notifBell" onclick="openNotifications()" aria-label="Notifications">
-                            <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-                            <span class="bell-badge hidden" id="notifNavBadge">0</span>
-                        </button>
-                        <div class="profile-avatar" id="profileAvatar" onclick="openProfile()">
-                            <span id="profileInitials">GP</span>
-                        </div>
-                    </div>
+    <div class="content gh-scroll" id="scroller">
+        <header class="gh-hero">
+            <picture>
+                <source type="image/webp" srcset="im/sengp-gp-background.webp">
+                <img class="gh-bg" src="im/sengp-gp-background.jpg" alt="" width="960" height="784" decoding="async">
+            </picture>
+            <div class="gh-hero__top">
+                <div class="gh-brand">
+                    <img src="im/sengp-logo.png" alt="SEN GP" width="132" height="82">
+                    <span>VOS COLIS, NOTRE ENGAGEMENT</span>
                 </div>
-
-                <!-- Rating Badge -->
-                <div class="rating-badge">
-                    <span class="star"><svg class="ic" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-                    <span class="rating" id="gpRating">--</span>
-                    <span class="reviews" id="gpReviews">(-- avis)</span>
+                <div class="gh-avatar" id="profileAvatar" onclick="openProfile()" role="button" tabindex="0" aria-label="Mon profil">
+                    <span id="profileInitials">GP</span>
                 </div>
             </div>
-
-            <!-- Stats Section -->
-            <div class="stats-section">
-                <div class="stats-grid">
-                    <div class="stat-card primary" onclick="openMissionsModal('active')" role="button" tabindex="0" style="cursor:pointer;">
-                        <div class="stat-header">
-                            <span class="stat-label">Missions actives</span>
-                            <span class="stat-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
-                        </div>
-                        <div class="stat-value">--</div>
-                        <div class="stat-change">En cours ›</div>
-                    </div>
-
-                    <div class="stat-card" onclick="openMissionsModal('completed')" role="button" tabindex="0" style="cursor:pointer;">
-                        <div class="stat-header">
-                            <span class="stat-label">Missions terminées</span>
-                            <span class="stat-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg></span>
-                        </div>
-                        <div class="stat-value">--</div>
-                        <div class="stat-change">Voir ›</div>
-                    </div>
-
-                    <div class="stat-card stat-card-full" id="gainsCard" onclick="openGainsHistory()" role="button" tabindex="0" style="cursor:pointer;">
-                        <div class="stat-header">
-                            <span class="stat-label">Gains totaux</span>
-                            <span class="stat-eye" id="gainsEye" onclick="toggleGainsVisibility(event)" role="button" tabindex="0" title="Afficher / Masquer le montant"></span>
-                        </div>
-                        <div class="stat-value" id="gainsValue">•••••• FCFA</div>
-                        <div class="stat-change info">Voir l'historique ›</div>
-                    </div>
-                </div>
+            <div class="gh-hello greeting">
+                <h1>Bonjour, <em id="ghName">GP</em> 👋</h1>
+                <p>Prêt pour une nouvelle mission ?</p>
             </div>
+        </header>
 
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <div class="section-header">
-                    <h2 class="section-title">Actions rapides</h2>
+        <div class="gh-body">
+            <!-- Mes missions -->
+            <section class="gh-card gh-reveal" style="--i:0" aria-label="Mes missions">
+                <h2>Mes <em>missions</em></h2>
+                <p>Consultez les missions qui vous sont confiées</p>
+                <div class="gh-art" aria-hidden="true">
+                    <span class="glow"></span><span class="ring"></span><span class="ring r2"></span>
+                    <img class="box" src="im/sengp-box-3d-cut.webp" alt="" width="378" height="255">
+                    <img class="plane" src="im/sengp-plane.png" alt="" width="192" height="142">
                 </div>
-
-                <!-- Créer un trajet Button -->
-                <button class="action-button action-button-primary" onclick="createTrip()">
-                    <div class="action-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
-                    <div class="action-text">
-                        <div class="action-title">Créer un trajet</div>
-                        <div class="action-subtitle">Ajoutez votre prochain voyage</div>
-                    </div>
-                    <div class="action-arrow">→</div>
+                <div class="gh-rows">
+                    <button type="button" class="gh-row gh-row--o" onclick="openMissionsSheet('soon')">
+                        <span class="gh-row__ic"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span>
+                        <span><b id="statSoon">–</b><span class="l">À venir</span></span>
+                        <svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                    <button type="button" class="gh-row gh-row--b" onclick="openMissionsSheet('active')">
+                        <span class="gh-row__ic"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
+                        <span><b id="statActive">–</b><span class="l">En cours</span></span>
+                        <svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                    <button type="button" class="gh-row gh-row--g" onclick="openMissionsSheet('done')">
+                        <span class="gh-row__ic"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>
+                        <span><b id="statDone">–</b><span class="l">Terminées</span></span>
+                        <svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                </div>
+                <button type="button" class="gh-cta" onclick="openMissionsSheet('all')">
+                    <svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+                    <span>Voir mes missions</span>
+                    <svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </button>
+            </section>
 
-                <!-- Rechercher missions Button (disabled until trip created) -->
-                <button class="action-button action-button-secondary" onclick="searchMissions()" id="searchMissionsBtn">
-                    <div class="action-icon"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
-                    <div class="action-text">
-                        <div class="action-title">Rechercher des missions</div>
-                        <div class="action-subtitle">Créez un trajet d'abord</div>
-                    </div>
-                    <div class="action-arrow">→</div>
-                </button>
+            <!-- Créer un trajet -->
+            <button type="button" class="gh-trip gh-reveal" style="--i:1" onclick="createTrip()">
+                <span class="gh-trip__map" aria-hidden="true">
+                    <svg viewBox="0 0 150 120">
+                        <path d="M6 78 40 52l46 10 56-26v50l-52 30-46-10L6 108z" fill="#E4ECFA"/>
+                        <path d="M40 52v50M86 62v50" stroke="#fff" stroke-width="2" opacity="0.8"/>
+                        <path d="M30 64c18-14 36 2 52-8s30-24 40-10" fill="none" stroke="#2F6BFF" stroke-width="2.4" stroke-dasharray="4 5" stroke-linecap="round"/>
+                        <path d="M30 18c-9 0-15 6-15 14 0 10 15 26 15 26s15-16 15-26c0-8-6-14-15-14z" fill="#2F6BFF"/><circle cx="30" cy="32" r="5" fill="#fff"/>
+                        <path d="M122 28c-8 0-13 5-13 12 0 9 13 23 13 23s13-14 13-23c0-7-5-12-13-12z" fill="#8B5CF6"/><circle cx="122" cy="40" r="4.5" fill="#fff"/>
+                        <rect x="52" y="64" width="34" height="26" rx="3" fill="#E9B678"/><path d="M52 74h34M69 64v26" stroke="#C98F4C" stroke-width="2"/>
+                    </svg>
+                </span>
+                <span class="gh-trip__t"><b>Créer un <em>trajet</em></b><small>Ajoutez votre billet et trouvez des missions sur votre trajet</small></span>
+                <span class="gh-trip__go"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+            </button>
 
-                <!-- Colis à livrer -->
-                <button class="action-button action-button-secondary" onclick="window.location.href='alivrer.html'">
-                    <div class="action-icon"><svg class="ic" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div>
-                    <div class="action-text">
-                        <div class="action-title">Colis à livrer</div>
-                        <div class="action-subtitle">Destinataires, appel et suivi de remise</div>
-                    </div>
-                    <div class="action-arrow">→</div>
-                </button>
-
-                <!-- Partager ma position (suivi live des colis en transit) -->
-                <button class="action-button action-button-secondary" id="locShareBtn" onclick="toggleLocationShare()">
-                    <div class="action-icon" id="locShareIcon"><svg class="ic" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-                    <div class="action-text">
-                        <div class="action-title">Partager ma position</div>
-                        <div class="action-subtitle" id="locShareSub">Suivi live désactivé</div>
-                    </div>
-                    <div class="action-arrow" id="locShareState">○</div>
-                </button>
-            </div>
-
-            <!-- Info Message -->
-            <div class="info-section">
-                <div class="info-card">
-                    <div class="info-icon">ℹ️</div>
-                    <div class="info-content">
-                        <h3>Comment ça marche ?</h3>
-                        <ol>
-                            <li>Créez un trajet en ajoutant votre billet d'avion et les détails de votre voyage</li>
-                            <li>Notre système vous proposera automatiquement des missions correspondant à votre trajet</li>
-                            <li>Acceptez les missions qui vous conviennent et gagnez de l'argent en voyageant</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <div class="nav-item active" onclick="navigateTo('home')" tabindex="0" role="button" aria-label="Accueil">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
-                <div class="nav-label">Accueil</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('missions')" tabindex="0" role="button" aria-label="Missions">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
-                <div class="nav-label">Missions</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('trips')" tabindex="0" role="button" aria-label="Mes trajets">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
-                <div class="nav-label">Trajets</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('earnings')" tabindex="0" role="button" aria-label="Gains">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-                <div class="nav-label">Gains</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
-                <div class="nav-label">Profil</div>
-            </div>
+            <!-- Partager ma position (suivi live) -->
+            <button type="button" class="gh-loc gh-reveal" style="--i:2" id="locShareBtn" onclick="toggleLocationShare()">
+                <span class="gh-loc__ic" id="locShareIcon"><svg class="ic" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+                <span class="gh-loc__t"><b>Partager ma position</b><small id="locShareSub">Suivi live désactivé</small></span>
+                <span class="gh-loc__st" id="locShareState">○</span>
+            </button>
         </div>
     </div>
+
+    <!-- Bottom navigation -->
+    <nav class="gh-nav" aria-label="Navigation principale">
+        <button type="button" class="gh-nav__item" aria-current="page" onclick="navigateTo('home')">
+            <span class="gh-nav__icon"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span>Accueil</span>
+        </button>
+        <button type="button" class="gh-nav__item" onclick="navigateTo('trips')">
+            <span class="gh-nav__icon"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span><span>Trajets</span>
+        </button>
+        <button type="button" class="gh-nav__item" onclick="navigateTo('earnings')">
+            <span class="gh-nav__icon"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span>Gains</span>
+        </button>
+        <button type="button" class="gh-nav__item" onclick="navigateTo('notifications')">
+            <span class="gh-nav__icon"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="bell-badge hidden" id="notifNavBadge">0</span></span><span class="lbl-long">Notifications</span><span class="lbl-short">Notifs</span>
+        </button>
+        <button type="button" class="gh-nav__item" onclick="navigateTo('profile')">
+            <span class="gh-nav__icon"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span>Profil</span>
+        </button>
+    </nav>
+
+    <!-- Bottom sheet : mes missions -->
+    <div class="gh-overlay" id="missionsOverlay" onclick="if (event.target === this) closeMissionsSheet()">
+        <div class="gh-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+            <div class="gh-sheet__grab"><i></i></div>
+            <div class="gh-sheet__head">
+                <div><h3 id="sheetTitle">Mes <em>missions</em></h3><p id="sheetSub">Chargement…</p></div>
+                <button type="button" class="gh-close" onclick="closeMissionsSheet()" aria-label="Fermer"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+            </div>
+            <div class="gh-tabs" role="tablist" id="ghTabs"></div>
+            <div class="gh-list" id="ghList"></div>
+        </div>
+    </div>
+</div>
 
     <!-- Popup GPS obligatoire (s'impose au GP avant toute action) -->
     <div class="gps-gate" id="gpsGate" role="dialog" aria-modal="true" aria-labelledby="gpsGateTitle">
@@ -1056,7 +526,6 @@
             await enforceGpsGate();
             await loadDashboardData();
             hideEmptyBadges();
-            renderGains();
             await initJourney();
         });
 
@@ -1181,7 +650,8 @@
             document.getElementById('locShareIcon').innerHTML = on
                 ? '<svg class="ic" viewBox="0 0 24 24"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg>'
                 : '<svg class="ic" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>';
-            document.getElementById('locShareState').textContent = on ? '●' : '○';
+            document.getElementById('locShareState').textContent = on ? 'ON' : 'OFF';
+            document.getElementById('locShareBtn').classList.toggle('on', !!on);
             document.getElementById('locShareSub').textContent = sub || (on ? 'Suivi live activé' : 'Suivi live désactivé');
         }
 
@@ -1430,7 +900,7 @@
             });
         }
 
-        async function checkAuthentication() {
+                async function checkAuthentication() {
             authToken = localStorage.getItem('authToken');
             const userData = localStorage.getItem('userData');
 
@@ -1450,7 +920,6 @@
                     return;
                 }
 
-                // Update header with user info
                 updateHeader();
             } catch (error) {
                 console.error('Error parsing user data:', error);
@@ -1459,49 +928,30 @@
         }
 
         function updateHeader() {
-            const greetingName = document.querySelector('.greeting h1');
-            const firstName = currentUser.first_name || 'GP';
-            greetingName.textContent = `Bonjour, ${firstName} 👋`;
+            document.getElementById('ghName').textContent = currentUser.first_name || 'GP';
 
-            // Avatar : photo de profil Google si disponible, sinon initiales.
+            // Avatar : photo de profil Google si disponible, sinon initiale.
             const avatar = document.getElementById('profileAvatar');
             const initialsEl = document.getElementById('profileInitials');
             const photo = currentUser.profile_photo_url;
-            if (photo) {
-                avatar.style.backgroundImage = `url("${photo}")`;
+            if (photo && /^https?:/.test(photo)) {
+                avatar.style.backgroundImage = `url("${photo.replace(/"/g, '%22')}")`;
                 avatar.classList.add('has-photo');
             } else {
-                const a = (currentUser.first_name || '').charAt(0);
-                const b = (currentUser.last_name || '').charAt(0);
-                initialsEl.textContent = (a + b).toUpperCase() || 'GP';
+                initialsEl.textContent = (currentUser.first_name || '').charAt(0).toUpperCase() || 'GP';
                 avatar.classList.remove('has-photo');
             }
         }
 
         async function loadDashboardData() {
             try {
-                // Show loading state
-                console.log('Loading dashboard data...');
-
-                // Load all data in parallel
-                await Promise.all([
-                    loadStats(),
-                    loadNewMissions(),
-                    loadMyMissions(),
-                    loadUnreadNotifCount()
-                ]);
-
-                console.log('Dashboard data loaded successfully');
+                await Promise.all([loadMissions(), loadUnreadNotifCount()]);
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
             }
         }
 
-        function openNotifications() {
-            window.location.href = 'notifications.html';
-        }
-
-        // Show the unread-notification count on the header bell. Best-effort.
+        // Show the unread-notification count on the nav bell. Best-effort.
         async function loadUnreadNotifCount() {
             try {
                 const r = await fetch(`${API_BASE_URL}/notifications/my-notifications?limit=100`, {
@@ -1517,298 +967,116 @@
             } catch (e) {}
         }
 
-        async function loadStats() {
-            try {
-                // Get GP's missions
-                const response = await fetch(`${API_BASE_URL}/missions/my-missions?limit=1000`, {
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
+        // ---------- Mes missions ----------
+        // À venir = confiée / acceptée mais pas encore récupérée ; En cours = colis en main ; Terminées = livrée.
+        const GROUPS = {
+            soon:   { label: 'À venir',   statuses: ['pending', 'matched', 'accepted'] },
+            active: { label: 'En cours',  statuses: ['picked_up', 'in_transit', 'in_customs', 'out_for_delivery'] },
+            done:   { label: 'Terminées', statuses: ['delivered'] }
+        };
+        const STATUS_UI = {
+            pending:          { label: 'À venir',        acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' },
+            matched:          { label: 'À venir',        acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' },
+            accepted:         { label: 'Confirmée',      acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' },
+            picked_up:        { label: 'Récupéré',       acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' },
+            in_transit:       { label: 'En transit',     acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' },
+            in_customs:       { label: 'En douane',      acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' },
+            out_for_delivery: { label: 'À destination',  acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' },
+            delivered:        { label: 'Terminée',       acc: '#17A34A', bg: '#D9F5E6', fg: '#13803F' },
+            cancelled:        { label: 'Annulée',        acc: '#94A3B8', bg: '#EDF1F6', fg: '#64748B' }
+        };
+        let ghMissions = [];
+        let ghFilter = 'all';
+        let ghLoaded = false;
 
-                if (!response.ok) {
-                    throw new Error('Failed to load stats');
-                }
+        const groupOf = m => {
+            const s = String(m.status || '').toLowerCase();
+            return Object.keys(GROUPS).find(k => GROUPS[k].statuses.includes(s)) || null;
+        };
 
-                const result = await response.json();
-                const missions = result.data || [];
-
-                // Calculate statistics
-                const activeMissions = missions.filter(m =>
-                    ['accepted', 'in_transit', 'picked_up'].includes(m.status)
-                ).length;
-
-                const completedMissions = missions.filter(m =>
-                    m.status === 'delivered'
-                ).length;
-
-                const totalEarnings = missions
-                    .filter(m => m.status === 'delivered')
-                    .reduce((sum, m) => sum + (parseFloat(m.price) || 0), 0);
-
-                // Update UI
-                document.querySelectorAll('.stat-value')[0].textContent = activeMissions;
-                document.querySelectorAll('.stat-value')[1].textContent = completedMissions;
-                window._gpTotalEarnings = totalEarnings;
-                renderGains();
-
-            } catch (error) {
-                console.error('Error loading stats:', error);
-            }
-        }
-
-        // ---- Cartes statistiques interactives ----
-        const EYE_OPEN = '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
-        const EYE_OFF  = '<svg viewBox="0 0 24 24"><path d="m3 3 18 18"/><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.4 0 10 7 10 7a18.4 18.4 0 0 1-2.6 3.5"/><path d="M6.6 6.6C3.9 8.3 2 12 2 12s3.6 7 10 7a10.5 10.5 0 0 0 4.1-.8"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
-
-        function renderGains() {
-            const hidden = localStorage.getItem('gpGainsHidden') === '1';
-            const v = document.getElementById('gainsValue');
-            const eye = document.getElementById('gainsEye');
-            if (v) v.textContent = hidden ? '•••••• FCFA'
-                : ((window._gpTotalEarnings || 0).toLocaleString('fr-FR') + ' FCFA');
-            if (eye) eye.innerHTML = hidden ? EYE_OFF : EYE_OPEN;
-        }
-
-        function toggleGainsVisibility(ev) {
-            if (ev) ev.stopPropagation();   // ne pas déclencher le clic de la carte
-            if (localStorage.getItem('gpGainsHidden') === '1') localStorage.removeItem('gpGainsHidden');
-            else localStorage.setItem('gpGainsHidden', '1');
-            renderGains();
-        }
-
-        function openGainsHistory() {
-            window.location.href = 'gains.html';
-        }
-
-        // Popup (design unifié) listant les missions actives ou terminées.
-        async function openMissionsModal(kind) {
-            let missions = [];
+        async function loadMissions() {
             try {
                 const r = await fetch(`${API_BASE_URL}/missions/my-missions?limit=1000`, {
                     headers: { 'Authorization': `Bearer ${authToken}` }
                 });
-                missions = r.ok ? ((await r.json()).data || []) : [];
-            } catch (e) { /* réseau */ }
-
-            const ACTIVE = ['accepted', 'in_transit', 'picked_up', 'in_customs', 'out_for_delivery'];
-            const list = missions.filter(m => {
-                const s = String(m.status || '').toLowerCase();
-                return kind === 'active' ? ACTIVE.includes(s) : s === 'delivered';
-            });
-
-            const rows = list.map(m => {
-                const price = parseFloat(m.price || 0).toLocaleString('fr-FR');
-                const info = getStatusInfo(m.status);
-                return `<div class="sengp-list-item" onclick="window.location.href='detailmissiongp.html?id=${m.id}'">
-                    <div style="flex:1;min-width:0;">
-                        <div style="font-weight:700;color:#fff;font-size:13px;">
-                            ${getCountryFlag(m.departure_country)} ${m.departure_city || '?'} → ${getCountryFlag(m.arrival_country)} ${m.arrival_city || '?'}
-                        </div>
-                        <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:3px;">${formatDate(m.departure_date)}</div>
-                    </div>
-                    <div style="text-align:right;flex-shrink:0;">
-                        <div style="color:#FFD700;font-weight:800;font-size:13px;">${price} FCFA</div>
-                        <span class="mission-status ${info.class}" style="display:inline-block;margin-top:4px;">${info.label}</span>
-                    </div>
-                </div>`;
-            }).join('');
-
-            const body = `<div class="sengp-list">${rows ||
-                '<div class="sengp-list-empty">Aucune mission dans cette catégorie pour le moment.</div>'}</div>`;
-            const title = (kind === 'active' ? 'Missions actives' : 'Missions terminées') + ` (${list.length})`;
-
-            sengpModal({
-                title: title,
-                bodyHTML: body,
-                actions: [
-                    { label: 'Fermer', value: false },
-                    { label: 'Voir tout', primary: true, value: true }
-                ]
-            }).then(v => { if (v) window.location.href = 'trajets.html'; });
-        }
-
-        async function loadNewMissions() {
-            try {
-                // Get pending missions (not yet accepted)
-                const response = await fetch(`${API_BASE_URL}/missions?status=pending&limit=5`, {
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to load new missions');
-                }
-
-                const result = await response.json();
-                const missions = result.data || [];
-
-                // Update new missions count in action button
-                const actionSubtitle = document.querySelector('.action-subtitle');
-                actionSubtitle.textContent = `${missions.length} nouvelles missions disponibles`;
-
-                // Update badge
-                const missionsBadge = document.querySelector('.nav-item[onclick*="missions"] .nav-badge');
-                if (missionsBadge) {
-                    missionsBadge.textContent = missions.length;
-                }
-
-                // Display new missions
-                displayNewMissions(missions.slice(0, 2));
-
+                if (!r.ok) throw new Error('Failed to load missions');
+                ghMissions = (await r.json()).data || [];
+                ghLoaded = true;
             } catch (error) {
-                console.error('Error loading new missions:', error);
-            }
-        }
-
-        async function loadMyMissions() {
-            try {
-                // Get GP's accepted missions
-                const response = await fetch(`${API_BASE_URL}/missions/my-missions?limit=10`, {
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to load my missions');
-                }
-
-                const result = await response.json();
-                const missions = result.data || [];
-
-                // Filter active missions
-                const activeMissions = missions.filter(m =>
-                    ['accepted', 'in_transit', 'picked_up'].includes(m.status)
-                );
-
-                // Update badge
-                const tripsBadge = document.querySelector('.nav-item[onclick*="trips"] .nav-badge');
-                if (tripsBadge) {
-                    tripsBadge.textContent = activeMissions.length;
-                }
-
-                // Display my missions
-                displayMyMissions(missions.slice(0, 2));
-
-            } catch (error) {
-                console.error('Error loading my missions:', error);
-            }
-        }
-
-        function displayNewMissions(missions) {
-            const cardsContainer = document.getElementById('newMissionsContainer');
-
-            if (!cardsContainer) return;
-
-            // Clear container
-            cardsContainer.innerHTML = '';
-
-            if (missions.length === 0) {
-                cardsContainer.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.5);">
-                        <div style="font-size: 44px; margin-bottom: 16px;"><svg class="ic" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div>
-                        <p>Aucune nouvelle mission pour le moment</p>
-                    </div>
-                `;
+                console.error('Error loading missions:', error);
                 return;
             }
-
-            missions.forEach(mission => {
-                const card = createMissionCard(mission, 'new');
-                cardsContainer.appendChild(card);
-            });
+            const count = k => ghMissions.filter(m => groupOf(m) === k).length;
+            document.getElementById('statSoon').textContent = count('soon');
+            document.getElementById('statActive').textContent = count('active');
+            document.getElementById('statDone').textContent = count('done');
         }
 
-        function displayMyMissions(missions) {
-            const cardsContainer = document.getElementById('myMissionsContainer');
+        const ICON = {
+            plane: '<svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>',
+            box: '<svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>',
+            cal: '<svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>'
+        };
 
-            if (!cardsContainer) return;
-
-            // Clear container
-            cardsContainer.innerHTML = '';
-
-            if (missions.length === 0) {
-                cardsContainer.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.5);">
-                        <div style="font-size: 44px; margin-bottom: 16px;"><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></div>
-                        <p>Vous n'avez pas encore accepté de mission</p>
-                    </div>
-                `;
-                return;
-            }
-
-            missions.forEach(mission => {
-                const statusType = getStatusType(mission.status);
-                const card = createMissionCard(mission, statusType);
-                cardsContainer.appendChild(card);
-            });
+        function shortDate(d) {
+            if (!d) return '';
+            const dt = new Date(d);
+            return isNaN(dt) ? '' : dt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
         }
 
-        function createMissionCard(mission, statusType) {
-            const card = document.createElement('div');
-            card.className = statusType === 'new' ? 'mission-card new' : 'mission-card';
-            card.onclick = () => viewMissionDetails(mission.id);
-
-            const statusInfo = getStatusInfo(mission.status);
-            const price = parseFloat(mission.price || 0).toLocaleString('fr-FR');
-
-            card.innerHTML = `
-                <div class="mission-header">
-                    <span class="mission-price">${price} FCFA</span>
-                    <span class="mission-status ${statusInfo.class}">${statusInfo.label}</span>
+        function missionCardHTML(m, i) {
+            const ui = STATUS_UI[String(m.status || '').toLowerCase()] || { label: m.status || '—', acc: '#94A3B8', bg: '#EDF1F6', fg: '#64748B' };
+            const code = jEsc(m.mission_code || m.tracking_number || '');
+            const weight = m.package_weight != null ? m.package_weight : m.weight;
+            const date = shortDate(m.departure_date);
+            const price = parseFloat(m.price || 0);
+            return `<button type="button" class="gh-m" style="--i:${Math.min(i, 8)};--gh-acc:${ui.acc};--gh-chipbg:${ui.bg};--gh-chipfg:${ui.fg}" onclick="viewMissionDetails('${jEsc(m.id)}')">
+                <div class="gh-m__top"><span class="gh-chip">${ui.label}</span><span class="gh-code">${code}</span></div>
+                <div class="gh-route">
+                    <div class="gh-city"><b>${jEsc(m.departure_city || '?')}</b><small>${getCountryFlag(m.departure_country)} ${jEsc(m.departure_country || '')}</small></div>
+                    <div class="gh-path">${ICON.plane}</div>
+                    <div class="gh-city"><b>${jEsc(m.arrival_city || '?')}</b><small>${getCountryFlag(m.arrival_country)} ${jEsc(m.arrival_country || '')}</small></div>
                 </div>
-                <div class="mission-route">
-                    <div class="route-location">
-                        <span class="flag">${getCountryFlag(mission.departure_country)}</span>
-                        <span>${mission.departure_city}</span>
-                    </div>
-                    <span class="route-arrow">→</span>
-                    <div class="route-location">
-                        <span class="flag">${getCountryFlag(mission.arrival_country)}</span>
-                        <span>${mission.arrival_city}</span>
-                    </div>
+                <div class="gh-meta">
+                    ${weight ? `<span class="gh-pill">${ICON.box}${jEsc(weight)} kg</span>` : ''}
+                    ${date ? `<span class="gh-pill">${ICON.cal}${jEsc(date)}</span>` : ''}
+                    ${price ? `<span class="gh-price">${price.toLocaleString('fr-FR')} <small>FCFA</small></span>` : ''}
                 </div>
-                <div class="mission-details">
-                    <div class="detail-item">
-                        <span><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
-                        <span>${mission.weight || 'N/A'} kg</span>
-                    </div>
-                    <div class="detail-item">
-                        <span><svg class="ic" viewBox="0 0 24 24"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg></span>
-                        <span>${mission.dimensions || 'N/A'}</span>
-                    </div>
-                </div>
-                <div class="mission-footer">
-                    <span class="mission-date">${formatDate(mission.departure_date)}</span>
-                    <span style="font-size:12px;color:rgba(255,255,255,0.45);">Assignée par l'admin</span>
-                </div>
-            `;
-
-            return card;
+            </button>`;
         }
 
-        function getStatusInfo(status) {
-            const statusMap = {
-                'pending': { label: '🔥 Nouveau', class: 'status-new' },
-                'accepted': { label: 'En cours', class: 'status-active' },
-                'in_transit': { label: 'En transit', class: 'status-active' },
-                'picked_up': { label: 'Récupéré', class: 'status-active' },
-                'delivered': { label: 'Terminée', class: 'status-completed' },
-                'cancelled': { label: 'Annulée', class: 'status-cancelled' }
-            };
-            return statusMap[status] || { label: status, class: '' };
+        function renderMissionsSheet() {
+            const counts = { all: ghMissions.length };
+            Object.keys(GROUPS).forEach(k => { counts[k] = ghMissions.filter(m => groupOf(m) === k).length; });
+            const tabs = [['all', 'Toutes']].concat(Object.keys(GROUPS).map(k => [k, GROUPS[k].label]));
+            document.getElementById('ghTabs').innerHTML = tabs.map(([k, l]) =>
+                `<button type="button" class="gh-tab" role="tab" aria-selected="${k === ghFilter}" onclick="setMissionsFilter('${k}')">${l}<b>${counts[k]}</b></button>`).join('');
+            const list = ghFilter === 'all' ? ghMissions : ghMissions.filter(m => groupOf(m) === ghFilter);
+            document.getElementById('sheetSub').textContent = ghLoaded
+                ? (list.length === 0 ? 'Aucune mission' : list.length + (list.length > 1 ? ' missions' : ' mission'))
+                : 'Impossible de charger vos missions';
+            document.getElementById('ghList').innerHTML = list.length
+                ? list.map(missionCardHTML).join('')
+                : `<div class="gh-empty">${ICON.box}<br>${ghLoaded ? 'Aucune mission dans cette catégorie pour le moment.' : 'Vérifiez votre connexion puis réessayez.'}</div>`;
+            document.getElementById('ghList').scrollTop = 0;
         }
 
-        function getStatusType(status) {
-            if (status === 'pending') return 'new';
-            if (status === 'delivered') return 'completed';
-            return 'active';
+        function setMissionsFilter(k) { ghFilter = k; renderMissionsSheet(); }
+
+        async function openMissionsSheet(filter) {
+            ghFilter = filter || 'all';
+            document.getElementById('missionsOverlay').classList.add('show');
+            document.getElementById('scroller').classList.add('is-locked');
+            renderMissionsSheet();
+            await loadMissions();   // rafraîchit à l'ouverture
+            if (document.getElementById('missionsOverlay').classList.contains('show')) renderMissionsSheet();
         }
+
+        function closeMissionsSheet() {
+            document.getElementById('missionsOverlay').classList.remove('show');
+            document.getElementById('scroller').classList.remove('is-locked');
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMissionsSheet(); });
 
         function getCountryFlag(country) {
             const flags = {
@@ -1822,57 +1090,12 @@
             return flags[country] || '🌍';
         }
 
-        function getInitials(name) {
-            if (!name) return '??';
-            const parts = name.split(' ');
-            if (parts.length >= 2) {
-                return parts[0][0] + parts[1][0];
-            }
-            return name.substring(0, 2).toUpperCase();
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return 'Date non définie';
-            const date = new Date(dateString);
-            const options = { day: 'numeric', month: 'short', year: 'numeric' };
-            return `Départ: ${date.toLocaleDateString('fr-FR', options)}`;
-        }
-
         function openProfile() {
             window.location.href = 'profilegp.html';
         }
 
         function createTrip() {
-            // Redirect to trip creation page
             window.location.href = 'creetrajet.html';
-        }
-
-        async function searchMissions() {
-            // Le GP doit avoir au moins un trajet pour voir/accepter des missions.
-            try {
-                const res = await fetch(`${API_BASE_URL}/trips/my-trips?limit=1`, {
-                    headers: { 'Authorization': `Bearer ${authToken}` }
-                });
-                const data = res.ok ? ((await res.json()).data || []) : [];
-                if (data.length > 0) {
-                    window.location.href = 'missions.html';
-                } else {
-                    alert('Veuillez créer un trajet d\'abord pour voir les missions disponibles.');
-                }
-            } catch (e) {
-                // En cas d'erreur réseau, ne pas bloquer.
-                window.location.href = 'missions.html';
-            }
-        }
-
-        function viewAllMissions() {
-            event.preventDefault();
-            window.location.href = 'missions.html';
-        }
-
-        function viewMyMissions() {
-            event.preventDefault();
-            window.location.href = 'trajets.html';
         }
 
         function viewMissionDetails(missionId) {
@@ -1882,46 +1105,15 @@
         }
 
         function navigateTo(section) {
-            // Remove active class from all items
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-
-            // Add active class to clicked item
-            event.currentTarget.classList.add('active');
-
             const pages = {
                 'home': 'dashgp.html',
-                'missions': 'missions.html',
                 'trips': 'trajets.html',
                 'earnings': 'gains.html',
+                'notifications': 'notifications.html',
                 'profile': 'profilegp.html'
             };
-
-            if (pages[section]) {
-                window.location.href = pages[section];
-            }
+            if (pages[section] && section !== 'home') window.location.href = pages[section];
         }
-
-        // Keyboard navigation support
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.click();
-                }
-            });
-        });
-
-        // Animation on load
-        window.addEventListener('load', () => {
-            document.querySelector('.content').style.opacity = '0';
-
-            setTimeout(() => {
-                document.querySelector('.content').style.transition = 'opacity 0.8s ease';
-                document.querySelector('.content').style.opacity = '1';
-            }, 100);
-        });
     </script>
 </body>
 </html>
