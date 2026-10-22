@@ -274,14 +274,14 @@
         };
         const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-        // ---- bottom navigation (expéditeur: 6 tabs like the rest of the redesigned app)
+        // ---- bottom navigation (expéditeur: 5 tabs like the rest of the redesigned app)
         const NAV = {
             expediteur: [
-                ['home', 'Accueil', null, ICON.home], ['orders', 'Envois', null, ICON.box], ['reclamation', 'Alertes', null, ICON.alert],
+                ['home', 'Accueil', null, ICON.home], ['orders', 'Envois', null, ICON.box],
                 ['tracking', 'Suivi', null, ICON.pin], ['notifications', 'Notifications', 'Notifs', ICON.bell], ['profile', 'Profil', null, ICON.user]
             ],
             gp: [
-                ['home', 'Accueil', null, ICON.home], ['missions', 'Missions', null, ICON.search], ['trips', 'Trajets', null, ICON.plane],
+                ['home', 'Accueil', null, ICON.home], ['trips', 'Trajets', null, ICON.plane],
                 ['notifications', 'Notifs', null, ICON.bell], ['profile', 'Profil', null, ICON.user]
             ]
         };
