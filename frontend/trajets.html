@@ -5,463 +5,171 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEN GP - Mes Trajets</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html { background: #F4F8FD; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #F4F8FD;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            color: #0B1D3A;
         }
+        :root { --tj-navy: #0B1D3A; --tj-muted: #6B7A93; --tj-orange: #F7931E; }
 
-        .mobile-frame {
-            width: 100%;
-            max-width: 375px;
-            height: 667px;
-            background: linear-gradient(135deg, rgba(15, 12, 41, 0.95) 0%, rgba(48, 43, 99, 0.95) 50%, rgba(36, 36, 62, 0.95) 100%);
-            border-radius: 40px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            overflow: hidden;
-            position: relative;
-        }
+        /* ============================================
+           MES TRAJETS (GP)
+           ============================================ */
+        .mobile-frame { position: relative; width: 100%; overflow: hidden; background: #F4F8FD; }
+        .mobile-frame::before { content: ""; position: absolute; inset: 0; background: #F4F8FD; }
+        .tj-i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+        button { font: inherit; -webkit-tap-highlight-color: transparent; }
 
-        .status-bar {
-            height: 44px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .time { color: #fff; }
-        .indicators {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-        .signal, .wifi, .battery {
-            width: 18px;
-            height: 12px;
-            background: rgba(255,255,255,0.8);
-            border-radius: 2px;
-        }
-
-        /* Header */
-        .header {
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .back-btn {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateX(-3px);
-        }
-
-        .header-title {
-            flex: 1;
-        }
-
-        .header-title h1 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .header-title p {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .add-trip-btn {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            border: none;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 24px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
-        }
-
-        .add-trip-btn:hover {
-            transform: scale(1.05);
-        }
-
-        /* Content */
-        .content {
-            height: calc(100% - 44px - 85px - 73px);
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .content::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .content::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 6px;
-            border-radius: 16px;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 10px 16px;
-            background: transparent;
-            border: none;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.6);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .tab.active {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #1a1a2e;
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
-        }
-
-        /* Trip Cards */
-        .trip-card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .trip-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        }
-
-        .trip-card.active {
-            border-color: rgba(78, 205, 196, 0.4);
-            background: linear-gradient(135deg, rgba(78, 205, 196, 0.12) 0%, rgba(76, 175, 80, 0.08) 100%);
-        }
-
-        .trip-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .trip-id {
-            font-size: 15px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .trip-status {
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .status-active {
-            background: rgba(78, 205, 196, 0.2);
-            color: #4ECDC4;
-            border: 1px solid rgba(78, 205, 196, 0.3);
-        }
-
-        .status-upcoming {
-            background: rgba(255, 230, 109, 0.2);
-            color: #FFE66D;
-            border: 1px solid rgba(255, 230, 109, 0.3);
-        }
-
-        .status-completed {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4CAF50;
-            border: 1px solid rgba(76, 175, 80, 0.3);
-        }
-
-        .trip-route {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .route-location {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .route-flag {
-            font-size: 32px;
-        }
-
-        .route-text {
-            flex: 1;
-        }
-
-        .route-city {
-            font-size: 16px;
-            color: #ffffff;
-            font-weight: 700;
-            margin-bottom: 2px;
-        }
-
-        .route-country {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .route-arrow {
-            font-size: 24px;
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        /* Trip Details */
-        .trip-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .detail-box {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 12px;
-            border-radius: 12px;
-        }
-
-        .detail-label {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.5);
-            margin-bottom: 4px;
-            text-transform: uppercase;
-        }
-
-        .detail-value {
-            font-size: 14px;
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        /* Packages Section */
-        .packages-section {
-            margin-bottom: 16px;
-        }
-
-        .section-title-small {
-            font-size: 12px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-
-        .package-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .package-info {
-            flex: 1;
-        }
-
-        .package-client {
-            font-size: 13px;
-            color: #ffffff;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .package-details {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .package-price {
-            font-size: 16px;
-            font-weight: 700;
-            color: #FFD700;
-        }
-
-        /* Earnings Summary */
-        .earnings-summary {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 165, 0, 0.12) 100%);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .earnings-label {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 600;
-        }
-
-        .earnings-amount {
-            font-size: 20px;
-            font-weight: 700;
-            color: #FFD700;
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 12px 16px;
-            border: none;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
-            color: #ffffff;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(78, 205, 196, 0.5);
-        }
-
-        /* Bottom Navigation (unified GP nav) */
-        .bottom-nav {
+        .tj-scroll {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(18, 16, 36, 0.92);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-top: 1px solid rgba(255, 255, 255, 0.07);
-            display: flex;
-            justify-content: space-around;
-            align-items: stretch;
-            padding: 9px 6px calc(9px + env(safe-area-inset-bottom));
-            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35);
+            top: 0; left: 0; right: 0;
+            bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+            overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            cursor: pointer;
-            flex: 1;
-            position: relative;
-            padding: 6px 0;
-            border-radius: 14px;
-            color: rgba(255, 255, 255, 0.5);
-            transition: color 0.25s ease;
-            -webkit-tap-highlight-color: transparent;
+        .tj-scroll::-webkit-scrollbar { display: none; }
+        .tj-scroll.is-locked { overflow: hidden; }
+
+        /* ---- hero ---- */
+        .tj-hero { position: relative; height: calc(222px + env(safe-area-inset-top, 0px)); overflow: hidden; background: linear-gradient(180deg, #0B1D3A, #2B4A7A); }
+        .tj-hero img.tj-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 78% 30%; }
+        .tj-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7, 20, 47, 0.55) 0%, rgba(7, 20, 47, 0.08) 62%, rgba(7, 20, 47, 0) 100%), linear-gradient(180deg, rgba(244, 248, 253, 0) 74%, #F4F8FD 100%); }
+        .tj-hero__in { position: absolute; z-index: 2; left: 0; right: 0; top: env(safe-area-inset-top, 0px); max-width: 480px; margin: 0 auto; padding: 18px 16px 0; display: flex; align-items: flex-start; gap: 12px; }
+        .tj-back { width: 46px; height: 46px; flex-shrink: 0; margin-top: 14px; display: flex; align-items: center; justify-content: center; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(40, 56, 90, 0.55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff; cursor: pointer; }
+        .tj-back .tj-i { width: 22px; height: 22px; }
+        .tj-back:active { transform: scale(0.95); }
+        .tj-brand img { display: block; width: 112px; height: auto; filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45)); }
+        .tj-brand span { display: block; margin-top: 1px; font-size: 8.5px; font-weight: 700; letter-spacing: 0.3px; color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7); white-space: nowrap; }
+        .tj-add { margin-left: auto; margin-top: 10px; display: flex; align-items: center; gap: 8px; padding: 10px 16px 10px 12px; border: 0; border-radius: 18px; background: linear-gradient(135deg, #FBBF24, #F7931E); color: var(--tj-navy); font-size: 15px; font-weight: 800; line-height: 1.15; text-align: left; cursor: pointer; box-shadow: 0 10px 24px rgba(247, 147, 30, 0.4); }
+        .tj-add .tj-i { width: 24px; height: 24px; stroke-width: 2.6; }
+        .tj-add:active { transform: scale(0.97); }
+        .tj-title { position: absolute; z-index: 2; left: 0; right: 0; bottom: 46px; max-width: 480px; margin: 0 auto; padding: 0 20px; }
+        .tj-title h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.1; color: #fff; text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6); }
+        .tj-title h1 em { font-style: normal; color: #FFA52B; }
+        .tj-title p { margin-top: 4px; font-size: 18px; color: #EEF3FB; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.65); }
+
+        .tj-body { position: relative; z-index: 3; max-width: 480px; margin: -26px auto 0; padding: 0 14px 26px; }
+
+        /* ---- tabs ---- */
+        .tj-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 6px; background: #fff; border-radius: 22px; box-shadow: 0 10px 30px rgba(11, 29, 58, 0.08); }
+        .tj-tab { min-width: 0; min-height: 66px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 6px 8px; border: 0; border-radius: 18px; background: none; color: #44526B; font-size: 16px; font-weight: 700; line-height: 1.2; text-align: left; cursor: pointer; transition: background 0.2s ease; }
+        .tj-tab .tj-i { width: 28px; height: 28px; }
+        .tj-tab[aria-selected="true"] { background: linear-gradient(135deg, #FB923C, #FBBF24); color: var(--tj-navy); box-shadow: 0 8px 20px rgba(247, 147, 30, 0.32); }
+        .tj-tab small { display: block; font-size: inherit; font-weight: inherit; }
+
+        /* ---- list ---- */
+        .tj-list { margin-top: 16px; display: flex; flex-direction: column; gap: 14px; }
+        .tj-card { position: relative; width: 100%; padding: 16px 16px 14px; background: #fff; border-radius: 26px; box-shadow: 0 8px 24px rgba(11, 29, 58, 0.07); overflow: hidden; animation: tjIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 50ms); }
+        .tj-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--tj-acc, #F7931E); }
+        .tj-card__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .tj-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: var(--tj-chipbg); color: var(--tj-chipfg); font-size: 13.5px; font-weight: 800; }
+        .tj-chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+        .tj-code { font-size: 13px; font-weight: 700; color: var(--tj-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .tj-route { margin-top: 14px; display: flex; align-items: center; gap: 8px; }
+        .tj-city { min-width: 0; flex: 0 1 auto; }
+        .tj-city b { display: block; font-size: 22px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.15; overflow-wrap: anywhere; }
+        .tj-city span { display: flex; align-items: center; gap: 7px; margin-top: 3px; font-size: 14px; color: var(--tj-muted); }
+        .tj-city:last-child { text-align: right; }
+        .tj-city:last-child span { justify-content: flex-end; }
+        .tj-flag { width: 24px; height: 17px; flex-shrink: 0; border-radius: 4px; overflow: hidden; background: #DCE5F3; box-shadow: 0 0 0 1px rgba(11, 29, 58, 0.1); display: inline-flex; }
+        .tj-flag svg { width: 100%; height: 100%; display: block; }
+        .tj-path { flex: 1; min-width: 30px; display: flex; align-items: center; color: var(--tj-acc, #F7931E); }
+        .tj-path::before, .tj-path::after { content: ""; flex: 1; height: 0; border-top: 2px dashed currentColor; opacity: 0.45; }
+        .tj-path .tj-i { width: 24px; height: 24px; margin: 0 4px; transform: rotate(45deg); }
+        .tj-facts { margin-top: 14px; padding-top: 12px; border-top: 1px dashed #E3EAF3; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .tj-fact { padding: 9px 12px; border-radius: 14px; background: #F1F5FA; min-width: 0; }
+        .tj-fact small { display: block; font-size: 13px; color: var(--tj-muted); }
+        .tj-fact b { display: block; margin-top: 1px; font-size: 15.5px; font-weight: 800; overflow-wrap: anywhere; }
+        .tj-actions { margin-top: 14px; display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; }
+        .tj-btn { min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 16px; font-size: 16px; font-weight: 800; cursor: pointer; transition: transform 0.15s ease; }
+        .tj-btn:active { transform: scale(0.985); }
+        .tj-btn--ghost { background: #EAEFF7; color: var(--tj-navy); }
+        .tj-btn--main { background: linear-gradient(90deg, #0A84FF, #6D4AF5); color: #fff; box-shadow: 0 10px 22px rgba(79, 70, 229, 0.28); }
+
+        /* ---- empty / loading ---- */
+        .tj-empty { margin-top: 16px; padding: 8px 14px 16px; background: #fff; border-radius: 28px; box-shadow: 0 8px 26px rgba(11, 29, 58, 0.06); text-align: center; }
+        .tj-art { position: relative; height: 232px; margin: 0 -14px; overflow: hidden; border-radius: 28px 28px 0 0; }
+        .tj-art__bg { position: absolute; inset: 0; background: url("im/sengp-trips-empty.webp") center 30% / cover no-repeat; opacity: 0.55; -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent 100%); mask-image: linear-gradient(180deg, #000 55%, transparent 100%); }
+        .tj-art__bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #fff 0%, rgba(255, 255, 255, 0) 22%, rgba(255, 255, 255, 0) 78%, #fff 100%); }
+        .tj-art img { position: absolute; left: 50%; bottom: 6px; width: 46%; max-width: 190px; height: auto; transform: translateX(-50%); filter: drop-shadow(0 12px 14px rgba(11, 29, 58, 0.22)); }
+        .tj-art svg { position: absolute; left: 14%; top: 14px; width: 24%; max-width: 100px; height: auto; overflow: visible; }
+        .tj-empty h2 { margin-top: 2px; font-size: 22px; font-weight: 800; letter-spacing: -0.3px; }
+        .tj-empty > p { margin: 8px auto 0; max-width: 320px; font-size: 16px; line-height: 1.45; color: var(--tj-muted); }
+        .tj-cta { margin: 16px auto 0; min-height: 60px; display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 0 34px; border: 0; border-radius: 999px; background: linear-gradient(90deg, #0A84FF, #6D4AF5); color: #fff; font-size: 19px; font-weight: 800; cursor: pointer; box-shadow: 0 12px 26px rgba(79, 70, 229, 0.32); }
+        .tj-cta .tj-i { width: 24px; height: 24px; stroke-width: 2.6; }
+        .tj-cta:active { transform: scale(0.985); }
+        .tj-tip { margin-top: 16px; width: 100%; display: flex; align-items: center; gap: 14px; padding: 14px 14px; border: 0; border-radius: 20px; background: #FFF4E4; text-align: left; color: inherit; cursor: pointer; }
+        .tj-tip > .tj-i:first-child { width: 36px; height: 36px; color: #F59E0B; padding-right: 12px; box-sizing: content-box; border-right: 1px solid #F3DDB8; }
+        .tj-tip b { display: block; font-size: 17px; font-weight: 800; color: #E8780C; }
+        .tj-tip p { margin-top: 2px; font-size: 15px; line-height: 1.4; color: #5B4B33; }
+        .tj-tip > .tj-i:last-child { margin-left: auto; width: 22px; height: 22px; color: #6B7A93; }
+        .tj-loading { margin-top: 30px; text-align: center; color: var(--tj-muted); font-size: 16px; }
+        .tj-loading i { display: block; width: 34px; height: 34px; margin: 0 auto 12px; border-radius: 50%; border: 4px solid #D9E4F5; border-top-color: #2F6BFF; animation: tjSpin 0.9s linear infinite; }
+        @keyframes tjSpin { to { transform: rotate(360deg); } }
+        @keyframes tjIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+        /* ---- bottom nav ---- */
+        .tj-nav { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; height: calc(76px + env(safe-area-inset-bottom, 0px)); padding: 6px 4px env(safe-area-inset-bottom, 0px); display: flex; gap: 2px; background: rgba(255, 255, 255, 0.97); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid #E3EAF3; box-shadow: 0 -8px 24px rgba(11, 29, 58, 0.06); }
+        .tj-nav__item { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; border-radius: 18px; background: none; color: var(--tj-muted); font-size: 12.5px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+        .tj-nav__item[aria-current="page"] { background: #FFF1DE; color: #E8780C; font-weight: 700; }
+        .tj-nav__icon { position: relative; display: flex; }
+        .tj-nav__icon .tj-i { width: 26px; height: 26px; }
+        .tj-nav .bell-badge { position: absolute; top: -6px; right: -9px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #EF4444; border: 2px solid #fff; color: #fff; font-size: 10.5px; font-weight: 800; line-height: 14px; text-align: center; }
+        .tj-nav .bell-badge.hidden { display: none; }
+        .lbl-short { display: none; }
+        @media (max-width: 460px) { .lbl-long { display: none; } .lbl-short { display: inline; } }
+
+        /* ---- detail sheet ---- */
+        .tj-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; background: rgba(7, 20, 47, 0.52); opacity: 0; pointer-events: none; transition: opacity 0.28s ease; }
+        .tj-overlay.show { opacity: 1; pointer-events: auto; }
+        .tj-sheet { width: 100%; max-width: 480px; max-height: 86dvh; display: flex; flex-direction: column; background: #F4F8FD; border-radius: 28px 28px 0 0; box-shadow: 0 -12px 40px rgba(7, 20, 47, 0.25); transform: translateY(100%); transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1); }
+        .tj-overlay.show .tj-sheet { transform: none; }
+        .tj-sheet__grab { padding: 10px 0 2px; display: flex; justify-content: center; }
+        .tj-sheet__grab i { width: 44px; height: 5px; border-radius: 3px; background: #CBD4E3; }
+        .tj-sheet__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 20px; }
+        .tj-sheet__head h3 { font-size: 22px; font-weight: 800; }
+        .tj-sheet__head p { margin-top: 2px; font-size: 14.5px; color: var(--tj-muted); }
+        .tj-close { width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: #E6ECF5; color: var(--tj-navy); cursor: pointer; }
+        .tj-close .tj-i { width: 20px; height: 20px; }
+        .tj-sheet__body { overflow-y: auto; overscroll-behavior: contain; padding: 6px 16px calc(22px + env(safe-area-inset-bottom, 0px)); }
+        .tj-sheet__body .tj-card { box-shadow: none; animation: none; }
+
+        .tj-back:focus-visible, .tj-add:focus-visible, .tj-tab:focus-visible, .tj-btn:focus-visible, .tj-cta:focus-visible, .tj-tip:focus-visible, .tj-nav__item:focus-visible, .tj-close:focus-visible { outline: 2px solid #2F6BFF; outline-offset: 2px; }
+        @media (prefers-reduced-motion: reduce) { .tj-card, .tj-loading i { animation: none; } * { transition-duration: 0.01ms !important; } }
+
+        /* PWA install banner (pwa.js): keep it compact */
+        #sengp-install-banner { bottom: 8px !important; padding: 8px 12px !important; gap: 10px !important; font-size: 12px !important; line-height: 1.3 !important; border-radius: 14px !important; }
+        #sengp-install-banner img { width: 34px !important; height: 34px !important; }
+        #sengp-install-banner strong { font-size: 13px !important; }
+
+        @media (max-width: 400px) {
+            .tj-title h1 { font-size: 30px; }
+            .tj-title p { font-size: 16.5px; }
+            .tj-tab { flex-direction: column; gap: 4px; text-align: center; font-size: 14.5px; }
+            .tj-tab .tj-i { width: 24px; height: 24px; }
+            .tj-add { font-size: 14px; padding: 9px 12px 9px 9px; }
         }
-        .nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
-        .nav-icon svg {
-            width: 24px; height: 24px; fill: none; stroke: currentColor;
-            stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
-            transition: transform 0.25s ease;
+        @media (max-width: 359px) {
+            .tj-body { padding-left: 10px; padding-right: 10px; }
+            .tj-title h1 { font-size: 27px; }
+            .tj-add span { display: none; }
+            .tj-add { padding: 10px; border-radius: 16px; }
+            .tj-tab { font-size: 13px; }
+            .tj-city b { font-size: 19px; }
+            .tj-fact { padding: 8px 10px; }
+            .tj-fact b { font-size: 14px; }
+            .tj-cta { padding: 0 24px; font-size: 17px; }
         }
-        .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2px; color: inherit; }
-        .nav-item.active { color: #FFC107; }
-        .nav-item.active .nav-icon svg { transform: translateY(-1px) scale(1.06); }
-        .nav-item.active::after {
-            content: ''; position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
-            width: 26px; height: 3px; border-radius: 0 0 3px 3px;
-            background: linear-gradient(90deg, #FFD700, #FFA500);
-        }
-        .nav-item:not(.active):active { color: rgba(255, 255, 255, 0.85); }
-        .nav-badge {
-            position: absolute; top: 0px; left: calc(50% + 5px);
-            min-width: 17px; height: 17px; background: #FF4757;
-            border: 1.5px solid #121024; border-radius: 9px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 9px; font-weight: 800; color: white; padding: 0 4px;
-        }
-        .nav-badge.new { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #1a1a2e; }
-        .nav-badge.hidden { display: none; }
-            /* sengp-responsive-override */
-        .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
-        body{padding:0!important;}
-        </style>
+    </style>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -476,116 +184,162 @@
     <script src="pwa.js" defer></script>
 </head>
 <body class="ds">
-    <div class="mobile-frame">
+<div class="mobile-frame">
 
-        <!-- Header -->
-        <div class="header">
-            <button class="back-btn" onclick="goBack()">←</button>
-            <div class="header-title">
-                <h1>Mes Trajets</h1>
-                <p>Gérez vos missions</p>
+    <div class="content tj-scroll" id="scroller">
+        <header class="tj-hero">
+            <picture>
+                <source type="image/webp" srcset="im/sengp-create-background.webp">
+                <img class="tj-bg" src="im/sengp-create-background.jpg" alt="" decoding="async">
+            </picture>
+            <div class="tj-hero__in">
+                <button type="button" class="tj-back" onclick="goBack()" aria-label="Retour">
+                    <svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <div class="tj-brand">
+                    <img src="im/sengp-logo.png" alt="SEN GP" width="112" height="69">
+                    <span>VOS COLIS, NOTRE ENGAGEMENT</span>
+                </div>
+                <button type="button" class="tj-add" onclick="addTrip()" aria-label="Créer un trajet">
+                    <svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                    <span>Créer<br>un trajet</span>
+                </button>
             </div>
-            <button class="add-trip-btn" onclick="addTrip()">+</button>
-        </div>
-
-        <!-- Content -->
-        <div class="content">
-            <!-- Tabs -->
-            <div class="tabs">
-                <button class="tab active" id="tab-active" onclick="switchTab('active', this)">En cours (0)</button>
-                <button class="tab" id="tab-upcoming" onclick="switchTab('upcoming', this)">À venir (0)</button>
-                <button class="tab" id="tab-completed" onclick="switchTab('completed', this)">Terminés (0)</button>
+            <div class="tj-title">
+                <h1>Mes <em>Trajets</em></h1>
+                <p>Gérez tous vos voyages</p>
             </div>
+        </header>
 
-            <div id="tripsLoading" style="text-align:center;padding:50px 20px;color:rgba(255,255,255,0.6);font-size:13px;">
-                Chargement de vos trajets…
-            </div>
-            <div id="tripsEmpty" style="display:none;text-align:center;padding:50px 20px;color:rgba(255,255,255,0.6);">
-                <div style="font-size:44px;margin-bottom:12px;"><svg class="ic" viewBox="0 0 24 24"><path d="M6 20a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 20v2M14 20v2M12 6v14"/></svg></div>
-                <div id="tripsEmptyText" style="font-size:14px;line-height:1.5;">Aucun trajet ici.<br>Créez votre premier trajet avec le bouton +.</div>
-            </div>
-            <div id="tripsList"></div>
-
-        </div>
-
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <div class="nav-item" onclick="navigateTo('home')" tabindex="0" role="button" aria-label="Accueil">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
-                <div class="nav-label">Accueil</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('missions')" tabindex="0" role="button" aria-label="Missions">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
-                <div class="nav-label">Missions</div>
-            </div>
-
-            <div class="nav-item active" onclick="navigateTo('trips')" tabindex="0" role="button" aria-label="Trajets">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
-                <div class="nav-label">Trajets</div>
+        <div class="tj-body">
+            <div class="tj-tabs" role="tablist" aria-label="Catégories de trajets">
+                <button type="button" class="tj-tab" id="tab-active" role="tab" aria-selected="true" onclick="switchTab('active')">
+                    <svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                    <span>En cours<small id="cnt-active">(0)</small></span>
+                </button>
+                <button type="button" class="tj-tab" id="tab-upcoming" role="tab" aria-selected="false" onclick="switchTab('upcoming')">
+                    <svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    <span>À venir<small id="cnt-upcoming">(0)</small></span>
+                </button>
+                <button type="button" class="tj-tab" id="tab-completed" role="tab" aria-selected="false" onclick="switchTab('completed')">
+                    <svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                    <span>Terminés<small id="cnt-completed">(0)</small></span>
+                </button>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('earnings')" tabindex="0" role="button" aria-label="Gains">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-                <div class="nav-label">Gains</div>
-            </div>
+            <div class="tj-loading" id="tripsLoading"><i></i>Chargement de vos trajets…</div>
+            <div class="tj-list" id="tripsList"></div>
 
-            <div class="nav-item" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
-                <div class="nav-label">Profil</div>
-            </div>
+            <section class="tj-empty" id="tripsEmpty" style="display: none;">
+                <div class="tj-art" aria-hidden="true">
+                    <div class="tj-art__bg"></div>
+                    <svg viewBox="0 0 100 70"><path d="M8 62C0 40 14 24 34 26" fill="none" stroke="#2F6BFF" stroke-width="2" stroke-dasharray="3 4" stroke-linecap="round"/><path d="M96 4 44 22l17 7 6 17z" fill="#2F8BFF"/><path d="M96 4 61 29l6 17" fill="#1E6FE0"/></svg>
+                    <img src="im/sengp-suitcase.webp" alt="" width="420" height="386">
+                </div>
+                <h2 id="emptyTitle">Aucun trajet dans cette catégorie</h2>
+                <p id="emptyText">Créez un trajet pour commencer à recevoir des missions.</p>
+                <button type="button" class="tj-cta" id="emptyCta" onclick="addTrip()"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span id="emptyCtaLabel">Créer un trajet</span></button>
+                <button type="button" class="tj-tip" id="emptyTip" onclick="addTrip()">
+                    <svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                    <span><b>Conseil</b><p>Créez un trajet dès maintenant pour voir les missions disponibles sur votre itinéraire.</p></span>
+                    <svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+            </section>
         </div>
     </div>
 
+    <!-- Bottom navigation -->
+    <nav class="tj-nav" aria-label="Navigation principale">
+        <button type="button" class="tj-nav__item" onclick="navigateTo('home')">
+            <span class="tj-nav__icon"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span>Accueil</span>
+        </button>
+        <button type="button" class="tj-nav__item" aria-current="page" onclick="navigateTo('trips')">
+            <span class="tj-nav__icon"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span><span>Trajets</span>
+        </button>
+        <button type="button" class="tj-nav__item" onclick="navigateTo('earnings')">
+            <span class="tj-nav__icon"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span>Gains</span>
+        </button>
+        <button type="button" class="tj-nav__item" onclick="navigateTo('notifications')">
+            <span class="tj-nav__icon"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="bell-badge hidden" id="notifNavBadge">0</span></span><span class="lbl-long">Notifications</span><span class="lbl-short">Notifs</span>
+        </button>
+        <button type="button" class="tj-nav__item" onclick="navigateTo('profile')">
+            <span class="tj-nav__icon"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span>Profil</span>
+        </button>
+    </nav>
+
+    <!-- Bottom sheet : détail d'un trajet -->
+    <div class="tj-overlay" id="sheetOverlay" onclick="if (event.target === this) closeSheet()">
+        <div class="tj-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+            <div class="tj-sheet__grab"><i></i></div>
+            <div class="tj-sheet__head">
+                <div><h3 id="sheetTitle">Détails du trajet</h3><p id="sheetSub"></p></div>
+                <button type="button" class="tj-close" onclick="closeSheet()" aria-label="Fermer"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+            </div>
+            <div class="tj-sheet__body" id="sheetBody"></div>
+        </div>
+    </div>
+</div>
     <script>
         const API_BASE_URL = window.API_BASE_URL;
         const authToken = localStorage.getItem('authToken');
+        const $ = id => document.getElementById(id);
 
         let allTrips = [];
         let currentBucket = 'active';
+        let loadFailed = false;
 
         const BUCKETS = {
             active: ['active'],
             upcoming: ['published', 'draft'],
             completed: ['completed', 'cancelled']
         };
-
-        const FLAGS = {
-            'Sénégal': '🇸🇳', 'Senegal': '🇸🇳', 'France': '🇫🇷', 'Espagne': '🇪🇸',
-            'Italie': '🇮🇹', 'USA': '🇺🇸', 'États-Unis': '🇺🇸', 'Etats-Unis': '🇺🇸',
-            'Canada': '🇨🇦', 'Royaume-Uni': '🇬🇧', 'Angleterre': '🇬🇧', 'Allemagne': '🇩🇪',
-            'Belgique': '🇧🇪', 'Maroc': '🇲🇦', 'Mali': '🇲🇱', 'Côte d\'Ivoire': '🇨🇮'
+        const EMPTY_TEXT = {
+            active: 'Vous n\'avez pas encore de trajet en cours.',
+            upcoming: 'Vous n\'avez pas encore de trajet à venir.',
+            completed: 'Vous n\'avez pas encore de trajet terminé.'
         };
-        function flagFor(c) { return FLAGS[c] || '🌍'; }
+
+        // Drapeaux en SVG (les emoji drapeaux ne s'affichent pas sous Windows)
+        const FLAGS = {
+            'Sénégal': '<rect width="10" height="20" fill="#00853F"/><rect x="10" width="10" height="20" fill="#FDEF42"/><rect x="20" width="10" height="20" fill="#E31B23"/><path d="m15 6.5 1.2 3.6h3.8l-3.1 2.2 1.2 3.6-3.1-2.2-3.1 2.2 1.2-3.6L10 10.1h3.8z" fill="#00853F"/>',
+            'France': '<rect width="10" height="20" fill="#0055A4"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#EF4135"/>',
+            'Espagne': '<rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/>',
+            'Italie': '<rect width="10" height="20" fill="#009246"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#CE2B37"/>',
+            'USA': '<rect width="30" height="20" fill="#fff"/><g fill="#B22234"><rect width="30" height="1.6"/><rect y="3.1" width="30" height="1.6"/><rect y="6.2" width="30" height="1.6"/><rect y="9.2" width="30" height="1.6"/><rect y="12.3" width="30" height="1.6"/><rect y="15.4" width="30" height="1.6"/><rect y="18.4" width="30" height="1.6"/></g><rect width="13" height="10.8" fill="#3C3B6E"/>',
+            'Canada': '<rect width="30" height="20" fill="#fff"/><rect width="7.5" height="20" fill="#D52B1E"/><rect x="22.5" width="7.5" height="20" fill="#D52B1E"/><path d="m15 4 1.6 3.2 2.2-.8-.8 4 1.6-.4-3.4 4 .2 1.6h-3l.2-1.6-3.4-4 1.6.4-.8-4 2.2.8z" fill="#D52B1E"/>',
+            'Algérie': '<rect width="15" height="20" fill="#006233"/><rect x="15" width="15" height="20" fill="#fff"/><circle cx="15.4" cy="10" r="4.6" fill="#D21034"/><circle cx="16.6" cy="10" r="3.8" fill="#fff"/><path d="m17.8 8.2.6 1.7h1.8l-1.5 1.1.6 1.7-1.5-1.1-1.5 1.1.6-1.7-1.5-1.1h1.8z" fill="#D21034"/>'
+        };
+        const FLAG_ALIAS = { 'Senegal': 'Sénégal', 'États-Unis': 'USA', 'Etats-Unis': 'USA' };
+        const GLOBE = '<rect width="30" height="20" fill="#DCE8FB"/><circle cx="15" cy="10" r="6" fill="none" stroke="#2F6BFF" stroke-width="1.4"/><path d="M9 10h12M15 4c2.5 3 2.5 9 0 12M15 4c-2.5 3-2.5 9 0 12" fill="none" stroke="#2F6BFF" stroke-width="1.1"/>';
+        function flagFor(c) {
+            const k = FLAG_ALIAS[c] || c;
+            return '<span class="tj-flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + (FLAGS[k] || GLOBE) + '</svg></span>';
+        }
         function esc(s) {
-            return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
         function formatDateTime(d) {
             if (!d) return '—';
             try {
                 const dt = new Date(d);
+                if (isNaN(dt)) return '—';
                 return dt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ', ' +
                        dt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
             } catch (e) { return '—'; }
         }
         function statusMeta(s) {
             switch (s) {
-                case 'active': return { cls: 'status-active', label: '<svg class="ic" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg> En cours' };
-                case 'published': return { cls: 'status-upcoming', label: '<svg class="ic" viewBox="0 0 24 24"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg> Ouvert' };
-                case 'draft': return { cls: 'status-upcoming', label: '<svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8"/></svg> Brouillon' };
-                case 'completed': return { cls: 'status-completed', label: '<svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Terminé' };
-                case 'cancelled': return { cls: 'status-completed', label: '<svg class="ic" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Annulé' };
-                default: return { cls: 'status-upcoming', label: s || '—' };
+                case 'active': return { label: 'En cours', acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' };
+                case 'published': return { label: 'Ouvert', acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' };
+                case 'draft': return { label: 'Brouillon', acc: '#94A3B8', bg: '#EDF1F6', fg: '#64748B' };
+                case 'completed': return { label: 'Terminé', acc: '#17A34A', bg: '#D9F5E6', fg: '#13803F' };
+                case 'cancelled': return { label: 'Annulé', acc: '#94A3B8', bg: '#EDF1F6', fg: '#64748B' };
+                default: return { label: s || '—', acc: '#94A3B8', bg: '#EDF1F6', fg: '#64748B' };
             }
         }
 
-        function goBack() {
-            window.location.href = 'dashgp.html';
-        }
-
-        function addTrip() {
-            window.location.href = 'creetrajet.html';
-        }
+        function goBack() { window.location.href = 'dashgp.html'; }
+        function addTrip() { window.location.href = 'creetrajet.html'; }
 
         async function loadTrips() {
             if (!authToken) {
@@ -593,27 +347,27 @@
                 window.location.href = 'connexion.html';
                 return;
             }
+            loadFailed = false;
+            $('tripsLoading').style.display = '';
+            $('tripsEmpty').style.display = 'none';
             try {
                 const res = await fetch(`${API_BASE_URL}/trips/my-trips?limit=100`, {
                     headers: { 'Authorization': `Bearer ${authToken}` }
                 });
                 if (!res.ok) throw new Error('Échec du chargement');
-                const json = await res.json();
-                allTrips = json.data || [];
-                document.getElementById('tripsLoading').style.display = 'none';
+                allTrips = (await res.json()).data || [];
+                $('tripsLoading').style.display = 'none';
                 updateTabCounts();
                 // Sélectionner par défaut le premier onglet non vide.
-                const order = ['active', 'upcoming', 'completed'];
-                const firstNonEmpty = order.find(b => bucketTrips(b).length > 0);
-                if (firstNonEmpty) setActiveTab(firstNonEmpty);
-                renderTrips();
+                const firstNonEmpty = ['active', 'upcoming', 'completed'].find(b => bucketTrips(b).length > 0);
+                if (firstNonEmpty) currentBucket = firstNonEmpty;
             } catch (e) {
                 console.error('Erreur chargement trajets:', e);
-                document.getElementById('tripsLoading').style.display = 'none';
-                document.getElementById('tripsEmptyText').innerHTML =
-                    'Impossible de charger vos trajets.<br>Vérifiez votre connexion.';
-                document.getElementById('tripsEmpty').style.display = 'block';
+                loadFailed = true;
+                $('tripsLoading').style.display = 'none';
             }
+            renderTabs();
+            renderTrips();
         }
 
         function bucketTrips(bucket) {
@@ -622,107 +376,99 @@
         }
 
         function updateTabCounts() {
-            document.getElementById('tab-active').textContent = `En cours (${bucketTrips('active').length})`;
-            document.getElementById('tab-upcoming').textContent = `À venir (${bucketTrips('upcoming').length})`;
-            document.getElementById('tab-completed').textContent = `Terminés (${bucketTrips('completed').length})`;
+            ['active', 'upcoming', 'completed'].forEach(b => { $('cnt-' + b).textContent = `(${bucketTrips(b).length})`; });
         }
 
-        function setActiveTab(bucket) {
-            currentBucket = bucket;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            const el = document.getElementById('tab-' + bucket);
-            if (el) el.classList.add('active');
+        function renderTabs() {
+            ['active', 'upcoming', 'completed'].forEach(b => $('tab-' + b).setAttribute('aria-selected', String(b === currentBucket)));
         }
 
-        function switchTab(bucket, element) {
+        function switchTab(bucket) {
             currentBucket = bucket;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            if (element) element.classList.add('active');
+            renderTabs();
             renderTrips();
         }
 
-        function tripCard(t) {
+        function tripCard(t, i, inSheet) {
             const st = statusMeta(t.status);
             const cap = `${t.current_packages || 0}/${t.max_packages || 0} colis`;
             const isOpen = t.status === 'published' || t.status === 'draft';
+            const buttons = inSheet ? '' : `
+                <div class="tj-actions">
+                    <button type="button" class="tj-btn tj-btn--ghost" onclick="viewTripDetails('${esc(t.id)}')">Détails</button>
+                    <button type="button" class="tj-btn tj-btn--main" onclick="navigateTo('missions')">${isOpen ? 'Chercher colis' : 'Voir missions'}</button>
+                </div>`;
             return `
-            <div class="trip-card${t.status === 'active' ? ' active' : ''}">
-                <div class="trip-header">
-                    <span class="trip-id">${esc(t.trip_code || '')}</span>
-                    <span class="trip-status ${st.cls}">${st.label}</span>
+            <article class="tj-card" style="--i:${Math.min(i || 0, 8)};--tj-acc:${st.acc};--tj-chipbg:${st.bg};--tj-chipfg:${st.fg}">
+                <div class="tj-card__top"><span class="tj-chip">${st.label}</span><span class="tj-code">${esc(t.trip_code || '')}</span></div>
+                <div class="tj-route">
+                    <div class="tj-city"><b>${esc(t.departure_city || '—')}</b><span>${flagFor(t.departure_country)}${esc(t.departure_country || '')}</span></div>
+                    <div class="tj-path"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
+                    <div class="tj-city"><b>${esc(t.arrival_city || '—')}</b><span>${flagFor(t.arrival_country)}${esc(t.arrival_country || '')}</span></div>
                 </div>
-                <div class="trip-route">
-                    <div class="route-location">
-                        <span class="route-flag">${flagFor(t.departure_country)}</span>
-                        <div class="route-text">
-                            <div class="route-city">${esc(t.departure_city || '—')}</div>
-                            <div class="route-country">${esc(t.departure_country || '')}</div>
-                        </div>
-                    </div>
-                    <span class="route-arrow">→</span>
-                    <div class="route-location">
-                        <span class="route-flag">${flagFor(t.arrival_country)}</span>
-                        <div class="route-text">
-                            <div class="route-city">${esc(t.arrival_city || '—')}</div>
-                            <div class="route-country">${esc(t.arrival_country || '')}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="trip-details">
-                    <div class="detail-box">
-                        <div class="detail-label">Départ</div>
-                        <div class="detail-value">${formatDateTime(t.departure_date)}</div>
-                    </div>
-                    <div class="detail-box">
-                        <div class="detail-label">Arrivée</div>
-                        <div class="detail-value">${formatDateTime(t.arrival_date)}</div>
-                    </div>
-                </div>
-                <div class="trip-details">
-                    <div class="detail-box">
-                        <div class="detail-label">Capacité</div>
-                        <div class="detail-value">${parseFloat(t.available_weight) || 0} kg</div>
-                    </div>
-                    <div class="detail-box">
-                        <div class="detail-label">Colis acceptés</div>
-                        <div class="detail-value">${cap}</div>
-                    </div>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-secondary" onclick="viewTripDetails('${t.id}')">Détails</button>
-                    ${isOpen
-                        ? `<button class="btn btn-primary" onclick="navigateTo('missions')">Chercher colis</button>`
-                        : `<button class="btn btn-primary" onclick="navigateTo('missions')">Voir missions</button>`}
-                </div>
-            </div>`;
+                <div class="tj-facts">
+                    <div class="tj-fact"><small>Départ</small><b>${formatDateTime(t.departure_date)}</b></div>
+                    <div class="tj-fact"><small>Arrivée</small><b>${formatDateTime(t.arrival_date)}</b></div>
+                    <div class="tj-fact"><small>Capacité</small><b>${parseFloat(t.available_weight) || 0} kg</b></div>
+                    <div class="tj-fact"><small>Colis acceptés</small><b>${cap}</b></div>
+                </div>${buttons}
+            </article>`;
         }
 
         function renderTrips() {
             const list = bucketTrips(currentBucket);
-            const container = document.getElementById('tripsList');
-            const empty = document.getElementById('tripsEmpty');
-            if (list.length === 0) {
+            const container = $('tripsList');
+            const empty = $('tripsEmpty');
+            if (loadFailed || list.length === 0) {
                 container.innerHTML = '';
-                document.getElementById('tripsEmptyText').innerHTML =
-                    'Aucun trajet dans cette catégorie.<br>Créez un trajet avec le bouton +.';
+                if (loadFailed) {
+                    $('emptyTitle').textContent = 'Impossible de charger vos trajets';
+                    $('emptyText').textContent = 'Vérifiez votre connexion puis réessayez.';
+                    $('emptyCtaLabel').textContent = 'Réessayer';
+                    $('emptyCta').onclick = loadTrips;
+                    $('emptyTip').style.display = 'none';
+                } else {
+                    $('emptyTitle').textContent = 'Aucun trajet dans cette catégorie';
+                    $('emptyText').textContent = EMPTY_TEXT[currentBucket] + ' Créez un trajet pour commencer à recevoir des missions.';
+                    $('emptyCtaLabel').textContent = 'Créer un trajet';
+                    $('emptyCta').onclick = addTrip;
+                    $('emptyTip').style.display = '';
+                }
                 empty.style.display = 'block';
                 return;
             }
             empty.style.display = 'none';
-            container.innerHTML = list.map(tripCard).join('');
+            container.innerHTML = list.map((t, i) => tripCard(t, i, false)).join('');
         }
 
         function viewTripDetails(tripId) {
             const t = allTrips.find(x => String(x.id) === String(tripId));
             if (!t) return;
-            alert(
-                `Trajet ${t.trip_code || ''}\n\n` +
-                `${t.departure_city || t.departure_country} → ${t.arrival_city || t.arrival_country}\n` +
-                `Départ: ${formatDateTime(t.departure_date)}\nArrivée: ${formatDateTime(t.arrival_date)}\n` +
-                `Capacité: ${parseFloat(t.available_weight) || 0} kg\n` +
-                `Colis: ${t.current_packages || 0}/${t.max_packages || 0}\n` +
-                `Statut: ${statusMeta(t.status).label}`
-            );
+            $('sheetTitle').textContent = 'Détails du trajet';
+            $('sheetSub').textContent = t.trip_code || '';
+            $('sheetBody').innerHTML = tripCard(t, 0, true) +
+                `<div class="tj-actions" style="grid-template-columns:1fr;margin-top:12px"><button type="button" class="tj-btn tj-btn--main" onclick="closeSheet();navigateTo('missions')">${(t.status === 'published' || t.status === 'draft') ? 'Chercher colis' : 'Voir missions'}</button></div>`;
+            $('sheetOverlay').classList.add('show');
+            $('scroller').classList.add('is-locked');
+        }
+        function closeSheet() {
+            $('sheetOverlay').classList.remove('show');
+            $('scroller').classList.remove('is-locked');
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+        // Pastille de notifications non lues sur l'onglet Notifs. Best-effort.
+        async function loadUnreadNotifCount() {
+            try {
+                const r = await fetch(`${API_BASE_URL}/notifications/my-notifications?limit=100`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                if (!r.ok) return;
+                const unread = ((await r.json()).data || []).filter(n => !n.is_read).length;
+                const b = $('notifNavBadge');
+                if (unread > 0) { b.textContent = unread > 99 ? '99+' : unread; b.classList.remove('hidden'); }
+                else b.classList.add('hidden');
+            } catch (e) {}
         }
 
         function navigateTo(section) {
@@ -731,12 +477,14 @@
                 'missions': 'missions.html',
                 'trips': 'trajets.html',
                 'earnings': 'gains.html',
+                'notifications': 'notifications.html',
                 'profile': 'profilegp.html'
             };
-            if (pages[section]) window.location.href = pages[section];
+            if (pages[section] && section !== 'trips') window.location.href = pages[section];
         }
 
-        document.addEventListener('DOMContentLoaded', loadTrips);
+        document.addEventListener('DOMContentLoaded', () => { loadTrips(); loadUnreadNotifCount(); });
     </script>
+    <script src="ptr.js"></script>
 </body>
 </html>
