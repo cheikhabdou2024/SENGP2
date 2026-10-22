@@ -1,0 +1,84 @@
+/* ============================================================================
+   SEN GP — adaptation tablette / grands écrans / paysage
+   Chargé en dernier sur chaque page (après les <style> de la page et theme.css).
+
+   - Téléphones (< 600 px) : rien ne change.
+   - Tablettes et plus (≥ 600 px) : le contenu des écrans redessinés est agrandi
+     (propriété `zoom`) et centré dans une colonne ; la photo d'en-tête reste
+     pleine largeur. Barre du bas et feuilles du bas suivent la même colonne.
+   - Anciens écrans (classe .rs-legacy sur <html>) : cadre centré de 600 px max.
+   - Téléphone en paysage (hauteur ≤ 520 px) : barre du bas compacte.
+   ============================================================================ */
+:root { --rs-z: 1; --rs-nav: 76px; }
+
+/* --------------------------------------------------------------- tablettes */
+@media (min-width: 600px) { :root { --rs-z: 1.2; } }
+@media (min-width: 768px) { :root { --rs-z: 1.4; } }
+@media (min-width: 1000px) { :root { --rs-z: 1.5; } }
+/* paysage : l'écran est peu haut, on agrandit moins pour garder du contenu visible */
+@media (min-width: 600px) and (orientation: landscape) { :root { --rs-z: 1.15; } }
+@media (min-width: 1000px) and (min-height: 800px) and (orientation: landscape) { :root { --rs-z: 1.3; } }
+@media (orientation: landscape) and (max-height: 520px) { :root { --rs-z: 1; } }
+
+@media (min-width: 600px) {
+    /* contenu des écrans redessinés */
+    .hm-scroll > *, .ev-scroll > *, .sv-scroll > *, .nt-scroll > *, .pr-scroll > *,
+    .gh-scroll > *, .tj-scroll > *, .cr-scroll > *, .ct-scroll > * { zoom: var(--rs-z); }
+
+    /* barre du bas : icônes regroupées au centre, sans s'étirer sur tout l'écran */
+    .hm-nav, .ev-nav, .sv-nav, .nt-nav, .pr-nav, .gh-nav, .tj-nav {
+        padding-left: max(8px, calc((100% - 640px) / 2));
+        padding-right: max(8px, calc((100% - 640px) / 2));
+    }
+
+    /* feuilles du bas : même échelle que le contenu, hauteur corrigée du zoom */
+    .hm-sheet, .ev-sheet, .sv-sheet, .pr-sheet, .gh-sheet, .tj-sheet, .ct-sheet, .modal-content {
+        zoom: var(--rs-z);
+        max-height: calc(88dvh / var(--rs-z));
+    }
+    .gh-sheet { height: calc(86dvh / var(--rs-z)); }
+
+    /* pieds de page des parcours de création */
+    .bottom-actions > *, .ct-foot__in { max-width: 600px; margin-left: auto; margin-right: auto; }
+
+    /* photos d'en-tête : cadrage plus large */
+    .hm-bg img, .ev-hero img, .sv-hero img, .nt-hero img, .pr-hero img, .gh-hero img.gh-bg,
+    .tj-hero img.tj-bg, .cr-hero img, .ct-hero img.ct-bg { object-position: 60% 35%; }
+}
+
+/* ------------------------------------------------- anciens écrans (non refaits) */
+@media (min-width: 700px) {
+    html.rs-legacy .mobile-frame {
+        max-width: 600px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+    html.rs-legacy body { justify-content: center; }
+}
+
+/* ------------------------------------------------ téléphone en mode paysage */
+@media (orientation: landscape) and (max-height: 520px) {
+    :root { --rs-nav: 56px; }
+    .ev-nav, .sv-nav, .nt-nav, .pr-nav, .gh-nav, .tj-nav {
+        height: calc(56px + env(safe-area-inset-bottom, 0px));
+        padding-top: 2px;
+    }
+    .hm-nav { height: calc(56px + env(safe-area-inset-bottom, 0px)); }
+    .hm-scroll, .ev-scroll, .sv-scroll, .nt-scroll, .pr-scroll, .gh-scroll, .tj-scroll {
+        bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+    }
+    .hm-nav svg, .ev-nav svg, .sv-nav svg, .nt-nav svg, .pr-nav svg, .gh-nav svg, .tj-nav svg { max-height: 22px; }
+    .hm-sheet, .ev-sheet, .sv-sheet, .pr-sheet, .gh-sheet, .tj-sheet, .ct-sheet, .modal-content { max-height: 94dvh; }
+    .gh-sheet { height: 94dvh; }
+}
+
+/* ------------------------------------- petits téléphones en hauteur (SE, 5s) */
+@media (max-height: 600px) and (orientation: portrait) {
+    .gh-sheet, .tj-sheet, .pr-sheet, .ev-sheet, .sv-sheet { max-height: 92dvh; }
+}
+
+/* très petits téléphones : l'itinéraire de l'accueil expéditeur passe sur deux lignes */
+@media (max-width: 359px) {
+    .hm-route { grid-template-columns: minmax(0, 1fr); }
+    .hm-place { hyphens: manual; -webkit-hyphens: manual; }
+}

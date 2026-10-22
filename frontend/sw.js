@@ -11,6 +11,7 @@ const PRECACHE = [
     'manifest.json',
     'config.js',
     'theme.css',
+    'responsive.css',
     'ui.js',
     'icons/icon-192.png',
     'icons/icon-512.png'
