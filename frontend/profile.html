@@ -5,475 +5,205 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEN GP - Profil</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html { background: #F4F8FD; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #F4F8FD;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            color: #0B1D3A;
         }
+        :root { --pr-navy: #0B1D3A; --pr-muted: #6B7A93; }
 
-        .mobile-frame {
-            width: 100%;
-            max-width: 375px;
-            height: 667px;
-            background: linear-gradient(135deg, rgba(15, 12, 41, 0.95) 0%, rgba(48, 43, 99, 0.95) 50%, rgba(36, 36, 62, 0.95) 100%);
-            border-radius: 40px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            overflow: hidden;
-            position: relative;
-        }
+        /* ============================================
+           PROFIL
+           ============================================ */
+        .mobile-frame { position: relative; width: 100%; overflow: hidden; background: #F4F8FD; }
+        .mobile-frame::before { content: ""; position: absolute; inset: 0; z-index: 0; background: #F4F8FD; }
+        .pr-screen { position: absolute; inset: 0; z-index: 1; }
+        .pr-i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+        button, input { font: inherit; -webkit-tap-highlight-color: transparent; }
 
-        .status-bar {
-            height: 44px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .time { color: #fff; }
-        .indicators {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-        .signal, .wifi, .battery {
-            width: 18px;
-            height: 12px;
-            background: rgba(255,255,255,0.8);
-            border-radius: 2px;
-        }
-
-        /* Header */
-        .header {
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .back-btn {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateX(-3px);
-        }
-
-        .header-title {
-            flex: 1;
-        }
-
-        .header-title h1 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .header-title p {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* Content */
-        .content {
-            height: calc(100% - 44px - 85px - 73px);
+        .pr-scroll {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+            overflow-x: hidden;
             overflow-y: auto;
-            padding: 0;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .pr-scroll::-webkit-scrollbar { display: none; }
+        .pr-scroll.is-locked { overflow: hidden; }
+
+        /* ---- hero ---- */
+        .pr-hero { position: relative; height: calc(205px + env(safe-area-inset-top, 0px)); overflow: hidden; background: linear-gradient(180deg, #0B1D3A, #2B4A7A); }
+        .pr-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 75% 18%; }
+        .pr-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7, 20, 47, 0.45) 0%, rgba(7, 20, 47, 0.08) 45%, rgba(244, 248, 253, 0) 62%), linear-gradient(180deg, rgba(244, 248, 253, 0) 70%, #F4F8FD 100%); }
+        .pr-hero__row { position: absolute; z-index: 2; left: 0; right: 0; top: env(safe-area-inset-top, 0px); max-width: 480px; margin: 0 auto; padding: 22px 18px 0; display: flex; align-items: center; gap: 14px; }
+        .pr-back { width: 46px; height: 46px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(40, 56, 90, 0.55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff; cursor: pointer; }
+        .pr-back .pr-i { width: 22px; height: 22px; }
+        .pr-back:active { transform: scale(0.95); }
+        .pr-hero h1 { font-size: 27px; font-weight: 800; line-height: 1.1; letter-spacing: -0.3px; color: #fff; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55); }
+        .pr-hero p { margin-top: 3px; font-size: 15px; color: #E8EEF8; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6); }
+
+        .pr-body { position: relative; z-index: 3; max-width: 480px; margin: -52px auto 0; padding: 0 14px 28px; }
+
+        /* ---- identity card ---- */
+        .pr-card { display: flex; align-items: center; gap: 18px; padding: 20px 18px; background: #fff; border-radius: 28px; box-shadow: 0 12px 34px rgba(11, 29, 58, 0.1); position: relative; overflow: hidden; }
+        .pr-card::after { content: ""; position: absolute; right: -40px; bottom: -40px; width: 200px; height: 140px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 190, 120, 0.2), rgba(255, 190, 120, 0)); pointer-events: none; }
+        .pr-avatar { position: relative; width: 84px; height: 84px; flex-shrink: 0; border: 0; border-radius: 50%; background: #9A6A4F center / cover no-repeat; color: #fff; font-size: 40px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 22px rgba(11, 29, 58, 0.22); }
+        .pr-avatar.has-photo .pr-avatar__txt { display: none; }
+        .pr-cam { position: absolute; right: -2px; bottom: -2px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #0B1D3A; color: #fff; border: 2px solid #fff; }
+        .pr-cam .pr-i { width: 17px; height: 17px; }
+        .pr-id { min-width: 0; position: relative; z-index: 1; }
+        .pr-name { font-size: 23px; font-weight: 800; line-height: 1.2; letter-spacing: -0.3px; color: var(--pr-navy); overflow-wrap: anywhere; }
+        .pr-email { margin-top: 4px; font-size: 16px; color: var(--pr-muted); overflow-wrap: anywhere; }
+        .pr-phone { margin-top: 2px; font-size: 15px; color: var(--pr-muted); }
+        .pr-badge { margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px 7px 10px; border-radius: 999px; background: #DDF5E7; color: #13803F; font-size: 16px; font-weight: 700; }
+        .pr-badge .pr-i { width: 22px; height: 22px; stroke-width: 2.6; }
+        .pr-badge.is-warn { background: #FFF1CF; color: #B87500; }
+
+        /* ---- stats ---- */
+        .pr-stats { margin-top: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .pr-stat { min-width: 0; display: flex; align-items: center; gap: 10px; padding: 14px 12px; border-radius: 22px; }
+        .pr-stat--o { background: #FFF4E4; }
+        .pr-stat--b { background: #EAF3FF; }
+        .pr-stat--g { background: #E5F8EE; }
+        .pr-stat__ic { width: 46px; height: 46px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.85); }
+        .pr-stat--o .pr-stat__ic { color: #F59E0B; }
+        .pr-stat--b .pr-stat__ic { color: #2F6BFF; }
+        .pr-stat--g .pr-stat__ic { color: #17A34A; }
+        .pr-stat__ic .pr-i { width: 24px; height: 24px; }
+        .pr-stat b { display: block; font-size: 25px; font-weight: 800; line-height: 1.1; color: var(--pr-navy); }
+        .pr-stat div span { display: block; margin-top: 1px; font-size: 14.5px; color: var(--pr-muted); }
+
+        /* ---- menu sections ---- */
+        .pr-sec { margin-top: 22px; }
+        .pr-sec h2 { padding: 0 4px 10px; font-size: 21px; font-weight: 800; letter-spacing: -0.2px; color: var(--pr-navy); }
+        .pr-list { background: #fff; border-radius: 26px; box-shadow: 0 8px 26px rgba(11, 29, 58, 0.06); overflow: hidden; }
+        .pr-item { width: 100%; display: flex; align-items: center; gap: 16px; padding: 14px 16px; border: 0; background: none; text-align: left; color: inherit; cursor: pointer; transition: background 0.15s ease; }
+        .pr-item + .pr-item { border-top: 1px solid #EEF2F8; }
+        .pr-item:active { background: #F4F8FD; }
+        .pr-item__ic { width: 56px; height: 56px; flex-shrink: 0; border-radius: 18px; display: flex; align-items: center; justify-content: center; }
+        .pr-item__ic .pr-i { width: 28px; height: 28px; }
+        .pr-ic--blue { background: #E3EEFF; color: #2F6BFF; }
+        .pr-ic--indigo { background: #E9E7FF; color: #4F46E5; }
+        .pr-ic--orange { background: #FFF1D6; color: #E8890C; }
+        .pr-ic--green { background: #DDF5E7; color: #17A34A; }
+        .pr-ic--sky { background: #DCEBFF; color: #1D5FD6; }
+        .pr-item__t { flex: 1; min-width: 0; }
+        .pr-item__t b { display: block; font-size: 18px; font-weight: 800; color: var(--pr-navy); }
+        .pr-item__t small { display: block; margin-top: 2px; font-size: 15.5px; color: var(--pr-muted); }
+        .pr-item > .pr-i { width: 24px; height: 24px; color: #6B7A93; }
+
+        .pr-logout { margin-top: 22px; width: 100%; min-height: 62px; display: flex; align-items: center; justify-content: center; gap: 12px; border: 1.5px solid #F4B8B8; border-radius: 22px; background: #FDECEC; color: #D12626; font-size: 19px; font-weight: 800; cursor: pointer; transition: transform 0.15s ease; }
+        .pr-logout .pr-i { width: 26px; height: 26px; }
+        .pr-logout:active { transform: scale(0.985); }
+
+        /* ---- bottom nav ---- */
+        .pr-nav { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; height: calc(76px + env(safe-area-inset-bottom, 0px)); padding: 6px 4px env(safe-area-inset-bottom, 0px); display: flex; gap: 2px; background: rgba(255, 255, 255, 0.97); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid #E3EAF3; box-shadow: 0 -8px 24px rgba(11, 29, 58, 0.06); }
+        .pr-nav__item { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; border-radius: 18px; background: none; color: var(--pr-muted); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+        .pr-nav__item[aria-current="page"] { background: #E8F1FF; color: #1E6FEA; font-weight: 700; }
+        .pr-nav__icon { position: relative; display: flex; }
+        .pr-nav__icon .pr-i { width: 26px; height: 26px; }
+        .pr-dotbadge { position: absolute; top: -2px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: #EF4444; border: 2px solid #fff; }
+        .pr-dotbadge.hidden { display: none; }
+        .lbl-short { display: none; }
+        @media (max-width: 460px) { .lbl-long { display: none; } .lbl-short { display: inline; } .pr-nav__item { font-size: 11.5px; } }
+
+        /* ---- bottom sheets ---- */
+        .pr-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; background: rgba(7, 20, 47, 0.52); opacity: 0; pointer-events: none; transition: opacity 0.28s ease; }
+        .pr-overlay.show { opacity: 1; pointer-events: auto; }
+        .pr-sheet { width: 100%; max-width: 480px; max-height: 90dvh; display: flex; flex-direction: column; background: #fff; border-radius: 28px 28px 0 0; box-shadow: 0 -12px 40px rgba(7, 20, 47, 0.25); transform: translateY(100%); transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1); }
+        .pr-overlay.show .pr-sheet { transform: none; }
+        .pr-sheet__grab { padding: 10px 0 2px; display: flex; justify-content: center; }
+        .pr-sheet__grab i { width: 44px; height: 5px; border-radius: 3px; background: #D5DCE8; }
+        .pr-sheet__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 8px 20px 4px; }
+        .pr-sheet__head h3 { font-size: 22px; font-weight: 800; letter-spacing: -0.2px; }
+        .pr-sheet__head p { margin-top: 3px; font-size: 14.5px; color: var(--pr-muted); }
+        .pr-close { width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: #EDF1F7; color: var(--pr-navy); cursor: pointer; }
+        .pr-close .pr-i { width: 20px; height: 20px; }
+        .pr-sheet__body { overflow-y: auto; overscroll-behavior: contain; padding: 14px 20px calc(22px + env(safe-area-inset-bottom, 0px)); }
+
+        .pr-field { margin-bottom: 16px; }
+        .pr-field label { display: block; margin-bottom: 8px; font-size: 15px; font-weight: 700; color: var(--pr-navy); }
+        .ds .pr-field input.pr-input, .ds .pr-field input.pr-input:focus { width: 100%; min-height: 54px; padding: 0 16px; border: 1.5px solid #D5DEEA; border-radius: 16px; background: #F8FAFD; color: var(--pr-navy); font-size: 17px; box-shadow: none; outline: none; }
+        .ds .pr-field input.pr-input:focus { border-color: #FF9A3D; box-shadow: 0 0 0 3px rgba(255, 154, 61, 0.2); background: #fff; }
+        .pr-idprev { margin-bottom: 8px; border-radius: 16px; overflow: hidden; background: #F1F5FA; }
+        .pr-idprev:empty { display: none; }
+        .pr-idprev img { display: block; width: 100%; max-height: 180px; object-fit: cover; }
+        .pr-idbtn { width: 100%; min-height: 50px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px dashed #AFC3E3; border-radius: 16px; background: #F5F9FF; color: #2F6BFF; font-size: 16px; font-weight: 700; cursor: pointer; }
+        .pr-idbtn .pr-i { width: 20px; height: 20px; }
+        .pr-actions { margin-top: 6px; display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; }
+        .pr-btn { min-height: 56px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 18px; font-size: 17px; font-weight: 800; cursor: pointer; transition: transform 0.15s ease, opacity 0.2s ease; }
+        .pr-btn:active { transform: scale(0.985); }
+        .pr-btn:disabled { opacity: 0.6; cursor: progress; }
+        .pr-btn--ghost { background: #EAEFF7; color: var(--pr-navy); }
+        .pr-btn--main { background: linear-gradient(90deg, #06B6F4, #3B6FFA 60%, #8B5CF5); color: #fff; box-shadow: 0 10px 24px rgba(59, 111, 250, 0.32); }
+        .pr-btn--danger { background: linear-gradient(135deg, #EF4444, #D12626); color: #fff; box-shadow: 0 10px 24px rgba(209, 38, 38, 0.3); }
+
+        .pr-opts { display: flex; flex-direction: column; gap: 10px; }
+        .pr-opt { display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 10px 16px; border: 1.5px solid #E3EAF3; border-radius: 18px; background: #fff; font-size: 18px; font-weight: 700; text-align: left; color: var(--pr-navy); }
+        .pr-opt small { margin-left: auto; padding: 3px 10px; border-radius: 999px; background: #EEF2F7; color: var(--pr-muted); font-size: 12.5px; font-weight: 700; }
+        .pr-opt.is-on { border: 2px solid #2F6BFF; background: #F3F7FF; }
+        .pr-opt.is-on::after { content: "✓"; margin-left: auto; color: #2F6BFF; font-size: 22px; }
+        .pr-opt.is-off { opacity: 0.6; }
+        .pr-rows { display: flex; flex-direction: column; gap: 10px; }
+        .pr-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 18px; background: #F5F8FC; border: 1px solid #EAEFF6; text-decoration: none; color: inherit; }
+        .pr-row .pr-item__ic { width: 48px; height: 48px; border-radius: 16px; }
+        .pr-row .pr-item__ic .pr-i { width: 24px; height: 24px; }
+        .pr-row b { display: block; font-size: 17px; color: var(--pr-navy); }
+        .pr-row small { display: block; margin-top: 2px; font-size: 15px; color: var(--pr-muted); overflow-wrap: anywhere; }
+        .pr-about { text-align: center; padding: 4px 0 6px; }
+        .pr-about img { width: 92px; height: 92px; border-radius: 22px; box-shadow: 0 10px 26px rgba(11, 29, 58, 0.2); }
+        .pr-about h4 { margin-top: 12px; font-size: 22px; font-weight: 800; }
+        .pr-about .v { margin-top: 2px; font-size: 15px; color: var(--pr-muted); }
+        .pr-about p { margin-top: 14px; font-size: 16px; line-height: 1.55; color: #3E4C66; }
+        .pr-about .c { margin-top: 14px; font-size: 13.5px; color: var(--pr-muted); }
+        .pr-note { margin-bottom: 16px; padding: 14px 16px; border-radius: 18px; background: #FFF6E5; border: 1px solid #FFE0A3; font-size: 15px; line-height: 1.5; color: #7A4B00; }
+        .pr-logout-msg { text-align: center; padding: 6px 0 16px; }
+        .pr-logout-msg .em { font-size: 44px; line-height: 1; }
+        .pr-logout-msg p { margin-top: 10px; font-size: 17px; line-height: 1.5; color: #3E4C66; }
+
+        .pr-toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 1200; transform: translate(-50%, 20px); max-width: calc(100% - 32px); padding: 12px 18px; border-radius: 999px; background: #0B1D3A; color: #fff; font-size: 15px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.25s ease, transform 0.25s ease; text-align: center; }
+        .pr-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+        .pr-avatar:focus-visible, .pr-item:focus-visible, .pr-logout:focus-visible, .pr-back:focus-visible, .pr-nav__item:focus-visible, .pr-close:focus-visible, .pr-btn:focus-visible, .pr-opt:focus-visible, .pr-idbtn:focus-visible { outline: 2px solid #2F6BFF; outline-offset: 2px; }
+
+        .pr-reveal { animation: prReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 60ms); }
+        @keyframes prReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+        @media (prefers-reduced-motion: reduce) { .pr-reveal { animation: none; } * { transition-duration: 0.01ms !important; } }
+
+        /* PWA install banner (pwa.js): keep it compact */
+        #sengp-install-banner { bottom: 8px !important; padding: 8px 12px !important; gap: 10px !important; font-size: 12px !important; line-height: 1.3 !important; border-radius: 14px !important; }
+        #sengp-install-banner img { width: 34px !important; height: 34px !important; }
+        #sengp-install-banner strong { font-size: 13px !important; }
+
+        @media (max-width: 400px) {
+            .pr-card { gap: 14px; padding: 18px 14px; }
+            .pr-avatar { width: 76px; height: 76px; font-size: 34px; }
+            .pr-stat { flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px; }
+            .pr-stat__ic { width: 40px; height: 40px; }
+            .pr-stat__ic .pr-i { width: 22px; height: 22px; }
+            .pr-item { gap: 14px; padding: 12px 14px; }
+            .pr-item__ic { width: 52px; height: 52px; }
+        }
+        @media (max-width: 359px) {
+            .pr-body { padding-left: 10px; padding-right: 10px; }
+            .pr-name { font-size: 20px; }
+            .pr-stat b { font-size: 22px; }
+            .pr-actions { grid-template-columns: 1fr; }
         }
 
-        .content::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .content::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-
-        /* Profile Header */
-        .profile-header {
-            padding: 30px 20px;
-            text-align: center;
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(255, 230, 109, 0.15) 100%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .profile-avatar-large {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
-            border-radius: 50%;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .profile-avatar-large:hover {
-            transform: scale(1.05);
-        }
-
-        .edit-avatar-btn {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
-            border: 3px solid rgba(15, 12, 41, 0.95);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .profile-name {
-            font-size: 24px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 6px;
-        }
-
-        .profile-email {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 16px;
-        }
-
-        .profile-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: linear-gradient(135deg, rgba(78, 205, 196, 0.2) 0%, rgba(78, 205, 196, 0.1) 100%);
-            border: 1px solid rgba(78, 205, 196, 0.3);
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #4ECDC4;
-        }
-
-        /* Stats Section */
-        .stats-section {
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.03);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 16px 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .stat-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-2px);
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 500;
-        }
-
-        /* Menu Sections */
-        .menu-section {
-            padding: 20px;
-        }
-
-        .section-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.5);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .menu-item:hover {
-            background: rgba(255, 255, 255, 0.12);
-            transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .menu-icon {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 230, 109, 0.2) 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .menu-content {
-            flex: 1;
-        }
-
-        .menu-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .menu-subtitle {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .menu-arrow {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .menu-toggle {
-            width: 48px;
-            height: 28px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 14px;
-            position: relative;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .menu-toggle.active {
-            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
-        }
-
-        .toggle-slider {
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 24px;
-            height: 24px;
-            background: #ffffff;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .menu-toggle.active .toggle-slider {
-            transform: translateX(20px);
-        }
-
-        /* Logout Button */
-        .logout-section {
-            padding: 20px;
-        }
-
-        .logout-btn {
-            width: 100%;
-            padding: 16px;
-            background: rgba(255, 107, 107, 0.2);
-            border: 2px solid rgba(255, 107, 107, 0.4);
-            border-radius: 12px;
-            color: #FF6B6B;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 107, 107, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
-        }
-
-        /* Bottom Navigation */
-        .bottom-nav { position:absolute; bottom:0; left:0; right:0; background:rgba(18,16,36,.92);
-            backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-top:1px solid rgba(255,255,255,.07);
-            display:flex; justify-content:space-around; align-items:stretch;
-            padding:9px 6px calc(9px + env(safe-area-inset-bottom)); box-shadow:0 -8px 30px rgba(0,0,0,.35); }
-        .nav-item { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
-            cursor:pointer; flex:1; position:relative; padding:6px 0; border-radius:14px; color:rgba(255,255,255,.5);
-            transition:color .25s ease; -webkit-tap-highlight-color:transparent; }
-        .nav-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; }
-        .nav-icon svg { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
-        .nav-label { font-size:10px; font-weight:600; color:inherit; }
-        .nav-item.active { color:#FF6B6B; }
-        .nav-item.active::after { content:''; position:absolute; top:-9px; left:50%; transform:translateX(-50%);
-            width:26px; height:3px; border-radius:0 0 3px 3px; background:linear-gradient(90deg,#FF6B6B,#FFE66D); }
-        .nav-item:not(.active):active { color:rgba(255,255,255,.85); }
-        .nav-badge { position:absolute; top:0; left:calc(50% + 5px); min-width:17px; height:17px; background:#FF4757;
-            border:1.5px solid #121024; border-radius:9px; display:flex; align-items:center; justify-content:center;
-            font-size:9px; font-weight:800; color:#fff; padding:0 4px; }
-        .nav-badge.hidden { display:none; }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
-        .modal {
-            width: 90%;
-            max-width: 320px;
-            background: linear-gradient(135deg, rgba(15, 12, 41, 0.98) 0%, rgba(48, 43, 99, 0.98) 100%);
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-header {
-            padding: 24px 20px;
-            text-align: center;
-        }
-
-        .modal-icon {
-            font-size: 60px;
-            margin-bottom: 16px;
-        }
-
-        .modal-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 8px;
-        }
-
-        .modal-message {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.6;
-        }
-
-        .modal-footer {
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 14px 20px;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-cancel {
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .btn-cancel:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .btn-confirm {
-            background: linear-gradient(135deg, #FF6B6B 0%, #FF4757 100%);
-            color: #ffffff;
-            font-weight: 700;
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
-        }
-
-        .btn-confirm:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(255, 107, 107, 0.5);
-        }
-        .pf-field { margin-bottom: 12px; }
-        .pf-field label { display:block; font-size:12px; color:rgba(255,255,255,.65); margin-bottom:6px; }
-        .pf-input { width:100%; padding:11px 13px; border-radius:10px; border:1px solid rgba(255,255,255,.2);
-            background:rgba(255,255,255,.07); color:#fff; font-size:14px; }
-        .pf-idbtn { width:100%; padding:11px; border:1px dashed rgba(255,255,255,.28); border-radius:10px;
-            background:rgba(255,255,255,.05); color:#4ECDC4; font-weight:600; cursor:pointer; font-size:13px; }
-        .pf-idprev img { width:100%; max-height:130px; object-fit:contain; border-radius:8px; margin-bottom:8px; background:rgba(255,255,255,.04); }
-            /* sengp-responsive-override */
+        /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
-        </style>
+    </style>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -488,275 +218,188 @@
     <script src="pwa.js" defer></script>
 </head>
 <body class="ds">
-    <div class="mobile-frame">
+<div class="mobile-frame">
+  <div class="pr-screen">
 
-        <!-- Header -->
-        <div class="header">
-            <button class="back-btn" onclick="goBack()">←</button>
-            <div class="header-title">
-                <h1>Mon Profil</h1>
-                <p>Gérez vos informations</p>
-            </div>
+    <!-- Scrollable content (pull-to-refresh attaches to .content) -->
+    <div class="content pr-scroll" id="scroller">
+      <header class="pr-hero">
+        <picture>
+          <source type="image/webp" srcset="im/sengp-home-background.webp">
+          <img src="im/sengp-home-background.jpg" alt="" width="941" height="1672" decoding="async">
+        </picture>
+        <div class="pr-hero__row">
+          <button type="button" class="pr-back" onclick="goBack()" aria-label="Retour">
+            <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          </button>
+          <div>
+            <h1>Mon Profil</h1>
+            <p>Gérez vos informations</p>
+          </div>
         </div>
+      </header>
 
-        <!-- Content -->
-        <div class="content">
-            <!-- Profile Header -->
-            <div class="profile-header">
-                <div class="profile-avatar-large" onclick="editAvatar()">
-                    <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
-                    <div class="edit-avatar-btn"><svg class="ic" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div>
-                </div>
-                <h2 class="profile-name" id="userName">Moussa Diallo</h2>
-                <p class="profile-email" id="userEmail">moussa.diallo@email.com</p>
-                <p class="profile-email" id="userPhone" style="font-size: 13px; margin-top: 4px; color: rgba(255,255,255,0.6);">+221 77 123 45 67</p>
-                <div class="profile-badge">
-                    <span><svg class="ic" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-                    <span>Client Vérifié</span>
-                </div>
-            </div>
+      <div class="pr-body">
+        <!-- Identity -->
+        <section class="pr-card pr-reveal" style="--i:0" aria-label="Mon compte">
+          <button type="button" class="pr-avatar" id="avatar" onclick="editAvatar()" aria-label="Changer la photo de profil">
+            <span class="pr-avatar__txt" id="avatarTxt">?</span>
+            <span class="pr-cam" aria-hidden="true"><svg class="pr-i" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></span>
+          </button>
+          <div class="pr-id">
+            <h2 class="pr-name" id="userName">Utilisateur</h2>
+            <p class="pr-email" id="userEmail"></p>
+            <p class="pr-phone" id="userPhone"></p>
+            <span class="pr-badge" id="verifBadge"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><span id="verifTxt">Client vérifié</span></span>
+          </div>
+        </section>
 
-            <!-- Stats Section -->
-            <div class="stats-section">
-                <div class="stat-item">
-                    <div class="stat-value">15</div>
-                    <div class="stat-label">Envois</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">4.8</div>
-                    <div class="stat-label">Note</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">12</div>
-                    <div class="stat-label">Avis</div>
-                </div>
-            </div>
+        <!-- Stats (real data: /users/me/stats) -->
+        <section class="pr-stats pr-reveal" style="--i:1" aria-label="Mes envois">
+          <div class="pr-stat pr-stat--o">
+            <span class="pr-stat__ic"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
+            <div><b id="statTotal">–</b><span>Envois</span></div>
+          </div>
+          <div class="pr-stat pr-stat--b">
+            <span class="pr-stat__ic"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+            <div><b id="statActive">–</b><span>En cours</span></div>
+          </div>
+          <div class="pr-stat pr-stat--g">
+            <span class="pr-stat__ic"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>
+            <div><b id="statDone">–</b><span>Livrés</span></div>
+          </div>
+        </section>
 
-            <!-- Account Menu -->
-            <div class="menu-section">
-                <div class="section-title">Compte</div>
+        <!-- Account -->
+        <section class="pr-sec pr-reveal" style="--i:2">
+          <h2>Compte</h2>
+          <div class="pr-list">
+            <button type="button" class="pr-item" onclick="openSheet('edit')">
+              <span class="pr-item__ic pr-ic--blue"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+              <span class="pr-item__t"><b>Modifier le profil</b><small>Nom, email, téléphone</small></span>
+              <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+            <button type="button" class="pr-item" onclick="openSheet('password')">
+              <span class="pr-item__ic pr-ic--orange"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+              <span class="pr-item__t"><b>Mot de passe</b><small>Sécurité du compte</small></span>
+              <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+            <button type="button" class="pr-item" onclick="openSheet('lang')">
+              <span class="pr-item__ic pr-ic--indigo"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+              <span class="pr-item__t"><b>Langue</b><small>Français</small></span>
+              <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </section>
 
-                <div class="menu-item" onclick="editProfile()">
-                    <div class="menu-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
-                    <div class="menu-content">
-                        <div class="menu-title">Modifier le profil</div>
-                        <div class="menu-subtitle">Nom, email, téléphone</div>
-                    </div>
-                    <div class="menu-arrow">→</div>
-                </div>
+        <!-- Support -->
+        <section class="pr-sec pr-reveal" style="--i:3">
+          <h2>Support</h2>
+          <div class="pr-list">
+            <button type="button" class="pr-item" onclick="openSheet('help')">
+              <span class="pr-item__ic pr-ic--orange"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+              <span class="pr-item__t"><b>Centre d'aide</b><small>FAQ et guides</small></span>
+              <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+            <button type="button" class="pr-item" onclick="openSheet('contact')">
+              <span class="pr-item__ic pr-ic--sky"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 15a2 2 0 0 1-2 2h-1a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h3z"/><path d="M3 15a2 2 0 0 0 2 2h1a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1H3z"/><path d="M21 17v1a3 3 0 0 1-3 3h-4"/></svg></span>
+              <span class="pr-item__t"><b>Contacter le support</b><small>Nous sommes là pour vous</small></span>
+              <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+            <button type="button" class="pr-item" onclick="openSheet('about')">
+              <span class="pr-item__ic pr-ic--indigo"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
+              <span class="pr-item__t"><b>À propos</b><small>Version 1.0.0</small></span>
+              <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </section>
 
-                <div class="menu-item" onclick="changePassword()">
-                    <div class="menu-icon"><svg class="ic" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-                    <div class="menu-content">
-                        <div class="menu-title">Mot de passe</div>
-                        <div class="menu-subtitle">Sécurité du compte</div>
-                    </div>
-                    <div class="menu-arrow">→</div>
-                </div>
-
-                <div class="menu-item" onclick="paymentMethods()">
-                    <div class="menu-icon"><svg class="ic" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
-                    <div class="menu-content">
-                        <div class="menu-title">Moyens de paiement</div>
-                        <div class="menu-subtitle">Cartes et portefeuilles</div>
-                    </div>
-                    <div class="menu-arrow">→</div>
-                </div>
-            </div>
-
-            <!-- Preferences Menu -->
-            <div class="menu-section">
-                <div class="section-title">Préférences</div>
-
-                <div class="menu-item">
-                    <div class="menu-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
-                    <div class="menu-content">
-                        <div class="menu-title">Notifications push</div>
-                        <div class="menu-subtitle">Alertes en temps réel</div>
-                    </div>
-                    <div class="menu-toggle active" onclick="toggleSetting(this)">
-                        <div class="toggle-slider"></div>
-                    </div>
-                </div>
-
-                <div class="menu-item">
-                    <div class="menu-icon"><svg class="ic" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-10 5L2 7"/></svg></div>
-                    <div class="menu-content">
-                        <div class="menu-title">Notifications email</div>
-                        <div class="menu-subtitle">Recevoir les mises à jour</div>
-                    </div>
-                    <div class="menu-toggle active" onclick="toggleSetting(this)">
-                        <div class="toggle-slider"></div>
-                    </div>
-                </div>
-
-                <div class="menu-item" onclick="language()">
-                    <div class="menu-icon"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-                    <div class="menu-content">
-                        <div class="menu-title">Langue</div>
-                        <div class="menu-subtitle">Français</div>
-                    </div>
-                    <div class="menu-arrow">→</div>
-                </div>
-            </div>
-
-            <!-- Support Menu -->
-            <div class="menu-section">
-                <div class="section-title">Support</div>
-
-                <div class="menu-item" onclick="helpCenter()">
-                    <div class="menu-icon"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></div>
-                    <div class="menu-content">
-                        <div class="menu-title">Centre d'aide</div>
-                        <div class="menu-subtitle">FAQ et guides</div>
-                    </div>
-                    <div class="menu-arrow">→</div>
-                </div>
-
-                <div class="menu-item" onclick="contactSupport()">
-                    <div class="menu-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-                    <div class="menu-content">
-                        <div class="menu-title">Contacter le support</div>
-                        <div class="menu-subtitle">Nous sommes là pour vous</div>
-                    </div>
-                    <div class="menu-arrow">→</div>
-                </div>
-
-                <div class="menu-item" onclick="about()">
-                    <div class="menu-icon">ℹ️</div>
-                    <div class="menu-content">
-                        <div class="menu-title">À propos</div>
-                        <div class="menu-subtitle">Version 1.0.0</div>
-                    </div>
-                    <div class="menu-arrow">→</div>
-                </div>
-            </div>
-
-            <!-- Logout Section -->
-            <div class="logout-section">
-                <button class="logout-btn" onclick="confirmLogout()">
-                    <span><svg class="ic" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
-                    <span>Déconnexion</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <div class="nav-item" onclick="navigateTo('home')">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
-                <div class="nav-label">Accueil</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('reclamation')">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10.3 4 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
-                <div class="nav-label">Réclamation</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('tracking')">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-                <div class="nav-label">Suivi</div>
-            </div>
-
-            <div class="nav-item" onclick="navigateTo('notifications')">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
-                <div class="nav-label">Notifications</div>
-            </div>
-
-            <div class="nav-item active" onclick="navigateTo('profile')">
-                <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
-                <div class="nav-label">Profil</div>
-            </div>
-        </div>
-
-        <!-- Logout Confirmation Modal -->
-        <div class="modal-overlay" id="logoutModal">
-            <div class="modal">
-                <div class="modal-header">
-                    <div class="modal-icon">👋</div>
-                    <h3 class="modal-title">Déconnexion</h3>
-                    <p class="modal-message">Êtes-vous sûr de vouloir vous déconnecter ?</p>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-cancel" onclick="closeLogoutModal()">Annuler</button>
-                    <button class="btn btn-confirm" onclick="logout()">Déconnexion</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Edit Profile Modal -->
-        <div class="modal-overlay" id="editProfileModal">
-            <div class="modal" style="max-height:88vh;display:flex;flex-direction:column;">
-                <div class="modal-header"><h3 class="modal-title">Modifier le profil</h3></div>
-                <div style="overflow-y:auto;padding:4px 2px;">
-                    <div class="pf-field"><label>Prénom</label><input id="epFirst" class="pf-input"></div>
-                    <div class="pf-field"><label>Nom</label><input id="epLast" class="pf-input"></div>
-                    <div class="pf-field"><label>Téléphone</label><input id="epPhone" class="pf-input" type="tel" placeholder="+221 77 123 45 67"></div>
-                    <div class="pf-field"><label>Carte d'identité — Recto</label>
-                        <div id="epRectoPrev" class="pf-idprev"></div>
-                        <input type="file" accept="image/*" id="epRecto" style="display:none" onchange="previewId('recto')">
-                        <button type="button" class="pf-idbtn" onclick="document.getElementById('epRecto').click()"><svg class="ic" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg> Choisir / Prendre une photo (recto)</button>
-                    </div>
-                    <div class="pf-field"><label>Carte d'identité — Verso</label>
-                        <div id="epVersoPrev" class="pf-idprev"></div>
-                        <input type="file" accept="image/*" id="epVerso" style="display:none" onchange="previewId('verso')">
-                        <button type="button" class="pf-idbtn" onclick="document.getElementById('epVerso').click()"><svg class="ic" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg> Choisir / Prendre une photo (verso)</button>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-cancel" onclick="closeModal('editProfileModal')">Annuler</button>
-                    <button class="btn btn-confirm" id="epSave" onclick="saveProfile()">Enregistrer</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Change Password Modal -->
-        <div class="modal-overlay" id="passwordModal">
-            <div class="modal">
-                <div class="modal-header"><h3 class="modal-title">Changer le mot de passe</h3></div>
-                <div style="padding:4px 2px;">
-                    <div class="pf-field"><input id="pwOld" class="pf-input" type="password" placeholder="Mot de passe actuel"></div>
-                    <div class="pf-field"><input id="pwNew" class="pf-input" type="password" placeholder="Nouveau (min. 8 caractères)"></div>
-                    <div class="pf-field"><input id="pwConf" class="pf-input" type="password" placeholder="Confirmer le nouveau"></div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-cancel" onclick="closeModal('passwordModal')">Annuler</button>
-                    <button class="btn btn-confirm" id="pwSave" onclick="savePassword()">Changer</button>
-                </div>
-            </div>
-        </div>
+        <button type="button" class="pr-logout pr-reveal" style="--i:4" onclick="openSheet('logout')">
+          <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>Déconnexion
+        </button>
+      </div>
     </div>
 
+    <!-- Bottom navigation -->
+    <nav class="pr-nav" aria-label="Navigation principale">
+      <button type="button" class="pr-nav__item" onclick="navigateTo('home')">
+        <span class="pr-nav__icon"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span>Accueil</span>
+      </button>
+      <button type="button" class="pr-nav__item" onclick="navigateTo('orders')">
+        <span class="pr-nav__icon"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span><span>Envois</span>
+      </button>
+      <button type="button" class="pr-nav__item" onclick="navigateTo('reclamation')">
+        <span class="pr-nav__icon"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 4 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span><span>Alertes</span>
+      </button>
+      <button type="button" class="pr-nav__item" onclick="navigateTo('tracking')">
+        <span class="pr-nav__icon"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span>Suivi</span>
+      </button>
+      <button type="button" class="pr-nav__item" onclick="navigateTo('notifications')">
+        <span class="pr-nav__icon">
+          <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="pr-dotbadge hidden" id="notifDot" aria-label="Notifications non lues"></span>
+        </span><span class="lbl-long">Notifications</span><span class="lbl-short">Notifs</span>
+      </button>
+      <button type="button" class="pr-nav__item" aria-current="page" onclick="navigateTo('profile')">
+        <span class="pr-nav__icon"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span>Profil</span>
+      </button>
+    </nav>
+
+    <!-- Bottom sheet (edit / password / language / help / contact / about / logout) -->
+    <div class="pr-overlay" id="sheetOverlay" onclick="if (event.target === this) closeSheet()">
+      <div class="pr-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+        <div class="pr-sheet__grab"><i></i></div>
+        <div class="pr-sheet__head">
+          <div><h3 id="sheetTitle"></h3><p id="sheetSub"></p></div>
+          <button type="button" class="pr-close" id="sheetClose" onclick="closeSheet()" aria-label="Fermer"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        </div>
+        <div class="pr-sheet__body" id="sheetBody"></div>
+      </div>
+    </div>
+    <div class="pr-toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+</div>
     <script>
-        function goBack() {
-            window.location.href = 'dashexpediteur.html';
-        }
-
-        function editAvatar() {
-            alert('Modifier la photo de profil\n\nSélectionnez une nouvelle photo depuis votre galerie.');
-        }
-
         const API_BASE_URL = window.API_BASE_URL;
+        const $ = id => document.getElementById(id);
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const IC = {
+            upload: '<svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>',
+            mail: '<svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-10 6L2 7"/></svg>',
+            phone: '<svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>'
+        };
 
-        function getAuthToken() {
-            return localStorage.getItem('authToken');
-        }
-
+        function getAuthToken() { return localStorage.getItem('authToken'); }
         function getUserData() {
-            const userData = localStorage.getItem('userData');
-            return userData ? JSON.parse(userData) : null;
+            try { return JSON.parse(localStorage.getItem('userData') || 'null'); } catch (e) { return null; }
+        }
+        function goBack() { window.location.href = 'dashexpediteur.html'; }
+
+        let toastTimer = null;
+        function toast(msg) {
+            const t = $('toast');
+            t.textContent = msg; t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
         }
 
         let currentUser = null;
 
         function fillDisplay(u) {
             const name = ((u.first_name || '') + ' ' + (u.last_name || '')).trim() || 'Utilisateur';
-            document.getElementById('userName').textContent = name;
-            document.getElementById('userEmail').textContent = u.email || '';
-            document.getElementById('userPhone').textContent = u.phone || '';
-            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-            const av = document.querySelector('.profile-avatar-large');
-            if (av) av.childNodes[0] && (av.childNodes[0].nodeValue = initials);
+            $('userName').textContent = name;
+            $('userEmail').textContent = u.email || '';
+            $('userPhone').textContent = u.phone || '';
+            const initials = name.charAt(0).toUpperCase() || '?';
+            $('avatarTxt').textContent = initials;
+            const av = $('avatar');
+            if (u.profile_photo_url && /^https?:/.test(u.profile_photo_url)) {
+                av.style.backgroundImage = 'url("' + u.profile_photo_url.replace(/"/g, '%22') + '")';
+                av.classList.add('has-photo');
+            } else { av.style.backgroundImage = ''; av.classList.remove('has-photo'); }
+            const ok = !!u.is_email_verified;
+            $('verifBadge').classList.toggle('is-warn', !ok);
+            $('verifTxt').textContent = ok ? 'Client vérifié' : 'Email non vérifié';
         }
 
         async function loadUserProfile() {
@@ -764,70 +407,161 @@
             if (!token) { window.location.href = 'connexion.html'; return; }
             currentUser = getUserData() || {};
             fillDisplay(currentUser);
+            const h = { 'Authorization': 'Bearer ' + token };
             try {
-                const r = await fetch(`${API_BASE_URL}/users/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const r = await fetch(API_BASE_URL + '/users/me', { headers: h });
                 if (r.ok) {
                     currentUser = (await r.json()).data || currentUser;
                     localStorage.setItem('userData', JSON.stringify(Object.assign(getUserData() || {}, currentUser)));
                     fillDisplay(currentUser);
                 }
             } catch (e) {}
+            try {
+                const r = await fetch(API_BASE_URL + '/users/me/stats', { headers: h });
+                if (r.ok) {
+                    const s = (await r.json()).data || {};
+                    const n = v => String(parseInt(v, 10) || 0);
+                    $('statTotal').textContent = n(s.total_missions);
+                    $('statActive').textContent = n(Number(s.pending || 0) + Number(s.in_transit || 0));
+                    $('statDone').textContent = n(s.delivered);
+                }
+            } catch (e) {}
         }
 
-        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+        async function loadNotifDot() {
+            try {
+                const r = await fetch(API_BASE_URL + '/notifications/my-notifications?limit=100', { headers: { 'Authorization': 'Bearer ' + getAuthToken() } });
+                if (!r.ok) return;
+                const unread = ((await r.json()).data || []).filter(n => !n.is_read).length;
+                $('notifDot').classList.toggle('hidden', unread === 0);
+            } catch (e) {}
+        }
 
-        // --- Modifier le profil ---
+        function editAvatar() { toast('Changement de photo bientôt disponible'); }
+
+        /* ---------- bottom sheet ---------- */
+        let sheetKind = null;
+        const SHEETS = {
+            edit: () => ({
+                title: 'Modifier le profil', sub: 'Vos informations personnelles',
+                html: `
+                <div class="pr-field"><label for="epFirst">Prénom</label><input class="pr-input" id="epFirst" autocomplete="given-name"></div>
+                <div class="pr-field"><label for="epLast">Nom</label><input class="pr-input" id="epLast" autocomplete="family-name"></div>
+                <div class="pr-field"><label for="epPhone">Téléphone</label><input class="pr-input" id="epPhone" type="tel" autocomplete="tel"></div>
+                <div class="pr-field"><label>Pièce d'identité — recto</label>
+                    <div class="pr-idprev" id="epRectoPrev"></div>
+                    <input type="file" id="epRecto" accept="image/*" hidden onchange="previewId('recto')">
+                    <button type="button" class="pr-idbtn" onclick="$('epRecto').click()">${IC.upload}Choisir une image</button></div>
+                <div class="pr-field"><label>Pièce d'identité — verso</label>
+                    <div class="pr-idprev" id="epVersoPrev"></div>
+                    <input type="file" id="epVerso" accept="image/*" hidden onchange="previewId('verso')">
+                    <button type="button" class="pr-idbtn" onclick="$('epVerso').click()">${IC.upload}Choisir une image</button></div>
+                <div class="pr-actions"><button type="button" class="pr-btn pr-btn--ghost" onclick="closeSheet()">Annuler</button>
+                <button type="button" class="pr-btn pr-btn--main" id="epSave" onclick="saveProfile()">Enregistrer</button></div>`,
+                init() {
+                    const u = currentUser || {};
+                    $('epFirst').value = u.first_name || '';
+                    $('epLast').value = u.last_name || '';
+                    $('epPhone').value = u.phone || '';
+                    rectoFile = null; versoFile = null;
+                    if (u.identity_document_url && /^https?:/.test(u.identity_document_url)) $('epRectoPrev').innerHTML = '<img alt="" src="' + esc(u.identity_document_url) + '">';
+                    if (u.identity_document_url_back && /^https?:/.test(u.identity_document_url_back)) $('epVersoPrev').innerHTML = '<img alt="" src="' + esc(u.identity_document_url_back) + '">';
+                }
+            }),
+            password: () => ({
+                title: 'Mot de passe', sub: 'Au moins 8 caractères',
+                html: `
+                <div class="pr-field"><label for="pwOld">Mot de passe actuel</label><input class="pr-input" id="pwOld" type="password" autocomplete="current-password"></div>
+                <div class="pr-field"><label for="pwNew">Nouveau mot de passe</label><input class="pr-input" id="pwNew" type="password" autocomplete="new-password"></div>
+                <div class="pr-field"><label for="pwConf">Confirmer le mot de passe</label><input class="pr-input" id="pwConf" type="password" autocomplete="new-password"></div>
+                <div class="pr-actions"><button type="button" class="pr-btn pr-btn--ghost" onclick="closeSheet()">Annuler</button>
+                <button type="button" class="pr-btn pr-btn--main" id="pwSave" onclick="savePassword()">Changer</button></div>`
+            }),
+            lang: () => ({
+                title: 'Langue', sub: "Langue d'affichage de l'application",
+                html: `<div class="pr-opts">
+                <div class="pr-opt is-on">Français</div>
+                <div class="pr-opt is-off">English<small>Bientôt</small></div>
+                <div class="pr-opt is-off">Wolof<small>Bientôt</small></div></div>`
+            }),
+            help: () => ({
+                title: "Centre d'aide", sub: 'Les réponses à vos questions',
+                html: `<div class="pr-rows">
+                <div class="pr-row"><div><b>Comment créer un envoi ?</b><small>Onglet Accueil › Nouvel envoi : décrivez le colis, indiquez les adresses, vérifiez le récapitulatif puis payez.</small></div></div>
+                <div class="pr-row"><div><b>Comment suivre mon colis ?</b><small>Onglet Suivi : la frise indique chaque étape, de la prise en charge à la livraison.</small></div></div>
+                <div class="pr-row"><div><b>Un problème avec un envoi ?</b><small>Ouvrez l'onglet Alertes pour déposer une réclamation.</small></div></div></div>`
+            }),
+            contact: () => ({
+                title: 'Contacter le support', sub: 'Nous sommes là pour vous',
+                html: `<div class="pr-rows">
+                <a class="pr-row" href="mailto:support@sengp.com"><span class="pr-item__ic pr-ic--blue">${IC.mail}</span><div><b>Email</b><small>support@sengp.com</small></div></a>
+                <a class="pr-row" href="tel:+221331234567"><span class="pr-item__ic pr-ic--green">${IC.phone}</span><div><b>Téléphone</b><small>+221 33 123 45 67</small></div></a></div>`
+            }),
+            about: () => ({
+                title: 'À propos', sub: '',
+                html: `<div class="pr-about"><img src="im/sengp-logo-square.png" alt="SEN GP" width="92" height="92">
+                <h4>SEN GP</h4><div class="v">Version 1.0.0</div>
+                <p>SEN GP met en relation les expéditeurs de colis et les voyageurs internationaux pour des envois sûrs, rapides et abordables.</p>
+                <div class="c">© 2025 SEN GP. Tous droits réservés.</div></div>`
+            }),
+            logout: () => ({
+                title: 'Déconnexion', sub: '',
+                html: `<div class="pr-logout-msg"><p>Voulez-vous vraiment vous déconnecter de SEN GP ?</p></div>
+                <div class="pr-actions"><button type="button" class="pr-btn pr-btn--ghost" onclick="closeSheet()">Annuler</button>
+                <button type="button" class="pr-btn pr-btn--danger" onclick="logout()">Se déconnecter</button></div>`
+            })
+        };
+
+        function openSheet(kind) {
+            const d = SHEETS[kind](); sheetKind = kind;
+            $('sheetTitle').textContent = d.title;
+            $('sheetSub').textContent = d.sub;
+            $('sheetSub').style.display = d.sub ? '' : 'none';
+            $('sheetBody').innerHTML = d.html;
+            if (d.init) d.init();
+            $('sheetOverlay').classList.add('show');
+            $('scroller').classList.add('is-locked');
+        }
+        function closeSheet() {
+            $('sheetOverlay').classList.remove('show');
+            $('scroller').classList.remove('is-locked');
+            sheetKind = null;
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && sheetKind) closeSheet(); });
+
+        /* ---------- modifier le profil ---------- */
         let rectoFile = null, versoFile = null;
-        function editProfile() {
-            const u = currentUser || {};
-            document.getElementById('epFirst').value = u.first_name || '';
-            document.getElementById('epLast').value = u.last_name || '';
-            document.getElementById('epPhone').value = u.phone || '';
-            rectoFile = null; versoFile = null;
-            document.getElementById('epRecto').value = '';
-            document.getElementById('epVerso').value = '';
-            document.getElementById('epRectoPrev').innerHTML = u.identity_document_url ? `<img src="${u.identity_document_url}">` : '';
-            document.getElementById('epVersoPrev').innerHTML = u.identity_document_url_back ? `<img src="${u.identity_document_url_back}">` : '';
-            document.getElementById('editProfileModal').classList.add('show');
-        }
-
         function previewId(side) {
-            const input = document.getElementById(side === 'recto' ? 'epRecto' : 'epVerso');
-            const prev = document.getElementById(side === 'recto' ? 'epRectoPrev' : 'epVersoPrev');
-            const f = input.files[0];
+            const f = $(side === 'recto' ? 'epRecto' : 'epVerso').files[0];
             if (!f) return;
             if (side === 'recto') rectoFile = f; else versoFile = f;
-            const url = URL.createObjectURL(f);
-            prev.innerHTML = `<img src="${url}">`;
+            $(side === 'recto' ? 'epRectoPrev' : 'epVersoPrev').innerHTML = '<img alt="" src="' + URL.createObjectURL(f) + '">';
         }
 
         async function uploadFile(file) {
             const fd = new FormData();
             fd.append('file', file, file.name || 'cni.jpg');
-            const r = await fetch(`${API_BASE_URL}/uploads`, {
-                method: 'POST', headers: { 'Authorization': `Bearer ${getAuthToken()}` }, body: fd
-            });
+            const r = await fetch(API_BASE_URL + '/uploads', { method: 'POST', headers: { 'Authorization': 'Bearer ' + getAuthToken() }, body: fd });
             const j = await r.json();
             if (!r.ok || !j.success) throw new Error(j.error || 'Upload échoué');
             return j.data.key;
         }
 
         async function saveProfile() {
-            const btn = document.getElementById('epSave');
+            const btn = $('epSave');
             btn.disabled = true; btn.textContent = 'Enregistrement…';
             try {
                 const body = {
-                    first_name: document.getElementById('epFirst').value.trim(),
-                    last_name: document.getElementById('epLast').value.trim(),
-                    phone: document.getElementById('epPhone').value.trim()
+                    first_name: $('epFirst').value.trim(),
+                    last_name: $('epLast').value.trim(),
+                    phone: $('epPhone').value.trim()
                 };
                 if (rectoFile || versoFile) body.identity_document_type = 'cni';
                 if (rectoFile) body.identity_document_url = await uploadFile(rectoFile);
                 if (versoFile) body.identity_document_url_back = await uploadFile(versoFile);
-
-                const r = await fetch(`${API_BASE_URL}/users/me`, {
+                const r = await fetch(API_BASE_URL + '/users/me', {
                     method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
+                    headers: { 'Authorization': 'Bearer ' + getAuthToken(), 'Content-Type': 'application/json' },
                     body: JSON.stringify(body)
                 });
                 const j = await r.json();
@@ -835,124 +569,62 @@
                     currentUser = j.data;
                     localStorage.setItem('userData', JSON.stringify(Object.assign(getUserData() || {}, currentUser)));
                     fillDisplay(currentUser);
-                    closeModal('editProfileModal');
-                    alert('Profil mis à jour ✅');
+                    closeSheet();
+                    toast('Profil mis à jour ✅');
                 } else {
                     alert('Erreur: ' + (j.error || j.message || 'Mise à jour échouée'));
+                    btn.disabled = false; btn.textContent = 'Enregistrer';
                 }
             } catch (e) {
                 alert('Erreur: ' + e.message);
-            } finally {
                 btn.disabled = false; btn.textContent = 'Enregistrer';
             }
         }
 
-        // --- Mot de passe ---
-        function changePassword() {
-            document.getElementById('pwOld').value = '';
-            document.getElementById('pwNew').value = '';
-            document.getElementById('pwConf').value = '';
-            document.getElementById('passwordModal').classList.add('show');
-        }
-
+        /* ---------- mot de passe ---------- */
         async function savePassword() {
-            const oldP = document.getElementById('pwOld').value;
-            const newP = document.getElementById('pwNew').value;
-            const conf = document.getElementById('pwConf').value;
+            const oldP = $('pwOld').value, newP = $('pwNew').value, conf = $('pwConf').value;
             if (!oldP || !newP) { alert('Remplissez tous les champs.'); return; }
             if (newP.length < 8) { alert('Le nouveau mot de passe doit faire au moins 8 caractères.'); return; }
             if (newP !== conf) { alert('Les mots de passe ne correspondent pas.'); return; }
-            const btn = document.getElementById('pwSave');
+            const btn = $('pwSave');
             btn.disabled = true; btn.textContent = 'Changement…';
             try {
-                const r = await fetch(`${API_BASE_URL}/auth/change-password`, {
+                const r = await fetch(API_BASE_URL + '/auth/change-password', {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
+                    headers: { 'Authorization': 'Bearer ' + getAuthToken(), 'Content-Type': 'application/json' },
                     body: JSON.stringify({ oldPassword: oldP, newPassword: newP })
                 });
                 const j = await r.json();
-                if (r.ok && j.success) { closeModal('passwordModal'); alert('Mot de passe modifié ✅'); }
-                else alert('Erreur: ' + (j.error || j.message || 'Échec'));
+                if (r.ok && j.success) { closeSheet(); toast('Mot de passe modifié ✅'); return; }
+                alert('Erreur: ' + (j.error || j.message || 'Échec'));
             } catch (e) {
                 alert('Erreur de connexion.');
-            } finally {
-                btn.disabled = false; btn.textContent = 'Changer';
             }
+            btn.disabled = false; btn.textContent = 'Changer';
         }
 
-        function paymentMethods() {
-            alert('Moyens de paiement\n\nGérez vos cartes bancaires et portefeuilles mobiles.\n\n(Fonctionnalité à venir)');
-        }
-
-        // Load profile on page load
-        window.addEventListener('load', () => {
-            loadUserProfile();
-        });
-
-        function toggleSetting(element) {
-            element.classList.toggle('active');
-            const isActive = element.classList.contains('active');
-            const title = element.parentElement.querySelector('.menu-title').textContent;
-            alert(`${title}\n\n${isActive ? 'Activé ✓' : 'Désactivé ✗'}`);
-        }
-
-        function language() {
-            alert('Changer la langue\n\nLangues disponibles:\n- Français (actuel)\n- English\n- Wolof');
-        }
-
-        function helpCenter() {
-            alert('Centre d\'aide\n\nAccès aux FAQ et guides d\'utilisation de SEN GP.');
-        }
-
-        function contactSupport() {
-            alert('Contacter le support\n\nEmail: support@sengp.com\nTéléphone: +221 33 123 45 67\nChat en direct disponible 24/7');
-        }
-
-        function about() {
-            alert('À propos de SEN GP\n\nVersion: 1.0.0\n\nSEN GP est une plateforme qui met en relation les expéditeurs de colis et les voyageurs internationaux.\n\n© 2025 SEN GP. Tous droits réservés.');
-        }
-
-        function confirmLogout() {
-            document.getElementById('logoutModal').classList.add('show');
-        }
-
-        function closeLogoutModal() {
-            document.getElementById('logoutModal').classList.remove('show');
-        }
-
+        /* ---------- déconnexion ---------- */
         function logout() {
-            closeLogoutModal();
-
-            // Clear all user data from localStorage
             localStorage.removeItem('authToken');
             localStorage.removeItem('userData');
-
-            alert('Déconnexion réussie!\n\nÀ bientôt sur SEN GP.');
-
-            // Redirection vers la page de choix du type de compte (sans onboarding)
             window.location.href = 'index.html?choice=1';
         }
 
         function navigateTo(section) {
             const pages = {
                 'home': 'dashexpediteur.html',
+                'orders': 'envois.html',
                 'reclamation': 'reclamation.html',
                 'tracking': 'suivi.html',
                 'notifications': 'notifications.html',
                 'profile': 'profile.html'
             };
-
-            if (pages[section]) {
-                window.location.href = pages[section];
-            }
+            if (pages[section]) window.location.href = pages[section];
         }
 
-        // Close modal when clicking outside
-        document.getElementById('logoutModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeLogoutModal();
-            }
-        });
+        window.addEventListener('load', () => { loadUserProfile(); loadNotifDot(); });
     </script>
+    <script src="ptr.js"></script>
 </body>
 </html>
