@@ -5,472 +5,162 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEN GP - Créer un Trajet</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html { background: #F4F8FD; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #F4F8FD;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            color: #0B1D3A;
         }
+        :root { --ct-navy: #0B1D3A; --ct-muted: #6B7A93; --ct-blue: #2F6BFF; --ct-banner-h: 0px; }
 
-        .mobile-frame {
-            width: 100%;
-            max-width: 375px;
-            height: 667px;
-            background: linear-gradient(135deg, rgba(15, 12, 41, 0.95) 0%, rgba(48, 43, 99, 0.95) 50%, rgba(36, 36, 62, 0.95) 100%);
-            border-radius: 40px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            overflow: hidden;
-            position: relative;
-        }
+        /* ============================================
+           CRÉER UN TRAJET
+           ============================================ */
+        .mobile-frame { position: relative; width: 100%; overflow: hidden; background: #F4F8FD; }
+        .mobile-frame::before { content: ""; position: absolute; inset: 0; background: #F4F8FD; }
+        .ct-i { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+        button, input, select { font: inherit; -webkit-tap-highlight-color: transparent; }
 
-        .status-bar {
-            height: 44px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .time { color: #fff; }
-        .indicators {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-        .signal, .wifi, .battery {
-            width: 18px;
-            height: 12px;
-            background: rgba(255,255,255,0.8);
-            border-radius: 2px;
-        }
-
-        /* Header */
-        .header {
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .back-btn {
-            width: 36px;
-            height: 36px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateX(-3px);
-        }
-
-        .header-title h1 {
-            font-size: 20px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .header-title p {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: 2px;
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.03);
-        }
-
-        .progress-steps {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            margin-bottom: 10px;
-        }
-
-        .progress-line {
+        .ct-scroll {
             position: absolute;
-            top: 15px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.1);
-            z-index: 0;
-        }
-
-        .progress-line-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4ECDC4 0%, #44A08D 100%);
-            transition: width 0.3s ease;
-        }
-
-        .step {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.5);
-            position: relative;
-            z-index: 1;
-            transition: all 0.3s ease;
-        }
-
-        .step.active {
-            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
-            border-color: #4ECDC4;
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
-        }
-
-        .step.completed {
-            background: #4ECDC4;
-            border-color: #4ECDC4;
-            color: #ffffff;
-        }
-
-        .step-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-        }
-
-        .step-label {
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 600;
-            text-align: center;
-            width: 30px;
-        }
-
-        .step-label.active {
-            color: #4ECDC4;
-        }
-
-        /* Content */
-        .content {
-            height: calc(100% - 44px - 100px - 85px);
+            top: 0; left: 0; right: 0;
+            bottom: calc(var(--ct-foot-h, 130px) + var(--ct-banner-h));
+            overflow-x: hidden;
             overflow-y: auto;
-            padding: 20px;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .ct-scroll::-webkit-scrollbar { display: none; }
+
+        /* ---- hero ---- */
+        .ct-hero { position: relative; height: calc(214px + env(safe-area-inset-top, 0px)); overflow: hidden; background: linear-gradient(180deg, #0B1D3A, #2B4A7A); }
+        .ct-hero img.ct-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 78% 30%; }
+        .ct-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7, 20, 47, 0.55) 0%, rgba(7, 20, 47, 0.1) 60%, rgba(7, 20, 47, 0) 100%), linear-gradient(180deg, rgba(244, 248, 253, 0) 72%, #F4F8FD 100%); }
+        .ct-hero__in { position: absolute; z-index: 2; left: 0; right: 0; top: env(safe-area-inset-top, 0px); max-width: 480px; margin: 0 auto; padding: 14px 18px 0; }
+        .ct-logo { display: block; margin-left: 52px; width: 118px; height: auto; filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45)); }
+        .ct-back { position: absolute; left: 18px; top: calc(66px + env(safe-area-inset-top, 0px)); z-index: 3; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(40, 56, 90, 0.55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff; cursor: pointer; }
+        .ct-back .ct-i { width: 22px; height: 22px; }
+        .ct-back:active { transform: scale(0.95); }
+        .ct-title { position: absolute; z-index: 2; left: 0; right: 0; bottom: 52px; max-width: 480px; margin: 0 auto; padding: 0 20px; }
+        .ct-title h1 { font-size: 31px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.1; color: #fff; text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6); }
+        .ct-title p { margin-top: 5px; font-size: 17px; color: #EEF3FB; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.65); }
+
+        .ct-body { position: relative; z-index: 3; max-width: 480px; margin: -30px auto 0; padding: 0 14px 24px; }
+
+        /* ---- stepper ---- */
+        .ct-steps { padding: 12px 22px 10px; background: #fff; border-radius: 24px; box-shadow: 0 10px 30px rgba(11, 29, 58, 0.08); }
+        .ct-steps__row { position: relative; display: flex; justify-content: space-between; align-items: center; }
+        .ct-line { position: absolute; left: 30px; right: 30px; top: 50%; height: 3px; margin-top: -1.5px; border-radius: 2px; background: #E3EAF5; overflow: hidden; }
+        .ct-line i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #06B6F4, #3B6FFA); transition: width 0.4s ease; }
+        .ct-step { position: relative; z-index: 1; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #E9EEF6; color: #6B7A93; font-size: 24px; font-weight: 800; transition: background 0.3s ease; }
+        .ct-step.active { background: linear-gradient(135deg, #06B6F4, #3B6FFA); color: #fff; box-shadow: 0 8px 20px rgba(59, 111, 250, 0.4); }
+        .ct-step.completed { background: #17A34A; color: #fff; }
+        .ct-step.completed span { display: none; }
+        .ct-step.completed::after { content: ""; width: 12px; height: 22px; margin-top: -4px; border: solid #fff; border-width: 0 4px 4px 0; transform: rotate(45deg); }
+        .ct-labels { margin-top: 8px; display: flex; justify-content: space-between; }
+        .ct-label { width: 60px; text-align: center; font-size: 16px; font-weight: 600; color: var(--ct-muted); }
+        .ct-label.active { color: var(--ct-blue); font-weight: 800; }
+        .ct-label.completed { color: #17A34A; font-weight: 700; }
+        .ct-label:last-child { width: 80px; margin-right: -10px; }
+        .ct-label:first-child { width: 80px; margin-left: -10px; }
+
+        .ct-pane { display: none; }
+        .ct-pane.active { display: block; animation: ctIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+        @keyframes ctIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+        .ct-head { margin-top: 18px; display: flex; align-items: flex-start; gap: 14px; }
+        .ct-head__ic { width: 62px; height: 62px; flex-shrink: 0; border-radius: 20px; display: flex; align-items: center; justify-content: center; background: #FFE9D2; color: #F7931E; }
+        .ct-head__ic .ct-i { width: 34px; height: 34px; }
+        .ct-head h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.15; }
+        .ct-head p { margin-top: 6px; font-size: 17px; line-height: 1.35; color: var(--ct-muted); }
+
+        /* ---- upload zone ---- */
+        .ct-drop { position: relative; margin-top: 18px; padding: 14px 18px 18px; border: 2px dashed #8FB4F5; border-radius: 28px; background: linear-gradient(180deg, #F7FAFF, #EEF4FF); text-align: center; overflow: hidden; }
+        .ct-drop.has-file { border-style: solid; border-color: #17A34A; background: #F3FBF6; }
+        .ct-art { position: relative; width: 64%; max-width: 230px; margin: 0 auto; }
+        .ct-art svg { display: block; width: 100%; height: auto; overflow: visible; }
+        .ct-drop h3 { margin-top: 6px; font-size: 25px; font-weight: 800; letter-spacing: -0.2px; }
+        .ct-drop > p { margin-top: 4px; font-size: 16px; color: var(--ct-muted); overflow-wrap: anywhere; }
+        .ct-btn { margin-top: 12px; width: 100%; max-width: 330px; min-height: 62px; display: inline-flex; align-items: center; justify-content: center; gap: 12px; border: 0; border-radius: 999px; background: linear-gradient(90deg, #0A84FF, #6D4AF5); color: #fff; font-size: 20px; font-weight: 800; cursor: pointer; box-shadow: 0 12px 26px rgba(79, 70, 229, 0.32); transition: transform 0.15s ease; }
+        .ct-btn:active { transform: scale(0.985); }
+        .ct-btn .ct-i { width: 26px; height: 26px; }
+        .ct-preview { display: none; margin: 0 auto; width: 100%; max-width: 300px; max-height: 200px; object-fit: contain; border-radius: 18px; background: #fff; box-shadow: 0 10px 26px rgba(11, 29, 58, 0.14); }
+        .ct-pdf { display: none; margin: 0 auto; width: 110px; height: 130px; align-items: center; justify-content: center; border-radius: 20px; background: #fff; color: #E5484D; box-shadow: 0 10px 26px rgba(11, 29, 58, 0.14); }
+        .ct-pdf .ct-i { width: 54px; height: 54px; }
+        .ct-pdf b { position: absolute; margin-top: 30px; font-size: 15px; letter-spacing: 1px; }
+        .ct-drop.has-file .ct-art { display: none; }
+        .ct-drop.has-file .ct-preview.on, .ct-drop.has-file .ct-pdf.on { display: flex; }
+        .ct-drop.has-file .ct-preview.on { display: block; }
+
+        .ct-cam { margin-top: 14px; width: 100%; display: flex; align-items: center; gap: 16px; padding: 14px 16px; border: 0; border-radius: 24px; background: #fff; text-align: left; color: inherit; cursor: pointer; box-shadow: 0 8px 24px rgba(11, 29, 58, 0.06); }
+        .ct-cam:active { background: #F4F8FD; }
+        .ct-cam__ic { width: 62px; height: 62px; flex-shrink: 0; border-radius: 20px; display: flex; align-items: center; justify-content: center; background: #E3EEFF; color: var(--ct-blue); }
+        .ct-cam__ic .ct-i { width: 32px; height: 32px; }
+        .ct-cam b { display: block; font-size: 19px; font-weight: 800; }
+        .ct-cam small { display: block; margin-top: 2px; font-size: 16px; color: var(--ct-muted); }
+        .ct-cam > .ct-i { margin-left: auto; width: 24px; height: 24px; color: var(--ct-muted); }
+        .ct-secure { margin-top: 16px; display: flex; align-items: center; gap: 12px; padding: 0 6px; font-size: 15.5px; line-height: 1.35; color: var(--ct-muted); }
+        .ct-secure .ct-i { width: 30px; height: 30px; color: var(--ct-blue); }
+
+        /* ---- step 2 form ---- */
+        .ct-card { margin-top: 18px; padding: 18px 16px 4px; background: #fff; border-radius: 26px; box-shadow: 0 8px 26px rgba(11, 29, 58, 0.06); }
+        .ct-card h3 { margin-bottom: 14px; display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 800; }
+        .ct-card h3 .ct-i { width: 24px; height: 24px; color: var(--ct-blue); }
+        .ct-field { margin-bottom: 16px; }
+        .ct-field label { display: block; margin-bottom: 8px; font-size: 15px; font-weight: 700; color: var(--ct-navy); }
+        .ds .ct-field select.ct-input, .ds .ct-field input.ct-input { width: 100%; min-height: 56px; padding: 0 16px; border: 1.5px solid #D5DEEA; border-radius: 16px; background: #F8FAFD; color: var(--ct-navy); font-size: 17px; box-shadow: none; outline: none; -webkit-appearance: none; appearance: none; }
+        .ds .ct-field select.ct-input { padding-right: 42px; background: #F8FAFD url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236B7A93' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center; }
+        .ds .ct-field select.ct-input option { color: #0B1D3A; background: #fff; }
+        .ds .ct-field .ct-input:focus { border-color: #3B6FFA; box-shadow: 0 0 0 3px rgba(59, 111, 250, 0.18); background-color: #fff; }
+        .ct-note { margin-top: 18px; display: flex; gap: 12px; padding: 14px 16px; border-radius: 18px; background: #EAF3FF; font-size: 15px; line-height: 1.45; color: #2B4673; }
+        .ct-note .ct-i { width: 24px; height: 24px; color: var(--ct-blue); margin-top: 1px; }
+
+        /* ---- footer ---- */
+        .ct-foot { position: absolute; left: 0; right: 0; bottom: var(--ct-banner-h); z-index: 20; padding: 14px 14px calc(12px + env(safe-area-inset-bottom, 0px)); background: rgba(255, 255, 255, 0.97); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid #E3EAF3; border-radius: 26px 26px 0 0; box-shadow: 0 -8px 24px rgba(11, 29, 58, 0.06); }
+        .ct-foot__in { max-width: 480px; margin: 0 auto; }
+        .ct-actions { display: flex; gap: 10px; }
+        .ct-next { flex: 1; min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 24px; border: 0; border-radius: 20px; background: linear-gradient(90deg, #0A84FF, #6D4AF5); color: #fff; font-size: 20px; font-weight: 800; cursor: pointer; box-shadow: 0 12px 26px rgba(79, 70, 229, 0.3); transition: transform 0.15s ease, opacity 0.2s ease; }
+        .ct-next span { flex: 1; text-align: center; }
+        .ct-next .ct-i { width: 26px; height: 26px; }
+        .ct-next:active:not(:disabled) { transform: scale(0.985); }
+        .ct-next:disabled { background: #B8D4FA; box-shadow: none; cursor: not-allowed; }
+        .ct-prev { min-height: 62px; padding: 0 22px; border: 0; border-radius: 20px; background: #EAEFF7; color: var(--ct-navy); font-size: 18px; font-weight: 800; cursor: pointer; }
+        .ct-foot p { margin-top: 8px; text-align: center; font-size: 14px; color: var(--ct-muted); }
+
+        .ct-back:focus-visible, .ct-btn:focus-visible, .ct-cam:focus-visible, .ct-next:focus-visible, .ct-prev:focus-visible { outline: 2px solid #2F6BFF; outline-offset: 2px; }
+        @media (prefers-reduced-motion: reduce) { .ct-pane.active { animation: none; } * { transition-duration: 0.01ms !important; } }
+
+        /* PWA install banner (pwa.js): keep it compact, reserve its height */
+        #sengp-install-banner { bottom: 8px !important; padding: 8px 12px !important; gap: 10px !important; font-size: 12px !important; line-height: 1.3 !important; border-radius: 14px !important; }
+        #sengp-install-banner img { width: 34px !important; height: 34px !important; }
+        #sengp-install-banner strong { font-size: 13px !important; }
+
+        @media (max-width: 400px) {
+            .ct-title h1 { font-size: 28px; }
+            .ct-head h2 { font-size: 23px; }
+            .ct-head__ic { width: 54px; height: 54px; }
+            .ct-step { width: 54px; height: 54px; }
+        }
+        @media (max-width: 359px) {
+            .ct-body { padding-left: 10px; padding-right: 10px; }
+            .ct-title h1 { font-size: 25px; }
+            .ct-head p { font-size: 15.5px; }
+            .ct-drop h3 { font-size: 22px; }
+            .ct-btn { font-size: 18px; }
+            .ct-cam b { font-size: 17px; }
+            .ct-cam small { font-size: 14.5px; }
         }
 
-        .content::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .content::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-
-        /* Step Content */
-        .step-content {
-            display: none;
-        }
-
-        .step-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .step-header {
-            margin-bottom: 20px;
-        }
-
-        .step-header h2 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 8px;
-        }
-
-        .step-header p {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
-            line-height: 1.5;
-        }
-
-        /* Photo Upload */
-        .upload-area {
-            background-image: linear-gradient(rgba(18, 16, 40, 0.55), rgba(18, 16, 40, 0.6)), url('im/billet.jpeg');
-            background-size: cover;
-            background-position: center;
-            border: 2px dashed rgba(78, 205, 196, 0.5);
-            border-radius: 16px;
-            padding: 48px 20px;
-            min-height: 190px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .upload-area:hover {
-            border-color: rgba(78, 205, 196, 0.8);
-        }
-
-        .upload-area.has-file {
-            border-style: solid;
-            border-color: #4ECDC4;
-            background-image: none;
-            background-color: rgba(78, 205, 196, 0.1);
-            min-height: 0;
-        }
-
-        .upload-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-
-        .upload-text h3 {
-            font-size: 16px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .upload-text p {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .preview-image {
-            width: 100%;
-            max-height: 200px;
-            object-fit: contain;
-            border-radius: 12px;
-            margin-top: 12px;
-        }
-
-        .upload-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .upload-option {
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .upload-option:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: #4ECDC4;
-        }
-
-        .upload-option-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .upload-option-text {
-            font-size: 13px;
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        /* Form */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 8px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            font-size: 14px;
-            color: #ffffff;
-            transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #4ECDC4;
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .form-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            font-size: 14px;
-            color: #ffffff;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .form-select:focus {
-            outline: none;
-            border-color: #4ECDC4;
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .form-select option {
-            background: #1a1a2e;
-            color: #ffffff;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 20px;
-            background: linear-gradient(180deg, rgba(15, 12, 41, 0.95) 0%, rgba(26, 22, 48, 0.98) 100%);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(78, 205, 196, 0.5);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .info-box {
-            background: linear-gradient(135deg, rgba(78, 205, 196, 0.1) 0%, rgba(68, 160, 141, 0.1) 100%);
-            border: 1px solid rgba(78, 205, 196, 0.2);
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 16px;
-        }
-
-        .info-box-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .info-box-icon {
-            font-size: 20px;
-        }
-
-        .info-box-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #4ECDC4;
-        }
-
-        .info-box-text {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.5;
-        }
-
-        /* Hidden file input */
-        input[type="file"] {
-            display: none;
-        }
-            /* sengp-responsive-override */
+        /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
-        </style>
+    </style>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -485,163 +175,189 @@
     <script src="pwa.js" defer></script>
 </head>
 <body class="ds">
-    <div class="mobile-frame">
+<div class="mobile-frame">
 
-        <!-- Header -->
-        <div class="header">
-            <button class="back-btn" onclick="goBack()">←</button>
-            <div class="header-title">
+    <div class="content ct-scroll" id="scroller">
+        <header class="ct-hero">
+            <picture>
+                <source type="image/webp" srcset="im/sengp-create-background.webp">
+                <img class="ct-bg" src="im/sengp-create-background.jpg" alt="" decoding="async">
+            </picture>
+            <div class="ct-hero__in"><img class="ct-logo" src="im/sengp-logo.png" alt="SEN GP" width="118" height="73"></div>
+            <button type="button" class="ct-back" onclick="goBack()" aria-label="Retour">
+                <svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            </button>
+            <div class="ct-title">
                 <h1>Créer un trajet</h1>
                 <p>Ajoutez votre prochain voyage</p>
             </div>
-        </div>
+        </header>
 
-        <!-- Progress Bar -->
-        <div class="progress-container">
-            <div class="progress-steps">
-                <div class="progress-line">
-                    <div class="progress-line-fill" id="progressFill" style="width: 0%"></div>
+        <div class="ct-body">
+            <!-- Stepper -->
+            <section class="ct-steps" aria-label="Progression">
+                <div class="ct-steps__row">
+                    <div class="ct-line"><i id="progressFill"></i></div>
+                    <div class="ct-step active" id="step1"><span>1</span></div>
+                    <div class="ct-step" id="step2"><span>2</span></div>
                 </div>
-                <div class="step active" id="step1">1</div>
-                <div class="step" id="step2">2</div>
+                <div class="ct-labels">
+                    <div class="ct-label active" id="label1">Billet</div>
+                    <div class="ct-label" id="label2">Détails</div>
+                </div>
+            </section>
+
+            <!-- Step 1: ticket -->
+            <div class="ct-pane active" id="content1">
+                <div class="ct-head">
+                    <span class="ct-head__ic"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true" style="fill: currentColor; stroke: none;"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span>
+                    <div>
+                        <h2>Votre billet d'avion</h2>
+                        <p>Importez une photo ou un fichier PDF de votre billet pour préremplir les détails du trajet.</p>
+                    </div>
+                </div>
+
+                <div class="ct-drop" id="uploadArea">
+                    <div class="ct-art" aria-hidden="true">
+                        <svg viewBox="0 0 300 190">
+                            <defs>
+                                <linearGradient id="tkB" x1="0" x2="1"><stop offset="0" stop-color="#1E78F0"/><stop offset="1" stop-color="#3B8BFF"/></linearGradient>
+                                <linearGradient id="tkR" x1="0" x2="1"><stop offset="0" stop-color="#FFC247"/><stop offset="0.5" stop-color="#FF8A1F"/><stop offset="1" stop-color="#2F8BFF"/></linearGradient>
+                            </defs>
+                            <ellipse cx="70" cy="140" rx="60" ry="30" fill="#DCE8FB" opacity="0.7"/>
+                            <ellipse cx="240" cy="132" rx="52" ry="26" fill="#DCE8FB" opacity="0.7"/>
+                            <ellipse cx="150" cy="98" rx="128" ry="52" fill="none" stroke="url(#tkR)" stroke-width="5" transform="rotate(-14 150 98)" opacity="0.9"/>
+                            <g transform="rotate(-14 150 96)">
+                                <rect x="62" y="48" width="170" height="96" rx="10" fill="#fff" stroke="#DCE6F5" stroke-width="2"/>
+                                <path d="M62 58a10 10 0 0 1 10-10h150a10 10 0 0 1 10 10v22H62z" fill="url(#tkB)"/>
+                                <path d="M92 118l8-30 6 4-4 14 14-4-6 18z" fill="#1E78F0" opacity="0.0"/>
+                                <g transform="translate(93 92) scale(1.1)"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" fill="#2F6BFF"/></g>
+                                <rect x="128" y="96" width="62" height="6" rx="3" fill="#D4DCE9"/>
+                                <rect x="128" y="110" width="48" height="6" rx="3" fill="#D4DCE9"/>
+                                <rect x="128" y="124" width="34" height="6" rx="3" fill="#E4EAF3"/>
+                                <path d="M204 52v92" stroke="#DCE6F5" stroke-width="2" stroke-dasharray="4 4"/>
+                                <g fill="#5B6B85"><rect x="212" y="60" width="2" height="22"/><rect x="216" y="60" width="4" height="22"/><rect x="222" y="60" width="2" height="22"/></g>
+                            </g>
+                            <circle cx="222" cy="104" r="34" fill="#fff" stroke="#E4ECF8" stroke-width="2"/>
+                            <path d="M222 118V92" stroke="#2F6BFF" stroke-width="4" stroke-linecap="round"/>
+                            <path d="m211 102 11-12 11 12" fill="none" stroke="#2F6BFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M208 124h28" stroke="#2F6BFF" stroke-width="4" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <img id="preview" class="ct-preview" alt="Aperçu du billet">
+                    <div id="pdfBadge" class="ct-pdf"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6"/></svg><b>PDF</b></div>
+                    <h3 id="uploadTitle">Ajouter votre billet</h3>
+                    <p id="uploadDesc">JPG, PNG ou PDF · 5 Mo max</p>
+                    <button type="button" class="ct-btn" id="pickBtn" onclick="document.getElementById('fileInput').click()">
+                        <svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6"/></svg>
+                        <span id="pickLabel">Choisir un fichier</span>
+                    </button>
+                </div>
+
+                <input type="file" id="fileInput" accept="image/*,application/pdf" onchange="handleFileSelect(event)" hidden>
+                <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleFileSelect(event)" hidden>
+
+                <button type="button" class="ct-cam" onclick="openCamera()">
+                    <span class="ct-cam__ic"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3.5"/></svg></span>
+                    <span><b>Prendre une photo</b><small>Photographiez votre billet directement</small></span>
+                    <svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+
+                <p class="ct-secure"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.7 8.9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>Vos informations sont utilisées uniquement pour préparer votre trajet.</p>
             </div>
-            <div class="step-labels">
-                <div class="step-label active" id="label1">Billet</div>
-                <div class="step-label" id="label2">Détails</div>
-            </div>
-        </div>
 
-        <!-- Content -->
-        <div class="content">
-            <!-- Step 1: Photo Upload -->
-            <div class="step-content active" id="content1">
-                <div class="step-header">
-                    <h2>📸 Photo du billet</h2>
-                    <p>Prenez une photo ou téléversez votre billet d'avion pour commencer</p>
-                </div>
-
-                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-                    <div class="upload-text">
-                        <h3 id="uploadTitle">Ajouter votre billet</h3>
-                        <p id="uploadDesc">Cliquez pour choisir un fichier</p>
-                    </div>
-                    <img id="preview" class="preview-image" style="display: none;">
-                </div>
-
-                <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
-
-                <div class="upload-options" style="grid-template-columns: 1fr;">
-                    <div class="upload-option" onclick="openCamera()">
-                        <div class="upload-option-icon">📷</div>
-                        <div class="upload-option-text">Prendre une photo</div>
+            <!-- Step 2: details -->
+            <div class="ct-pane" id="content2">
+                <div class="ct-head">
+                    <span class="ct-head__ic"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 14h6"/><path d="M9 18h4"/></svg></span>
+                    <div>
+                        <h2>Détails du trajet</h2>
+                        <p>Complétez les informations de votre voyage.</p>
                     </div>
                 </div>
 
-                <div class="info-box">
-                    <div class="info-box-header">
-                        <div class="info-box-icon">💡</div>
-                        <div class="info-box-title">Astuce</div>
-                    </div>
-                    <div class="info-box-text">
-                        Assurez-vous que toutes les informations sur le billet sont lisibles : dates, villes, heures de départ et d'arrivée.
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 2: Trip Details -->
-            <div class="step-content" id="content2">
-                <div class="step-header">
-                    <h2>📋 Détails du trajet</h2>
-                    <p>Complétez les informations de votre voyage</p>
-                </div>
-
-                <form id="tripForm">
-                    <!-- Departure -->
-                    <div class="form-group">
-                        <label class="form-label">🛫 Pays de départ</label>
-                        <select class="form-select" id="departureCountry" required onchange="updateDepartureCities()">
-                            <option value="">Sélectionnez le pays</option>
-                            <option value="Sénégal">🇸🇳 Sénégal</option>
-                            <option value="France">🇫🇷 France</option>
-                            <option value="Espagne">🇪🇸 Espagne</option>
-                            <option value="Italie">🇮🇹 Italie</option>
-                            <option value="USA">🇺🇸 États-Unis</option>
-                            <option value="Canada">🇨🇦 Canada</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Ville de départ</label>
-                        <select class="form-select" id="departureCity" required>
-                            <option value="">Sélectionnez la ville</option>
-                        </select>
-                    </div>
-
-                    <!-- Arrival -->
-                    <div class="form-group">
-                        <label class="form-label">🛬 Pays d'arrivée</label>
-                        <select class="form-select" id="arrivalCountry" required onchange="updateArrivalCities()">
-                            <option value="">Sélectionnez le pays</option>
-                            <option value="Sénégal">🇸🇳 Sénégal</option>
-                            <option value="France">🇫🇷 France</option>
-                            <option value="Espagne">🇪🇸 Espagne</option>
-                            <option value="Italie">🇮🇹 Italie</option>
-                            <option value="USA">🇺🇸 États-Unis</option>
-                            <option value="Canada">🇨🇦 Canada</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Ville d'arrivée</label>
-                        <select class="form-select" id="arrivalCity" required>
-                            <option value="">Sélectionnez la ville</option>
-                        </select>
-                    </div>
-
-                    <!-- Dates and Times -->
-                    <div class="form-group">
-                        <label class="form-label">📅 Date et heure de départ</label>
-                        <input type="datetime-local" class="form-input" id="departureDateTime" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">📅 Date et heure d'arrivée</label>
-                        <input type="datetime-local" class="form-input" id="arrivalDateTime" required>
-                    </div>
-
-                    <!-- Available Weight -->
-                    <div class="form-group">
-                        <label class="form-label">⚖️ Poids disponible (kg)</label>
-                        <input type="number" class="form-input" id="availableWeight"
-                               placeholder="Ex: 15" min="1" max="50" required>
-                    </div>
-
-                    <div class="info-box">
-                        <div class="info-box-header">
-                            <div class="info-box-icon">ℹ️</div>
-                            <div class="info-box-title">Information</div>
+                <form id="tripForm" onsubmit="return false">
+                    <section class="ct-card">
+                        <h3><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 22h20"/><path d="M6.4 14.2 3 12l1.5-1.5 4.1.9L13 8 5 4l1.5-1.5 11.2 3.3a2 2 0 0 1 .6 3.5l-3.4 2.6 4.4 4.9-1.5 1.5-5.6-3.5z"/></svg>Départ</h3>
+                        <div class="ct-field">
+                            <label for="departureCountry">Pays de départ</label>
+                            <select class="ct-input" id="departureCountry" required onchange="updateDepartureCities()">
+                                <option value="">Sélectionnez le pays</option>
+                                <option value="Sénégal">🇸🇳 Sénégal</option>
+                                <option value="France">🇫🇷 France</option>
+                                <option value="Espagne">🇪🇸 Espagne</option>
+                                <option value="Italie">🇮🇹 Italie</option>
+                                <option value="USA">🇺🇸 États-Unis</option>
+                                <option value="Canada">🇨🇦 Canada</option>
+                            </select>
                         </div>
-                        <div class="info-box-text">
-                            Le poids disponible correspond à la capacité que vous pouvez transporter en plus de vos bagages personnels.
+                        <div class="ct-field">
+                            <label for="departureCity">Ville de départ</label>
+                            <select class="ct-input" id="departureCity" required>
+                                <option value="">Sélectionnez la ville</option>
+                            </select>
                         </div>
+                        <div class="ct-field">
+                            <label for="departureDateTime">Date et heure de départ</label>
+                            <input type="datetime-local" class="ct-input" id="departureDateTime" required>
+                        </div>
+                    </section>
+
+                    <section class="ct-card">
+                        <h3><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>Arrivée</h3>
+                        <div class="ct-field">
+                            <label for="arrivalCountry">Pays d'arrivée</label>
+                            <select class="ct-input" id="arrivalCountry" required onchange="updateArrivalCities()">
+                                <option value="">Sélectionnez le pays</option>
+                                <option value="Sénégal">🇸🇳 Sénégal</option>
+                                <option value="France">🇫🇷 France</option>
+                                <option value="Espagne">🇪🇸 Espagne</option>
+                                <option value="Italie">🇮🇹 Italie</option>
+                                <option value="USA">🇺🇸 États-Unis</option>
+                                <option value="Canada">🇨🇦 Canada</option>
+                            </select>
+                        </div>
+                        <div class="ct-field">
+                            <label for="arrivalCity">Ville d'arrivée</label>
+                            <select class="ct-input" id="arrivalCity" required>
+                                <option value="">Sélectionnez la ville</option>
+                            </select>
+                        </div>
+                        <div class="ct-field">
+                            <label for="arrivalDateTime">Date et heure d'arrivée</label>
+                            <input type="datetime-local" class="ct-input" id="arrivalDateTime" required>
+                        </div>
+                    </section>
+
+                    <section class="ct-card">
+                        <h3><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>Capacité</h3>
+                        <div class="ct-field">
+                            <label for="availableWeight">Poids disponible (kg)</label>
+                            <input type="number" class="ct-input" id="availableWeight" placeholder="Ex : 15" min="1" max="50" inputmode="decimal" required>
+                        </div>
+                    </section>
+
+                    <div class="ct-note">
+                        <svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                        <span>Le poids disponible correspond à la capacité que vous pouvez transporter en plus de vos bagages personnels.</span>
                     </div>
                 </form>
             </div>
         </div>
+    </div>
 
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <button class="btn btn-secondary" id="prevBtn" onclick="prevStep()" style="display: none;">
-                Précédent
-            </button>
-            <button class="btn btn-primary" id="nextBtn" onclick="nextStep()" disabled>
-                Suivant
-            </button>
-            <button class="btn btn-primary" id="submitBtn" onclick="submitTrip()" style="display: none;">
-                Créer le trajet
-            </button>
+    <!-- Footer -->
+    <div class="ct-foot" id="foot">
+        <div class="ct-foot__in">
+            <div class="ct-actions">
+                <button type="button" class="ct-prev" id="prevBtn" onclick="prevStep()" style="display: none;">Précédent</button>
+                <button type="button" class="ct-next" id="nextBtn" onclick="nextStep()" disabled><span>Continuer</span><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+                <button type="button" class="ct-next" id="submitBtn" onclick="submitTrip()" style="display: none;"><span>Créer le trajet</span></button>
+            </div>
+            <p id="footNote">Vous pourrez vérifier les informations à l'étape suivante.</p>
         </div>
     </div>
+</div>
 
     <script>
         let currentStep = 1;
@@ -691,32 +407,45 @@
             }
         }
 
+        const MAX_FILE = 5 * 1024 * 1024; // limite du serveur (5 Mo)
+
+        function showFile(file, dataUrl) {
+            const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+            const prev = document.getElementById('preview');
+            const pdf = document.getElementById('pdfBadge');
+            prev.classList.toggle('on', !isPdf);
+            pdf.classList.toggle('on', isPdf);
+            if (!isPdf) prev.src = dataUrl;
+            document.getElementById('uploadArea').classList.add('has-file');
+            document.getElementById('uploadTitle').textContent = 'Billet ajouté';
+            document.getElementById('uploadDesc').textContent = file.name;
+            document.getElementById('pickLabel').textContent = 'Changer de fichier';
+            document.getElementById('nextBtn').disabled = false;
+        }
+
         function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (file) {
-                uploadedFile = file;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('preview');
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-
-                    document.getElementById('uploadArea').classList.add('has-file');
-                    document.getElementById('uploadTitle').textContent = '✅ Billet ajouté';
-                    document.getElementById('uploadDesc').textContent = file.name;
-
-                    // Enable next button
-                    document.getElementById('nextBtn').disabled = false;
-                };
-                reader.readAsDataURL(file);
+            const input = event.target;
+            const file = input.files[0];
+            input.value = '';
+            if (!file) return;
+            const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+            if (!isPdf && !/^image\//.test(file.type)) {
+                alert('Format non pris en charge.\n\nChoisissez une image (JPG, PNG) ou un PDF.');
+                return;
             }
+            if (file.size > MAX_FILE) {
+                alert('Fichier trop volumineux.\n\nLa taille maximale est de 5 Mo.');
+                return;
+            }
+            uploadedFile = file;
+            if (isPdf) { showFile(file, ''); return; }
+            const reader = new FileReader();
+            reader.onload = e => showFile(file, e.target.result);
+            reader.readAsDataURL(file);
         }
 
         function openCamera() {
-            // Trigger camera input
-            const input = document.getElementById('fileInput');
-            input.setAttribute('capture', 'environment');
-            input.click();
+            document.getElementById('cameraInput').click();
         }
 
         function nextStep() {
@@ -772,12 +501,15 @@
             const submitBtn = document.getElementById('submitBtn');
 
             prevBtn.style.display = currentStep > 1 ? 'block' : 'none';
+            document.getElementById('footNote').style.display = currentStep === 1 ? '' : 'none';
+            document.getElementById('scroller').scrollTop = 0;
+            syncFootHeight();
 
             if (currentStep === 2) {
                 nextBtn.style.display = 'none';
-                submitBtn.style.display = 'block';
+                submitBtn.style.display = 'flex';
             } else {
-                nextBtn.style.display = 'block';
+                nextBtn.style.display = 'flex';
                 submitBtn.style.display = 'none';
             }
         }
@@ -809,7 +541,7 @@
             try {
                 // Show loading
                 const submitBtn = document.getElementById('submitBtn');
-                submitBtn.textContent = 'Création en cours...';
+                submitBtn.querySelector('span').textContent = 'Création en cours...';
                 submitBtn.disabled = true;
 
                 // Prepare form data with file
@@ -839,16 +571,37 @@
                     window.location.href = 'dashgp.html';
                 } else {
                     alert('Erreur lors de la création du trajet:\n\n' + (result.message || 'Erreur inconnue'));
-                    submitBtn.textContent = 'Créer le trajet';
+                    submitBtn.querySelector('span').textContent = 'Créer le trajet';
                     submitBtn.disabled = false;
                 }
             } catch (error) {
                 console.error('Error creating trip:', error);
                 alert('Erreur de connexion au serveur.\n\nVeuillez réessayer.');
-                document.getElementById('submitBtn').textContent = 'Créer le trajet';
+                document.getElementById('submitBtn').querySelector('span').textContent = 'Créer le trajet';
                 document.getElementById('submitBtn').disabled = false;
             }
         }
+
+
+        // Hauteur réelle du pied de page + place de la bannière d'installation PWA (pwa.js)
+        function syncFootHeight() {
+            const f = document.getElementById('foot');
+            document.documentElement.style.setProperty('--ct-foot-h', f.offsetHeight + 'px');
+        }
+        (function trackInstallBanner() {
+            const root = document.documentElement;
+            let ro = null;
+            const sync = () => {
+                const b = document.getElementById('sengp-install-banner');
+                root.style.setProperty('--ct-banner-h', b ? (b.offsetHeight + 8) + 'px' : '0px');
+                if (b && !ro && window.ResizeObserver) { ro = new ResizeObserver(sync); ro.observe(b); }
+                if (!b && ro) { ro.disconnect(); ro = null; }
+            };
+            new MutationObserver(sync).observe(document.body, { childList: true });
+            sync();
+        })();
+        window.addEventListener('load', syncFootHeight);
+        window.addEventListener('resize', syncFootHeight);
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
