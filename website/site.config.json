@@ -1,0 +1,36 @@
+{
+  "live": false,
+  "legalReviewed": false,
+  "site": {
+    "name": "SEN GP",
+    "tagline": "Vos colis, notre engagement",
+    "url": "https://sengp.co",
+    "locale": "fr",
+    "appUrl": "https://sengp.vercel.app",
+    "description": "SEN GP met en relation des expéditeurs et des voyageurs pour envoyer des colis entre le Sénégal et le reste du monde, avec suivi en temps réel et remise sécurisée."
+  },
+  "company": {
+    "legalName": "[À COMPLÉTER : raison sociale exacte]",
+    "legalForm": "[À COMPLÉTER : forme juridique]",
+    "rccm": "[À COMPLÉTER : numéro RCCM]",
+    "ninea": "[À COMPLÉTER : NINEA]",
+    "address": "[À COMPLÉTER : adresse du siège social]",
+    "phone": "[À COMPLÉTER : téléphone officiel]",
+    "email": "[À COMPLÉTER : email de contact]",
+    "publicationDirector": "[À COMPLÉTER : directeur de la publication]",
+    "host": "Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis"
+  },
+  "social": {
+    "facebook": "",
+    "instagram": "",
+    "linkedin": "",
+    "whatsapp": ""
+  },
+  "nav": [
+    { "path": "/", "label": "Accueil", "key": "home" },
+    { "path": "/comment-ca-marche/", "label": "Comment ça marche", "key": "how" },
+    { "path": "/a-propos/", "label": "À propos", "key": "about" },
+    { "path": "/faq/", "label": "FAQ", "key": "faq" },
+    { "path": "/contact/", "label": "Contact", "key": "contact" }
+  ]
+}

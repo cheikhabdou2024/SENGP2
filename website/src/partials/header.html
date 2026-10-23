@@ -1,0 +1,15 @@
+<header class="site-header" id="top">
+  <div class="wrap site-header__in">
+    <a class="brand" href="/" aria-label="SEN GP — accueil">
+      <img src="/assets/logo.webp" alt="" width="132" height="82">
+      <span class="brand__txt"><b>SEN GP</b><small>{{site.tagline}}</small></span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Navigation principale">
+      {{{navHtml}}}
+      <a class="btn btn--sm btn--grad nav__cta" href="{{site.appUrl}}" rel="noopener">Ouvrir l'application</a>
+    </nav>
+    <button class="burger" id="burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
