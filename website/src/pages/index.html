@@ -1,9 +1,13 @@
 <!--meta {"title":"SEN GP","key":"home","description":"SEN GP met en relation des expéditeurs et des voyageurs pour envoyer des colis entre le Sénégal et l'international, avec suivi en temps réel et remise confirmée par QR code."} -->
 <section class="hero">
-  <div class="hero__bg">
-    <picture>
-      <source type="image/webp" srcset="/assets/hero-sunset.webp">
-      <img src="/assets/hero-sunset.jpg" alt="" width="1600" height="900" fetchpriority="high">
+  <div class="hero__bg hero__bg--fade" aria-hidden="true">
+    <picture class="hero__slide hero__slide--a">
+      <source type="image/webp" srcset="/assets/hero-cargo.webp">
+      <img src="/assets/hero-cargo.jpg" alt="" width="1600" height="900" fetchpriority="high">
+    </picture>
+    <picture class="hero__slide hero__slide--b">
+      <source type="image/webp" srcset="/assets/hero-sky.webp">
+      <img src="/assets/hero-sky.jpg" alt="" width="1600" height="900" loading="lazy">
     </picture>
   </div>
   <div class="wrap">
@@ -47,6 +51,7 @@
     </div>
     <div class="audience">
       <article class="aud aud--exp reveal">
+        <img class="aud__art aud__art--box" src="/assets/box.webp" alt="" width="360" height="243" loading="lazy">
         <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></div>
         <h3>Vous voulez envoyer un colis</h3>
         <ul class="ticks">
@@ -58,6 +63,7 @@
         <a class="btn btn--grad" href="/comment-ca-marche/#expediteurs">Voir le parcours expéditeur</a>
       </article>
       <article class="aud aud--gp reveal">
+        <img class="aud__art aud__art--bag" src="/assets/suitcase.webp" alt="" width="640" height="584" loading="lazy">
         <div class="icon icon--orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
         <h3>Vous voyagez et avez de la place</h3>
         <ul class="ticks">
@@ -96,12 +102,12 @@
       <p>Les pays actuellement proposés dans l'application. D'autres destinations seront ajoutées.</p>
     </div>
     <ul class="lanes reveal">
-      <li class="lane"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Sénégal → France</li>
-      <li class="lane"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Sénégal → Espagne</li>
-      <li class="lane"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Sénégal → Italie</li>
-      <li class="lane"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Sénégal → États-Unis</li>
-      <li class="lane"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Sénégal → Canada</li>
-      <li class="lane"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Sénégal → Algérie</li>
+      <li class="lane"><span class="lane__flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="10" height="20" fill="#0055A4"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#EF4135"/></svg></span>Sénégal → France</li>
+      <li class="lane"><span class="lane__flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/></svg></span>Sénégal → Espagne</li>
+      <li class="lane"><span class="lane__flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="10" height="20" fill="#009246"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#CE2B37"/></svg></span>Sénégal → Italie</li>
+      <li class="lane"><span class="lane__flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="30" height="20" fill="#fff"/><g fill="#B22234"><rect width="30" height="1.6"/><rect y="3.1" width="30" height="1.6"/><rect y="6.2" width="30" height="1.6"/><rect y="9.2" width="30" height="1.6"/><rect y="12.3" width="30" height="1.6"/><rect y="15.4" width="30" height="1.6"/><rect y="18.4" width="30" height="1.6"/></g><rect width="13" height="10.8" fill="#3C3B6E"/></svg></span>Sénégal → États-Unis</li>
+      <li class="lane"><span class="lane__flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="30" height="20" fill="#fff"/><rect width="7.5" height="20" fill="#D52B1E"/><rect x="22.5" width="7.5" height="20" fill="#D52B1E"/><path d="m15 4 1.6 3.2 2.2-.8-.8 4 1.6-.4-3.4 4 .2 1.6h-3l.2-1.6-3.4-4 1.6.4-.8-4 2.2.8z" fill="#D52B1E"/></svg></span>Sénégal → Canada</li>
+      <li class="lane"><span class="lane__flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="15" height="20" fill="#006233"/><rect x="15" width="15" height="20" fill="#fff"/><circle cx="15.4" cy="10" r="4.6" fill="#D21034"/><circle cx="16.6" cy="10" r="3.8" fill="#fff"/><path d="m17.8 8.2.6 1.7h1.8l-1.5 1.1.6 1.7-1.5-1.1-1.5 1.1.6-1.7-1.5-1.1h1.8z" fill="#D21034"/></svg></span>Sénégal → Algérie</li>
     </ul>
   </div>
 </section>
