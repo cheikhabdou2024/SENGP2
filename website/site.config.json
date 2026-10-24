@@ -10,16 +10,17 @@
     "description": "SEN GP met en relation des expéditeurs et des voyageurs pour envoyer des colis entre le Sénégal et le reste du monde, avec suivi en temps réel et remise sécurisée."
   },
   "company": {
-    "legalName": "[À COMPLÉTER : raison sociale exacte]",
-    "legalForm": "[À COMPLÉTER : forme juridique]",
+    "legalName": "SENEGAL GP",
+    "legalForm": "Société à responsabilité limitée (SARL)",
     "capital": "[À COMPLÉTER : capital social]",
-    "rccm": "[À COMPLÉTER : numéro RCCM]",
-    "ninea": "[À COMPLÉTER : NINEA]",
-    "address": "[À COMPLÉTER : adresse du siège social]",
+    "rccm": "SN DKR 2025 4885",
+    "ninea": "012692241 2Y2",
+    "address": "[À COMPLÉTER : confirmer l'adresse du siège — « 29 route de l'aéroport, BNDE » ou « 22 route de l'aéroport, immeuble BNDE », Dakar, Sénégal]",
     "phone": "[À COMPLÉTER : téléphone officiel]",
-    "email": "[À COMPLÉTER : email de contact]",
-    "publicationDirector": "[À COMPLÉTER : directeur de la publication]",
-    "host": "Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis"
+    "email": "contact@sengp.co",
+    "publicationDirector": "Mountaga Sylla",
+    "host": "Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis",
+    "cdp": "Commission de Protection des Données Personnelles (CDP) — www.cdp.sn"
   },
   "social": {
     "facebook": "",
@@ -28,10 +29,30 @@
     "whatsapp": ""
   },
   "nav": [
-    { "path": "/", "label": "Accueil", "key": "home" },
-    { "path": "/comment-ca-marche/", "label": "Comment ça marche", "key": "how" },
-    { "path": "/a-propos/", "label": "À propos", "key": "about" },
-    { "path": "/faq/", "label": "FAQ", "key": "faq" },
-    { "path": "/contact/", "label": "Contact", "key": "contact" }
+    {
+      "path": "/",
+      "label": "Accueil",
+      "key": "home"
+    },
+    {
+      "path": "/comment-ca-marche/",
+      "label": "Comment ça marche",
+      "key": "how"
+    },
+    {
+      "path": "/a-propos/",
+      "label": "À propos",
+      "key": "about"
+    },
+    {
+      "path": "/faq/",
+      "label": "FAQ",
+      "key": "faq"
+    },
+    {
+      "path": "/contact/",
+      "label": "Contact",
+      "key": "contact"
+    }
   ]
 }
