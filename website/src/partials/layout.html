@@ -19,10 +19,11 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="stylesheet" href="/css/site.css">
+{{{extraHead}}}
 <noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
 <script type="application/ld+json">{{{jsonld}}}</script>
 </head>
-<body>
+<body class="{{page.bodyClass}}">
 <a class="skip" href="#contenu">Aller au contenu</a>
 {{{draftBanner}}}
 {{> header}}
@@ -31,5 +32,6 @@
 </main>
 {{> footer}}
 <script src="/js/site.js" defer></script>
+{{{extraScripts}}}
 </body>
 </html>

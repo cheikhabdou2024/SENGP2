@@ -1,139 +1,288 @@
-<!--meta {"title":"SEN GP","key":"home","description":"SEN GP met en relation des expéditeurs et des voyageurs pour envoyer des colis entre le Sénégal et l'international, avec suivi en temps réel et remise confirmée par QR code."} -->
-<section class="hero">
-  <div class="hero__bg hero__bg--fade" aria-hidden="true">
-    <picture class="hero__slide hero__slide--a">
-      <source type="image/webp" srcset="/assets/hero-cargo.webp">
-      <img src="/assets/hero-cargo.jpg" alt="" width="1600" height="900" fetchpriority="high">
-    </picture>
-    <picture class="hero__slide hero__slide--b">
-      <source type="image/webp" srcset="/assets/hero-sky.webp">
-      <img src="/assets/hero-sky.jpg" alt="" width="1600" height="900" loading="lazy">
+<!--meta {"hero":true,"css":"home","js":"home","title":"SEN GP","key":"home","description":"SEN GP met en relation des expéditeurs et des voyageurs pour envoyer des colis entre le Sénégal et l'international, avec suivi en temps réel et remise confirmée par QR code."} -->
+
+<!-- ===================================================== HERO -->
+<section class="hx" id="hero" data-hero>
+  <div class="hx__bg" data-layer="0.03">
+    <picture>
+      <source media="(max-width: 700px)" type="image/webp" srcset="/assets/hero-travel-m.webp">
+      <source type="image/webp" srcset="/assets/hero-travel.webp">
+      <img src="/assets/hero-travel.jpg" alt="" width="1900" height="760" fetchpriority="high">
     </picture>
   </div>
-  <div class="wrap">
-    <div class="hero__in">
-      <span class="eyebrow">Sénégal ↔ International</span>
-      <h1>Envoyez vos colis avec des <em>voyageurs</em> de confiance.</h1>
-      <p class="lead">SEN GP met en relation des expéditeurs et des voyageurs (les « GP ») pour acheminer vos colis entre le Sénégal et l'international, avec suivi en temps réel et remise confirmée par QR code.</p>
-      <div class="hero__cta">
-        <a class="btn btn--warm" href="{{site.appUrl}}" rel="noopener">Ouvrir l'application</a>
+  <div class="hx__shade"></div>
+
+  <div class="hx__route" data-layer="-0.05" aria-hidden="true">
+    <svg viewBox="0 0 520 380" focusable="false">
+      <defs>
+        <linearGradient id="routeGrad" x1="0" x2="1"><stop offset="0" stop-color="#FFB02E"/><stop offset="1" stop-color="#4FD1FF"/></linearGradient>
+        <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="4"/></filter>
+      </defs>
+      <path class="route__ghost" d="M80 290 C 120 120, 280 40, 400 70" />
+      <path class="route__glow draw" pathLength="1" d="M80 290 C 120 120, 280 40, 400 70" filter="url(#glow)" />
+      <path class="route__line draw" pathLength="1" d="M80 290 C 120 120, 280 40, 400 70" />
+      <g class="route__plane"><path d="M0 0 L-9 -5 L-6 0 L-9 5 Z M-6 0 L-14 0" fill="#fff" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></g>
+      <g class="route__pt route__pt--a" transform="translate(80 290)"><circle r="16" class="pulse"/><circle r="6"/><text x="-4" y="30" text-anchor="middle">Dakar</text></g>
+      <g class="route__pt route__pt--b" transform="translate(400 70)"><circle r="16" class="pulse"/><circle r="6"/><text x="0" y="-18" text-anchor="middle">Paris</text></g>
+    </svg>
+  </div>
+
+  <div class="wrap hx__grid">
+    <div class="hx__copy">
+      <span class="eyebrow eyebrow--dark hx__in" style="--d:0">Sénégal ↔ International</span>
+      <h1 class="hx__in" style="--d:1">Vos colis voyagent <em>plus loin</em> avec des personnes de confiance.</h1>
+      <p class="lead hx__in" style="--d:2">SEN GP met en relation des expéditeurs et des voyageurs (les « GP ») pour acheminer vos colis entre le Sénégal et l'international, avec suivi en temps réel et remise confirmée par QR code.</p>
+      <div class="hero__cta hx__in" style="--d:3">
+        <a class="btn btn--warm" href="{{site.appUrl}}" rel="noopener">Ouvrir l'application
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
         <a class="btn btn--ghost" href="/comment-ca-marche/">Comment ça marche</a>
       </div>
-      <ul class="chips" aria-label="Points forts">
+      <ul class="chips hx__in" style="--d:4" aria-label="Points forts">
         <li class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>Suivi en temps réel</li>
         <li class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg>Remise par QR code</li>
         <li class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>Paiement Wave ou à la livraison</li>
       </ul>
     </div>
+
+    <aside class="hx__card hx__in" style="--d:5" data-layer="-0.02" aria-label="Exemple de suivi d'un colis">
+      <small>Exemple de suivi</small>
+      <div class="hx__card-row"><b><i class="dot"></i>En transit</b><span>Dakar → Paris</span></div>
+      <div class="hx__prog" aria-hidden="true"><i></i></div>
+      <div class="hx__card-steps" aria-hidden="true"><span>Départ</span><span>En route</span><span>Arrivée</span></div>
+    </aside>
+  </div>
+
+  <a class="hx__scroll" href="#parcours" aria-label="Découvrir SEN GP"><span>Découvrir</span>
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a>
+</section>
+
+<!-- ===================================================== PARCOURS -->
+<section class="sec sec--light" id="parcours">
+  <div class="wrap">
+    <div class="sec__head reveal">
+      <span class="eyebrow">Deux parcours</span>
+      <h2>Que souhaitez-vous faire&nbsp;?</h2>
+      <p>Que vous ayez un colis à envoyer ou de la place dans vos bagages, tout commence dans l'application.</p>
+    </div>
+
+    <div class="parc reveal" data-tabs>
+      <div class="parc__tabs" role="tablist" aria-label="Choisir un parcours">
+        <button class="parc__tab" role="tab" id="tab-exp" aria-controls="panel-exp" aria-selected="true" type="button" data-tone="blue">
+          <span class="parc__tabic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
+          <span class="parc__tabtx"><b>Je veux envoyer un colis</b><small>Parcours expéditeur</small></span>
+        </button>
+        <button class="parc__tab" role="tab" id="tab-gp" aria-controls="panel-gp" aria-selected="false" tabindex="-1" type="button" data-tone="orange">
+          <span class="parc__tabic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span>
+          <span class="parc__tabtx"><b>Je voyage avec de la place</b><small>Parcours voyageur (GP)</small></span>
+        </button>
+      </div>
+
+      <div class="parc__stage">
+        <article class="parc__panel parc__panel--blue" role="tabpanel" id="panel-exp" aria-labelledby="tab-exp">
+          <div class="parc__text">
+            <h3>Envoyer un colis</h3>
+            <p>Vous décrivez votre colis, indiquez la destination et les adresses. L'équipe SEN GP vous met en relation avec un voyageur dont le trajet correspond.</p>
+            <ul class="ticks">
+              <li>Photo du colis contrôlée automatiquement</li>
+              <li>Suivi étape par étape dans l'application</li>
+              <li>Paiement par Wave ou à la livraison</li>
+              <li>Remise confirmée par QR code</li>
+            </ul>
+            <div class="parc__cta">
+              <a class="btn btn--grad" href="{{site.appUrl}}" rel="noopener">Envoyer un colis</a>
+              <a class="parc__more" href="/comment-ca-marche/#expediteurs">Voir le parcours détaillé →</a>
+            </div>
+          </div>
+          <div class="parc__art" aria-hidden="true">
+            <span class="parc__halo"></span>
+            <img class="parc__img parc__img--box" src="/assets/box.webp" alt="" width="360" height="243" loading="lazy">
+          </div>
+        </article>
+
+        <article class="parc__panel parc__panel--orange" role="tabpanel" id="panel-gp" aria-labelledby="tab-gp" hidden>
+          <div class="parc__text">
+            <h3>Voyager avec des colis</h3>
+            <p>Vous ajoutez votre trajet avec votre billet et le poids disponible. Vous recevez des missions qui correspondent à votre itinéraire et vous choisissez de les accepter ou non.</p>
+            <ul class="ticks">
+              <li>Votre trajet, vos dates, votre capacité</li>
+              <li>Missions à accepter ou à décliner en un geste</li>
+              <li>Étapes validées depuis votre téléphone</li>
+              <li>Gains et historique dans l'application</li>
+            </ul>
+            <div class="parc__cta">
+              <a class="btn btn--warm" href="{{site.appUrl}}" rel="noopener">Devenir voyageur</a>
+              <a class="parc__more" href="/comment-ca-marche/#voyageurs">Voir le parcours détaillé →</a>
+            </div>
+          </div>
+          <div class="parc__art" aria-hidden="true">
+            <span class="parc__halo"></span>
+            <img class="parc__img parc__img--bag" src="/assets/suitcase.webp" alt="" width="640" height="584" loading="lazy">
+          </div>
+        </article>
+      </div>
+    </div>
+    <noscript><style>.parc__panel[hidden]{display:grid}</style></noscript>
   </div>
 </section>
 
-<section class="section">
+<!-- ===================================================== FONCTIONNEMENT -->
+<section class="sec sec--dark sec--curve" id="fonctionnement">
   <div class="wrap">
-    <div class="section__head reveal">
-      <span class="eyebrow">En trois étapes</span>
-      <h2>Simple pour l'expéditeur, utile pour le voyageur</h2>
-      <p>Une fois votre envoi créé, l'équipe SEN GP vous met en relation avec un voyageur dont le trajet correspond.</p>
+    <div class="sec__head reveal">
+      <span class="eyebrow eyebrow--dark">Comment ça marche</span>
+      <h2>Un colis, quatre étapes, une seule application</h2>
+      <p>Suivez le trajet du colis, de la création de l'envoi jusqu'à la remise au destinataire.</p>
     </div>
-    <ol class="steps reveal">
-      <li class="step"><h3>Créez votre envoi</h3><p>Photographiez le colis, indiquez son type et son poids, puis renseignez les adresses de ramassage et de livraison.</p></li>
-      <li class="step"><h3>Un voyageur est associé</h3><p>L'équipe SEN GP associe votre colis à un voyageur (GP) qui effectue déjà le trajet, et le voyageur confirme la mission.</p></li>
-      <li class="step"><h3>Suivez, puis recevez</h3><p>Suivez votre colis étape par étape. À l'arrivée, le destinataire confirme la remise avec un QR code.</p></li>
+
+    <ol class="journey" data-journey>
+      <li class="journey__rail" aria-hidden="true"><span class="journey__fill"></span><span class="journey__plane"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span></li>
+      <li class="journey__step" data-step>
+        <span class="journey__node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
+        <div class="journey__card"><small>Étape 1</small><h3>L'expéditeur crée son envoi</h3><p>Photo du colis, type, poids, adresses de ramassage et de livraison : l'envoi est décrit en quelques minutes dans l'application.</p></div>
+      </li>
+      <li class="journey__step" data-step>
+        <span class="journey__node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        <div class="journey__card"><small>Étape 2</small><h3>Un voyageur compatible est associé</h3><p>L'équipe SEN GP associe votre colis à un voyageur dont le trajet correspond. Le voyageur accepte la mission.</p></div>
+      </li>
+      <li class="journey__step" data-step>
+        <span class="journey__node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+        <div class="journey__card"><small>Étape 3</small><h3>Le colis voyage, vous le suivez</h3><p>Le voyageur prend le colis en charge puis valide chaque étape. Vous suivez l'avancement dans l'application, avec sa position pendant la mission.</p></div>
+      </li>
+      <li class="journey__step" data-step>
+        <span class="journey__node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg></span>
+        <div class="journey__card"><small>Étape 4</small><h3>La remise est confirmée par QR code</h3><p>Le destinataire présente son QR code, le voyageur le scanne : la remise est confirmée pour toutes les parties.</p></div>
+      </li>
     </ol>
   </div>
 </section>
 
-<section class="section section--white">
+<!-- ===================================================== APPLICATION -->
+<section class="sec sec--light" id="application">
   <div class="wrap">
-    <div class="section__head reveal">
-      <span class="eyebrow">Pour qui ?</span>
-      <h2>Deux manières d'utiliser SEN GP</h2>
+    <div class="appdemo" data-tabs data-autoplay="false">
+      <div class="appdemo__copy reveal">
+        <span class="eyebrow">L'application</span>
+        <h2>Tout SEN GP dans votre téléphone</h2>
+        <p class="lead">Créez un envoi, suivez vos colis, gérez vos trajets. SEN GP s'utilise dès maintenant depuis votre navigateur et s'installe sur l'écran d'accueil, sans passer par un magasin d'applications.</p>
+
+        <div class="appdemo__tabs" role="tablist" aria-label="Aperçus de l'application">
+          <button class="appdemo__tab" role="tab" id="atab-exp" aria-controls="apanel-exp" aria-selected="true" type="button"><span class="appdemo__num">01</span><span><b>Expéditeur</b><small>Créer un envoi et retrouver ses colis</small></span></button>
+          <button class="appdemo__tab" role="tab" id="atab-suivi" aria-controls="apanel-suivi" aria-selected="false" tabindex="-1" type="button"><span class="appdemo__num">02</span><span><b>Suivi</b><small>Voir où en est chaque colis, étape par étape</small></span></button>
+          <button class="appdemo__tab" role="tab" id="atab-gp" aria-controls="apanel-gp" aria-selected="false" tabindex="-1" type="button"><span class="appdemo__num">03</span><span><b>Voyageur (GP)</b><small>Accepter ou décliner les missions reçues</small></span></button>
+        </div>
+        <p class="note note--left">Captures d'écran réelles de l'application, avec des données de démonstration.</p>
+      </div>
+
+      <div class="appdemo__stage reveal">
+        <span class="appdemo__circle" aria-hidden="true"></span>
+        <div class="phone3d" data-tilt>
+          <div class="phone3d__frame">
+            <div class="phone3d__screens">
+              <figure class="phone3d__shot is-on" role="tabpanel" id="apanel-exp" aria-labelledby="atab-exp"><img src="/assets/app/exp-accueil.webp" alt="Accueil de l'expéditeur : choisir un trajet, voir ses envois en cours et créer un envoi" width="520" height="1125" loading="lazy"></figure>
+              <figure class="phone3d__shot" role="tabpanel" id="apanel-suivi" aria-labelledby="atab-suivi" hidden><img src="/assets/app/exp-suivi.webp" alt="Suivi d'un colis étape par étape" width="520" height="1125" loading="lazy"></figure>
+              <figure class="phone3d__shot" role="tabpanel" id="apanel-gp" aria-labelledby="atab-gp" hidden><img src="/assets/app/gp-missions.webp" alt="Liste des missions d'un voyageur avec les boutons Accepter et Décliner" width="520" height="1125" loading="lazy"></figure>
+            </div>
+          </div>
+        </div>
+        <span class="appchip appchip--a" aria-hidden="true">Suivi en temps réel</span>
+        <span class="appchip appchip--b" aria-hidden="true">Remise par QR code</span>
+      </div>
     </div>
-    <div class="audience">
-      <article class="aud aud--exp reveal">
-        <img class="aud__art aud__art--box" src="/assets/box.webp" alt="" width="360" height="243" loading="lazy">
-        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></div>
-        <h3>Vous voulez envoyer un colis</h3>
-        <ul class="ticks">
-          <li>Un envoi décrit en quelques minutes, avec une photo contrôlée automatiquement</li>
-          <li>Le suivi de votre colis, avec la position du voyageur en cours de trajet</li>
-          <li>Le paiement par Wave ou à la livraison</li>
-          <li>Une réclamation possible depuis l'application en cas de problème</li>
+    <noscript><style>.phone3d__shot[hidden]{display:block;position:static}</style></noscript>
+  </div>
+</section>
+
+<!-- ===================================================== DESTINATIONS -->
+<section class="sec sec--dark sec--curve" id="destinations">
+  <div class="wrap">
+    <div class="sec__head reveal">
+      <span class="eyebrow eyebrow--dark">Destinations</span>
+      <h2>Du Sénégal vers le monde</h2>
+      <p>Les liaisons actuellement proposées dans l'application. D'autres destinations seront ajoutées.</p>
+    </div>
+
+    <div class="dest reveal" data-dest>
+      <div class="dest__map" aria-hidden="true">
+        <img class="dest__dots" src="/assets/world-dots.svg" alt="" width="1000" height="476" loading="lazy">
+        <svg class="dest__routes" viewBox="0 0 1000 476.2" focusable="false">
+          <path class="dest__route draw" data-route="france" d="M559.9 375.5 Q638.5 136.4 717.1 104.3" pathLength="1"/>
+          <path class="dest__route draw" data-route="espagne" d="M559.9 375.5 Q614.5 197.0 669.0 171.3" pathLength="1"/>
+          <path class="dest__route draw" data-route="italie" d="M559.9 375.5 Q678.8 161.5 797.6 159.5" pathLength="1"/>
+          <path class="dest__route draw" data-route="etats-unis" d="M559.9 375.5 Q335.5 109.2 111.1 169.0" pathLength="1"/>
+          <path class="dest__route draw" data-route="canada" d="M559.9 375.5 Q337.2 85.5 114.5 131.0" pathLength="1"/>
+          <path class="dest__route draw" data-route="algerie" d="M559.9 375.5 Q641.3 209.0 722.7 200.4" pathLength="1"/>
+          <g class="dest__pt" data-pt="france"><circle cx="717.1" cy="104.3" r="5"/></g>
+          <g class="dest__pt" data-pt="espagne"><circle cx="669.0" cy="171.3" r="5"/></g>
+          <g class="dest__pt" data-pt="italie"><circle cx="797.6" cy="159.5" r="5"/></g>
+          <g class="dest__pt" data-pt="etats-unis"><circle cx="111.1" cy="169.0" r="5"/></g>
+          <g class="dest__pt" data-pt="canada"><circle cx="114.5" cy="131.0" r="5"/></g>
+          <g class="dest__pt" data-pt="algerie"><circle cx="722.7" cy="200.4" r="5"/></g>
+          <g class="dest__home"><circle class="pulse" cx="559.9" cy="375.5" r="14"/><circle cx="559.9" cy="375.5" r="6"/><text x="559.9" y="401.5" text-anchor="middle">Dakar</text></g>
+        </svg>
+      </div>
+
+      <div class="dest__panel">
+        <ul class="dest__list" role="list">
+          <li><button type="button" class="dest__btn is-active" data-dest-btn="france" aria-pressed="true"><span class="flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="10" height="20" fill="#0055A4"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#EF4135"/></svg></span><b>France</b><i aria-hidden="true">→</i></button></li>
+          <li><button type="button" class="dest__btn" data-dest-btn="espagne" aria-pressed="false"><span class="flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/></svg></span><b>Espagne</b><i aria-hidden="true">→</i></button></li>
+          <li><button type="button" class="dest__btn" data-dest-btn="italie" aria-pressed="false"><span class="flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="10" height="20" fill="#009246"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#CE2B37"/></svg></span><b>Italie</b><i aria-hidden="true">→</i></button></li>
+          <li><button type="button" class="dest__btn" data-dest-btn="etats-unis" aria-pressed="false"><span class="flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="30" height="20" fill="#fff"/><g fill="#B22234"><rect width="30" height="1.6"/><rect y="3.1" width="30" height="1.6"/><rect y="6.2" width="30" height="1.6"/><rect y="9.2" width="30" height="1.6"/><rect y="12.3" width="30" height="1.6"/><rect y="15.4" width="30" height="1.6"/><rect y="18.4" width="30" height="1.6"/></g><rect width="13" height="10.8" fill="#3C3B6E"/></svg></span><b>États-Unis</b><i aria-hidden="true">→</i></button></li>
+          <li><button type="button" class="dest__btn" data-dest-btn="canada" aria-pressed="false"><span class="flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="30" height="20" fill="#fff"/><rect width="7.5" height="20" fill="#D52B1E"/><rect x="22.5" width="7.5" height="20" fill="#D52B1E"/><path d="m15 4 1.6 3.2 2.2-.8-.8 4 1.6-.4-3.4 4 .2 1.6h-3l.2-1.6-3.4-4 1.6.4-.8-4 2.2.8z" fill="#D52B1E"/></svg></span><b>Canada</b><i aria-hidden="true">→</i></button></li>
+          <li><button type="button" class="dest__btn" data-dest-btn="algerie" aria-pressed="false"><span class="flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="15" height="20" fill="#006233"/><rect x="15" width="15" height="20" fill="#fff"/><circle cx="15.4" cy="10" r="4.6" fill="#D21034"/><circle cx="16.6" cy="10" r="3.8" fill="#fff"/><path d="m17.8 8.2.6 1.7h1.8l-1.5 1.1.6 1.7-1.5-1.1-1.5 1.1.6-1.7-1.5-1.1h1.8z" fill="#D21034"/></svg></span><b>Algérie</b><i aria-hidden="true">→</i></button></li>
         </ul>
-        <a class="btn btn--grad" href="/comment-ca-marche/#expediteurs">Voir le parcours expéditeur</a>
-      </article>
-      <article class="aud aud--gp reveal">
-        <img class="aud__art aud__art--bag" src="/assets/suitcase.webp" alt="" width="640" height="584" loading="lazy">
-        <div class="icon icon--orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
-        <h3>Vous voyagez et avez de la place</h3>
-        <ul class="ticks">
-          <li>Ajoutez votre trajet avec votre billet d'avion et votre capacité disponible</li>
-          <li>Recevez des missions qui correspondent à votre trajet, et acceptez-les ou déclinez-les</li>
-          <li>Validez chaque étape depuis l'application, jusqu'à la remise au destinataire</li>
-          <li>Retrouvez vos gains et leur historique dans l'application</li>
+        <div class="dest__info" aria-live="polite">
+          <small>Liaison sélectionnée</small>
+          <h3 id="destTitle">Sénégal → France</h3>
+          <p>Villes d'arrivée proposées : <b id="destCities">Paris, Lyon, Marseille, Toulouse, Nice</b></p>
+          <p class="dest__from">Villes de départ : Dakar, Thiès, Saint-Louis, Kaolack, Ziguinchor</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== ENGAGEMENTS -->
+<section class="sec sec--light" id="engagements">
+  <div class="wrap">
+    <div class="trust">
+      <div class="trust__visual reveal">
+        <picture>
+          <source type="image/webp" srcset="/assets/night-globe.webp">
+          <img src="/assets/night-globe.jpg" alt="Avion en approche au-dessus d'une ville de nuit, devant un globe lumineux reliant les continents" width="1500" height="1000" loading="lazy">
+        </picture>
+        <div class="trust__quote"><b>Chaque étape est visible,</b> de la création de l'envoi à la remise.</div>
+      </div>
+      <div class="trust__body">
+        <div class="reveal">
+          <span class="eyebrow">Nos engagements</span>
+          <h2>Une solution pensée pour la confiance</h2>
+          <p class="lead">Expéditeurs et voyageurs voient la même information, au même moment.</p>
+        </div>
+        <ul class="trust__list">
+          <li class="reveal"><span class="trust__n">01</span><div><h3>Un parcours simple</h3><p>Quatre étapes dans l'application, de la photo du colis jusqu'au paiement.</p></div></li>
+          <li class="reveal"><span class="trust__n">02</span><div><h3>Une mise en relation selon les trajets</h3><p>Votre colis est associé à un voyageur dont l'itinéraire et la capacité correspondent.</p></div></li>
+          <li class="reveal"><span class="trust__n">03</span><div><h3>Un suivi de bout en bout</h3><p>Étapes validées par le voyageur, position partagée pendant la mission.</p></div></li>
+          <li class="reveal"><span class="trust__n">04</span><div><h3>Une remise confirmée</h3><p>Le QR code du destinataire, scanné par le voyageur, confirme la livraison.</p></div></li>
+          <li class="reveal"><span class="trust__n">05</span><div><h3>Une équipe et des réclamations intégrées</h3><p>Un problème ? Ouvrez une réclamation depuis l'application, l'équipe SEN GP l'examine.</p></div></li>
         </ul>
-        <a class="btn btn--warm" href="/comment-ca-marche/#voyageurs">Voir le parcours voyageur</a>
-      </article>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="section">
+<!-- ===================================================== APPEL FINAL -->
+<section class="sec sec--light sec--tight">
   <div class="wrap">
-    <div class="section__head reveal">
-      <span class="eyebrow">L'application</span>
-      <h2>Tout se passe dans votre téléphone</h2>
-      <p>SEN GP est utilisable dès maintenant depuis votre navigateur et s'installe sur l'écran d'accueil, sans passer par un magasin d'applications.</p>
-    </div>
-    <div class="phones reveal">
-      <figure class="phone"><div class="phone__frame"><img src="/assets/app/exp-accueil.webp" alt="Écran d'accueil de l'expéditeur dans l'application SEN GP" width="520" height="1125" loading="lazy"></div><figcaption>Accueil expéditeur<small>Créer un envoi, voir ses colis</small></figcaption></figure>
-      <figure class="phone phone--mid"><div class="phone__frame"><img src="/assets/app/exp-suivi.webp" alt="Écran de suivi en temps réel d'un colis" width="520" height="1125" loading="lazy"></div><figcaption>Suivi en temps réel<small>Chaque étape, de la prise en charge à la livraison</small></figcaption></figure>
-      <figure class="phone"><div class="phone__frame"><img src="/assets/app/gp-missions.webp" alt="Liste des missions d'un voyageur avec les boutons Accepter et Décliner" width="520" height="1125" loading="lazy"></div><figcaption>Missions du voyageur<small>Accepter ou décliner en un geste</small></figcaption></figure>
-    </div>
-    <p class="note">Captures d'écran de l'application avec des données de démonstration.</p>
-  </div>
-</section>
-
-<section class="section section--navy">
-  <div class="wrap">
-    <div class="section__head reveal">
-      <span class="eyebrow">Destinations</span>
-      <h2>Des liaisons au départ du Sénégal</h2>
-      <p>Les pays actuellement proposés dans l'application. D'autres destinations seront ajoutées.</p>
-    </div>
-    <ul class="lanes reveal">
-      <li class="lane"><span class="lane__flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="10" height="20" fill="#0055A4"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#EF4135"/></svg></span>Sénégal → France</li>
-      <li class="lane"><span class="lane__flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/></svg></span>Sénégal → Espagne</li>
-      <li class="lane"><span class="lane__flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="10" height="20" fill="#009246"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#CE2B37"/></svg></span>Sénégal → Italie</li>
-      <li class="lane"><span class="lane__flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="30" height="20" fill="#fff"/><g fill="#B22234"><rect width="30" height="1.6"/><rect y="3.1" width="30" height="1.6"/><rect y="6.2" width="30" height="1.6"/><rect y="9.2" width="30" height="1.6"/><rect y="12.3" width="30" height="1.6"/><rect y="15.4" width="30" height="1.6"/><rect y="18.4" width="30" height="1.6"/></g><rect width="13" height="10.8" fill="#3C3B6E"/></svg></span>Sénégal → États-Unis</li>
-      <li class="lane"><span class="lane__flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="30" height="20" fill="#fff"/><rect width="7.5" height="20" fill="#D52B1E"/><rect x="22.5" width="7.5" height="20" fill="#D52B1E"/><path d="m15 4 1.6 3.2 2.2-.8-.8 4 1.6-.4-3.4 4 .2 1.6h-3l.2-1.6-3.4-4 1.6.4-.8-4 2.2.8z" fill="#D52B1E"/></svg></span>Sénégal → Canada</li>
-      <li class="lane"><span class="lane__flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="15" height="20" fill="#006233"/><rect x="15" width="15" height="20" fill="#fff"/><circle cx="15.4" cy="10" r="4.6" fill="#D21034"/><circle cx="16.6" cy="10" r="3.8" fill="#fff"/><path d="m17.8 8.2.6 1.7h1.8l-1.5 1.1.6 1.7-1.5-1.1-1.5 1.1.6-1.7-1.5-1.1h1.8z" fill="#D21034"/></svg></span>Sénégal → Algérie</li>
-    </ul>
-  </div>
-</section>
-
-<section class="section">
-  <div class="wrap">
-    <div class="section__head reveal">
-      <span class="eyebrow">Confiance</span>
-      <h2>Pensé pour que chacun sache où en est le colis</h2>
-    </div>
-    <div class="grid grid--3">
-      <article class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div><h3>Suivi de position</h3><p>Pendant une mission, le voyageur partage sa position pour que l'expéditeur puisse suivre l'avancement du colis.</p></article>
-      <article class="card reveal"><div class="icon icon--green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg></div><h3>Remise confirmée</h3><p>Le destinataire présente un QR code que le voyageur scanne : la remise est confirmée dans l'application.</p></article>
-      <article class="card reveal"><div class="icon icon--orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 15a2 2 0 0 1-2 2h-1a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h3z"/><path d="M3 15a2 2 0 0 0 2 2h1a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1H3z"/></svg></div><h3>Une équipe derrière l'application</h3><p>L'équipe SEN GP associe les colis aux voyageurs et reste joignable. Un problème ? Ouvrez une réclamation depuis l'application.</p></article>
-    </div>
-  </div>
-</section>
-
-<section class="section" style="padding-top:0">
-  <div class="wrap">
-    <div class="cta-band reveal">
-      <h2>Prêt à envoyer un colis, ou à voyager utile ?</h2>
-      <p>Ouvrez l'application depuis votre navigateur, créez votre compte et lancez votre premier envoi ou votre premier trajet.</p>
-      <div class="hero__cta">
-        <a class="btn btn--warm" href="{{site.appUrl}}" rel="noopener">Ouvrir l'application</a>
-        <a class="btn btn--ghost" href="/faq/">Lire la FAQ</a>
+    <div class="final reveal">
+      <div class="final__bg" aria-hidden="true"><picture><source type="image/webp" srcset="/assets/hero-sunset.webp"><img src="/assets/hero-sunset.jpg" alt="" width="1600" height="900" loading="lazy"></picture></div>
+      <div class="final__in">
+        <span class="eyebrow eyebrow--dark">Prêt à commencer&nbsp;?</span>
+        <h2>Envoyer un colis, ou voyager utile.</h2>
+        <p>Ouvrez l'application depuis votre navigateur, créez votre compte et lancez votre premier envoi ou votre premier trajet.</p>
+        <div class="hero__cta">
+          <a class="btn btn--warm" href="{{site.appUrl}}" rel="noopener">Envoyer un colis</a>
+          <a class="btn btn--ghost" href="{{site.appUrl}}" rel="noopener">Voyager avec des colis</a>
+          <a class="final__faq" href="/faq/">Lire la FAQ →</a>
+        </div>
       </div>
     </div>
   </div>

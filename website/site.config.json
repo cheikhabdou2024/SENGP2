@@ -40,6 +40,11 @@
       "key": "how"
     },
     {
+      "path": "/#destinations",
+      "label": "Destinations",
+      "key": "dest"
+    },
+    {
       "path": "/a-propos/",
       "label": "À propos",
       "key": "about"

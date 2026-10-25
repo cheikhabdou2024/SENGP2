@@ -11,11 +11,19 @@ npm run preview      # sert dist/ sur http://localhost:8200
 npm run build:live   # build de production — REFUSÉ tant qu'il reste un champ « À COMPLÉTER »
 ```
 
+## Recette (accueil)
+```
+node scripts/serve.mjs 8200                      # serveur de dist/
+msedge --headless=new --remote-debugging-port=9333   # ou Chrome
+node scripts/recette.mjs                         # 31 vérifications + captures dans recette/ (non versionné)
+```
+La carte des destinations est générée par `scripts/make-map.py` (Natural Earth, domaine public).
+
 ## Structure
 - `site.config.json` — **toutes** les informations de l'entreprise (raison sociale, RCCM, NINEA, adresse, téléphone, email, réseaux) + navigation + `live` / `legalReviewed`.
 - `src/pages/**/index.html` — une page par dossier ; première ligne `<!--meta {…} -->` (titre, description, clé de navigation).
 - `src/partials/` — gabarit (`layout`), en-tête, pied de page. Jetons : `{{company.legalName}}`, `{{{email_link}}}`, `{{{legalNotice}}}`…
-- `src/css/site.css`, `src/js/site.js`, `src/assets/` (images WebP/JPG optimisées, captures de l'application dans `assets/app/`).
+- `src/css/site.css` (+ `home.css` accueil), `src/js/site.js` (+ `home.js` accueil), `src/assets/` (images WebP/JPG optimisées, captures de l'application dans `assets/app/`).
 - `scripts/shoot-app.mjs` régénère les captures de l'application (données de démonstration).
 - `vercel.json` — en-têtes de sécurité (CSP, HSTS…), cache des ressources.
 
