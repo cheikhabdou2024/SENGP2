@@ -96,8 +96,8 @@ for (const file of walk(pagesDir)) {
     draft: !LIVE,
   };
   ctx.page.bodyClass = meta.hero ? 'has-hero' : 'no-hero';
-  ctx.extraHead = meta.css ? `<link rel="stylesheet" href="/css/${meta.css}.css">` : '';
-  ctx.extraScripts = meta.js ? `<script src="/js/${meta.js}.js" defer></script>` : '';
+  ctx.extraHead = meta.css ? meta.css.split(/\s+/).map(n => `<link rel="stylesheet" href="/css/${n}.css">`).join('') : '';
+  ctx.extraScripts = meta.js ? meta.js.split(/\s+/).map(n => `<script src="/js/${n}.js" defer></script>`).join('') : '';
   ctx.navHtml = cfg.nav.map(n => `<a class="nav__link" href="${n.path}"${n.key === ctx.page.key ? ' aria-current="page"' : ''}>${esc(n.label)}</a>`).join('');
   ctx.draftBanner = LIVE ? '' : '<div class="draft-bar" role="note"><strong>Version de relecture</strong> — site non publié et non indexé. Les zones surlignées sont à compléter.</div>';
   ctx.legalNotice = cfg.legalReviewed ? '' : '<div class="notice" role="note"><strong>Projet de texte — non validé juridiquement.</strong> Ce document doit être relu et validé par un juriste avant la publication du site.</div>';

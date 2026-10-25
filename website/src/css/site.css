@@ -91,7 +91,7 @@ mark.todo { background: #FFE58A; color: #5B3B00; padding: 0 4px; border-radius: 
 .burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
 .burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-.has-hero main > .hero:first-child, .has-hero main > .page-hero:first-child, .has-hero main > .hx:first-child { margin-top: calc(var(--header-h) * -1); padding-top: var(--header-h); }
+.has-hero main > .hero:first-child, .has-hero main > .page-hero:first-child, .has-hero main > .hx:first-child, .has-hero main > .hw:first-child { margin-top: calc(var(--header-h) * -1); padding-top: var(--header-h); }
 @media (max-width: 1100px) and (min-width: 881px) {
   .nav__link { padding: 10px 9px; font-size: 0.93rem; }
   .nav__link::after { left: 9px; right: 9px; }
