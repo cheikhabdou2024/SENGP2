@@ -17,7 +17,7 @@ node scripts/serve.mjs 8200                      # serveur de dist/
 msedge --headless=new --remote-debugging-port=9333   # ou Chrome
 node scripts/recette.mjs                         # 31 vérifications + captures dans recette/ (non versionné)
 ```
-`node scripts/recette-how.mjs` : 23 vérifications de la page « Comment ça marche » (captures dans `recette/how/`). `scripts/shoot-flow.mjs` régénère les captures de l'application utilisées par cette page.
+`node scripts/recette-how.mjs` : 23 vérifications de la page « Comment ça marche » (captures dans `recette/how/`). `node scripts/recette-about.mjs` : 24 vérifications de la page « À propos ». `scripts/shoot-flow.mjs` régénère les captures de l'application utilisées par cette page.
 La carte des destinations est générée par `scripts/make-map.py` (Natural Earth, domaine public).
 
 ## Structure
