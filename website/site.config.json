@@ -15,7 +15,7 @@
     "capital": "[À COMPLÉTER : capital social]",
     "rccm": "SN DKR 2025 4885",
     "ninea": "012692241 2Y2",
-    "address": "22 route de l'aéroport, immeuble BNDE, Dakar, Sénégal",
+    "address": "29 route de l'aéroport, immeuble BNDE, Dakar, Sénégal",
     "phone": "+221 78 188 36 89",
     "email": "contact@sengp.co",
     "publicationDirector": "Mountaga Sylla",
@@ -40,7 +40,7 @@
       "key": "how"
     },
     {
-      "path": "/#destinations",
+      "path": "/destinations/",
       "label": "Destinations",
       "key": "dest"
     },

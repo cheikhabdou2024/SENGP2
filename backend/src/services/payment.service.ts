@@ -45,7 +45,7 @@ export class PaymentService {
       throw new Error('Invalid payment amount');
     }
 
-    const commissionPct = Number(process.env.PLATFORM_COMMISSION_PERCENTAGE) || 10;
+    const commissionPct = Number(process.env.PLATFORM_COMMISSION_PERCENTAGE) || 15;
     const commission = Helpers.calculateCommission(amount, commissionPct);
     const net_amount = amount - commission;
     const payment_code = Helpers.generateCode('PAY');

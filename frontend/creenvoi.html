@@ -2163,10 +2163,20 @@
             $('summaryDate').textContent = date ? date.split('-').reverse().join('/') : '-';
             $('summaryGP').textContent = 'Ouvert à tous les GP';
 
-            // Suggested price (~3000 FCFA/kg) unless the user already set one
+            // Prix suggéré = tarif de référence de la grille tarifaire SEN GP (FCFA/kg, départ de Dakar),
+            // 1 kg minimum facturable ; le client peut le modifier ensuite.
             const priceInput = $('offeredPrice');
-            if (!priceInput.value && weight > 0) priceInput.value = Math.round(weight * 3000);
+            if (!priceInput.value && weight > 0) priceInput.value = Math.round(Math.max(weight, 1) * referencePricePerKg(to));
             recomputeTotal();
+        }
+
+        const REFERENCE_PRICE_PER_KG = {
+            'Paris': 7000, 'New York': 10000, 'Montréal': 8500, 'Bruxelles': 7000, 'Londres': 7500,
+            'Casablanca': 5500, 'Abidjan': 4500, 'Conakry': 3250
+        };
+        const DEFAULT_PRICE_PER_KG = 3000; // destination absente de la grille
+        function referencePricePerKg(to) {
+            return (to && REFERENCE_PRICE_PER_KG[to.city]) || DEFAULT_PRICE_PER_KG;
         }
 
         function recomputeTotal() {
