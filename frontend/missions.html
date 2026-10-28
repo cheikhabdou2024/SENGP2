@@ -534,6 +534,7 @@
     <link rel="apple-touch-icon" href="icons/icon-180.png">
     <script src="pwa.js" defer></script>
     <link rel="stylesheet" href="responsive.css">
+<script src="geo-data.js" defer></script><script src="geo.js" defer></script>
 </head>
 <body class="ds">
     <div class="mobile-frame">
@@ -634,7 +635,7 @@
             'Canada': '🇨🇦', 'Royaume-Uni': '🇬🇧', 'Angleterre': '🇬🇧', 'Allemagne': '🇩🇪',
             'Belgique': '🇧🇪', 'Maroc': '🇲🇦', 'Mali': '🇲🇱', 'Côte d\'Ivoire': '🇨🇮'
         };
-        function flagFor(country) { return FLAGS[country] || '🌍'; }
+        function flagFor(country) { return FLAGS[country] || (window.SengpGeo ? SengpGeo.flag(country) : '🌍'); }
 
         function esc(s) {
             return String(s == null ? '' : s)

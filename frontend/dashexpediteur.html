@@ -232,6 +232,8 @@
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
+    <script src="geo-data.js" defer></script>
+    <script src="geo.js" defer></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
@@ -372,19 +374,6 @@
                 </button>
             </nav>
 
-            <!-- Country selection sheet -->
-            <div class="modal-overlay" id="countryModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-                <div class="hm-sheet">
-                    <div class="hm-sheet__head">
-                        <h3 id="modalTitle">Choisir le pays de départ</h3>
-                        <button type="button" class="hm-close" onclick="closeCountryModal()" aria-label="Fermer"><svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
-                    </div>
-                    <div class="hm-search">
-                        <input type="text" id="countrySearch" placeholder="Rechercher un pays..." oninput="filterCountries()" autocomplete="off" aria-label="Rechercher un pays">
-                    </div>
-                    <div class="hm-list" id="countryList"></div>
-                </div>
-            </div>
         </div>
     </div>
     <script>
@@ -622,26 +611,10 @@
             return statusMap[String(status || '').toLowerCase()] || status || '';
         }
 
-        // Obtenir le drapeau du pays
+        // Obtenir le drapeau du pays (tous les pays de geo-data.js)
         function getCountryFlag(country) {
-            const countryFlags = {
-                'Sénégal': '🇸🇳',
-                'France': '🇫🇷',
-                'États-Unis': '🇺🇸',
-                'USA': '🇺🇸',
-                'Royaume-Uni': '🇬🇧',
-                'UK': '🇬🇧',
-                'Canada': '🇨🇦',
-                'Espagne': '🇪🇸',
-                'Italie': '🇮🇹',
-                'Allemagne': '🇩🇪',
-                'Belgique': '🇧🇪',
-                'Suisse': '🇨🇭',
-                'Maroc': '🇲🇦',
-                'Algérie': '🇩🇿',
-                'Tunisie': '🇹🇳'
-            };
-            return countryFlags[country] || '🌍';
+            const f = window.SengpGeo && SengpGeo.find(country);
+            return f ? SengpGeo.flagOf(f.c[0]) : '🌍';
         }
 
         // Formater la date
@@ -651,101 +624,18 @@
             return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
         }
 
-        // Database des pays avec drapeaux et villes principales
-        const countries = [
-            { flag: '🇸🇳', name: 'Sénégal', city: 'Dakar', code: 'SN' },
-            { flag: '🇫🇷', name: 'France', city: 'Paris', code: 'FR' },
-            { flag: '🇺🇸', name: 'États-Unis', city: 'New York', code: 'US' },
-            { flag: '🇬🇧', name: 'Royaume-Uni', city: 'Londres', code: 'GB' },
-            { flag: '🇨🇦', name: 'Canada', city: 'Montréal', code: 'CA' },
-            { flag: '🇪🇸', name: 'Espagne', city: 'Madrid', code: 'ES' },
-            { flag: '🇮🇹', name: 'Italie', city: 'Rome', code: 'IT' },
-            { flag: '🇩🇪', name: 'Allemagne', city: 'Berlin', code: 'DE' },
-            { flag: '🇧🇪', name: 'Belgique', city: 'Bruxelles', code: 'BE' },
-            { flag: '🇨🇭', name: 'Suisse', city: 'Genève', code: 'CH' },
-            { flag: '🇳🇱', name: 'Pays-Bas', city: 'Amsterdam', code: 'NL' },
-            { flag: '🇵🇹', name: 'Portugal', city: 'Lisbonne', code: 'PT' },
-            { flag: '🇲🇦', name: 'Maroc', city: 'Casablanca', code: 'MA' },
-            { flag: '🇩🇿', name: 'Algérie', city: 'Alger', code: 'DZ' },
-            { flag: '🇹🇳', name: 'Tunisie', city: 'Tunis', code: 'TN' },
-            { flag: '🇨🇮', name: 'Côte d\'Ivoire', city: 'Abidjan', code: 'CI' },
-            { flag: '🇲🇱', name: 'Mali', city: 'Bamako', code: 'ML' },
-            { flag: '🇬🇳', name: 'Guinée', city: 'Conakry', code: 'GN' },
-            { flag: '🇧🇫', name: 'Burkina Faso', city: 'Ouagadougou', code: 'BF' },
-            { flag: '🇳🇬', name: 'Nigeria', city: 'Lagos', code: 'NG' },
-            { flag: '🇬🇭', name: 'Ghana', city: 'Accra', code: 'GH' },
-            { flag: '🇰🇪', name: 'Kenya', city: 'Nairobi', code: 'KE' },
-            { flag: '🇿🇦', name: 'Afrique du Sud', city: 'Johannesburg', code: 'ZA' },
-            { flag: '🇪🇬', name: 'Égypte', city: 'Le Caire', code: 'EG' },
-            { flag: '🇦🇪', name: 'Émirats Arabes', city: 'Dubaï', code: 'AE' },
-            { flag: '🇸🇦', name: 'Arabie Saoudite', city: 'Riyad', code: 'SA' },
-            { flag: '🇹🇷', name: 'Turquie', city: 'Istanbul', code: 'TR' },
-            { flag: '🇨🇳', name: 'Chine', city: 'Shanghai', code: 'CN' },
-            { flag: '🇯🇵', name: 'Japon', city: 'Tokyo', code: 'JP' },
-            { flag: '🇰🇷', name: 'Corée du Sud', city: 'Séoul', code: 'KR' },
-            { flag: '🇮🇳', name: 'Inde', city: 'Mumbai', code: 'IN' },
-            { flag: '🇧🇷', name: 'Brésil', city: 'São Paulo', code: 'BR' },
-            { flag: '🇲🇽', name: 'Mexique', city: 'Mexico', code: 'MX' },
-            { flag: '🇦🇷', name: 'Argentine', city: 'Buenos Aires', code: 'AR' },
-            { flag: '🇦🇺', name: 'Australie', city: 'Sydney', code: 'AU' }
-        ];
-
-        let currentSelector = null;
-
+        // Sélecteur continent > pays > région (geo.js)
         function openCountryModal(type) {
-            currentSelector = type;
-            const modal = document.getElementById('countryModal');
-            document.getElementById('modalTitle').textContent =
-                type === 'departure' ? 'Choisir le pays de départ' : 'Choisir le pays d\'arrivée';
-
-            renderCountryList(countries);
-            modal.classList.add('show');
-        }
-
-        function closeCountryModal() {
-            document.getElementById('countryModal').classList.remove('show');
-            document.getElementById('countrySearch').value = '';
-        }
-
-        function renderCountryList(countriesToShow) {
-            const countryList = document.getElementById('countryList');
-            countryList.textContent = '';
-
-            countriesToShow.forEach(country => {
-                const item = document.createElement('button');
-                item.type = 'button';
-                item.className = 'hm-country';
-                item.onclick = () => selectCountry(country);
-
-                item.innerHTML = `
-                    <span class="hm-flag">${country.flag}</span>
-                    <span>
-                        <span class="hm-country__name">${esc(country.name)}</span><br>
-                        <span class="hm-country__city">${esc(country.city)}</span>
-                    </span>
-                `;
-
-                countryList.appendChild(item);
+            SengpGeo.open({
+                title: type === 'departure' ? 'Lieu de départ' : "Lieu d'arrivée",
+                onPick: sel => {
+                    const prefix = type === 'departure' ? 'departure' : 'arrival';
+                    document.getElementById(prefix + 'Flag').textContent = sel.flag;
+                    const nameEl = document.getElementById(prefix + 'Name');
+                    nameEl.textContent = `${sel.region}, ${sel.country}`;
+                    nameEl.classList.remove('hm-place--ph');
+                }
             });
-        }
-
-        function filterCountries() {
-            const searchValue = document.getElementById('countrySearch').value.toLowerCase();
-            const filtered = countries.filter(country =>
-                country.name.toLowerCase().includes(searchValue) ||
-                country.city.toLowerCase().includes(searchValue)
-            );
-            renderCountryList(filtered);
-        }
-
-        function selectCountry(country) {
-            const prefix = currentSelector === 'departure' ? 'departure' : 'arrival';
-            document.getElementById(prefix + 'Flag').textContent = country.flag;
-            const nameEl = document.getElementById(prefix + 'Name');
-            nameEl.textContent = `${country.city}, ${country.name}`;
-            nameEl.classList.remove('hm-place--ph');
-
-            closeCountryModal();
         }
 
         // Swap departure and arrival (opens the destination picker if none is chosen yet)
@@ -762,15 +652,6 @@
             [depName.textContent, arrivalName.textContent] = [arrivalName.textContent, depName.textContent];
         }
 
-        // Close the sheet when clicking outside it, or with Escape
-        document.getElementById('countryModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeCountryModal();
-            }
-        });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeCountryModal();
-        });
 
         function createShipment() {
             // Rediriger vers la page de création d'envoi

@@ -259,6 +259,8 @@
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
+    <script src="geo-data.js" defer></script>
+    <script src="geo.js" defer></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
@@ -454,16 +456,6 @@
             window.location.href = 'dashgp.html';
         }
 
-        // Pays / villes proposés
-        const cities = {
-            'Sénégal': ['Dakar', 'Thiès', 'Saint-Louis', 'Kaolack', 'Ziguinchor'],
-            'France': ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice'],
-            'Espagne': ['Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Bilbao'],
-            'Italie': ['Rome', 'Milan', 'Naples', 'Turin', 'Florence'],
-            'USA': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Miami'],
-            'Canada': ['Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Ottawa'],
-            'Algérie': ['Alger', 'Oran', 'Constantine', 'Annaba', 'Tlemcen']
-        };
         const COUNTRY_LABEL = { 'USA': 'États-Unis' };
 
         // Drapeaux en SVG (les emoji drapeaux ne s'affichent pas sous Windows)
@@ -486,7 +478,7 @@
         function renderPlace(side) {
             const key = side === 'dep' ? 'Dep' : 'Arr';
             const p = trip[side];
-            document.getElementById('flag' + key).innerHTML = flagHTML(p.country);
+            document.getElementById('flag' + key).innerHTML = p.flag ? '<span style="font-size:20px;line-height:24px;width:100%;text-align:center">' + p.flag + '</span>' : flagHTML(p.country);
             document.getElementById('city' + key).textContent = p.city || 'Choisir';
             document.getElementById('country' + key).textContent = p.country ? countryName(p.country) : 'Pays';
             document.getElementById('place' + key).classList.toggle('is-empty', !p.city);
@@ -512,25 +504,16 @@
         }
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
 
-        function openPlaceSheet(side, country) {
-            sheetKind = side;
+        function openPlaceSheet(side) {
             const cur = trip[side];
-            const label = side === 'dep' ? 'Départ' : 'Arrivée';
-            const chevron = '<svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
-            if (!country) {
-                const rows = Object.keys(cities).map(c =>
-                    '<button type="button" class="ct-opt' + (c === cur.country ? ' is-on' : '') + '" onclick="openPlaceSheet(\'' + side + '\',\'' + c + '\')"><span class="ct-flag">' + flagHTML(c) + '</span>' + countryName(c) + chevron + '</button>').join('');
-                openSheet(side === 'dep' ? 'Pays de départ' : "Pays d'arrivée", 'Choisissez le pays', rows);
-            } else {
-                const rows = cities[country].map(city =>
-                    '<button type="button" class="ct-opt' + (country === cur.country && city === cur.city ? ' is-on' : '') + '" onclick="pickCity(\'' + side + '\',\'' + country + '\',\'' + city + '\')">' + city + '</button>').join('');
-                openSheet('Ville · ' + countryName(country), label, '<button type="button" class="ct-crumb" onclick="openPlaceSheet(\'' + side + '\')"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Changer de pays</button>' + rows);
-            }
-        }
-        function pickCity(side, country, city) {
-            trip[side] = { country: country, city: city };
-            renderPlace(side);
-            closeSheet();
+            SengpGeo.open({
+                title: side === 'dep' ? 'Lieu de départ' : "Lieu d'arrivée",
+                country: cur.country,
+                onPick: sel => {
+                    trip[side] = { country: sel.country, city: sel.region, flag: sel.flag };
+                    renderPlace(side);
+                }
+            });
         }
 
         // ---------- dates ----------

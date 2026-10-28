@@ -1515,6 +1515,8 @@
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
+    <script src="geo-data.js" defer></script>
+    <script src="geo.js" defer></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
@@ -1991,24 +1993,7 @@
             </div>
         </div>
 
-        <!-- Location + country code pickers (bottom sheets) -->
-            <!-- Location Selection Modal -->
-            <div class="modal" id="locationModal" onclick="closeLocationModal(event)">
-                <div class="modal-content location-modal-content" onclick="event.stopPropagation()">
-                    <div class="modal-header">
-                        <h3 id="modalTitle">Sélectionner le lieu</h3>
-                        <button class="modal-close" onclick="closeLocationModal()">×</button>
-                    </div>
-
-                    <div class="search-box">
-                        <input type="text" id="locationSearch" placeholder="🔍 Rechercher un pays ou une ville..." onkeyup="filterLocations()" />
-                    </div>
-
-                    <div class="locations-list" id="locationsList">
-                        <!-- Locations will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
+        <!-- Country code picker (bottom sheet) ; le choix du lieu passe par geo.js -->
 
             <!-- Country Code Selection Modal -->
             <div class="modal" id="countryCodeModal" onclick="closeCountryCodeModal(event)">
@@ -2166,17 +2151,14 @@
             // Prix suggéré = tarif de référence de la grille tarifaire SEN GP (FCFA/kg, départ de Dakar),
             // 1 kg minimum facturable ; le client peut le modifier ensuite.
             const priceInput = $('offeredPrice');
-            if (!priceInput.value && weight > 0) priceInput.value = Math.round(Math.max(weight, 1) * referencePricePerKg(to));
+            const perKg = referencePricePerKg(to);
+            if (!priceInput.value && weight > 0 && perKg) priceInput.value = Math.round(Math.max(weight, 1) * perKg);
             recomputeTotal();
         }
 
-        const REFERENCE_PRICE_PER_KG = {
-            'Paris': 7000, 'New York': 10000, 'Montréal': 8500, 'Bruxelles': 7000, 'Londres': 7500,
-            'Casablanca': 5500, 'Abidjan': 4500, 'Conakry': 3250
-        };
-        const DEFAULT_PRICE_PER_KG = 3000; // destination absente de la grille
+        // Tarif de référence = grille tarifaire par continent (geo-data.js) ; null = pas de tarif défini.
         function referencePricePerKg(to) {
-            return (to && REFERENCE_PRICE_PER_KG[to.city]) || DEFAULT_PRICE_PER_KG;
+            return (to && SengpGeo.priceFor(to.country)) || null;
         }
 
         function recomputeTotal() {
@@ -2784,99 +2766,15 @@
         let selectedDeparture = null;
         let selectedArrival = null;
 
-        // Liste des pays et villes des 4 continents
-        const locations = [
-            // Afrique
-            { flag: '🇸🇳', country: 'Sénégal', city: 'Dakar', continent: 'Afrique' },
-            { flag: '🇲🇦', country: 'Maroc', city: 'Casablanca', continent: 'Afrique' },
-            { flag: '🇲🇦', country: 'Maroc', city: 'Rabat', continent: 'Afrique' },
-            { flag: '🇩🇿', country: 'Algérie', city: 'Alger', continent: 'Afrique' },
-            { flag: '🇹🇳', country: 'Tunisie', city: 'Tunis', continent: 'Afrique' },
-            { flag: '🇨🇮', country: 'Côte d\'Ivoire', city: 'Abidjan', continent: 'Afrique' },
-            { flag: '🇨🇲', country: 'Cameroun', city: 'Yaoundé', continent: 'Afrique' },
-            { flag: '🇬🇭', country: 'Ghana', city: 'Accra', continent: 'Afrique' },
-            { flag: '🇳🇬', country: 'Nigeria', city: 'Lagos', continent: 'Afrique' },
-            { flag: '🇿🇦', country: 'Afrique du Sud', city: 'Le Cap', continent: 'Afrique' },
-
-            // Europe
-            { flag: '🇫🇷', country: 'France', city: 'Paris', continent: 'Europe' },
-            { flag: '🇫🇷', country: 'France', city: 'Lyon', continent: 'Europe' },
-            { flag: '🇫🇷', country: 'France', city: 'Marseille', continent: 'Europe' },
-            { flag: '🇬🇧', country: 'Royaume-Uni', city: 'Londres', continent: 'Europe' },
-            { flag: '🇪🇸', country: 'Espagne', city: 'Madrid', continent: 'Europe' },
-            { flag: '🇪🇸', country: 'Espagne', city: 'Barcelone', continent: 'Europe' },
-            { flag: '🇮🇹', country: 'Italie', city: 'Rome', continent: 'Europe' },
-            { flag: '🇮🇹', country: 'Italie', city: 'Milan', continent: 'Europe' },
-            { flag: '🇩🇪', country: 'Allemagne', city: 'Berlin', continent: 'Europe' },
-            { flag: '🇧🇪', country: 'Belgique', city: 'Bruxelles', continent: 'Europe' },
-            { flag: '🇨🇭', country: 'Suisse', city: 'Genève', continent: 'Europe' },
-            { flag: '🇵🇹', country: 'Portugal', city: 'Lisbonne', continent: 'Europe' },
-
-            // Amérique
-            { flag: '🇺🇸', country: 'États-Unis', city: 'New York', continent: 'Amérique' },
-            { flag: '🇺🇸', country: 'États-Unis', city: 'Los Angeles', continent: 'Amérique' },
-            { flag: '🇺🇸', country: 'États-Unis', city: 'Miami', continent: 'Amérique' },
-            { flag: '🇨🇦', country: 'Canada', city: 'Montréal', continent: 'Amérique' },
-            { flag: '🇨🇦', country: 'Canada', city: 'Toronto', continent: 'Amérique' },
-            { flag: '🇧🇷', country: 'Brésil', city: 'São Paulo', continent: 'Amérique' },
-            { flag: '🇲🇽', country: 'Mexique', city: 'Mexico', continent: 'Amérique' },
-
-            // Asie
-            { flag: '🇨🇳', country: 'Chine', city: 'Pékin', continent: 'Asie' },
-            { flag: '🇨🇳', country: 'Chine', city: 'Shanghai', continent: 'Asie' },
-            { flag: '🇯🇵', country: 'Japon', city: 'Tokyo', continent: 'Asie' },
-            { flag: '🇰🇷', country: 'Corée du Sud', city: 'Séoul', continent: 'Asie' },
-            { flag: '🇮🇳', country: 'Inde', city: 'New Delhi', continent: 'Asie' },
-            { flag: '🇹🇭', country: 'Thaïlande', city: 'Bangkok', continent: 'Asie' },
-            { flag: '🇦🇪', country: 'Émirats Arabes Unis', city: 'Dubaï', continent: 'Asie' },
-            { flag: '🇸🇦', country: 'Arabie Saoudite', city: 'Riyad', continent: 'Asie' }
-        ];
-
+        // Sélecteur continent > pays > région (geo.js)
         function openLocationModal(type) {
             currentModalType = type;
-            const modal = document.getElementById('locationModal');
-            const title = document.getElementById('modalTitle');
-
-            title.textContent = type === 'departure' ? 'Sélectionner le lieu de départ' : 'Sélectionner le lieu d\'arrivée';
-
-            populateLocations(locations);
-            modal.classList.add('active');
-        }
-
-        function closeLocationModal(event) {
-            if (event && event.target !== event.currentTarget) return;
-            document.getElementById('locationModal').classList.remove('active');
-            document.getElementById('locationSearch').value = '';
-        }
-
-        function populateLocations(locs) {
-            const list = document.getElementById('locationsList');
-            list.innerHTML = '';
-
-            locs.forEach(loc => {
-                const item = document.createElement('div');
-                item.className = 'location-item';
-                item.onclick = () => selectLocation(loc);
-
-                item.innerHTML = `
-                    <span class="location-item-flag">${loc.flag}</span>
-                    <div class="location-item-info">
-                        <div class="location-item-country">${loc.country}</div>
-                        <div class="location-item-city">${loc.city}</div>
-                    </div>
-                `;
-
-                list.appendChild(item);
+            const cur = type === 'departure' ? selectedDeparture : selectedArrival;
+            SengpGeo.open({
+                title: type === 'departure' ? 'Lieu de départ' : "Lieu d'arrivée",
+                country: cur && cur.country,
+                onPick: sel => selectLocation({ flag: sel.flag, country: sel.country, city: sel.region, continent: sel.continent })
             });
-        }
-
-        function filterLocations() {
-            const search = document.getElementById('locationSearch').value.toLowerCase();
-            const filtered = locations.filter(loc =>
-                loc.country.toLowerCase().includes(search) ||
-                loc.city.toLowerCase().includes(search)
-            );
-            populateLocations(filtered);
         }
 
         function selectLocation(location) {
@@ -2892,7 +2790,6 @@
                 document.getElementById('arrivalLocation').classList.add('is-filled');
             }
 
-            closeLocationModal();
             validateStep2();
         }
 

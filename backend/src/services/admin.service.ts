@@ -343,7 +343,7 @@ export class AdminService {
       `SELECT m.id, m.mission_code, m.status, m.arrival_confirmed, m.departure_city, m.arrival_city,
               m.offered_price AS price, m.package_weight AS weight, m.tracking_number, m.created_at,
               e.first_name || ' ' || e.last_name AS expediteur_name,
-              g.first_name || ' ' || g.last_name AS gp_name
+              g.first_name || ' ' || g.last_name AS gp_name, g.phone AS gp_phone, m.updated_at
        FROM missions m
        LEFT JOIN users e ON m.expediteur_id = e.id
        LEFT JOIN users g ON m.gp_id = g.id

@@ -209,6 +209,25 @@
         .toast.ok { border-left: 4px solid #7ee081; }
         .toast.err { border-left: 4px solid #ff8f8f; }
         .toast.info { border-left: 4px solid #4ECDC4; }
+        /* File « Arrivées à confirmer » : GP déclarés à destination, en attente de l'admin */
+        .arr-wrap { margin: 0 0 16px; }
+        .arr-card { background: linear-gradient(135deg, rgba(251,191,36,.14), rgba(99,102,241,.12)); border:1px solid rgba(251,191,36,.45);
+            border-radius: 16px; padding: 14px 16px; }
+        .arr-head { display:flex; align-items:center; gap:10px; font-weight:800; font-size:14px; margin-bottom:10px; }
+        .arr-head .pulse { width:10px; height:10px; border-radius:50%; background: var(--warn); animation: arrPulse 1.4s infinite; }
+        .arr-item { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:10px 0; border-top:1px solid var(--border); }
+        .arr-item:first-of-type { border-top:0; }
+        .arr-info { flex:1 1 220px; min-width:0; font-size:13px; }
+        .arr-info b { font-size:14px; }
+        .arr-info small { display:block; color: var(--muted); margin-top:2px; }
+        .arr-btns { display:flex; gap:8px; flex-wrap:wrap; }
+        .arr-btns a, .arr-btns button { border:0; cursor:pointer; border-radius:10px; padding:8px 12px; font:700 12px inherit; text-decoration:none; }
+        .arr-wa { background: rgba(37,211,102,.18); color:#4ade80; border:1px solid rgba(37,211,102,.4) !important; }
+        .arr-ok { background: linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+        .nav-count { margin-left:auto; min-width:20px; height:20px; padding:0 6px; border-radius:10px; background: var(--warn); color:#1a1200;
+            font-size:11px; font-weight:800; display:none; align-items:center; justify-content:center; }
+        @keyframes arrPulse { 0%,100% { box-shadow:0 0 0 0 rgba(251,191,36,.6); } 50% { box-shadow:0 0 0 7px rgba(251,191,36,0); } }
+        @media (prefers-reduced-motion: reduce) { .arr-head .pulse { animation: none; } }
         @keyframes toastIn { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform:none; } }
         @media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
 
@@ -315,7 +334,7 @@
 
                     <div class="nav-section">Opérations</div>
                     <div class="nav-link" data-view="users" data-perm="users:read" onclick="switchView('users',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg> <span>Utilisateurs</span></div>
-                    <div class="nav-link" data-view="missions" data-perm="missions:read" onclick="switchView('missions',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/></svg> <span>Missions</span></div>
+                    <div class="nav-link" data-view="missions" data-perm="missions:read" onclick="switchView('missions',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/></svg> <span>Missions</span><span class="nav-count" id="navArrCount"></span></div>
                     <div class="nav-link" data-view="trips" data-perm="trips:read" onclick="switchView('trips',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l20-8-8 20-2.5-8.5z"/></svg> <span>Trajets</span></div>
                     <div class="nav-link" data-view="kyc" data-perm="users:verify" onclick="switchView('kyc',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="12" r="2"/><path d="M14 10h4M14 14h4"/></svg> <span>Vérification KYC</span></div>
 
@@ -353,6 +372,7 @@
                         <button class="btn-logout" onclick="logout()">Déconnexion</button>
                     </div>
                 </div>
+                <div id="arrivalQueue" class="arr-wrap" style="padding:20px 26px 0"></div>
                 <div class="main" id="main"></div>
             </div>
         </div>
@@ -473,6 +493,7 @@
         });
 
         function logout(){
+            stopArrivalWatch();
             localStorage.removeItem('authToken'); localStorage.removeItem('userData');
             token = null; me = null;
             document.getElementById('app').style.display = 'none';
@@ -490,6 +511,7 @@
             await loadPermissions();
             applyPermissionGates();
             switchView('overview', document.querySelector('.nav-link'));
+            startArrivalWatch();
         }
         // Topbar search → jump to Users filtered by the query.
         function globalSearchGo(){
@@ -1515,11 +1537,50 @@
                 notify(ok, 'Mission réassignée — le GP a été notifié.', json); if (ok) loadList();
             });
         }
+        // ---------- File « Arrivées à confirmer » ----------
+        // Les GP qui ont touché « Arrivé à destination » (statut out_for_delivery) restent
+        // verrouillés tant que l'admin n'a pas confirmé : on les remonte en temps quasi réel.
+        let _arrTimer = null, _arrSeen = null;
+        function stopArrivalWatch(){ if (_arrTimer) { clearInterval(_arrTimer); _arrTimer = null; } _arrSeen = null; }
+        function startArrivalWatch(){
+            stopArrivalWatch();
+            if (!can('missions:write')) return;
+            refreshArrivalQueue();
+            _arrTimer = setInterval(() => { if (!document.hidden) refreshArrivalQueue(); }, 15000);
+        }
+        async function refreshArrivalQueue(){
+            const box = document.getElementById('arrivalQueue');
+            if (!box || !token) return;
+            let list = [];
+            try {
+                const { ok, json } = await api('/admin/missions?status=out_for_delivery&limit=50');
+                if (ok) list = (json.data || []).filter(m => !m.arrival_confirmed);
+                else return;
+            } catch (e) { return; }
+            const ids = new Set(list.map(m => m.id));
+            // Toast uniquement pour les nouvelles demandes (pas au premier chargement).
+            if (_arrSeen) list.filter(m => !_arrSeen.has(m.id)).forEach(m =>
+                toast('🛬 ' + (m.gp_name || 'Un GP') + ' est arrivé à destination (' + m.mission_code + ') — à confirmer', 'info'));
+            _arrSeen = ids;
+            const cnt = document.getElementById('navArrCount');
+            if (cnt) { cnt.textContent = list.length; cnt.style.display = list.length ? 'inline-flex' : 'none'; }
+            if (!list.length) { box.innerHTML = ''; return; }
+            box.innerHTML = '<div class="arr-card"><div class="arr-head"><span class="pulse"></span>'
+                + list.length + ' GP' + (list.length > 1 ? ' ont' : ' a') + ' déclaré' + (list.length > 1 ? 's' : '') + ' être arrivé' + (list.length > 1 ? 's' : '') + ' à destination — confirmation requise</div>'
+                + list.map(m => {
+                    const tel = String(m.gp_phone || '').replace(/[^\d]/g, '');
+                    const wa = tel ? `<a class="arr-wa" href="https://wa.me/${tel}" target="_blank" rel="noopener">💬 Appeler / WhatsApp</a>` : '';
+                    return `<div class="arr-item"><div class="arr-info"><b>${esc(m.mission_code)}</b> · ${esc((m.departure_city||'?')+' → '+(m.arrival_city||'?'))}`
+                        + `<small>GP : ${esc(m.gp_name||'—')}${m.gp_phone ? ' · ' + esc(m.gp_phone) : ''} · Expéditeur : ${esc(m.expediteur_name||'—')}${m.updated_at ? ' · depuis ' + esc(new Date(m.updated_at).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})) : ''}</small></div>`
+                        + `<div class="arr-btns">${wa}<button class="arr-ok" onclick="confirmArrival('${m.id}','${esc(m.mission_code)}')">✅ Confirmer l'arrivée</button></div></div>`;
+                }).join('') + '</div>';
+        }
         async function confirmArrival(id, code){
             if (!await confirmDialog('Confirmer l\'arrivée du GP à destination pour ' + code + ' ? À faire après l\'appel WhatsApp de vérification. Le GP pourra alors scanner le QR du destinataire.', { title:'Confirmer l\'arrivée', confirmLabel:'Confirmer' })) return;
             const { ok, json } = await api('/admin/missions/'+id+'/confirm-arrival', { method:'POST' });
-            notify(ok, 'Arrivée confirmée — le GP peut livrer.', json);
-            if (ok) loadList();
+            notify(ok, 'Arrivée confirmée — le GP peut scanner.', json);
+            refreshArrivalQueue();
+            if (ok && state.view === 'missions') loadList();
         }
         // ---------- Mission detail (timeline + GPS map + parties) ----------
         async function showMissionDetail(id){

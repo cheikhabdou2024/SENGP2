@@ -261,6 +261,7 @@
     <link rel="apple-touch-icon" href="icons/icon-180.png">
     <script src="pwa.js" defer></script>
     <link rel="stylesheet" href="responsive.css">
+<script src="geo-data.js" defer></script><script src="geo.js" defer></script>
 </head>
 <body class="ds">
 <div class="mobile-frame">
@@ -372,7 +373,7 @@
   };
 
   const FLAGS = {'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱','Algérie':'🇩🇿','Tunisie':'🇹🇳','Côte d\'Ivoire':'🇨🇮','Belgique':'🇧🇪','Suisse':'🇨🇭'};
-  const flag = c => FLAGS[c] || '🌍';
+  const flag = c => FLAGS[c] || (window.SengpGeo ? SengpGeo.flag(c) : '🌍');
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const st = m => String(m.status || '').toLowerCase();
   const validDate = d => { const x = d ? new Date(d) : null; return x && !isNaN(x.getTime()) ? x : null; };

@@ -13,6 +13,8 @@ const PRECACHE = [
     'theme.css',
     'responsive.css',
     'ui.js',
+    'geo.js',
+    'geo-data.js',
     'icons/icon-192.png',
     'icons/icon-512.png'
 ];

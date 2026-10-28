@@ -250,6 +250,7 @@
     <link rel="apple-touch-icon" href="icons/icon-180.png">
     <script src="pwa.js" defer></script>
     <link rel="stylesheet" href="responsive.css">
+<script src="geo-data.js" defer></script><script src="geo.js" defer></script>
 </head>
 <body class="ds">
 <div class="mobile-frame">
@@ -379,6 +380,7 @@
         const GLOBE = '<rect width="30" height="20" fill="#DCE8FB"/><circle cx="15" cy="10" r="6" fill="none" stroke="#2F6BFF" stroke-width="1.4"/><path d="M9 10h12M15 4c2.5 3 2.5 9 0 12M15 4c-2.5 3-2.5 9 0 12" fill="none" stroke="#2F6BFF" stroke-width="1.1"/>';
         function flagFor(c) {
             const k = FLAG_ALIAS[c] || c;
+            if (!FLAGS[k] && window.SengpGeo && SengpGeo.find(c)) return '<span class="tj-flag" style="align-items:center;justify-content:center;font-size:16px;line-height:1">' + SengpGeo.flag(c) + '</span>';
             return '<span class="tj-flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + (FLAGS[k] || GLOBE) + '</svg></span>';
         }
         function esc(s) {
