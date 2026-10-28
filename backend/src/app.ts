@@ -85,6 +85,7 @@ const apiVersionPublic = process.env.API_VERSION || 'v1';
 app.use(`/api/${apiVersionPublic}/public`, RateLimitMiddleware.publicTracking, publicRoutes);
 app.get('/t/:token', PublicController.trackPage);
 app.get('/d/:token', PublicController.deliveryPage);
+app.get('/q/:token', PublicController.recipientQrPage);
 
 // Payment provider redirect landing pages (success / error).
 app.get('/payment-success', PublicController.paymentResultPage(true));

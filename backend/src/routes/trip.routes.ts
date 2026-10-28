@@ -4,6 +4,7 @@ import { TripController } from '../controllers/trip.controller';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { ValidationMiddleware } from '../middlewares/validation.middleware';
 import { UserType } from '../types';
+import { requireGpUnlocked } from '../middlewares/gpLock.middleware';
 import {
   createTripValidator,
   updateTripStatusValidator,
@@ -37,6 +38,7 @@ router.get('/:id', TripController.getById);
 router.post(
   '/',
   AuthMiddleware.requireRole(UserType.GP),
+  requireGpUnlocked,
   upload.single('flight_ticket_photo'),
   ValidationMiddleware.validate(createTripValidator),
   TripController.create

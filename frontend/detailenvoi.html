@@ -276,7 +276,7 @@
                         <svg class="ico" viewBox="0 0 24 24" style="display:inline-block;vertical-align:-4px;margin-right:6px;"><path d="M4 4h16v16H4z" fill="none"/><path d="M12 2a10 10 0 0 0-8.94 14.46L2 22l5.7-1.49A10 10 0 1 0 12 2z"/></svg>
                         Envoyer le QR au destinataire (WhatsApp)
                     </button>
-                    <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:8px;text-align:center;">Le destinataire montre ce QR au livreur (GP) à la réception.</div>`;
+                    <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:8px;text-align:center;">Collez ce QR sur le colis : le livreur (GP) le scannera, puis celui du destinataire.</div>`;
             } catch (e) {
                 box.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.6);padding:12px;">QR indisponible pour le moment.' +
                     ' <button class="btn" style="margin-top:8px;background:rgba(255,215,0,.15);color:#FFD700;border:1px solid rgba(255,215,0,.3);" onclick="loadPackageQR()">Réessayer</button></div>';
@@ -292,8 +292,8 @@
             const caption =
                 `🎁 SEN GP — Votre colis est en route !\n\n` +
                 `📦 Numéro de suivi : ${trackingNum}\n\n` +
-                `À la livraison, montrez CE QR code au livreur (GP) SEN GP. ` +
-                `Il le scannera pour confirmer la remise de votre colis.\n\n` +
+                `QR code du colis : à imprimer ou coller sur le colis. ` +
+                `Le livreur (GP) SEN GP le scannera, puis celui du destinataire, pour confirmer la remise.\n\n` +
                 `SEN GP — La livraison collaborative`;
             const img = document.getElementById('qrImg');
             const dataUrl = img && img.src;

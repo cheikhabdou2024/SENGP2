@@ -226,6 +226,17 @@ export class AdminController {
       ResponseUtil.badRequest(res, e.message || 'Confirmation failed');
     }
   }
+  static async listScanReviews(_req: AuthRequest, res: Response): Promise<void> {
+    try { ResponseUtil.success(res, await AdminService.listScanReviews()); }
+    catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
+  }
+  static async releaseGp(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const r = await AdminService.releaseGp(req.params.id);
+      void logAdminAction({ req, action: 'gp.release_scan', entityType: 'user', entityId: req.params.id });
+      ResponseUtil.success(res, r, 'Accès du GP rétabli');
+    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
+  }
   static async missionStatusSeries(req: AuthRequest, res: Response): Promise<void> {
     try {
       const to = (req.query.to as string) || new Date().toISOString().slice(0, 10);

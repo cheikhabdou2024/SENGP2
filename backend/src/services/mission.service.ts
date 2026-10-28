@@ -838,6 +838,84 @@ export class MissionService {
     return (await this.getById(missionId)) as Mission;
   }
 
+  /** Extract the mission id from a package QR (JSON {id, mission_code, ...}). */
+  private static missionIdFromPackageQr(qr: string): string | null {
+    try { const j = JSON.parse(qr); return j && j.id ? String(j.id) : null; } catch { return null; }
+  }
+
+  /** Extract the delivery token from a recipient QR (URL .../d/<token>, JSON {token} or raw token). */
+  private static tokenFromRecipientQr(qr: string): string | null {
+    const s = String(qr || '').trim();
+    const m = s.match(/\/d\/([A-Za-z0-9_-]{8,100})/);
+    if (m) return m[1];
+    try { const j = JSON.parse(s); if (j && j.token) return String(j.token); } catch { /* not JSON */ }
+    return /^[A-Za-z0-9_-]{16,100}$/.test(s) ? s : null;
+  }
+
+  /**
+   * Compare the colis QR with the recipient's QR. Same mission → delivery is confirmed
+   * (green check); otherwise match=false (red cross) and nothing is changed.
+   */
+  static async verifyPair(
+    packageQr: string,
+    recipientQr: string,
+    gpId: string
+  ): Promise<{ match: boolean; reason?: string; mission?: Mission }> {
+    const pkgId = this.missionIdFromPackageQr(packageQr);
+    if (!pkgId) return { match: false, reason: 'QR du colis non reconnu.' };
+    const token = this.tokenFromRecipientQr(recipientQr);
+    if (!token) return { match: false, reason: 'QR du destinataire non reconnu.' };
+    const r = await pool.query('SELECT id FROM missions WHERE delivery_token = $1', [token]);
+    if (r.rows.length === 0 || String(r.rows[0].id) !== pkgId) {
+      return { match: false, reason: 'Le QR du colis ne correspond pas à celui du destinataire.' };
+    }
+    const mission = await this.verifyDeliveryByQR(packageQr, gpId);
+    return { match: true, mission };
+  }
+
+  /** Is this GP locked until the admin validates the end of their scan? */
+  static async isGpLocked(userId: string): Promise<boolean> {
+    const r = await pool.query('SELECT scan_review_pending FROM gp_profiles WHERE user_id = $1', [userId]);
+    return !!(r.rows[0] && r.rows[0].scan_review_pending);
+  }
+
+  /**
+   * GP taps « Scan terminé » : lock the GP and ask the admin(s) to validate.
+   */
+  static async completeScan(gpId: string): Promise<{ locked: true; delivered: number; remaining: number }> {
+    const gp = await pool.query('SELECT first_name, last_name FROM users WHERE id = $1', [gpId]);
+    const prof = await pool.query('SELECT scan_released_at FROM gp_profiles WHERE user_id = $1', [gpId]);
+    if (prof.rows.length === 0) throw new Error('Profil GP introuvable');
+    const since = prof.rows[0].scan_released_at || new Date(Date.now() - 30 * 864e5);
+    const del = await pool.query(
+      "SELECT COUNT(*)::int AS n FROM missions WHERE gp_id = $1 AND status = 'delivered' AND completed_at >= $2",
+      [gpId, since]
+    );
+    const rem = await pool.query(
+      "SELECT COUNT(*)::int AS n FROM missions WHERE gp_id = $1 AND status IN ('picked_up','in_transit','out_for_delivery')",
+      [gpId]
+    );
+    if (del.rows[0].n === 0) throw new Error('Aucun colis livré : scannez au moins un colis avant de terminer.');
+    await pool.query(
+      'UPDATE gp_profiles SET scan_review_pending = TRUE, scan_requested_at = CURRENT_TIMESTAMP WHERE user_id = $1',
+      [gpId]
+    );
+    const name = gp.rows[0] ? gp.rows[0].first_name + ' ' + gp.rows[0].last_name : 'Un GP';
+    try {
+      const admins = await pool.query(`SELECT id FROM users WHERE user_type = 'admin' AND deleted_at IS NULL`);
+      for (const a of admins.rows) {
+        await NotificationService.create({
+          user_id: a.id,
+          notification_type: NotificationType.MISSION_TRANSIT,
+          title: 'Scan terminé — validation requise',
+          message: `${name} a terminé son scan : ${del.rows[0].n} colis livré(s), ${rem.rows[0].n} restant(s). Validez pour lui rendre l'accès à l'application.`,
+          metadata: { gp_id: gpId },
+        });
+      }
+    } catch (e: any) { logger.warn('Scan-complete admin notification failed:', e.message); }
+    return { locked: true, delivered: del.rows[0].n, remaining: rem.rows[0].n };
+  }
+
   /**
    * Get mission tracking history
    */

@@ -51,6 +51,8 @@ router.put('/missions/:id', requirePermission('missions:write'), AdminController
 router.post('/missions/:id/assign', requirePermission('missions:assign'), AdminController.assignMission);
 router.post('/missions/:id/reassign', requirePermission('missions:assign'), AdminController.reassignMission);
 router.post('/missions/:id/confirm-arrival', requirePermission('missions:write'), AdminController.confirmArrival);
+router.get('/scan-reviews', requirePermission('missions:read'), AdminController.listScanReviews);
+router.post('/gps/:id/release', requirePermission('missions:write'), AdminController.releaseGp);
 router.delete('/missions/:id', requirePermission('missions:delete'), AdminController.deleteMission);
 
 router.get('/trips', requirePermission('trips:read'), AdminController.listTrips);

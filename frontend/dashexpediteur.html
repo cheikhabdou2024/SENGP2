@@ -688,7 +688,14 @@
         }
 
         // Charger les données du dashboard
-        window.addEventListener('load', loadDashboardData);
+        window.addEventListener('load', () => {
+            // Retour d'un paiement en ligne : ouvre « Mes envois » pour partager suivi + QR au destinataire.
+            try {
+                const p = JSON.parse(localStorage.getItem('sg_pending_share') || 'null');
+                if (p && p.id) { location.href = 'envois.html?open=' + encodeURIComponent(p.id); return; }
+            } catch (e) {}
+            loadDashboardData();
+        });
     </script>
     <script src="ptr.js"></script>
     <script src="deeplink.js"></script>

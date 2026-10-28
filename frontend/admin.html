@@ -1540,8 +1540,8 @@
         // ---------- File « Arrivées à confirmer » ----------
         // Les GP qui ont touché « Arrivé à destination » (statut out_for_delivery) restent
         // verrouillés tant que l'admin n'a pas confirmé : on les remonte en temps quasi réel.
-        let _arrTimer = null, _arrSeen = null;
-        function stopArrivalWatch(){ if (_arrTimer) { clearInterval(_arrTimer); _arrTimer = null; } _arrSeen = null; }
+        let _arrTimer = null, _arrSeen = null, _revSeen = null;
+        function stopArrivalWatch(){ if (_arrTimer) { clearInterval(_arrTimer); _arrTimer = null; } _arrSeen = null; _revSeen = null; }
         function startArrivalWatch(){
             stopArrivalWatch();
             if (!can('missions:write')) return;
@@ -1557,15 +1557,30 @@
                 if (ok) list = (json.data || []).filter(m => !m.arrival_confirmed);
                 else return;
             } catch (e) { return; }
+            // GP qui ont terminé leur scan : l'admin doit valider pour leur rendre l'accès.
+            let reviews = [];
+            try { const r = await api('/admin/scan-reviews'); if (r.ok) reviews = r.json.data || []; } catch (e) {}
+            if (_revSeen) reviews.filter(g => !_revSeen.has(g.id)).forEach(g =>
+                toast('✅ ' + (g.gp_name || 'Un GP') + ' a terminé son scan — à valider', 'info'));
+            _revSeen = new Set(reviews.map(g => g.id));
             const ids = new Set(list.map(m => m.id));
             // Toast uniquement pour les nouvelles demandes (pas au premier chargement).
             if (_arrSeen) list.filter(m => !_arrSeen.has(m.id)).forEach(m =>
                 toast('🛬 ' + (m.gp_name || 'Un GP') + ' est arrivé à destination (' + m.mission_code + ') — à confirmer', 'info'));
             _arrSeen = ids;
             const cnt = document.getElementById('navArrCount');
-            if (cnt) { cnt.textContent = list.length; cnt.style.display = list.length ? 'inline-flex' : 'none'; }
-            if (!list.length) { box.innerHTML = ''; return; }
-            box.innerHTML = '<div class="arr-card"><div class="arr-head"><span class="pulse"></span>'
+            if (cnt) { cnt.textContent = list.length + reviews.length; cnt.style.display = (list.length + reviews.length) ? 'inline-flex' : 'none'; }
+            if (!list.length && !reviews.length) { box.innerHTML = ''; return; }
+            const revHtml = !reviews.length ? '' : '<div class="arr-card" style="margin-top:12px"><div class="arr-head"><span class="pulse"></span>'
+                + reviews.length + ' GP ont terminé leur scan — validation requise (accès suspendu)</div>'
+                + reviews.map(g => {
+                    const tel = String(g.gp_phone || '').replace(/[^\d]/g, '');
+                    const wa = tel ? `<a class="arr-wa" href="https://wa.me/${tel}" target="_blank" rel="noopener">💬 WhatsApp</a>` : '';
+                    return `<div class="arr-item"><div class="arr-info"><b>${esc(g.gp_name||'GP')}</b>`
+                        + `<small>${g.delivered} colis livré(s) · ${g.remaining} restant(s) non livré(s)${g.gp_phone ? ' · ' + esc(g.gp_phone) : ''}</small></div>`
+                        + `<div class="arr-btns">${wa}<button class="arr-ok" onclick="releaseGp('${g.id}','${esc(g.gp_name||'')}')">✅ Valider et rendre l'accès</button></div></div>`;
+                }).join('') + '</div>';
+            const arrHtml = !list.length ? '' : '<div class="arr-card"><div class="arr-head"><span class="pulse"></span>'
                 + list.length + ' GP' + (list.length > 1 ? ' ont' : ' a') + ' déclaré' + (list.length > 1 ? 's' : '') + ' être arrivé' + (list.length > 1 ? 's' : '') + ' à destination — confirmation requise</div>'
                 + list.map(m => {
                     const tel = String(m.gp_phone || '').replace(/[^\d]/g, '');
@@ -1574,6 +1589,13 @@
                         + `<small>GP : ${esc(m.gp_name||'—')}${m.gp_phone ? ' · ' + esc(m.gp_phone) : ''} · Expéditeur : ${esc(m.expediteur_name||'—')}${m.updated_at ? ' · depuis ' + esc(new Date(m.updated_at).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})) : ''}</small></div>`
                         + `<div class="arr-btns">${wa}<button class="arr-ok" onclick="confirmArrival('${m.id}','${esc(m.mission_code)}')">✅ Confirmer l'arrivée</button></div></div>`;
                 }).join('') + '</div>';
+            box.innerHTML = arrHtml + revHtml;
+        }
+        async function releaseGp(id, name){
+            if (!await confirmDialog('Valider la fin de scan de ' + (name || 'ce GP') + ' ? Il retrouvera l\'accès à l\'application (créer un trajet, voir ses missions…).', { title:'Valider la fin de scan', confirmLabel:'Valider' })) return;
+            const { ok, json } = await api('/admin/gps/'+id+'/release', { method:'POST' });
+            notify(ok, 'Accès du GP rétabli.', json);
+            refreshArrivalQueue();
         }
         async function confirmArrival(id, code){
             if (!await confirmDialog('Confirmer l\'arrivée du GP à destination pour ' + code + ' ? À faire après l\'appel WhatsApp de vérification. Le GP pourra alors scanner le QR du destinataire.', { title:'Confirmer l\'arrivée', confirmLabel:'Confirmer' })) return;

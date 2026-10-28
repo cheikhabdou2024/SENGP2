@@ -529,6 +529,42 @@ export class AdminService {
     return m;
   }
 
+  /** GPs who tapped « Scan terminé » and are locked until the admin validates. */
+  static async listScanReviews() {
+    const r = await pool.query(
+      `SELECT u.id, u.first_name || ' ' || u.last_name AS gp_name, u.phone AS gp_phone,
+              gp.scan_requested_at,
+              (SELECT COUNT(*)::int FROM missions m WHERE m.gp_id = u.id AND m.status = 'delivered'
+                 AND m.completed_at >= COALESCE(gp.scan_released_at, NOW() - INTERVAL '30 days')) AS delivered,
+              (SELECT COUNT(*)::int FROM missions m WHERE m.gp_id = u.id
+                 AND m.status IN ('picked_up','in_transit','out_for_delivery')) AS remaining
+       FROM gp_profiles gp JOIN users u ON u.id = gp.user_id
+       WHERE gp.scan_review_pending = TRUE
+       ORDER BY gp.scan_requested_at ASC`
+    );
+    return r.rows;
+  }
+
+  /** Admin validates the end of the GP's scan: the GP regains access to the app. */
+  static async releaseGp(gpId: string) {
+    const upd = await pool.query(
+      `UPDATE gp_profiles SET scan_review_pending = FALSE, scan_released_at = CURRENT_TIMESTAMP
+       WHERE user_id = $1 AND scan_review_pending = TRUE RETURNING user_id`,
+      [gpId]
+    );
+    if (upd.rows.length === 0) throw new Error("Ce GP n'est pas en attente de validation");
+    try {
+      await NotificationService.create({
+        user_id: gpId,
+        notification_type: NotificationType.MISSION_TRANSIT,
+        title: 'Accès rétabli',
+        message: "L'administration a validé la fin de votre scan. Vous pouvez de nouveau utiliser l'application.",
+        action_url: 'dashgp.html',
+      });
+    } catch (e: any) { logger.warn('Release notification failed: ' + e.message); }
+    return { id: gpId, released: true };
+  }
+
   /** Hard-delete a mission and all its dependents (admin cleanup), in a transaction. */
   static async deleteMission(id: string) {
     const client = await pool.connect();

@@ -316,6 +316,42 @@ export class MissionController {
     }
   }
 
+  /** GET /api/v1/missions/gp-lock — is the signed-in GP locked pending admin validation? */
+  static async gpLock(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) { ResponseUtil.unauthorized(res); return; }
+      const locked = req.user.user_type === UserType.GP ? await MissionService.isGpLocked(req.user.id) : false;
+      ResponseUtil.success(res, { locked });
+    } catch (error: any) {
+      ResponseUtil.badRequest(res, error.message || 'Failed');
+    }
+  }
+
+  /** POST /api/v1/missions/verify-pair { package_qr, recipient_qr } */
+  static async verifyPair(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) { ResponseUtil.unauthorized(res); return; }
+      const { package_qr, recipient_qr } = req.body || {};
+      if (!package_qr || !recipient_qr) { ResponseUtil.badRequest(res, 'Les deux QR codes sont requis'); return; }
+      const r = await MissionService.verifyPair(String(package_qr), String(recipient_qr), req.user.id);
+      ResponseUtil.success(res, r, r.match ? 'QR compatibles — livraison confirmée' : 'QR incompatibles');
+    } catch (error: any) {
+      logger.error('Verify pair error:', error);
+      ResponseUtil.badRequest(res, error.message || 'Vérification impossible');
+    }
+  }
+
+  /** POST /api/v1/missions/scan-complete — GP finished scanning; admin must validate. */
+  static async scanComplete(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) { ResponseUtil.unauthorized(res); return; }
+      const r = await MissionService.completeScan(req.user.id);
+      ResponseUtil.success(res, r, 'Scan terminé — en attente de validation par l\'administration');
+    } catch (error: any) {
+      ResponseUtil.badRequest(res, error.message || 'Échec');
+    }
+  }
+
   /**
    * Verify QR code and confirm delivery
    * POST /api/v1/missions/verify-qr

@@ -457,10 +457,66 @@
                 selectTabButton(tab);
                 updateCounts();
                 render();
+                resolveAutoShare();
             } catch(e){ document.getElementById('list').innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`; }
             loadUnreadNotifCount();
         }
         window.onPullRefresh = load;
+
+        // ---- Partage automatique au destinataire (WhatsApp) juste après la création de l'envoi.
+        // WhatsApp exige un appui sur « Envoyer » : le message (suivi + QR) est pré-rempli et la
+        // conversation du destinataire s'ouvre toute seule ; sinon un bouton en un clic s'affiche.
+        const waDigits = p => String(p || '').replace(/[^0-9]/g, '').replace(/^00/, '');
+        async function recipientMessage(m){
+            let qrLink = '';
+            try {
+                const r = await fetch(`${API}/missions/${encodeURIComponent(m.id)}/delivery-qr`, { method:'POST', headers:{ 'Authorization':'Bearer '+token } });
+                const j = await r.json();
+                const t = j.data && j.data.token;
+                if (t) qrLink = API.replace(/\/api\/v1\/?$/, '') + '/q/' + encodeURIComponent(t);
+            } catch(e){}
+            const to = [m.arrival_city, m.arrival_country].filter(Boolean).join(', ');
+            return `Bonjour${m.recipient_name ? ' ' + m.recipient_name : ''}, un colis SEN GP vous est envoyé (${m.mission_code || m.tracking_number || ''})${to ? ' à destination de ' + to : ''}.
+
+` +
+                `📍 Suivi en direct : ${trackUrl(m)}
+` + (qrLink ? `🔳 Votre QR de livraison (à montrer au livreur) : ${qrLink}` : '');
+        }
+        // Paiement en ligne : on attend la confirmation du paiement avant de prévenir le destinataire.
+        async function resolveAutoShare(){
+            let pending = null;
+            try { pending = JSON.parse(localStorage.getItem('sg_pending_share') || 'null'); } catch(e){}
+            if (pending && pending.id) {
+                try { localStorage.removeItem('sg_pending_share'); } catch(e){}
+                let status = 'pending';
+                for (let i = 0; i < 6 && status !== 'completed' && pending.paymentId; i++) {
+                    try {
+                        const r = await fetch(`${API}/payments/${pending.paymentId}`, { headers:{ 'Authorization':'Bearer '+token } });
+                        status = ((await r.json()).data || {}).status || status;
+                    } catch(e){}
+                    if (status !== 'completed') await new Promise(res => setTimeout(res, 2000));
+                }
+                if (status === 'completed') maybeAutoShare(byId[pending.id]);
+                return;
+            }
+            if (openParam) maybeAutoShare(byId[openParam]);     // paiement à la livraison : immédiat
+        }
+        async function maybeAutoShare(m){
+            if (!m || !m.recipient_phone) return;
+            const key = 'sg_autoshared_' + m.id;
+            try { if (localStorage.getItem(key)) return; } catch(e){}
+            const created = validDate(m.created_at);
+            if (created && Date.now() - created > 30 * 60 * 1000) return;     // envoi récent uniquement
+            const url = 'https://wa.me/' + waDigits(m.recipient_phone) + '?text=' + encodeURIComponent(await recipientMessage(m));
+            const w = window.open(url, '_blank');
+            if (w) { try { localStorage.setItem(key, '1'); } catch(e){}; return; }
+            const bar = document.createElement('div');
+            bar.style.cssText = 'position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:900;background:#0B1D3A;color:#fff;border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:flex;align-items:center;gap:12px';
+            bar.innerHTML = '<div style="flex:1;font-size:14px;line-height:1.4"><b>Envoi créé ✓</b><br>Prévenez ' + esc(m.recipient_name || 'le destinataire') + ' : suivi + QR de livraison.</div>'
+                + '<button type="button" style="border:0;border-radius:12px;padding:12px 14px;font:800 14px inherit;background:#25D366;color:#06231f;cursor:pointer">Envoyer sur WhatsApp</button>';
+            bar.querySelector('button').onclick = () => { try { localStorage.setItem(key, '1'); } catch(e){}; window.open(url, '_blank'); bar.remove(); };
+            document.body.appendChild(bar);
+        }
 
         const isActive = m => ACTIVE.includes(st(m));
         const isDelivered = m => st(m) === 'delivered';
@@ -530,7 +586,7 @@
         function tilesHtml(){
             return `<div class="ev-tiles">
                 <button type="button" class="ev-tile ev-tile--share" data-act="share">${IC.share}<span><span class="ev-tile__t">Partager le suivi</span><span class="ev-tile__s">WhatsApp, Telegram, etc.</span></span>${IC.go}</button>
-                <button type="button" class="ev-tile ev-tile--qr" data-act="qr">${IC.qr}<span><span class="ev-tile__t">QR code</span><span class="ev-tile__s">Preuve de livraison</span></span>${IC.go}</button>
+                <button type="button" class="ev-tile ev-tile--qr" data-act="qr">${IC.qr}<span><span class="ev-tile__t">QR code</span><span class="ev-tile__s">À coller sur le colis</span></span>${IC.go}</button>
                 <button type="button" class="ev-tile ev-tile--pkg" data-act="pkg">${IC.pkg}<span><span class="ev-tile__t">Détails du colis</span><span class="ev-tile__s">Poids, dimensions, assurance</span></span>${IC.go}</button>
                 <button type="button" class="ev-tile ev-tile--more" data-act="more">${IC.doc}<span><span class="ev-tile__t">Plus de détails</span><span class="ev-tile__s">Référence, dates, destinataire</span></span>${IC.go}</button>
             </div>`;
@@ -618,7 +674,7 @@
             const body = document.getElementById('sheetBody');
             body.scrollTop = 0;
             if (type === 'share') { title.textContent = 'Partager le suivi'; sub.textContent = 'Envoyez le lien de suivi à votre destinataire'; body.innerHTML = shareHtml(m); }
-            else if (type === 'qr') { title.textContent = 'QR code de livraison'; sub.textContent = 'À montrer au livreur (GP) à la réception'; body.innerHTML = '<div class="ev-qrcard"><div class="ev-qrskel"></div></div>'; loadQr(m); }
+            else if (type === 'qr') { title.textContent = 'QR code du colis'; sub.textContent = 'À imprimer ou coller sur le colis'; body.innerHTML = '<div class="ev-qrcard"><div class="ev-qrskel"></div></div>'; loadQr(m); }
             else if (type === 'pkg') { title.textContent = 'Détails du colis'; sub.textContent = m.mission_code || ''; body.innerHTML = pkgHtml(m); }
             else { title.textContent = 'Plus de détails'; sub.textContent = 'Enlèvement, livraison et suivi'; body.innerHTML = moreHtml(m); }
             document.getElementById('sheetOverlay').classList.add('show');
@@ -721,7 +777,7 @@
                         <div class="ev-qrcard__num">${esc(m.tracking_number || m.mission_code || '')}</div>
                     </div>
                     <button type="button" class="ev-wa" onclick="shareQrWhatsApp()">${IC.wa}Partager via WhatsApp</button>
-                    <p class="ev-hint">Le destinataire montre ce QR au livreur (GP) à la réception du colis.</p>`);
+                    <p class="ev-hint">Collez ce QR sur le colis : le livreur (GP) le scannera, puis celui du destinataire, pour confirmer la remise.</p>`);
             } catch (e) {
                 draw(`<div class="ev-msg">QR indisponible pour le moment.<br><button type="button" class="ev-retry" onclick="retryQr()">Réessayer</button></div>`);
             }
@@ -735,8 +791,8 @@
             const caption =
                 `🎁 SEN GP — Votre colis est en route !\n\n` +
                 `📦 Numéro de suivi : ${trackingNum}\n\n` +
-                `À la livraison, montrez CE QR code au livreur (GP) SEN GP. ` +
-                `Il le scannera pour confirmer la remise de votre colis.\n\n` +
+                `QR code du colis : à imprimer ou coller sur le colis. ` +
+                `Le livreur (GP) SEN GP le scannera, puis celui du destinataire, pour confirmer la remise.\n\n` +
                 `SEN GP — La livraison collaborative`;
             const img = document.getElementById('qrImg');
             const dataUrl = img && img.src;

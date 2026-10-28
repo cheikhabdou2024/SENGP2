@@ -3,6 +3,7 @@ import { MissionController } from '../controllers/mission.controller';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { ValidationMiddleware } from '../middlewares/validation.middleware';
 import { UserType } from '../types';
+import { requireGpUnlocked } from '../middlewares/gpLock.middleware';
 import {
   createMissionValidator,
   updateStatusValidator,
@@ -16,8 +17,11 @@ router.use(AuthMiddleware.verifyToken);
 // Get all missions (with filters)
 router.get('/', MissionController.getAll);
 
+// GP lock status (must be before /:id)
+router.get('/gp-lock', MissionController.gpLock);
+
 // Get user's missions
-router.get('/my-missions', MissionController.getMyMissions);
+router.get('/my-missions', requireGpUnlocked, MissionController.getMyMissions);
 
 // Search/track by tracking number
 router.get('/track/:trackingNumber', MissionController.trackByNumber);
@@ -40,6 +44,7 @@ router.put('/:id', MissionController.update);
 router.post(
   '/:id/accept',
   AuthMiddleware.requireRole(UserType.GP),
+  requireGpUnlocked,
   MissionController.accept
 );
 
@@ -69,6 +74,12 @@ router.post(
   ValidationMiddleware.validate(updateStatusValidator),
   MissionController.updateStatus
 );
+
+// Compare colis QR vs recipient QR (green check / red cross) and confirm delivery
+router.post('/verify-pair', AuthMiddleware.requireRole(UserType.GP), MissionController.verifyPair);
+
+// GP finished scanning → locked until the admin validates
+router.post('/scan-complete', AuthMiddleware.requireRole(UserType.GP), MissionController.scanComplete);
 
 // Verify QR code delivery (must be before /:id routes)
 router.post(

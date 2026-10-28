@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { MissionService } from '../services/mission.service';
 import { ResponseUtil } from '../utils/response';
 import logger from '../utils/logger';
+import QRCode from 'qrcode';
 
 /** Keep only safe characters for a public token used in URLs / HTML. */
 function sanitizeToken(t: string): string {
@@ -101,6 +102,44 @@ export class PublicController {
       if (e.message === 'Not found') { ResponseUtil.notFound(res, 'Colis introuvable'); return; }
       logger.error('Confirm delivery error:', e);
       ResponseUtil.badRequest(res, e.message || 'Confirmation échouée');
+    }
+  }
+
+  /**
+   * Public page shown to the recipient (link sent by WhatsApp): displays the
+   * recipient's QR code, to be shown to the GP at delivery.
+   * GET /q/:token
+   */
+  static async recipientQrPage(req: Request, res: Response): Promise<void> {
+    const token = sanitizeToken(req.params.token);
+    const esc = (s: any) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    try {
+      const info = await MissionService.getDeliveryInfo(token);
+      const qr = await QRCode.toDataURL(`${req.protocol}://${req.get('host')}/d/${token}`, { margin: 1, width: 360 });
+      const html = `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex"><title>Votre QR de livraison - SEN GP</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center}
+.card{width:100%;max-width:380px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:26px 22px}
+h1{font-size:20px;margin-bottom:6px}.sub{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:16px;line-height:1.5}
+.qr{background:#fff;border-radius:16px;padding:12px;display:inline-block;margin-bottom:14px}.qr img{display:block;width:260px;max-width:70vw;height:auto}
+.code{font-weight:800;letter-spacing:.5px}.route{font-size:13px;color:rgba(255,255,255,.75);margin:4px 0 14px}
+.note{font-size:12px;color:rgba(255,255,255,.55);line-height:1.5}
+a.btn{display:inline-block;margin-top:14px;padding:12px 20px;border-radius:12px;background:linear-gradient(135deg,#FFD700,#FFA500);color:#1a1a2e;font-weight:800;text-decoration:none;font-size:14px}
+</style></head><body><div class="card">
+<h1>Votre QR de livraison</h1>
+<p class="sub">${info.recipient_name ? 'Bonjour ' + esc(info.recipient_name) + ', montrez' : 'Montrez'} ce QR code au livreur (GP) SEN GP à la réception de votre colis.</p>
+<div class="qr"><img src="${qr}" alt="QR code de livraison"></div>
+<div class="code">${esc(info.mission_code)}</div>
+<div class="route">${esc(info.departure_city)} → ${esc(info.arrival_city)}</div>
+<p class="note">Ne partagez ce QR qu'avec le livreur présent devant vous.</p>
+<a class="btn" href="/t/${encodeURIComponent(info.tracking_number || info.mission_code)}">Suivre mon colis</a>
+</div></body></html>`;
+      res.status(200).type('html').send(html);
+    } catch (e: any) {
+      res.status(404).type('html').send('<!DOCTYPE html><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><body style="font-family:sans-serif;text-align:center;padding:60px 20px"><h2>Lien introuvable</h2><p>Ce QR de livraison n&#39;existe pas ou a expiré.</p></body>');
     }
   }
 

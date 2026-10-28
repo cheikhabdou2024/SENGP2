@@ -2985,6 +2985,8 @@
                 // 3. Open the provider's payment page.
                 const redirectUrl = payResult.data?.redirect_url;
                 const paymentId = payResult.data?.payment?.id;
+                // Partage WhatsApp automatique au destinataire : déclenché (une fois le paiement confirmé) à l'ouverture de « Mes envois ».
+                try { localStorage.setItem('sg_pending_share', JSON.stringify({ id: mission.id, paymentId })); } catch (e) {}
                 if (!redirectUrl) {
                     alert('Mission créée, mais aucune URL de paiement n\'a été reçue.');
                     nextBtn.disabled = false;

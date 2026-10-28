@@ -41,6 +41,12 @@
         .scan-actions { display:flex; gap:10px; }
         .scan-btn { padding:12px 22px; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; background:linear-gradient(135deg,#FFD700,#FFA500); color:#1a1a2e; }
         .scan-btn.ghost { background:rgba(255,255,255,.12); color:#fff; }
+        .scan-step { font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#4ECDC4; }
+        .scan-result { display:none; width:min(60vw,200px); aspect-ratio:1; border-radius:50%; align-items:center; justify-content:center; font-size:110px; font-weight:900; line-height:1; color:#fff; }
+        .scan-result.ok { display:flex; background:#22c55e; box-shadow:0 0 0 14px rgba(34,197,94,.22); }
+        .scan-result.ko { display:flex; background:#ef4444; box-shadow:0 0 0 14px rgba(239,68,68,.22); }
+        .done-btn { width:100%; margin-top:6px; padding:16px; border:none; border-radius:14px; font-size:16px; font-weight:800; cursor:pointer; background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; }
+        .done-note { font-size:12px; color:rgba(255,255,255,.6); margin:8px 2px 0; line-height:1.5; text-align:center; }
     </style>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
@@ -56,6 +62,7 @@
     <script src="pwa.js" defer></script>
     <link rel="stylesheet" href="responsive.css">
 <script src="geo-data.js" defer></script><script src="geo.js" defer></script>
+<script src="gpguard.js" defer></script>
 </head>
 <body class="ds">
     <div class="mobile-frame">
@@ -66,18 +73,21 @@
         <div class="content">
             <button class="scan-cta" onclick="openScanner()">
                 <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg>
-                Scanner le QR du destinataire
+                Scanner un colis
             </button>
             <div id="list"><div class="loading">Chargement…</div></div>
+            <div id="doneBox"></div>
         </div>
     </div>
 
     <!-- QR scanner overlay -->
     <div id="scanOverlay" class="scan-overlay">
-        <div class="scan-box">
+        <div id="scanStepLbl" class="scan-step"></div>
+        <div class="scan-box" id="scanBox">
             <video id="scanVideo" playsinline muted></video>
             <div class="scan-frame"></div>
         </div>
+        <div id="scanResult" class="scan-result" role="img"></div>
         <div id="scanStatus" class="scan-status">Initialisation de la caméra…</div>
         <div class="scan-actions">
             <button id="scanRetry" class="scan-btn" style="display:none;" onclick="retryScan()">Rescanner</button>
@@ -111,7 +121,7 @@
                 const data=(await res.json()).data||[];
                 items=data.filter(m=>ACTIVE.includes(String(m.status||'').toLowerCase()));
                 if (focusMissionId) items = items.filter(m => String(m.id) === String(focusMissionId));
-                render();
+                render(); renderDone();
                 // Guided flow: auto-open the camera on the targeted colis.
                 if (focusMissionId && items.length && !scannerAutoOpened){ scannerAutoOpened = true; openScanner(); }
             }catch(e){ document.getElementById('list').innerHTML='<div class="empty">Erreur: '+esc(e.message)+'</div>'; }
@@ -151,8 +161,21 @@
 
         // ───────── QR scanner (GP scans the recipient's QR to confirm delivery) ─────────
         let scanStream = null, scanRAF = null, scanning = false, barcodeDetector = null;
+        // Vérification en 2 temps : 1) QR du COLIS, 2) QR du DESTINATAIRE → ✅ si compatibles, ❌ sinon.
+        let scanStep = 'package', pkgQr = null;
+        function showResult(kind){
+            const r = document.getElementById('scanResult');
+            r.className = 'scan-result' + (kind ? ' ' + kind : '');
+            r.textContent = kind === 'ok' ? '✓' : (kind === 'ko' ? '✕' : '');
+            document.getElementById('scanBox').style.display = kind ? 'none' : '';
+        }
+        function stepPrompt(){
+            document.getElementById('scanStepLbl').textContent = scanStep === 'package' ? 'Étape 1/2 · QR du colis' : 'Étape 2/2 · QR du destinataire';
+            setScanStatus(scanStep === 'package' ? 'Visez le QR code collé sur le COLIS…' : 'Visez le QR code du DESTINATAIRE (sur son téléphone)…');
+        }
 
         function openScanner(){
+            scanStep = 'package'; pkgQr = null; showResult(null);
             document.getElementById('scanRetry').style.display = 'none';
             document.getElementById('scanOverlay').style.display = 'flex';
             startScan();
@@ -178,6 +201,7 @@
         }
 
         async function startScan(){
+            showResult(null);
             document.getElementById('scanRetry').style.display = 'none';
             setScanStatus('Initialisation de la caméra…');
             const video = document.getElementById('scanVideo');
@@ -189,7 +213,7 @@
                 setScanStatus('Caméra indisponible. Autorisez l’accès à la caméra dans les réglages.');
                 return;
             }
-            setScanStatus('Visez le QR code du destinataire…');
+            stepPrompt();
             scanning = true;
 
             if ('BarcodeDetector' in window){
@@ -220,46 +244,80 @@
             tick();
         }
 
+        function stopCamera(){ if (scanStream){ scanStream.getTracks().forEach(t => t.stop()); scanStream = null; } }
+        function fail(msg){
+            stopCamera(); showResult('ko');
+            setScanStatus('❌ ' + msg);
+            document.getElementById('scanRetry').style.display = 'inline-block';
+            scanStep = 'package'; pkgQr = null;          // on recommence proprement
+        }
         async function onScanned(qrText){
-            // Scoped scan: only the targeted mission's QR is accepted here.
-            if (focusMissionId){
+            if (scanStep === 'package'){
                 let scannedId = null;
                 try { scannedId = JSON.parse(qrText).id; } catch(e){}
-                if (String(scannedId) !== String(focusMissionId)){
-                    if (scanStream){ scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
-                    setScanStatus('❌ Ce QR ne correspond pas à ce colis. Scannez le bon destinataire.');
-                    document.getElementById('scanRetry').style.display = 'inline-block';
-                    return;
-                }
+                if (!scannedId) return fail('Ce QR n’est pas celui d’un colis SEN GP.');
+                // Scan ciblé depuis une carte mission : seul le colis visé est accepté.
+                if (focusMissionId && String(scannedId) !== String(focusMissionId))
+                    return fail('Ce QR ne correspond pas à ce colis.');
+                pkgQr = qrText; scanStep = 'recipient';
+                stopCamera();
+                stepPrompt();
+                setTimeout(startScan, 350);                 // enchaîne l'étape 2
+                return;
             }
-            if (scanStream){ scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
-            setScanStatus('Vérification du colis…');
+            stopCamera();
+            setScanStatus('Comparaison des QR codes…');
             try {
-                const res = await fetch(`${API}/missions/verify-qr`, {
+                const res = await fetch(`${API}/missions/verify-pair`, {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ qr_data: qrText })
+                    body: JSON.stringify({ package_qr: pkgQr, recipient_qr: qrText })
                 });
                 const j = await res.json().catch(() => ({}));
-                if (res.ok && j.success){
-                    const m = (j.data && j.data.mission) || {};
-                    closeScanner();
-                    await window.sengpAlert(
-                        '✅ Colis ' + (m.mission_code || '') + ' livré' + (m.recipient_name ? ' à ' + m.recipient_name : '') +
-                        ' !\n\nL’expéditeur et l’administration ont été notifiés.',
-                        'Livraison confirmée'
-                    );
-                    load();
+                const d = (j && j.data) || {};
+                if (res.ok && j.success && d.match){
+                    const m = d.mission || {};
+                    showResult('ok');
+                    setScanStatus('✅ QR compatibles — colis ' + (m.mission_code || '') + (m.recipient_name ? ' remis à ' + m.recipient_name : ' livré') + '.');
+                    try { localStorage.setItem('sg_scan_ok', String((+localStorage.getItem('sg_scan_ok') || 0) + 1)); } catch(e){}
+                    scanStep = 'package'; pkgQr = null;
+                    document.getElementById('scanRetry').style.display = 'none';
+                    setTimeout(() => { closeScanner(); load(); }, 1800);
                 } else {
-                    setScanStatus('❌ ' + (j.error || j.message || 'QR non reconnu.'));
-                    document.getElementById('scanRetry').style.display = 'inline-block';
+                    fail(d.reason || j.error || j.message || 'QR incompatibles.');
                 }
             } catch (e){
-                setScanStatus('❌ Erreur réseau. Réessayez.');
-                document.getElementById('scanRetry').style.display = 'inline-block';
+                fail('Erreur réseau. Réessayez.');
             }
         }
-        function retryScan(){ startScan(); }
+        function retryScan(){ scanStep = 'package'; pkgQr = null; stepPrompt(); startScan(); }
+
+        // ───────── « Scan terminé » → l'admin doit valider avant que le GP retrouve l'accès ─────────
+        function renderDone(){
+            const n = +localStorage.getItem('sg_scan_ok') || 0;
+            const box = document.getElementById('doneBox');
+            if (!n){ box.innerHTML = ''; return; }
+            const left = items.length;
+            box.innerHTML = '<button class="done-btn" onclick="scanDone()">✅ Scan terminé</button>'
+                + '<p class="done-note">' + n + ' colis livré(s) cette tournée' + (left ? ' · ' + left + ' colis restent à scanner' : '')
+                + '. L’administration devra valider avant que vous puissiez de nouveau utiliser l’application.</p>';
+        }
+        async function scanDone(){
+            const left = items.length;
+            const msg = 'Terminer le scan' + (left ? ' (' + left + ' colis non scanné(s))' : '') + ' ?\n\nL’application sera bloquée jusqu’à validation par l’administration.';
+            const ok = window.sengpConfirm
+                ? await window.sengpConfirm(msg, { title: 'Scan terminé', confirmLabel: 'Oui, terminé' })
+                : confirm(msg);
+            if (!ok) return;
+            try {
+                const res = await fetch(`${API}/missions/scan-complete`, { method:'POST', headers:{ 'Authorization':'Bearer '+token } });
+                const j = await res.json().catch(() => ({}));
+                if (!res.ok || !j.success) throw new Error(j.error || j.message || 'Échec');
+                try { localStorage.removeItem('sg_scan_ok'); } catch(e){}
+                if (window.SengpGpGuard) window.SengpGpGuard.refresh();
+                renderDone();
+            } catch(e){ alert('Impossible de terminer le scan : ' + e.message); }
+        }
 
         window.onPullRefresh = async () => { await load(); return true; };
         load();

@@ -52,6 +52,10 @@ export async function initDatabase(): Promise<void> {
     // Admin confirms the GP's arrival at destination (by WhatsApp call) before the
     // GP is allowed to scan the recipient's QR and deliver.
     await pool.query('ALTER TABLE missions ADD COLUMN IF NOT EXISTS arrival_confirmed BOOLEAN DEFAULT FALSE');
+    // Fin de scan : le GP est verrouillé jusqu'à ce que l'admin valide (scan_review_pending).
+    await pool.query('ALTER TABLE gp_profiles ADD COLUMN IF NOT EXISTS scan_review_pending BOOLEAN DEFAULT FALSE');
+    await pool.query('ALTER TABLE gp_profiles ADD COLUMN IF NOT EXISTS scan_requested_at TIMESTAMP');
+    await pool.query('ALTER TABLE gp_profiles ADD COLUMN IF NOT EXISTS scan_released_at TIMESTAMP');
     // Phase 4 (Finance): payout proof on withdrawals + refund tracking on payments.
     await pool.query('ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS payout_proof_url VARCHAR(500)');
     await pool.query('ALTER TABLE payments ADD COLUMN IF NOT EXISTS refund_reason TEXT');
