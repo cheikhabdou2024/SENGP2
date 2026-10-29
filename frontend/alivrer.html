@@ -162,7 +162,7 @@
         // ───────── QR scanner (GP scans the recipient's QR to confirm delivery) ─────────
         let scanStream = null, scanRAF = null, scanning = false, barcodeDetector = null;
         // Vérification en 2 temps : 1) QR du COLIS, 2) QR du DESTINATAIRE → ✅ si compatibles, ❌ sinon.
-        let scanStep = 'package', pkgQr = null;
+        let scanStep = 'package', pkgQr = null, rcpQr = null, scanNum = 1;   // ordre libre : colis puis destinataire, ou l'inverse
         function showResult(kind){
             const r = document.getElementById('scanResult');
             r.className = 'scan-result' + (kind ? ' ' + kind : '');
@@ -170,12 +170,12 @@
             document.getElementById('scanBox').style.display = kind ? 'none' : '';
         }
         function stepPrompt(){
-            document.getElementById('scanStepLbl').textContent = scanStep === 'package' ? 'Étape 1/2 · QR du colis' : 'Étape 2/2 · QR du destinataire';
+            document.getElementById('scanStepLbl').textContent = 'Étape ' + scanNum + '/2 · QR du ' + (scanStep === 'package' ? 'colis' : 'destinataire');
             setScanStatus(scanStep === 'package' ? 'Visez le QR code collé sur le COLIS…' : 'Visez le QR code du DESTINATAIRE (sur son téléphone)…');
         }
 
         function openScanner(){
-            scanStep = 'package'; pkgQr = null; showResult(null);
+            scanStep = 'package'; pkgQr = null; rcpQr = null; scanNum = 1; showResult(null);
             document.getElementById('scanRetry').style.display = 'none';
             document.getElementById('scanOverlay').style.display = 'flex';
             startScan();
@@ -249,29 +249,35 @@
             stopCamera(); showResult('ko');
             setScanStatus('❌ ' + msg);
             document.getElementById('scanRetry').style.display = 'inline-block';
-            scanStep = 'package'; pkgQr = null;          // on recommence proprement
+            scanStep = 'package'; pkgQr = null; rcpQr = null; scanNum = 1;          // on recommence proprement
         }
         async function onScanned(qrText){
-            if (scanStep === 'package'){
-                let scannedId = null;
-                try { scannedId = JSON.parse(qrText).id; } catch(e){}
-                if (!scannedId) return fail('Ce QR n’est pas celui d’un colis SEN GP.');
-                // Scan ciblé depuis une carte mission : seul le colis visé est accepté.
-                if (focusMissionId && String(scannedId) !== String(focusMissionId))
-                    return fail('Ce QR ne correspond pas à ce colis.');
-                pkgQr = qrText; scanStep = 'recipient';
+            // Reconnaît le type de QR scanné, quel que soit l'ordre.
+            let kind = null, scannedId = null;
+            const t = String(qrText || '').trim();
+            try { const o = JSON.parse(t); if (o && o.id) { kind = 'package'; scannedId = o.id; } } catch(e){}
+            if (!kind && /\/d\/[A-Za-z0-9_-]{8,100}/.test(t)) kind = 'recipient';
+            if (!kind) return fail('Ce QR n’est ni celui d’un colis SEN GP, ni celui d’un destinataire.');
+            if (kind === 'package' && focusMissionId && String(scannedId) !== String(focusMissionId))
+                return fail('Ce QR ne correspond pas à ce colis.');
+            if (scanNum === 1){
+                if (kind === 'package'){ pkgQr = qrText; scanStep = 'recipient'; } else { rcpQr = qrText; scanStep = 'package'; }
+                scanNum = 2;
                 stopCamera();
                 stepPrompt();
                 setTimeout(startScan, 350);                 // enchaîne l'étape 2
                 return;
             }
+            if ((scanStep === 'recipient' && kind !== 'recipient') || (scanStep === 'package' && kind !== 'package'))
+                return fail(scanStep === 'package' ? 'Il faut maintenant scanner le QR du colis.' : 'Il faut maintenant scanner le QR du destinataire.');
+            if (kind === 'package') pkgQr = qrText; else rcpQr = qrText;
             stopCamera();
             setScanStatus('Comparaison des QR codes…');
             try {
                 const res = await fetch(`${API}/missions/verify-pair`, {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ package_qr: pkgQr, recipient_qr: qrText })
+                    body: JSON.stringify({ package_qr: pkgQr, recipient_qr: rcpQr })
                 });
                 const j = await res.json().catch(() => ({}));
                 const d = (j && j.data) || {};
@@ -280,7 +286,7 @@
                     showResult('ok');
                     setScanStatus('✅ QR compatibles — colis ' + (m.mission_code || '') + (m.recipient_name ? ' remis à ' + m.recipient_name : ' livré') + '.');
                     try { localStorage.setItem('sg_scan_ok', String((+localStorage.getItem('sg_scan_ok') || 0) + 1)); } catch(e){}
-                    scanStep = 'package'; pkgQr = null;
+                    scanStep = 'package'; pkgQr = null; rcpQr = null; scanNum = 1;
                     document.getElementById('scanRetry').style.display = 'none';
                     setTimeout(() => { closeScanner(); load(); }, 1800);
                 } else {
@@ -290,7 +296,7 @@
                 fail('Erreur réseau. Réessayez.');
             }
         }
-        function retryScan(){ scanStep = 'package'; pkgQr = null; stepPrompt(); startScan(); }
+        function retryScan(){ scanStep = 'package'; pkgQr = null; rcpQr = null; scanNum = 1; stepPrompt(); startScan(); }
 
         // ───────── « Scan terminé » → l'admin doit valider avant que le GP retrouve l'accès ─────────
         function renderDone(){
