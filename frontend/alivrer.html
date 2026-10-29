@@ -170,8 +170,8 @@
             document.getElementById('scanBox').style.display = kind ? 'none' : '';
         }
         function stepPrompt(){
-            document.getElementById('scanStepLbl').textContent = 'Étape ' + scanNum + '/2 · QR du ' + (scanStep === 'package' ? 'colis' : 'destinataire');
-            setScanStatus(scanStep === 'package' ? 'Visez le QR code collé sur le COLIS…' : 'Visez le QR code du DESTINATAIRE (sur son téléphone)…');
+            document.getElementById('scanStepLbl').textContent = 'Étape ' + scanNum + '/2 · QR du ' + (scanNum === 1 ? 'destinataire' : 'colis');
+            setScanStatus(scanNum === 1 ? 'Visez le QR code du DESTINATAIRE (sur son téléphone)…' : 'Visez maintenant le QR code collé sur le COLIS…');
         }
 
         function openScanner(){
@@ -252,25 +252,23 @@
             scanStep = 'package'; pkgQr = null; rcpQr = null; scanNum = 1;          // on recommence proprement
         }
         async function onScanned(qrText){
-            // Reconnaît le type de QR scanné, quel que soit l'ordre.
-            let kind = null, scannedId = null;
+            // Un seul QR par envoi : le même code sert au destinataire et au(x) colis (lien /d/<jeton>).
             const t = String(qrText || '').trim();
-            try { const o = JSON.parse(t); if (o && o.id) { kind = 'package'; scannedId = o.id; } } catch(e){}
-            if (!kind && /\/d\/[A-Za-z0-9_-]{8,100}/.test(t)) kind = 'recipient';
-            if (!kind) return fail('Ce QR n’est ni celui d’un colis SEN GP, ni celui d’un destinataire.');
-            if (kind === 'package' && focusMissionId && String(scannedId) !== String(focusMissionId))
+            let scannedId = null, valid = false;
+            try { const o = JSON.parse(t); if (o && o.id) { valid = true; scannedId = o.id; } } catch(e){}
+            if (!valid && /\/d\/[A-Za-z0-9_-]{8,100}/.test(t)) valid = true;
+            if (!valid) return fail('Ce QR n’est pas un QR SEN GP.');
+            if (scannedId && focusMissionId && String(scannedId) !== String(focusMissionId))
                 return fail('Ce QR ne correspond pas à ce colis.');
             if (scanNum === 1){
-                if (kind === 'package'){ pkgQr = qrText; scanStep = 'recipient'; } else { rcpQr = qrText; scanStep = 'package'; }
-                scanNum = 2;
-                stopCamera();
-                stepPrompt();
-                setTimeout(startScan, 350);                 // enchaîne l'étape 2
+                rcpQr = qrText; scanNum = 2; scanStep = 'package';
+                stopCamera(); showResult('ok');
+                document.getElementById('scanResultMsg') && (document.getElementById('scanResultMsg').textContent = '');
+                setScanStatus('✅ QR du destinataire validé');
+                setTimeout(() => { stepPrompt(); startScan(); }, 1300);   // enchaîne le scan du colis
                 return;
             }
-            if ((scanStep === 'recipient' && kind !== 'recipient') || (scanStep === 'package' && kind !== 'package'))
-                return fail(scanStep === 'package' ? 'Il faut maintenant scanner le QR du colis.' : 'Il faut maintenant scanner le QR du destinataire.');
-            if (kind === 'package') pkgQr = qrText; else rcpQr = qrText;
+            pkgQr = qrText;
             stopCamera();
             setScanStatus('Comparaison des QR codes…');
             try {
@@ -284,7 +282,7 @@
                 if (res.ok && j.success && d.match){
                     const m = d.mission || {};
                     showResult('ok');
-                    setScanStatus('✅ QR compatibles — colis ' + (m.mission_code || '') + (m.recipient_name ? ' remis à ' + m.recipient_name : ' livré') + '.');
+                    setScanStatus('✅ Le colis ' + (m.mission_code || '') + ' appartient bien à ce destinataire' + (m.recipient_name ? ' (' + m.recipient_name + ')' : '') + ' — livraison confirmée.');
                     try { localStorage.setItem('sg_scan_ok', String((+localStorage.getItem('sg_scan_ok') || 0) + 1)); } catch(e){}
                     scanStep = 'package'; pkgQr = null; rcpQr = null; scanNum = 1;
                     document.getElementById('scanRetry').style.display = 'none';

@@ -307,9 +307,11 @@ export class MissionController {
    */
   static async generateQRCode(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const qrCodeUrl = await MissionService.generateQRCode(req.params.id);
+      // Un seul QR par envoi : le même code sert au colis et au destinataire (lien /d/<jeton>).
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const data = await MissionService.generateDeliveryQR(req.params.id, baseUrl);
 
-      ResponseUtil.success(res, { qr_code_url: qrCodeUrl }, 'QR Code generated');
+      ResponseUtil.success(res, { qr_code_url: data.qr_code_url }, 'QR Code generated');
     } catch (error: any) {
       logger.error('Generate QR code error:', error);
       ResponseUtil.badRequest(res, error.message || 'QR Code generation failed');

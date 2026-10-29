@@ -861,15 +861,23 @@ export class MissionService {
     recipientQr: string,
     gpId: string
   ): Promise<{ match: boolean; reason?: string; mission?: Mission }> {
-    const pkgId = this.missionIdFromPackageQr(packageQr);
+    // Les deux QR peuvent être le même lien /d/<jeton> (ou l'ancien QR JSON du colis).
+    const resolve = async (qr: string): Promise<string | null> => {
+      const jsonId = this.missionIdFromPackageQr(qr);
+      if (jsonId) return jsonId;
+      const tok = this.tokenFromRecipientQr(qr);
+      if (!tok) return null;
+      const r = await pool.query('SELECT id FROM missions WHERE delivery_token = $1', [tok]);
+      return r.rows.length ? String(r.rows[0].id) : null;
+    };
+    const pkgId = await resolve(packageQr);
     if (!pkgId) return { match: false, reason: 'QR du colis non reconnu.' };
-    const token = this.tokenFromRecipientQr(recipientQr);
-    if (!token) return { match: false, reason: 'QR du destinataire non reconnu.' };
-    const r = await pool.query('SELECT id FROM missions WHERE delivery_token = $1', [token]);
-    if (r.rows.length === 0 || String(r.rows[0].id) !== pkgId) {
+    const rcpId = await resolve(recipientQr);
+    if (!rcpId) return { match: false, reason: 'QR du destinataire non reconnu.' };
+    if (pkgId !== rcpId) {
       return { match: false, reason: 'Le QR du colis ne correspond pas à celui du destinataire.' };
     }
-    const mission = await this.verifyDeliveryByQR(packageQr, gpId);
+    const mission = await this.verifyDeliveryByQR(JSON.stringify({ id: pkgId }), gpId);
     return { match: true, mission };
   }
 
