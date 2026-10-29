@@ -90,6 +90,7 @@
         <div id="scanResult" class="scan-result" role="img"></div>
         <div id="scanStatus" class="scan-status">Initialisation de la caméra…</div>
         <div class="scan-actions">
+            <button id="scanFinish" class="scan-btn" style="display:none;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;" onclick="scanDone()">✅ Scan terminé</button>
             <button id="scanRetry" class="scan-btn" style="display:none;" onclick="retryScan()">Rescanner</button>
             <button class="scan-btn ghost" onclick="closeScanner()">Fermer</button>
         </div>
@@ -176,7 +177,7 @@
 
         function openScanner(){
             scanStep = 'package'; pkgQr = null; rcpQr = null; scanNum = 1; showResult(null);
-            document.getElementById('scanRetry').style.display = 'none';
+            document.getElementById('scanRetry').style.display = 'none'; document.getElementById('scanFinish').style.display = 'none';
             document.getElementById('scanOverlay').style.display = 'flex';
             startScan();
         }
@@ -202,7 +203,7 @@
 
         async function startScan(){
             showResult(null);
-            document.getElementById('scanRetry').style.display = 'none';
+            document.getElementById('scanRetry').style.display = 'none'; document.getElementById('scanFinish').style.display = 'none';
             setScanStatus('Initialisation de la caméra…');
             const video = document.getElementById('scanVideo');
             try {
@@ -248,7 +249,7 @@
         function fail(msg){
             stopCamera(); showResult('ko');
             setScanStatus('❌ ' + msg);
-            document.getElementById('scanRetry').style.display = 'inline-block';
+            document.getElementById('scanRetry').style.display = 'inline-block'; document.getElementById('scanRetry').textContent = 'Rescanner';
             scanStep = 'package'; pkgQr = null; rcpQr = null; scanNum = 1;          // on recommence proprement
         }
         async function onScanned(qrText){
@@ -285,8 +286,9 @@
                     setScanStatus('✅ Le colis ' + (m.mission_code || '') + ' appartient bien à ce destinataire' + (m.recipient_name ? ' (' + m.recipient_name + ')' : '') + ' — livraison confirmée.');
                     try { localStorage.setItem('sg_scan_ok', String((+localStorage.getItem('sg_scan_ok') || 0) + 1)); } catch(e){}
                     scanStep = 'package'; pkgQr = null; rcpQr = null; scanNum = 1;
-                    document.getElementById('scanRetry').style.display = 'none';
-                    setTimeout(() => { closeScanner(); load(); }, 1800);
+                    const rb = document.getElementById('scanRetry'); rb.textContent = 'Scanner un autre colis'; rb.style.display = 'inline-block';
+                    document.getElementById('scanFinish').style.display = 'inline-block';
+                    load();
                 } else {
                     fail(d.reason || j.error || j.message || 'QR incompatibles.');
                 }
@@ -318,6 +320,7 @@
                 const j = await res.json().catch(() => ({}));
                 if (!res.ok || !j.success) throw new Error(j.error || j.message || 'Échec');
                 try { localStorage.removeItem('sg_scan_ok'); } catch(e){}
+                closeScanner();
                 if (window.SengpGpGuard) window.SengpGpGuard.refresh();
                 renderDone();
             } catch(e){ alert('Impossible de terminer le scan : ' + e.message); }

@@ -1578,7 +1578,7 @@
                     const wa = tel ? `<a class="arr-wa" href="https://wa.me/${tel}" target="_blank" rel="noopener">💬 WhatsApp</a>` : '';
                     return `<div class="arr-item"><div class="arr-info"><b>${esc(g.gp_name||'GP')}</b>`
                         + `<small>${g.delivered} colis livré(s) · ${g.remaining} restant(s) non livré(s)${g.gp_phone ? ' · ' + esc(g.gp_phone) : ''}</small></div>`
-                        + `<div class="arr-btns">${wa}<button class="arr-ok" onclick="releaseGp('${g.id}','${esc(g.gp_name||'')}')">✅ Valider et rendre l'accès</button></div></div>`;
+                        + `<div class="arr-btns">${wa}<button class="arr-ok" onclick="releaseGp('${g.id}','${esc(g.gp_name||'')}')">✅ Voyage terminé — rendre l'accès</button></div></div>`;
                 }).join('') + '</div>';
             const arrHtml = !list.length ? '' : '<div class="arr-card"><div class="arr-head"><span class="pulse"></span>'
                 + list.length + ' GP' + (list.length > 1 ? ' ont' : ' a') + ' déclaré' + (list.length > 1 ? 's' : '') + ' être arrivé' + (list.length > 1 ? 's' : '') + ' à destination — confirmation requise</div>'
@@ -1592,9 +1592,9 @@
             box.innerHTML = arrHtml + revHtml;
         }
         async function releaseGp(id, name){
-            if (!await confirmDialog('Valider la fin de scan de ' + (name || 'ce GP') + ' ? Il retrouvera l\'accès à l\'application (créer un trajet, voir ses missions…).', { title:'Valider la fin de scan', confirmLabel:'Valider' })) return;
+            if (!await confirmDialog('Marquer le voyage de ' + (name || 'ce GP') + ' comme terminé ? Son trajet passera à « terminé » et il retrouvera l’accès à l’application (créer un trajet, voir ses missions…).', { title:'Voyage terminé', confirmLabel:'Voyage terminé' })) return;
             const { ok, json } = await api('/admin/gps/'+id+'/release', { method:'POST' });
-            notify(ok, 'Accès du GP rétabli.', json);
+            notify(ok, 'Voyage terminé — accès du GP rétabli.', json);
             refreshArrivalQueue();
         }
         async function confirmArrival(id, code){

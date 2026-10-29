@@ -553,12 +553,22 @@ export class AdminService {
       [gpId]
     );
     if (upd.rows.length === 0) throw new Error("Ce GP n'est pas en attente de validation");
+    // Voyage terminé : les trajets du GP dont tous les colis sont livrés passent à « completed ».
+    try {
+      await pool.query(
+        `UPDATE trips SET status = 'completed', updated_at = CURRENT_TIMESTAMP
+         WHERE gp_id = $1 AND status IN ('draft', 'published', 'active')
+           AND id IN (SELECT trip_id FROM missions WHERE gp_id = $1 AND trip_id IS NOT NULL AND status = 'delivered')
+           AND id NOT IN (SELECT trip_id FROM missions WHERE trip_id IS NOT NULL AND status NOT IN ('delivered', 'cancelled'))`,
+        [gpId]
+      );
+    } catch (e: any) { logger.warn('Trip completion failed: ' + e.message); }
     try {
       await NotificationService.create({
         user_id: gpId,
         notification_type: NotificationType.MISSION_TRANSIT,
         title: 'Accès rétabli',
-        message: "L'administration a validé la fin de votre scan. Vous pouvez de nouveau utiliser l'application.",
+        message: "L'administration a validé la fin de votre voyage. Vous pouvez de nouveau utiliser l'application.",
         action_url: 'dashgp.html',
       });
     } catch (e: any) { logger.warn('Release notification failed: ' + e.message); }
