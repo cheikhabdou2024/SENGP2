@@ -324,8 +324,7 @@
             }
         }
 
-        const FLAGS = {'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱','Algérie':'🇩🇿','Tunisie':'🇹🇳','Côte d\'Ivoire':'🇨🇮','Belgique':'🇧🇪','Suisse':'🇨🇭'};
-        const flag = c => FLAGS[c] || (window.SengpGeo ? SengpGeo.flag(c) : '');
+        const flag = c => (window.SengpGeo ? SengpGeo.flag(c) : '');
 
         async function loadUserNotifications() {
             const token = getAuthToken();

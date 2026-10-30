@@ -121,8 +121,7 @@
         const missionId = params.get('id');
         let mission = null;
 
-        const FLAGS = {'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱'};
-        const flag = c => FLAGS[c] || (window.SengpGeo ? SengpGeo.flag(c) : '');
+        const flag = c => (window.SengpGeo ? SengpGeo.flag(c) : '');
         const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         const fcfa = n => (Number(n)||0).toLocaleString('fr-FR')+' FCFA';
         const dt = d => d ? new Date(d).toLocaleString('fr-FR',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';

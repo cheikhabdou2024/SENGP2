@@ -105,8 +105,7 @@
         const focusMissionId = new URLSearchParams(location.search).get('mission');
         let scannerAutoOpened = false;
 
-        const FLAGS={'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱'};
-        const flag=c=>FLAGS[c] || (window.SengpGeo ? SengpGeo.flag(c) : '');
+        const flag = c => (window.SengpGeo ? SengpGeo.flag(c) : '');
         const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         const ACTIVE=['accepted','picked_up','in_transit','in_customs','out_for_delivery'];
         const STATUS={accepted:['Accepté','b-blue'],picked_up:['Récupéré','b-blue'],in_transit:['En transit','b-blue'],in_customs:['En douane','b-blue'],out_for_delivery:['En livraison','b-blue']};
