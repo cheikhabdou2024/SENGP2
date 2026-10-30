@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { AdminService } from '../services/admin.service';
+import { AdminService } from '../services/admin';
 import { WithdrawalService } from '../services/withdrawal.service';
 import { ResponseUtil } from '../utils/response';
 import { logAdminAction } from '../utils/audit';
