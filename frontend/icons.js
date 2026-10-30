@@ -28,6 +28,9 @@
     mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
     gift: '<path d="M3 9h18v4H3zM5 13v7h14v-7M12 9v11"/><path d="M12 9c-2-4-6-3-5 0M12 9c2-4 6-3 5 0"/>',
     lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+    pause: '<path d="M8 5v14M16 5v14"/>',
+    play: '<path d="M7 4.5v15l12-7.5z"/>',
+    stop: '<rect x="6" y="6" width="12" height="12" rx="1.5"/>',
     shield: '<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3z"/>'
   };
   function svg(name, size, cls) {
@@ -41,6 +44,7 @@
       el.setAttribute('data-icon-done', '1');
     });
   }
+  if (window.MutationObserver) new MutationObserver(function () { hydrate(); }).observe(document.documentElement, { childList: true, subtree: true });
   window.SengpIcons = { svg: svg, hydrate: hydrate, names: Object.keys(P) };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { hydrate(); }); else hydrate();
 })();

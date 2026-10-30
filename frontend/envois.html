@@ -377,7 +377,7 @@
         const ACTIVE = ['pending','matched','accepted','picked_up','in_transit','in_customs','out_for_delivery'];
 
         const FLAGS = {'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱','Algérie':'🇩🇿','Tunisie':'🇹🇳','Côte d\'Ivoire':'🇨🇮','Belgique':'🇧🇪','Suisse':'🇨🇭'};
-        const flag = c => FLAGS[c] || (window.SengpGeo ? SengpGeo.flag(c) : '🌍');
+        const flag = c => FLAGS[c] || (window.SengpGeo ? SengpGeo.flag(c) : '');
         const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         const fcfa = n => (Number(n)||0).toLocaleString('fr-FR')+' FCFA';
         const validDate = d => { const x = d ? new Date(d) : null; return x && !isNaN(x.getTime()) ? x : null; };
@@ -479,8 +479,8 @@
             return `Bonjour${m.recipient_name ? ' ' + m.recipient_name : ''}, un colis SEN GP vous est envoyé (${m.mission_code || m.tracking_number || ''})${to ? ' à destination de ' + to : ''}.
 
 ` +
-                `📍 Suivi en direct : ${trackUrl(m)}
-` + (qrLink ? `🔳 Votre QR de livraison (à montrer au livreur) : ${qrLink}` : '');
+                `Suivi en direct : ${trackUrl(m)}
+` + (qrLink ? `Votre QR de livraison (à montrer au livreur) : ${qrLink}` : '');
         }
         // Paiement en ligne : on attend la confirmation du paiement avant de prévenir le destinataire.
         async function resolveAutoShare(){
@@ -789,8 +789,8 @@
             const m = sheetMission || {};
             const trackingNum = m.tracking_number || m.mission_code || '';
             const caption =
-                `🎁 SEN GP — Votre colis est en route !\n\n` +
-                `📦 Numéro de suivi : ${trackingNum}\n\n` +
+                `SEN GP — Votre colis est en route !\n\n` +
+                `Numéro de suivi : ${trackingNum}\n\n` +
                 `QR code du colis : à imprimer ou coller sur le colis. ` +
                 `Le livreur (GP) SEN GP le scannera, puis celui du destinataire, pour confirmer la remise.\n\n` +
                 `SEN GP — La livraison collaborative`;

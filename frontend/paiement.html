@@ -416,7 +416,7 @@
 
                 <div class="detail-row">
                     <span class="detail-label">Statut</span>
-                    <span class="detail-value" style="color: #FFE66D;">⏳ En attente GP</span>
+                    <span class="detail-value" style="color: #FFE66D;">En attente GP</span>
                 </div>
 
                 <div class="detail-row">
@@ -455,12 +455,12 @@
         }
 
         function downloadQR() {
-            alert('📥 Téléchargement du QR Code\n\nLe QR code sera enregistré dans vos téléchargements.\n\nDans la version complète, cela téléchargerait une image PNG haute résolution.');
+            alert('Téléchargement du QR Code\n\nLe QR code sera enregistré dans vos téléchargements.\n\nDans la version complète, cela téléchargerait une image PNG haute résolution.');
         }
 
         function shareTracking() {
             const trackingNumber = document.getElementById('trackingNumber').textContent;
-            const message = `📦 Suivi de colis SEN GP\n\nNuméro: ${trackingNumber}\n\nSuivez votre colis: https://sengp.com/track/${trackingNumber}`;
+            const message = `Suivi de colis SEN GP\n\nNuméro: ${trackingNumber}\n\nSuivez votre colis: https://sengp.com/track/${trackingNumber}`;
             
             if (navigator.share) {
                 navigator.share({
@@ -469,12 +469,12 @@
                 }).catch(() => {
                     // Fallback: copy to clipboard
                     navigator.clipboard.writeText(message);
-                    alert('📤 Lien de suivi copié !\n\nVous pouvez le partager avec vos contacts.');
+                    alert('Lien de suivi copié !\n\nVous pouvez le partager avec vos contacts.');
                 });
             } else {
                 // Fallback for browsers that don't support Web Share API
                 navigator.clipboard.writeText(message);
-                alert('📤 Lien de suivi copié !\n\nVous pouvez le partager avec vos contacts.');
+                alert('Lien de suivi copié !\n\nVous pouvez le partager avec vos contacts.');
             }
         }
 

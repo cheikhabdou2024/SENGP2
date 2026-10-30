@@ -579,7 +579,7 @@
                     localStorage.setItem('userData', JSON.stringify(Object.assign(getUserData() || {}, currentUser)));
                     fillDisplay(currentUser);
                     closeSheet();
-                    toast('Profil mis à jour ✅');
+                    toast('Profil mis à jour');
                 } else {
                     alert('Erreur: ' + (j.error || j.message || 'Mise à jour échouée'));
                     btn.disabled = false; btn.textContent = 'Enregistrer';
@@ -605,7 +605,7 @@
                     body: JSON.stringify({ oldPassword: oldP, newPassword: newP })
                 });
                 const j = await r.json();
-                if (r.ok && j.success) { closeSheet(); toast('Mot de passe modifié ✅'); return; }
+                if (r.ok && j.success) { closeSheet(); toast('Mot de passe modifié'); return; }
                 alert('Erreur: ' + (j.error || j.message || 'Échec'));
             } catch (e) {
                 alert('Erreur de connexion.');

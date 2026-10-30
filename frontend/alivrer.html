@@ -90,7 +90,7 @@
         <div id="scanResult" class="scan-result" role="img"></div>
         <div id="scanStatus" class="scan-status">Initialisation de la caméra…</div>
         <div class="scan-actions">
-            <button id="scanFinish" class="scan-btn" style="display:none;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;" onclick="scanDone()">✅ Scan terminé</button>
+            <button id="scanFinish" class="scan-btn" style="display:none;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;" onclick="scanDone()">Scan terminé</button>
             <button id="scanRetry" class="scan-btn" style="display:none;" onclick="retryScan()">Rescanner</button>
             <button class="scan-btn ghost" onclick="closeScanner()">Fermer</button>
         </div>
@@ -106,7 +106,7 @@
         let scannerAutoOpened = false;
 
         const FLAGS={'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱'};
-        const flag=c=>FLAGS[c] || (window.SengpGeo ? SengpGeo.flag(c) : '🌍');
+        const flag=c=>FLAGS[c] || (window.SengpGeo ? SengpGeo.flag(c) : '');
         const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         const ACTIVE=['accepted','picked_up','in_transit','in_customs','out_for_delivery'];
         const STATUS={accepted:['Accepté','b-blue'],picked_up:['Récupéré','b-blue'],in_transit:['En transit','b-blue'],in_customs:['En douane','b-blue'],out_for_delivery:['En livraison','b-blue']};
@@ -136,7 +136,7 @@
                 const phone=(m.recipient_phone||'').replace(/\s/g,'');
                 const nxt=NEXT[st];
                 return '<div class="card">'
-                    +'<div class="top"><div><div class="recipient">'+(m.recipient_name?esc(m.recipient_name):'⚠️ Destinataire non renseigné')+'</div>'
+                    +'<div class="top"><div><div class="recipient">'+(m.recipient_name?esc(m.recipient_name):'Destinataire non renseigné')+'</div>'
                     +'<div class="code">'+esc(m.mission_code||m.tracking_number||'')+'</div></div>'+badge(m.status)+'</div>'
                     +'<div class="route"><span class="flag">'+flag(m.departure_country)+'</span><span>'+esc(m.departure_city||'')+'</span><span class="arrow">→</span><span class="flag">'+flag(m.arrival_country)+'</span><span>'+esc(m.arrival_city||'')+'</span></div>'
                     +(m.recipient_phone?'<div class="line"><svg class="ic" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> '+esc(m.recipient_phone)+'</div>':'')
@@ -162,7 +162,7 @@
 
         // ───────── QR scanner (GP scans the recipient's QR to confirm delivery) ─────────
         let scanStream = null, scanRAF = null, scanning = false, barcodeDetector = null;
-        // Vérification en 2 temps : 1) QR du COLIS, 2) QR du DESTINATAIRE → ✅ si compatibles, ❌ sinon.
+        // Vérification en 2 temps : 1) QR du COLIS, 2) QR du DESTINATAIRE → vert si compatibles, rouge sinon.
         let scanStep = 'package', pkgQr = null, rcpQr = null, scanNum = 1;   // ordre libre : colis puis destinataire, ou l'inverse
         function showResult(kind){
             const r = document.getElementById('scanResult');
@@ -248,7 +248,7 @@
         function stopCamera(){ if (scanStream){ scanStream.getTracks().forEach(t => t.stop()); scanStream = null; } }
         function fail(msg){
             stopCamera(); showResult('ko');
-            setScanStatus('❌ ' + msg);
+            setScanStatus(msg);
             document.getElementById('scanRetry').style.display = 'inline-block'; document.getElementById('scanRetry').textContent = 'Rescanner';
             scanStep = 'package'; pkgQr = null; rcpQr = null; scanNum = 1;          // on recommence proprement
         }
@@ -265,7 +265,7 @@
                 rcpQr = qrText; scanNum = 2; scanStep = 'package';
                 stopCamera(); showResult('ok');
                 document.getElementById('scanResultMsg') && (document.getElementById('scanResultMsg').textContent = '');
-                setScanStatus('✅ QR du destinataire validé');
+                setScanStatus('QR du destinataire validé');
                 setTimeout(() => { stepPrompt(); startScan(); }, 1300);   // enchaîne le scan du colis
                 return;
             }
@@ -283,7 +283,7 @@
                 if (res.ok && j.success && d.match){
                     const m = d.mission || {};
                     showResult('ok');
-                    setScanStatus('✅ Le colis ' + (m.mission_code || '') + ' appartient bien à ce destinataire' + (m.recipient_name ? ' (' + m.recipient_name + ')' : '') + ' — livraison confirmée.');
+                    setScanStatus('Le colis ' + (m.mission_code || '') + ' appartient bien à ce destinataire' + (m.recipient_name ? ' (' + m.recipient_name + ')' : '') + ' — livraison confirmée.');
                     try { localStorage.setItem('sg_scan_ok', String((+localStorage.getItem('sg_scan_ok') || 0) + 1)); } catch(e){}
                     scanStep = 'package'; pkgQr = null; rcpQr = null; scanNum = 1;
                     const rb = document.getElementById('scanRetry'); rb.textContent = 'Scanner un autre colis'; rb.style.display = 'inline-block';
@@ -304,7 +304,7 @@
             const box = document.getElementById('doneBox');
             if (!n){ box.innerHTML = ''; return; }
             const left = items.length;
-            box.innerHTML = '<button class="done-btn" onclick="scanDone()">✅ Scan terminé</button>'
+            box.innerHTML = '<button class="done-btn" onclick="scanDone()">Scan terminé</button>'
                 + '<p class="done-note">' + n + ' colis livré(s) cette tournée' + (left ? ' · ' + left + ' colis restent à scanner' : '')
                 + '. L’administration devra valider avant que vous puissiez de nouveau utiliser l’application.</p>';
         }

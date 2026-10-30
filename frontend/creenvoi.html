@@ -1515,6 +1515,7 @@
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
+    <script src="icons.js"></script>
     <script src="geo-data.js" defer></script>
     <script src="geo.js" defer></script>
     <!-- PWA -->
@@ -1627,7 +1628,7 @@
                         <svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                     </button>
                     <div class="pc-danger" id="dangerNote" role="note" hidden>
-                        ⚠️ Les matières dangereuses (inflammables, explosifs, batteries au lithium…) sont soumises à des règles strictes de transport aérien. Indiquez précisément le contenu dans la description.
+                        Les matières dangereuses (inflammables, explosifs, batteries au lithium…) sont soumises à des règles strictes de transport aérien. Indiquez précisément le contenu dans la description.
                     </div>
                     <!-- Kept for the existing form logic (summary, validation) -->
                     <select id="packageType" hidden onchange="validateForm()" tabindex="-1" aria-hidden="true">
@@ -1667,7 +1668,7 @@
                             oninput="validateForm()"
                         ></textarea>
                         <button type="button" class="voice-btn" id="voiceBtn" onclick="openAudioControls()" title="Enregistrer un message audio">
-                            <span class="voice-icon">🎤</span>
+                            <span class="voice-icon" data-icon="mic" data-size="18"></span>
                         </button>
                     </div>
                     <div class="char-counter">
@@ -1677,23 +1678,19 @@
                     <!-- WhatsApp-Style Audio Recording Controls -->
                     <div class="audio-controls" id="audioControls">
                         <div class="recording-interface" id="recordingInterface" style="display: none;">
-                            <div class="recording-mic-icon">🎤</div>
+                            <div class="recording-mic-icon" data-icon="mic" data-size="34"></div>
                             <div class="recording-info">
                                 <div class="recording-timer" id="recordingTimer">0:00</div>
                                 <div class="recording-hint">Glissez pour annuler</div>
                             </div>
                             <div class="recording-actions">
-                                <button type="button" class="rec-action-btn pause" id="pauseBtn" onclick="pauseRecording()">
-                                    ⏸️
-                                </button>
-                                <button type="button" class="rec-action-btn stop" id="stopBtn" onclick="stopRecording()">
-                                    ⏹️
-                                </button>
+                                <button type="button" class="rec-action-btn pause" id="pauseBtn" onclick="pauseRecording()"><span data-icon="pause" data-size="20"></span></button>
+                                <button type="button" class="rec-action-btn stop" id="stopBtn" onclick="stopRecording()"><span data-icon="stop" data-size="20"></span></button>
                             </div>
                         </div>
 
                         <button type="button" class="audio-btn audio-btn-start" id="startBtn" onclick="startRecording()" style="width: 100%; padding: 14px; border-radius: 12px; background: linear-gradient(135deg, #25D366 0%, #20BA5A 100%); color: white; border: none; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                            🎤 Commencer l'enregistrement
+                            Commencer l'enregistrement
                         </button>
                     </div>
 
@@ -1712,9 +1709,7 @@
                                 </div>
                             </div>
                             <div class="audio-duration" id="audioDuration">0:00</div>
-                            <button type="button" class="delete-audio-btn" onclick="deleteAudio()" title="Supprimer l'audio">
-                                🗑️
-                            </button>
+                            <button type="button" class="delete-audio-btn" onclick="deleteAudio()" title="Supprimer l'audio"><span data-icon="trash" data-size="18"></span></button>
                         </div>
                     </div>
                     </div>
@@ -1736,7 +1731,7 @@
                     <div class="fd">
                         <span class="fd__label" id="arrivalLabel">Pays et ville du destinataire <span class="cr-req">*</span></span>
                         <button type="button" class="fd__box fd__pick" id="arrivalLocation" onclick="openLocationModal('arrival')" aria-labelledby="arrivalLabel arrivalName">
-                            <span class="fd__flag" id="arrivalFlag">🌍</span>
+                            <span class="fd__flag" id="arrivalFlag"></span>
                             <span class="fd__txt" id="arrivalName">Sélectionner...</span>
                             <svg class="cr-i fd__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
@@ -1786,7 +1781,7 @@
                     <div class="fd">
                         <span class="fd__label" id="departureLabel">Pays et ville de départ <span class="cr-req">*</span></span>
                         <button type="button" class="fd__box fd__pick" id="departureLocation" onclick="openLocationModal('departure')" aria-labelledby="departureLabel departureName">
-                            <span class="fd__flag" id="departureFlag">🌍</span>
+                            <span class="fd__flag" id="departureFlag"></span>
                             <span class="fd__txt" id="departureName">Sélectionner...</span>
                             <svg class="cr-i fd__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
@@ -1849,9 +1844,9 @@
                         <button type="button" class="rc-edit" onclick="editStep(2)" aria-label="Modifier le trajet"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Modifier</button>
                     </div>
                     <div class="rc-route">
-                        <div class="rc-place"><span class="rc-flag" id="sumFromFlag">🌍</span><div><b id="sumFromCity">-</b><small id="sumFromCountry"></small></div></div>
+                        <div class="rc-place"><span class="rc-flag" id="sumFromFlag"></span><div><b id="sumFromCity">-</b><small id="sumFromCountry"></small></div></div>
                         <div class="rc-line" aria-hidden="true"><i class="dot g"></i><span class="dash"></span><img src="im/sengp-plane.png" alt="" width="192" height="142"><span class="dash"></span><i class="dot r"></i></div>
-                        <div class="rc-place rc-place--r"><span class="rc-flag" id="sumToFlag">🌍</span><div><b id="sumToCity">-</b><small id="sumToCountry"></small></div></div>
+                        <div class="rc-place rc-place--r"><span class="rc-flag" id="sumToFlag"></span><div><b id="sumToCity">-</b><small id="sumToCountry"></small></div></div>
                     </div>
                 </section>
 
@@ -2004,7 +1999,7 @@
                     </div>
 
                     <div class="search-box">
-                        <input type="text" id="countryCodeSearch" placeholder="🔍 Rechercher un pays..." onkeyup="filterCountryCodes()" />
+                        <input type="text" id="countryCodeSearch" placeholder="Rechercher un pays..." onkeyup="filterCountryCodes()" />
                     </div>
 
                     <div class="locations-list" id="countryCodesList">
@@ -2032,10 +2027,10 @@
 
             <div class="qr-actions">
                 <button class="qr-btn qr-btn-secondary" onclick="downloadQRCode()">
-                    📥 Télécharger
+                    Télécharger
                 </button>
                 <button class="qr-btn qr-btn-secondary" onclick="shareQRCode()">
-                    📤 Partager
+                    Partager
                 </button>
             </div>
 
@@ -2131,10 +2126,10 @@
             // Route
             const from = selectedDeparture, to = selectedArrival;
             $('summaryRoute').textContent = from && to ? `${from.city} → ${to.city}` : '-';
-            $('sumFromFlag').textContent = from ? from.flag : '🌍';
+            $('sumFromFlag').textContent = from ? from.flag : '';
             $('sumFromCity').textContent = from ? from.city : '-';
             $('sumFromCountry').textContent = from ? from.country : '';
-            $('sumToFlag').textContent = to ? to.flag : '🌍';
+            $('sumToFlag').textContent = to ? to.flag : '';
             $('sumToCity').textContent = to ? to.city : '-';
             $('sumToCountry').textContent = to ? to.country : '';
 
@@ -2304,12 +2299,12 @@
                 mediaRecorder.pause();
                 isRecordingPaused = true;
                 clearInterval(recordingTimer);
-                document.getElementById('pauseBtn').innerHTML = '▶️';
+                document.getElementById('pauseBtn').innerHTML = SengpIcons.svg('play', 20);
             } else if (mediaRecorder && mediaRecorder.state === 'paused') {
                 mediaRecorder.resume();
                 isRecordingPaused = false;
                 startTimer();
-                document.getElementById('pauseBtn').innerHTML = '⏸️';
+                document.getElementById('pauseBtn').innerHTML = SengpIcons.svg('pause', 20);
             }
         }
 
@@ -2956,7 +2951,7 @@
                 // 2a. Paiement à la livraison : aucun paiement en ligne, récap + dashboard.
                 if (selectedPaymentMethod === 'cod') {
                     alert(
-                        'Envoi créé ✅\n\n' +
+                        'Envoi créé\n\n' +
                         'Type : ' + (packageTypeText || '—') + '\n' +
                         'Trajet : ' + selectedDeparture.city + ' → ' + selectedArrival.city + '\n' +
                         'Destinataire : ' + (recipientName || '—') + '\n' +
@@ -3012,7 +3007,7 @@
                             if (status !== 'completed') await new Promise(res => setTimeout(res, 2000));
                         }
                         if (status === 'completed') {
-                            alert('Paiement réussi ✅\n\nVotre envoi est créé.\nTrajet : ' + selectedDeparture.city + ' → ' + selectedArrival.city + '\nSuivi n° : ' + (mission.tracking_number || mission.mission_code || ''));
+                            alert('Paiement réussi\n\nVotre envoi est créé.\nTrajet : ' + selectedDeparture.city + ' → ' + selectedArrival.city + '\nSuivi n° : ' + (mission.tracking_number || mission.mission_code || ''));
                         } else {
                             alert('Paiement en cours de validation. Votre envoi apparaîtra dès confirmation.');
                         }

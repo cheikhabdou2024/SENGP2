@@ -622,9 +622,9 @@
                             </div>
                             <div id="voicePreview" style="display:none;margin-top:10px;">
                                 <audio id="voiceAudio" controls style="width:100%;"></audio>
-                                <button type="button" onclick="discardVoice()" style="margin-top:6px;background:rgba(255,107,107,.2);color:#ff8f8f;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;">🗑️ Supprimer le vocal</button>
+                                <button type="button" onclick="discardVoice()" style="margin-top:6px;background:rgba(255,107,107,.2);color:#ff8f8f;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;">Supprimer le vocal</button>
                             </div>
-                            <div id="voiceStatus" style="font-size:12px;color:rgba(255,255,255,.55);margin-top:8px;">🎙️ Appuyez sur le micro pour enregistrer un message vocal (parlez dans votre langue).</div>
+                            <div id="voiceStatus" style="font-size:12px;color:rgba(255,255,255,.55);margin-top:8px;">Appuyez sur le micro pour enregistrer un message vocal (parlez dans votre langue).</div>
                         </div>
                     </form>
                 </div>
@@ -709,13 +709,13 @@
                         voiceDataUrl = reader.result;
                         document.getElementById('voiceAudio').src = voiceDataUrl;
                         document.getElementById('voicePreview').style.display = 'block';
-                        document.getElementById('voiceStatus').textContent = '✅ Message vocal enregistré.';
+                        document.getElementById('voiceStatus').textContent = 'Message vocal enregistré.';
                     };
                     reader.readAsDataURL(blob);
                 };
                 mediaRecorder.start();
-                btn.classList.add('recording'); btn.textContent = '⏹';
-                document.getElementById('voiceStatus').textContent = '🔴 Enregistrement… appuyez de nouveau pour arrêter.';
+                btn.classList.add('recording'); btn.textContent = 'Arrêter';
+                document.getElementById('voiceStatus').textContent = 'Enregistrement… appuyez de nouveau pour arrêter.';
                 setTimeout(function(){ if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop(); }, 60000);
             } catch (e) {
                 alert('Micro indisponible ou permission refusée. Vous pouvez écrire votre message.');
@@ -724,7 +724,7 @@
         function discardVoice() {
             voiceDataUrl = null; voiceBlob = null;
             const p = document.getElementById('voicePreview'); if (p) p.style.display = 'none';
-            const s = document.getElementById('voiceStatus'); if (s) s.textContent = '🎙️ Appuyez sur le micro pour enregistrer un message vocal (parlez dans votre langue).';
+            const s = document.getElementById('voiceStatus'); if (s) s.textContent = 'Appuyez sur le micro pour enregistrer un message vocal (parlez dans votre langue).';
         }
 
         function getAuthToken() {

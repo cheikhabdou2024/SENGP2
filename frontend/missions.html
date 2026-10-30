@@ -579,12 +579,12 @@
             <!-- Section Header -->
             <div class="section-header">
                 <h2 class="section-title">Missions disponibles</h2>
-                <button class="sort-btn" onclick="sortMissions()">Trier par ↕</button>
+                <button class="sort-btn" onclick="sortMissions()">Trier</button>
             </div>
 
             <!-- Missions (rendered from real backend data) -->
             <div id="missionsLoading" class="missions-state">
-                <div class="state-icon">⏳</div>
+                <div class="state-icon"><span data-icon="clock" data-size="34"></span></div>
                 <div class="state-text">Chargement des missions…</div>
             </div>
             <div id="missionsEmpty" class="missions-state" style="display: none;">
@@ -629,14 +629,14 @@
         let searchTerm = '';
         let priceSortAsc = false;
 
-        // Drapeaux par pays (repli 🌍).
+        // Drapeaux par pays (repli).
         const FLAGS = {
             'Sénégal': '🇸🇳', 'Senegal': '🇸🇳', 'France': '🇫🇷', 'Espagne': '🇪🇸',
             'Italie': '🇮🇹', 'USA': '🇺🇸', 'États-Unis': '🇺🇸', 'Etats-Unis': '🇺🇸',
             'Canada': '🇨🇦', 'Royaume-Uni': '🇬🇧', 'Angleterre': '🇬🇧', 'Allemagne': '🇩🇪',
             'Belgique': '🇧🇪', 'Maroc': '🇲🇦', 'Mali': '🇲🇱', 'Côte d\'Ivoire': '🇨🇮'
         };
-        function flagFor(country) { return FLAGS[country] || (window.SengpGeo ? SengpGeo.flag(country) : '🌍'); }
+        function flagFor(country) { return FLAGS[country] || (window.SengpGeo ? SengpGeo.flag(country) : ''); }
 
         function esc(s) {
             return String(s == null ? '' : s)
@@ -645,9 +645,9 @@
         }
 
         function initials(name) {
-            if (!name) return '👤';
+            if (!name) return '–';
             const parts = name.trim().split(/\s+/);
-            return ((parts[0] || '').charAt(0) + (parts[1] || '').charAt(0)).toUpperCase() || '👤';
+            return ((parts[0] || '').charAt(0) + (parts[1] || '').charAt(0)).toUpperCase() || '–';
         }
 
         function shortName(name) {
@@ -892,7 +892,7 @@
                 `Prix: ${formatPrice(m.price)} (${m.is_price_negotiable ? 'négociable' : 'fixe'})\n` +
                 `Poids: ${parseFloat(m.weight) || 0} kg${desc}\n` +
                 `Départ: ${formatDate(m.departure_date)} — Arrivée: ${formatDate(m.desired_arrival_date)}\n\n` +
-                `ℹ️ Cette mission peut vous être assignée par l'administration. Vous serez notifié(e) dans l'onglet Notifications.`
+                `Cette mission peut vous être assignée par l'administration. Vous serez notifié(e) dans l'onglet Notifications.`
             );
         }
 

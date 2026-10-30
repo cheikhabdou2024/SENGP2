@@ -325,7 +325,7 @@
         }
 
         const FLAGS = {'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱','Algérie':'🇩🇿','Tunisie':'🇹🇳','Côte d\'Ivoire':'🇨🇮','Belgique':'🇧🇪','Suisse':'🇨🇭'};
-        const flag = c => FLAGS[c] || (window.SengpGeo ? SengpGeo.flag(c) : '🌍');
+        const flag = c => FLAGS[c] || (window.SengpGeo ? SengpGeo.flag(c) : '');
 
         async function loadUserNotifications() {
             const token = getAuthToken();
@@ -423,11 +423,11 @@
 
             let action;
             if (state === 'accepted') {
-                action = '<div class="ma-state ok">✅ Mission acceptée — l\'équipe SEN GP vous contactera pour confirmer et organiser la remise du colis.</div>';
+                action = '<div class="ma-state ok">Mission acceptée — l\'équipe SEN GP vous contactera pour confirmer et organiser la remise du colis.</div>';
             } else if (state === 'declined') {
-                action = '<div class="ma-state no">❌ Mission déclinée — elle sera ré-assignée à un autre GP de la même catégorie.</div>';
+                action = '<div class="ma-state no">Mission déclinée — elle sera ré-assignée à un autre GP de la même catégorie.</div>';
             } else if (!missionId) {
-                action = '<div class="ma-state no">⚠️ Détails de mission indisponibles.</div>';
+                action = '<div class="ma-state no">Détails de mission indisponibles.</div>';
             } else {
                 action = '<div class="ma-actions">'
                     + '<button type="button" class="ma-btn ma-accept" data-resp="accept" data-nid="' + nid + '" data-mid="' + mid + '">' + ICON.checkOnly + 'Accepter</button>'
@@ -488,7 +488,7 @@
             updateCounts();
             render();
             window.sengpAlert(action === 'accept'
-                ? '✅ Mission acceptée ! L\'équipe SEN GP vous contactera pour confirmer et organiser la remise du colis.'
+                ? 'Mission acceptée ! L\'équipe SEN GP vous contactera pour confirmer et organiser la remise du colis.'
                 : 'Mission déclinée. Elle sera ré-assignée à un autre GP de la même catégorie.');
         }
 

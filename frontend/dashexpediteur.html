@@ -276,7 +276,7 @@
 
                     <!-- Greeting -->
                     <div class="hm-greeting hm-reveal" style="--i:1">
-                        <h1 id="greetingTitle">Bonjour 👋</h1>
+                        <h1 id="greetingTitle">Bonjour</h1>
                         <p>Prêt à envoyer un colis ?</p>
                     </div>
 
@@ -296,7 +296,7 @@
                         </button>
 
                         <button type="button" class="hm-side" id="arrivalSelector" onclick="openCountryModal('arrival')">
-                            <span class="hm-flag" id="arrivalFlag">🌍</span>
+                            <span class="hm-flag" id="arrivalFlag"></span>
                             <span class="hm-side__txt">
                                 <span class="hm-label">Arrivée</span>
                                 <span class="hm-place hm-place--ph" id="arrivalName">Choisir destination</span>
@@ -416,7 +416,6 @@
             nameEl.className = 'hm-name';
             nameEl.textContent = firstName;
             title.appendChild(nameEl);
-            title.appendChild(document.createTextNode(' 👋'));
 
             // Avatar : photo de profil Google si disponible, sinon initiales.
             const avatar = document.getElementById('profileAvatar');
@@ -614,7 +613,7 @@
         // Obtenir le drapeau du pays (tous les pays de geo-data.js)
         function getCountryFlag(country) {
             const f = window.SengpGeo && SengpGeo.find(country);
-            return f ? SengpGeo.flagOf(f.c[0]) : '🌍';
+            return f ? SengpGeo.flagOf(f.c[0]) : '';
         }
 
         // Formater la date
