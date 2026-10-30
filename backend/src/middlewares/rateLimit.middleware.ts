@@ -34,6 +34,18 @@ export class RateLimitMiddleware {
   });
 
   /**
+   * Endpoints protégés par un secret partagé (amorçage admin, réinitialisation) :
+   * 5 tentatives par 15 minutes et par IP, succès compris.
+   */
+  static secretGate = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { success: false, error: 'Too many attempts, please try again later' },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  /**
    * Public tracking limiter (recipient pages, read-only).
    * Generous because mobile users often share a carrier NAT IP and the pages
    * auto-refresh. 300 requests / 5 minutes by default.

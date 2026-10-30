@@ -3,8 +3,16 @@ import { MissionService } from '../services/mission.service';
 import { ResponseUtil } from '../utils/response';
 import { AuthRequest, UserType } from '../types';
 import logger from '../utils/logger';
+import { missionAccessLevel, toPoolView, pickEditableFields } from '../utils/missionAccess';
 
 export class MissionController {
+  /** L'utilisateur connecté a-t-il un accès complet à cette mission (admin, expéditeur, GP assigné) ? */
+  private static async canAccess(req: AuthRequest, missionId: string): Promise<boolean> {
+    if (!req.user) return false;
+    const mission = await MissionService.getById(missionId);
+    return !!mission && missionAccessLevel(req.user, mission) === 'full';
+  }
+
   /**
    * Create new mission
    * POST /api/v1/missions
@@ -36,14 +44,21 @@ export class MissionController {
    */
   static async getById(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const mission = await MissionService.getById(req.params.id);
+      if (!req.user) {
+        ResponseUtil.unauthorized(res);
+        return;
+      }
 
-      if (!mission) {
+      const mission = await MissionService.getById(req.params.id);
+      const access = mission ? missionAccessLevel(req.user, mission) : 'none';
+
+      // Mission inexistante ou non autorisée : même réponse, pour ne pas révéler son existence.
+      if (!mission || access === 'none') {
         ResponseUtil.notFound(res, 'Mission not found');
         return;
       }
 
-      ResponseUtil.success(res, mission);
+      ResponseUtil.success(res, access === 'pool' ? toPoolView(mission) : mission);
     } catch (error: any) {
       logger.error('Get mission error:', error);
       ResponseUtil.badRequest(res, error.message || 'Failed to get mission');
@@ -62,15 +77,34 @@ export class MissionController {
       const departure_city = req.query.departure_city as string;
       const arrival_city = req.query.arrival_city as string;
 
+      if (!req.user) {
+        ResponseUtil.unauthorized(res);
+        return;
+      }
+
+      // Périmètre imposé par le rôle (jamais par la requête) :
+      // admin = tout ; expéditeur = ses envois ; GP = missions à pourvoir (vue réduite) ou les siennes.
+      const scope: { expediteur_id?: string; gp_id?: string } = {};
+      let poolOnly = false;
+      if (req.user.user_type === UserType.EXPEDITEUR) {
+        scope.expediteur_id = req.user.id;
+      } else if (req.user.user_type === UserType.GP) {
+        if (status === 'pending') poolOnly = true;
+        else scope.gp_id = req.user.id;
+      }
+
       const result = await MissionService.getAll({
         page,
         limit,
         status,
         departure_city,
         arrival_city,
+        ...scope,
+        unassignedOnly: poolOnly,
       });
 
-      ResponseUtil.success(res, result.data, undefined, result.pagination);
+      const data = poolOnly ? result.data.map(toPoolView) : result.data;
+      ResponseUtil.success(res, data, undefined, result.pagination);
     } catch (error: any) {
       logger.error('Get missions error:', error);
       ResponseUtil.badRequest(res, error.message || 'Failed to get missions');
@@ -123,7 +157,27 @@ export class MissionController {
         return;
       }
 
-      const mission = await MissionService.update(req.params.id, req.body);
+      const current = await MissionService.getById(req.params.id);
+      const isOwner = !!current && current.expediteur_id === req.user.id;
+      const isAdmin = req.user.user_type === UserType.ADMIN;
+      if (!current || (!isOwner && !isAdmin)) {
+        ResponseUtil.notFound(res, 'Mission not found');
+        return;
+      }
+      // Une mission déjà assignée ou en cours ne se modifie plus par cette route
+      // (statut, prix, GP et paiement passent par les parcours dédiés).
+      if (current.status !== 'pending') {
+        ResponseUtil.forbidden(res, 'Cette mission ne peut plus être modifiée');
+        return;
+      }
+
+      const changes = pickEditableFields(req.body);
+      if (Object.keys(changes).length === 0) {
+        ResponseUtil.badRequest(res, 'Aucun champ modifiable fourni');
+        return;
+      }
+
+      const mission = await MissionService.update(req.params.id, changes);
 
       ResponseUtil.success(res, mission, 'Mission updated successfully');
     } catch (error: any) {
@@ -307,6 +361,10 @@ export class MissionController {
    */
   static async generateQRCode(req: AuthRequest, res: Response): Promise<void> {
     try {
+      if (!(await MissionController.canAccess(req, req.params.id))) {
+        ResponseUtil.notFound(res, 'Mission not found');
+        return;
+      }
       // Un seul QR par envoi : le même code sert au colis et au destinataire (lien /d/<jeton>).
       const baseUrl = `${req.protocol}://${req.get('host')}`;
       const data = await MissionService.generateDeliveryQR(req.params.id, baseUrl);
@@ -391,6 +449,10 @@ export class MissionController {
    */
   static async getTracking(req: AuthRequest, res: Response): Promise<void> {
     try {
+      if (!(await MissionController.canAccess(req, req.params.id))) {
+        ResponseUtil.notFound(res, 'Mission not found');
+        return;
+      }
       const tracking = await MissionService.getTrackingHistory(req.params.id);
 
       ResponseUtil.success(res, tracking);
@@ -408,7 +470,7 @@ export class MissionController {
     try {
       const result = await MissionService.trackByNumber(req.params.trackingNumber);
 
-      if (!result) {
+      if (!result || !req.user || missionAccessLevel(req.user, result.mission) !== 'full') {
         ResponseUtil.notFound(res, 'Tracking number not found');
         return;
       }

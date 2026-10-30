@@ -7,6 +7,7 @@ import crypto from 'crypto';
 import axios from 'axios';
 import { NotificationService } from './notification.service';
 import { missionIdFromPackageQr, tokenFromRecipientQr } from '../utils/qr';
+import { EDITABLE_MISSION_FIELDS } from '../utils/missionAccess';
 
 export class MissionService {
   /**
@@ -128,6 +129,8 @@ export class MissionService {
     gp_id?: string;
     departure_city?: string;
     arrival_city?: string;
+    /** Ne renvoie que les missions encore non assignées (vue « à pourvoir » des GP). */
+    unassignedOnly?: boolean;
   }): Promise<PaginatedResult<Mission>> {
     const { page, limit, offset } = Helpers.getPaginationParams(params.page, params.limit);
 
@@ -155,6 +158,10 @@ export class MissionService {
       whereClause += ` AND m.gp_id = $${paramIndex}`;
       queryParams.push(params.gp_id);
       paramIndex++;
+    }
+
+    if (params.unassignedOnly) {
+      whereClause += ' AND m.gp_id IS NULL';
     }
 
     if (params.departure_city) {
@@ -215,9 +222,13 @@ export class MissionService {
     const values: any[] = [];
     let paramIndex = 1;
 
-    // Build dynamic update query
+    // Build dynamic update query. Les noms de colonnes sont concaténés dans le SQL : seuls
+    // les champs de la liste blanche sont acceptés (défense en profondeur, en plus du contrôleur).
     Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && key !== 'id' && key !== 'mission_code') {
+      if (!(EDITABLE_MISSION_FIELDS as readonly string[]).includes(key)) {
+        throw new Error('Champ non modifiable : ' + key);
+      }
+      if (value !== undefined) {
         fields.push(`${key} = $${paramIndex}`);
         values.push(value);
         paramIndex++;

@@ -2,6 +2,7 @@ import pool from '../../config/database';
 import bcrypt from 'bcryptjs';
 import { Helpers } from '../../utils/helpers';
 import { pushToSegment } from '../../utils/webpush';
+import { safeEqual } from '../../utils/safeEqual';
 
 /** Journal d’audit, diffusion, paramètres de la plateforme, amorçage admin. */
 export class AdminSystemService {
@@ -91,7 +92,7 @@ export class AdminSystemService {
   static async bootstrapAdmin(email: string, secret: string) {
     const expected = process.env.ADMIN_BOOTSTRAP_SECRET;
     if (!expected) throw new Error('Admin bootstrap is not configured');
-    if (secret !== expected) throw new Error('Invalid bootstrap secret');
+    if (!safeEqual(String(secret ?? ''), expected)) throw new Error('Invalid bootstrap secret');
     const result = await pool.query(
       `UPDATE users
           SET user_type = 'admin', status = 'verified',
@@ -112,7 +113,7 @@ export class AdminSystemService {
   static async resetPassword(email: string, secret: string, newPassword: string) {
     const expected = process.env.ADMIN_BOOTSTRAP_SECRET;
     if (!expected) throw new Error('Password reset is not configured');
-    if (secret !== expected) throw new Error('Invalid bootstrap secret');
+    if (!safeEqual(String(secret ?? ''), expected)) throw new Error('Invalid bootstrap secret');
     if (!newPassword || String(newPassword).length < 6) {
       throw new Error('Password must be at least 6 characters');
     }

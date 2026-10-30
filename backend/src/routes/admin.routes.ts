@@ -2,14 +2,15 @@ import { Router } from 'express';
 import { AdminController } from '../controllers/admin.controller';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { UserType } from '../types';
+import { RateLimitMiddleware } from '../middlewares/rateLimit.middleware';
 
 const router = Router();
 const { requirePermission } = AuthMiddleware;
 
 // Public, secret-gated: promote a user to admin (first-admin bootstrap).
-router.post('/bootstrap', AdminController.bootstrap);
+router.post('/bootstrap', RateLimitMiddleware.secretGate, AdminController.bootstrap);
 // Public, secret-gated: reset a user's password (recovery, no email flow).
-router.post('/reset-password', AdminController.resetPassword);
+router.post('/reset-password', RateLimitMiddleware.secretGate, AdminController.resetPassword);
 
 // Everything below requires an authenticated ADMIN…
 router.use(AuthMiddleware.verifyToken);
