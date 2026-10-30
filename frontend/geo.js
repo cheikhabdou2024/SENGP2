@@ -21,7 +21,7 @@
     var k = norm(name); return byName[k] || byName[ALIAS[k]] || null;
   }
   function priceFor(country) { var f = find(country); return f ? f.continent.price : null; }
-  function flag(name) { var f = find(name); return f ? flagOf(f.c[0]) : '🌍'; }
+  function flag(name) { var f = find(name); return f ? flagOf(f.c[0]) : ''; }
 
   var css = '.sg-ov{position:fixed;inset:0;z-index:3000;display:flex;align-items:flex-end;justify-content:center;background:rgba(7,20,47,.55);opacity:0;pointer-events:none;transition:opacity .2s}'
     + '.sg-ov.show{opacity:1;pointer-events:auto}'
@@ -84,7 +84,7 @@
       + '<span class="sg-ic">' + icon + '</span><span class="sg-main"><b>' + esc(title) + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '</span>' + (right || '<span class="sg-chev">›</span>') + '</button>';
   }
   function priceTag(n) { return '<span class="sg-price' + (n == null ? ' na' : '') + '">' + fcfa(n) + '</span>'; }
-  var CONT_ICON = { afrique: '🌍', europe: '🌍', 'amerique-nord': '🌎', 'amerique-sud': '🌎', asie: '🌏', oceanie: '🌏' };
+  var GLOBE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>';
 
   function render() {
     var q = norm(ov.querySelector('.sg-search').value), out = '', head = ov.querySelector('#sgTitle'), bk = ov.querySelector('.sg-back'), inp = ov.querySelector('.sg-search');
@@ -93,7 +93,7 @@
       head.innerHTML = esc(st.title || 'Destination') + '<small>Choisissez un continent</small>';
       inp.placeholder = 'Rechercher un pays ou une région…';
       if (!q) {
-        DATA.forEach(function (c, ci) { out += row('cont', ci, 0, 0, CONT_ICON[c.id] || '🌍', c.name, c.countries.length + ' pays', priceTag(c.price)); });
+        DATA.forEach(function (c, ci) { out += row('cont', ci, 0, 0, GLOBE, c.name, c.countries.length + ' pays', priceTag(c.price)); });
       } else {
         var n = 0;
         DATA.forEach(function (c, ci) {
@@ -119,7 +119,7 @@
       head.innerHTML = flagOf(p2[0]) + ' ' + esc(p2[1]) + '<small>Choisissez la région / l’État</small>';
       inp.placeholder = 'Rechercher une région…';
       p2[2].forEach(function (r, ri) {
-        if (!q || norm(r).indexOf(q) > -1) out += row('region', st.cont, st.country, ri, '📍', r, '', '<span class="sg-chev"></span>');
+        if (!q || norm(r).indexOf(q) > -1) out += row('region', st.cont, st.country, ri, '', r, '', '<span class="sg-chev"></span>');
       });
     }
     ov.querySelector('#sgList').innerHTML = out || '<div class="sg-empty">Aucun résultat</div>';

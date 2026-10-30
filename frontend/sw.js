@@ -14,6 +14,7 @@ const PRECACHE = [
     'responsive.css',
     'ui.js',
     'geo.js',
+    'icons.js',
     'gpguard.js',
     'geo-data.js',
     'icons/icon-192.png',

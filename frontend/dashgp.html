@@ -378,6 +378,7 @@
     </style>
     <script src="config.js"></script>
     <script src="ui.js"></script>
+    <script src="icons.js"></script>
     <link rel="stylesheet" href="theme.css">
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -412,7 +413,7 @@
                 </div>
             </div>
             <div class="gh-hello greeting">
-                <h1>Bonjour, <em id="ghName">GP</em> 👋</h1>
+                <h1>Bonjour, <em id="ghName">GP</em></h1>
                 <p>Prêt pour une nouvelle mission ?</p>
             </div>
         </header>
@@ -1087,7 +1088,7 @@
             await loadMissions();
             if (document.getElementById('missionsOverlay').classList.contains('show')) renderMissionsSheet();
             sengpAlert(action === 'accept'
-                ? '✅ Mission acceptée ! L’équipe SEN GP vous contactera pour organiser la remise du colis.'
+                ? 'Mission acceptée. L’équipe SEN GP vous contactera pour organiser la remise du colis.'
                 : 'Mission déclinée. Elle sera ré-assignée à un autre GP.');
             if (action === 'accept') initJourney();
         }
@@ -1134,7 +1135,7 @@
                 'USA': '🇺🇸',
                 'Canada': '🇨🇦'
             };
-            return flags[country] || (window.SengpGeo ? SengpGeo.flag(country) : '🌍');
+            return flags[country] || (window.SengpGeo ? SengpGeo.flag(country) : '');
         }
 
         function openProfile() {
