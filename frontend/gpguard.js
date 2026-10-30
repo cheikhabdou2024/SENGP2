@@ -56,7 +56,7 @@
   }
   function showGpsOverlay(msg) {
     if (!gpsEl) {
-      gpsEl = overlay('gpgGps', '<div class="gpg-ic">📍</div><h2>Le GPS doit rester allumé</h2>'
+      gpsEl = overlay('gpgGps', '<div class="gpg-ic"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div><h2>Le GPS doit rester allumé</h2>'
         + '<p>Pendant le transport du colis, votre position est suivie en continu. Réactivez la localisation de votre téléphone pour continuer : tant qu\'elle est coupée, l\'application est bloquée.</p>'
         + '<button type="button" class="gpg-btn" id="gpgRetry">Activer le GPS</button><div class="gpg-st" id="gpgSt"></div>');
       gpsEl.querySelector('#gpgRetry').onclick = function () {
@@ -101,7 +101,7 @@
   // ---------- verrou admin ----------
   function showLock() {
     if (lockEl) return;
-    lockEl = overlay('gpgLock', '<div class="gpg-ic">⏳</div><h2>Validation en cours</h2>'
+    lockEl = overlay('gpgLock', '<div class="gpg-ic"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h2>Validation en cours</h2>'
       + '<p>Vous avez terminé votre scan. L\'administration doit le valider avant que vous puissiez de nouveau utiliser l\'application (créer un trajet, voir vos missions…). Cet écran se débloquera automatiquement.</p>'
       + '<button type="button" class="gpg-btn ghost" id="gpgOut">Se déconnecter</button>');
     lockEl.querySelector('#gpgOut').onclick = function () {

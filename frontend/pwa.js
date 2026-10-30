@@ -46,7 +46,7 @@
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                 body: JSON.stringify(sub)
             });
-            if (interactive) alert('Notifications activées ✅');
+            if (interactive) alert('Notifications activées');
             return true;
         } catch (e) { console.warn('Push subscribe failed:', e); if (interactive) alert('Échec de l\'activation des notifications.'); return false; }
     }
@@ -155,7 +155,7 @@
             '<button class="sengp-install-go" style="' +
             'background:#fff;color:#1e40af;border:0;border-radius:12px;' +
             'padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;' +
-            'flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25)">⬇️ Installer</button>' +
+            'flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25)">Installer</button>' +
             CLOSE_BTN,
             function (banner) {
                 banner.querySelector('.sengp-install-go').addEventListener('click', function () {

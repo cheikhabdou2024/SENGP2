@@ -12,7 +12,7 @@
  * Pages read `window.API_BASE_URL`.
  */
 (function () {
-  // ⚠️ SET THIS to your deployed HTTPS API base URL before building the mobile
+  // SET THIS to your deployed HTTPS API base URL before building the mobile
   // app (e.g. https://api.sengp.com/api/v1). Must be HTTPS — Android/iOS block
   // cleartext HTTP by default.
   var PROD_API_BASE_URL = 'https://2txjgdd3cj.us-east-1.awsapprunner.com/api/v1';

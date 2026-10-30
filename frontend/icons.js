@@ -31,6 +31,23 @@
     pause: '<path d="M8 5v14M16 5v14"/>',
     play: '<path d="M7 4.5v15l12-7.5z"/>',
     stop: '<rect x="6" y="6" width="12" height="12" rx="1.5"/>',
+    briefcase: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>',
+    receipt: '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3z"/><path d="M9 8h6M9 12h6"/>',
+    key: '<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3"/>',
+    puzzle: '<path d="M10 4a2 2 0 0 1 4 0v2h4v4h-2a2 2 0 0 0 0 4h2v4h-4v-2a2 2 0 0 0-4 0v2H6v-4h2a2 2 0 0 0 0-4H6V6h4V4z"/>',
+    headset: '<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>',
+    chart: '<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>',
+    idcard: '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.5-2 5.500-2 6 0M14 10h4M14 14h4"/>',
+    megaphone: '<path d="M3 11v3h4l9 5V6L7 11H3z"/><path d="M19 9a4 4 0 0 1 0 6"/>',
+    phone: '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+    target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+    card: '<rect x="2.500" y="5" width="19" height="14" rx="2"/><path d="M2.500 10h19"/>',
+    ban: '<circle cx="12" cy="12" r="9"/><path d="m5.700 5.700 12.600 12.600"/>',
+    calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    refresh: '<path d="M20 11a8 8 0 0 0-14-4M4 4v4h4M4 13a8 8 0 0 0 14 4M20 20v-4h-4"/>',
+    volume: '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9a4 4 0 0 1 0 6"/>',
+    filter: '<path d="M3 5h18l-7 8v6l-4-2v-4L3 5z"/>',
     shield: '<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3z"/>'
   };
   function svg(name, size, cls) {

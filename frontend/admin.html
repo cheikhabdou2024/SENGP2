@@ -87,7 +87,7 @@
         .search { flex:1; max-width:420px; position:relative; }
         .search input { width:100%; padding: 9px 12px 9px 34px; border-radius:10px; border:1px solid var(--border2);
             background: rgba(255,255,255,.05); color:var(--ink); font-size:13px; }
-        .search::before { content:'🔍'; position:absolute; left:11px; top:50%; transform:translateY(-50%); font-size:12px; opacity:.6; }
+        .search::before { content:''; position:absolute; left:11px; top:50%; transform:translateY(-50%); width:14px; height:14px; opacity:.6; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") center/contain no-repeat; }
         .top-actions { margin-left:auto; display:flex; align-items:center; gap:10px; }
         .icon-btn { width:38px; height:38px; border-radius:10px; border:1px solid var(--border2); background: var(--surface);
             color: var(--muted); display:flex; align-items:center; justify-content:center; font-size:15px; position:relative; }
@@ -288,6 +288,7 @@
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
+    <script src="icons.js"></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
@@ -364,7 +365,7 @@
                 <div class="topbar">
                     <div class="search"><input id="globalSearch" placeholder="Rechercher un utilisateur…" onkeydown="if(event.key==='Enter')globalSearchGo()"></div>
                     <div class="top-actions">
-                        <button class="icon-btn" title="Alertes" onclick="switchView('claims', document.querySelector('.nav-link[data-view=claims]'))">🔔<span class="dot" id="bellDot" style="display:none"></span></button>
+                        <button class="icon-btn" title="Alertes" onclick="switchView('claims', document.querySelector('.nav-link[data-view=claims]'))"><span data-icon="bell" data-size="18"></span><span class="dot" id="bellDot" style="display:none"></span></button>
                         <div class="top-user">
                             <div class="avatar" id="topAvatar">AS</div>
                             <div><div class="u-name" id="topUserName">Admin</div><div class="u-mail" id="topUserMail"></div></div>
@@ -568,9 +569,9 @@
             if (state.view === 'settings') return renderSettings(main);
             let extra = '';
             if (state.view === 'payments' && can('payments:export'))
-                extra = `<button style="margin-left:auto" onclick="exportCsv('payments')">⬇ Exporter CSV</button>`;
+                extra = `<button style="margin-left:auto" onclick="exportCsv('payments')">Exporter CSV</button>`;
             else if (state.view === 'withdrawals')
-                extra = `<button style="margin-left:auto" onclick="exportCsv('withdrawals')">⬇ Exporter CSV</button>`;
+                extra = `<button style="margin-left:auto" onclick="exportCsv('withdrawals')">Exporter CSV</button>`;
             main.innerHTML = `
                 <div class="toolbar">
                     <input id="search" placeholder="Rechercher…" value="${esc(state.search)}">
@@ -587,7 +588,7 @@
         // Dedicated Users view: header + KPI cards + rich toolbar (reuses loadList/pager).
         function renderUsers(main){
             const createBtn = can('users:write') ? `<button class="pill-btn accent" onclick="createUserModal()">＋ Créer un utilisateur</button>` : '';
-            const exportBtn = can('users:read') ? `<button class="pill-btn" onclick="exportCsv('users')">⬇ Exporter</button>` : '';
+            const exportBtn = can('users:read') ? `<button class="pill-btn" onclick="exportCsv('users')">Exporter</button>` : '';
             const typeSel = `<select id="utype">
                 <option value="">Tous les types</option>
                 <option value="expediteur"${state.uType==='expediteur'?' selected':''}>Expéditeur</option>
@@ -603,7 +604,7 @@
                     <input id="search" placeholder="Rechercher un utilisateur…" value="${esc(state.search)}">
                     ${statusFilter()}
                     ${typeSel}
-                    <button onclick="applyFilters()">🔎 Filtrer</button>
+                    <button onclick="applyFilters()">Filtrer</button>
                     <span style="margin-left:auto"></span>${exportBtn}
                 </div>
                 <div id="tableArea"><div class="loading">Chargement…</div></div>
@@ -615,7 +616,7 @@
         // Dedicated Trajets view.
         async function renderTrips(main){
             const createBtn = can('trips:write') ? `<button class="pill-btn accent" onclick="toast('Les trajets sont créés par les GP depuis l\\'app. Depuis l\\'admin : modérez/gérez-les.', 'info')">＋ Créer un trajet</button>` : '';
-            const exportBtn = can('trips:read') ? `<button class="pill-btn" onclick="exportCsv('trips')">⬇ Exporter</button>` : '';
+            const exportBtn = can('trips:read') ? `<button class="pill-btn" onclick="exportCsv('trips')">Exporter</button>` : '';
             let gpSel = '';
             if (can('users:read')) {
                 let opts = '<option value="">Tous les GPs</option>';
@@ -634,7 +635,7 @@
                     <input id="search" placeholder="Rechercher un trajet…" value="${esc(state.search)}">
                     ${statusFilter()}
                     ${gpSel}
-                    <button onclick="applyFilters()">🔎 Filtrer</button>
+                    <button onclick="applyFilters()">Filtrer</button>
                     <span style="margin-left:auto"></span>${exportBtn}
                 </div>
                 <div id="tableArea"><div class="loading">Chargement…</div></div>
@@ -663,16 +664,16 @@
                     <div class="kpi-val">${esc(value)}</div>
                     <div class="kpi-bottom"><span>${delta||''} <span style="font-size:11px;color:var(--faint)">vs période préc.</span></span>${spark}</div></div>`;
             };
-            el.innerHTML = kpi('✈️','#8b5cf6','Total trajets', t.total, 'total')
-                + kpi('📢','#34d399','Publiés', t.published, 'published')
-                + kpi('⏳','#fbbf24','Brouillons', t.draft, 'draft')
-                + kpi('🟢','#38bdf8','Actifs', t.active, 'active')
-                + kpi('✖️','#fb7185','Annulés', t.cancelled, 'cancelled');
+            el.innerHTML = kpi(SengpIcons.svg('plane',18),'#8b5cf6','Total trajets', t.total, 'total')
+                + kpi(SengpIcons.svg('megaphone',18),'#34d399','Publiés', t.published, 'published')
+                + kpi(SengpIcons.svg('clock',18),'#fbbf24','Brouillons', t.draft, 'draft')
+                + kpi(SengpIcons.svg('check',18),'#38bdf8','Actifs', t.active, 'active')
+                + kpi(SengpIcons.svg('x',18),'#fb7185','Annulés', t.cancelled, 'cancelled');
         }
         // Dedicated Missions view.
         async function renderMissions(main){
             const createBtn = can('missions:write') ? `<button class="pill-btn accent" onclick="toast('Les missions sont créées par les expéditeurs depuis l\\'app. Depuis l\\'admin : affectez/gérez-les.', 'info')">＋ Créer une mission</button>` : '';
-            const exportBtn = can('missions:read') ? `<button class="pill-btn" onclick="exportCsv('missions')">⬇ Exporter</button>` : '';
+            const exportBtn = can('missions:read') ? `<button class="pill-btn" onclick="exportCsv('missions')">Exporter</button>` : '';
             let expSel = '';
             if (can('users:read')) {
                 let opts = '<option value="">Tous les expéditeurs</option>';
@@ -691,7 +692,7 @@
                     <input id="search" placeholder="Rechercher une mission…" value="${esc(state.search)}">
                     ${statusFilter()}
                     ${expSel}
-                    <button onclick="applyFilters()">🔎 Filtrer</button>
+                    <button onclick="applyFilters()">Filtrer</button>
                     <span style="margin-left:auto"></span>${exportBtn}
                 </div>
                 <div id="tableArea"><div class="loading">Chargement…</div></div>
@@ -720,11 +721,11 @@
                     <div class="kpi-val">${esc(value)}</div>
                     <div class="kpi-bottom"><span>${delta||''} <span style="font-size:11px;color:var(--faint)">vs période préc.</span></span>${spark}</div></div>`;
             };
-            el.innerHTML = kpi('📦','#8b5cf6','Total missions', m.total, 'total')
-                + kpi('⏳','#fbbf24','En attente', m.pending, 'pending')
-                + kpi('🚚','#38bdf8','En transit', m.in_transit, 'in_transit')
-                + kpi('✅','#34d399','Livrées', m.delivered, 'delivered')
-                + kpi('✖️','#fb7185','Annulées', m.cancelled, 'cancelled');
+            el.innerHTML = kpi(SengpIcons.svg('package',18),'#8b5cf6','Total missions', m.total, 'total')
+                + kpi(SengpIcons.svg('clock',18),'#fbbf24','En attente', m.pending, 'pending')
+                + kpi(SengpIcons.svg('truck',18),'#38bdf8','En transit', m.in_transit, 'in_transit')
+                + kpi(SengpIcons.svg('check',18),'#34d399','Livrées', m.delivered, 'delivered')
+                + kpi(SengpIcons.svg('x',18),'#fb7185','Annulées', m.cancelled, 'cancelled');
         }
         async function loadUserKpis(){
             const el = document.getElementById('usersKpis'); if (!el) return;
@@ -746,10 +747,10 @@
                     <div class="kpi-val">${esc(value)}</div>
                     <div class="kpi-bottom"><span>${delta||''} <span style="font-size:11px;color:var(--faint)">vs période préc.</span></span>${spark}</div></div>`;
             };
-            el.innerHTML = kpi('👥','#8b5cf6','Total utilisateurs', u.total, 'total')
-                + kpi('✅','#34d399','Vérifiés', u.verified, 'verified')
-                + kpi('⏳','#fbbf24','En attente', u.pending, 'pending')
-                + kpi('⛔','#fb7185','Suspendus', u.suspended, 'suspended');
+            el.innerHTML = kpi(SengpIcons.svg('users',18),'#8b5cf6','Total utilisateurs', u.total, 'total')
+                + kpi(SengpIcons.svg('check',18),'#34d399','Vérifiés', u.verified, 'verified')
+                + kpi(SengpIcons.svg('clock',18),'#fbbf24','En attente', u.pending, 'pending')
+                + kpi(SengpIcons.svg('ban',18),'#fb7185','Suspendus', u.suspended, 'suspended');
         }
 
         function statusFilter(){
@@ -865,11 +866,11 @@
                         <div class="kpi-bottom">${delta || '<span class="kpi-delta flat">—</span>'}${spark}</div></div>`;
                 };
                 const kpis = `<div class="kpi-grid">
-                    ${kpi('💼','#8b5cf6','Volume traité', fcfa(s.payments.gross_volume), 'gross', '#8b5cf6')}
-                    ${kpi('📦','#34d399','Missions', s.missions.total, 'missions', '#34d399')}
-                    ${kpi('👥','#38bdf8','Utilisateurs', s.users.total, 'new_users', '#38bdf8')}
-                    ${kpi('🧾','#fbbf24','Paiements', s.payments.completed_count, 'payments', '#fbbf24')}
-                    ${kpi('🛡️','#fb7185','Réclamations', s.claims.open, null, '#fb7185')}
+                    ${kpi(SengpIcons.svg('briefcase',18),'#8b5cf6','Volume traité', fcfa(s.payments.gross_volume), 'gross', '#8b5cf6')}
+                    ${kpi(SengpIcons.svg('package',18),'#34d399','Missions', s.missions.total, 'missions', '#34d399')}
+                    ${kpi(SengpIcons.svg('users',18),'#38bdf8','Utilisateurs', s.users.total, 'new_users', '#38bdf8')}
+                    ${kpi(SengpIcons.svg('receipt',18),'#fbbf24','Paiements', s.payments.completed_count, 'payments', '#fbbf24')}
+                    ${kpi(SengpIcons.svg('shield',18),'#fb7185','Réclamations', s.claims.open, null, '#fb7185')}
                 </div>`;
 
                 // Revenue chart
@@ -893,16 +894,16 @@
 
                 // Alerts
                 const alerts = [];
-                if (+s.claims.open>0) alerts.push({c:'#fb7185',i:'🛡️',t:`${s.claims.open} réclamation(s) en attente de traitement`});
-                if (+s.missions.pending>0) alerts.push({c:'#fbbf24',i:'📦',t:`${s.missions.pending} mission(s) en attente d'acceptation`});
-                if (+s.withdrawals.pending>0) alerts.push({c:'#38bdf8',i:'💸',t:`${s.withdrawals.pending} retrait(s) en attente (${fcfa(s.withdrawals.pending_amount)})`});
+                if (+s.claims.open>0) alerts.push({c:'#fb7185',i:SengpIcons.svg('shield',18),t:`${s.claims.open} réclamation(s) en attente de traitement`});
+                if (+s.missions.pending>0) alerts.push({c:'#fbbf24',i:SengpIcons.svg('package',18),t:`${s.missions.pending} mission(s) en attente d'acceptation`});
+                if (+s.withdrawals.pending>0) alerts.push({c:'#38bdf8',i:SengpIcons.svg('wallet',18),t:`${s.withdrawals.pending} retrait(s) en attente (${fcfa(s.withdrawals.pending_amount)})`});
                 const anyAlert = alerts.length>0;
                 const alertHtml = anyAlert ? alerts.map(a=>`<div class="feed-item"><div class="feed-ico" style="background:${a.c}20;color:${a.c}">${a.i}</div><div class="feed-main"><div class="feed-title">${esc(a.t)}</div></div></div>`).join('')
                     : `<div class="feed-item"><div class="feed-ico" style="background:#34d39920;color:#34d399">✓</div><div class="feed-main"><div class="feed-title">Tout est à jour.</div></div></div>`;
                 const bd = document.getElementById('bellDot'); if (bd) bd.style.display = anyAlert ? 'block' : 'none';
 
                 // Activity feed
-                const actMeta = { mission:{i:'📦',c:'#38bdf8'}, payment:{i:'💰',c:'#34d399'}, user:{i:'👤',c:'#fbbf24'}, claim:{i:'🛡️',c:'#fb7185'} };
+                const actMeta = { mission:{i:SengpIcons.svg('package',18),c:'#38bdf8'}, payment:{i:SengpIcons.svg('wallet',18),c:'#34d399'}, user:{i:SengpIcons.svg('user',18),c:'#fbbf24'}, claim:{i:SengpIcons.svg('shield',18),c:'#fb7185'} };
                 const actTitle = a => a.kind==='mission' ? `Mission ${a.ref} · ${a.detail}`
                     : a.kind==='payment' ? `Paiement reçu` : a.kind==='user' ? `Nouvel utilisateur` : `Réclamation ${a.ref}`;
                 const actSub = a => a.kind==='mission' ? (a.extra||'') : a.kind==='payment' ? `${a.ref} · ${fcfa(a.detail)}`
@@ -915,26 +916,26 @@
 
                 // Top routes / GP tables
                 const routeRows = routes.length ? routes.map(r=>`<tr><td>${esc((r.departure_city||'?')+' → '+(r.arrival_city||'?'))}</td><td>${esc(r.arrival_country||'—')}</td><td>${r.missions}</td><td>${fcfa(r.volume)}</td></tr>`).join('') : `<tr><td colspan="4" style="color:var(--faint)">${hasAn?'Aucune donnée':'Accès analytics requis'}</td></tr>`;
-                const gpRows = gps.length ? gps.map(g=>`<tr><td><div style="display:flex;align-items:center;gap:8px"><span class="avatar" style="width:26px;height:26px;font-size:11px">${esc(((g.gp_name||'  ')[0]||'')+((g.gp_name||'').split(' ')[1]||' ')[0]||'')}</span>${esc(g.gp_name||'—')}</div></td><td>${g.missions_completed}</td><td>${fcfa(g.total_earnings)}</td><td>⭐${Number(g.average_rating||0).toFixed(1)}</td></tr>`).join('') : `<tr><td colspan="4" style="color:var(--faint)">${hasAn?'Aucune donnée':'Accès analytics requis'}</td></tr>`;
+                const gpRows = gps.length ? gps.map(g=>`<tr><td><div style="display:flex;align-items:center;gap:8px"><span class="avatar" style="width:26px;height:26px;font-size:11px">${esc(((g.gp_name||'  ')[0]||'')+((g.gp_name||'').split(' ')[1]||' ')[0]||'')}</span>${esc(g.gp_name||'—')}</div></td><td>${g.missions_completed}</td><td>${fcfa(g.total_earnings)}</td><td>${Number(g.average_rating||0).toFixed(1)}</td></tr>`).join('') : `<tr><td colspan="4" style="color:var(--faint)">${hasAn?'Aucune donnée':'Accès analytics requis'}</td></tr>`;
 
                 // Quick actions
                 const qa = [];
-                if (can('users:write')) qa.push(['accent','➕ Ajouter un utilisateur','createUserModal()']);
-                if (can('users:verify')) qa.push(['',"🪪 Vérifier KYC","switchView('kyc',document.querySelector('.nav-link[data-view=kyc]'))"]);
-                if (can('missions:read')) qa.push(['',"📦 Voir les missions","switchView('missions',document.querySelector('.nav-link[data-view=missions]'))"]);
-                if (can('payments:export')) qa.push(['',"⬇ Exporter paiements","exportCsv('payments')"]);
-                if (can('analytics:read')) qa.push(['',"📈 Rapport analytique","switchView('analytics',document.querySelector('.nav-link[data-view=analytics]'))"]);
+                if (can('users:write')) qa.push(['accent','Ajouter un utilisateur','createUserModal()']);
+                if (can('users:verify')) qa.push(['',"Vérifier KYC","switchView('kyc',document.querySelector('.nav-link[data-view=kyc]'))"]);
+                if (can('missions:read')) qa.push(['',"Voir les missions","switchView('missions',document.querySelector('.nav-link[data-view=missions]'))"]);
+                if (can('payments:export')) qa.push(['',"Exporter paiements","exportCsv('payments')"]);
+                if (can('analytics:read')) qa.push(['',"Rapport analytique","switchView('analytics',document.querySelector('.nav-link[data-view=analytics]'))"]);
                 const quick = qa.length ? `<div class="section-title">Actions rapides</div><div class="quick-bar">${qa.map(([cls,label,fn])=>`<button class="qbtn ${cls}" onclick="${fn}">${label}</button>`).join('')}</div>` : '';
 
                 const rangeLabel = `${from.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})} – ${to.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'})}`;
-                const exportBtn = can('payments:export') ? `<button class="pill-btn" onclick="exportCsv('payments')">⬇ Exporter</button>` : '';
+                const exportBtn = can('payments:export') ? `<button class="pill-btn" onclick="exportCsv('payments')">Exporter</button>` : '';
 
                 main.innerHTML = `
                     <div class="page-head">
-                        <div><h1>Bonjour, ${esc((me&&me.first_name)||'Admin')} 👋</h1>
+                        <div><h1>Bonjour, ${esc((me&&me.first_name)||'Admin')}</h1>
                         <p>Voici un aperçu des activités de SEN GP.</p></div>
                         <div class="head-tools">
-                            <span class="pill-btn">📅 ${rangeLabel}</span>
+                            <span class="pill-btn">${rangeLabel}</span>
                             ${exportBtn}
                         </div>
                     </div>
@@ -1044,11 +1045,11 @@
                         <div class="kpi-bottom"><span>${delta||''} <span style="font-size:11px;color:var(--faint)">vs période préc.</span></span><div class="kpi-spark">${svgSpark(spk(cKey), color)}</div></div></div>`;
                 };
                 const kpis = `<div class="kpi-grid">
-                    ${kpi('💼','#8b5cf6','Volume traité', fcfa(cur.gross), 'gross', '#8b5cf6')}
+                    ${kpi(SengpIcons.svg('briefcase',18),'#8b5cf6','Volume traité', fcfa(cur.gross), 'gross', '#8b5cf6')}
                     ${kpi('％','#34d399','Commissions', fcfa(cur.commission), 'commission', '#34d399')}
-                    ${kpi('🧾','#38bdf8','Paiements', cur.payments||0, 'payments', '#38bdf8')}
-                    ${kpi('📦','#fbbf24','Missions créées', cur.missions||0, 'missions', '#fbbf24')}
-                    ${kpi('👥','#a78bfa','Nouveaux utilisateurs', cur.new_users||0, 'new_users', '#a78bfa')}
+                    ${kpi(SengpIcons.svg('receipt',18),'#38bdf8','Paiements', cur.payments||0, 'payments', '#38bdf8')}
+                    ${kpi(SengpIcons.svg('package',18),'#fbbf24','Missions créées', cur.missions||0, 'missions', '#fbbf24')}
+                    ${kpi(SengpIcons.svg('users',18),'#a78bfa','Nouveaux utilisateurs', cur.new_users||0, 'new_users', '#a78bfa')}
                 </div>`;
 
                 // Payment method donut
@@ -1087,12 +1088,12 @@
 
                 const seg = ['7j','30j','3mois','1an'].map(r => `<button class="${state.aRange===r?'active':''}" onclick="setAnRange('${r}')">${r}</button>`).join('');
                 const rangeLabel = `${from.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})} – ${to.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'})}`;
-                const exportBtn = can('payments:export') ? `<button class="pill-btn" onclick="exportCsv('payments')">⬇ Exporter</button>` : '';
+                const exportBtn = can('payments:export') ? `<button class="pill-btn" onclick="exportCsv('payments')">Exporter</button>` : '';
 
                 main.innerHTML = `
                     <div class="page-head">
                         <div><h1>Analytics</h1><p>Analysez les performances et l'activité de votre plateforme.</p></div>
-                        <div class="head-tools"><span class="pill-btn">📅 ${rangeLabel}</span>${exportBtn}</div>
+                        <div class="head-tools"><span class="pill-btn">${rangeLabel}</span>${exportBtn}</div>
                     </div>
                     ${kpis}
                     <div class="grid-2">
@@ -1170,12 +1171,12 @@
                     row: u => {
                         const nm = ((u.first_name||' ')[0]||'') + ((u.last_name||' ')[0]||'');
                         const typeLabel = { expediteur:'Expéditeur', gp:'GP', admin:'Admin' }[u.user_type] || u.user_type;
-                        const stMeta = { verified:['✓ Vérifié','b-green'], pending:['⏳ En attente','b-yellow'], suspended:['⛔ Suspendu','b-red'], deleted:['Supprimé','b-gray'] }[u.status] || [u.status,'b-gray'];
+                        const stMeta = { verified:['✓ Vérifié','b-green'], pending:['En attente','b-yellow'], suspended:['Suspendu','b-red'], deleted:['Supprimé','b-gray'] }[u.status] || [u.status,'b-gray'];
                         const acts = [];
                         acts.push(['act-edit','Détails',`showUserDetail('${u.id}')`]);
                         if (can('users:write')) acts.push(['act-edit','Éditer',`editUser('${u.id}')`]);
                         if (can('roles:manage')) acts.push(['act-ok','Rôle',`assignRole('${u.id}','${esc(u.email)}')`]);
-                        if (can('users:delete')) acts.push(['act-del','🗑',`delUser('${u.id}','${esc(u.email)}')`]);
+                        if (can('users:delete')) acts.push(['act-del','Supprimer',`delUser('${u.id}','${esc(u.email)}')`]);
                         return [
                         `<div style="display:flex;align-items:center;gap:10px"><span class="avatar" style="width:32px;height:32px;font-size:12px">${esc(nm.toUpperCase())}</span><span style="font-weight:600">${esc(u.first_name+' '+u.last_name)}</span></div>`,
                         esc(u.email),
@@ -1258,7 +1259,7 @@
                     head: ['Code','Type','Priorité','Statut','Demandeur','Message','Actions'],
                     row: c => {
                         const ev = (c.evidence_urls || []).filter(Boolean);
-                        const audio = ev.length ? `<button class="act act-ok" onclick="playEvidence('${encodeURIComponent(ev[0])}')">🔊 Vocal</button>` : '';
+                        const audio = ev.length ? `<button class="act act-ok" onclick="playEvidence('${encodeURIComponent(ev[0])}')">Vocal</button>` : '';
                         const msg = `<div style="max-width:240px;white-space:normal;">${esc(c.description||'—')}</div>${audio}`;
                         return [
                             esc(c.claim_code), esc(c.claim_type),
@@ -1273,7 +1274,7 @@
                 reviews: {
                     head: ['Note','Commentaire','Type','Auteur','Évalué','Mission','Date','Actions'],
                     row: r => [
-                        '⭐'.repeat(Math.max(0,Math.min(5,r.rating||0))) + ` ${r.rating||0}`,
+                        `${r.rating||0} / 5`,
                         `<div style="max-width:260px;white-space:normal">${esc(r.comment||'—')}</div>`,
                         esc(r.review_type||'—'), esc(r.reviewer_name||'—'), esc(r.reviewee_name||'—'),
                         esc(r.mission_code||'—'), dt(r.created_at),
@@ -1430,7 +1431,7 @@
             const { ok, json, status } = await api('/admin/kyc/queue' + q);
             if (!ok) { area.innerHTML = `<div class="empty">${status===403?'Accès refusé.':'Erreur.'}</div>`; return; }
             const rows = json.data || [];
-            if (!rows.length) { area.innerHTML = '<div class="empty">Aucune pièce en attente de vérification. 🎉</div>'; renderPager(json.meta); return; }
+            if (!rows.length) { area.innerHTML = '<div class="empty">Aucune pièce en attente de vérification.</div>'; renderPager(json.meta); return; }
             area.innerHTML = rows.map(u => {
                 const imgs = [];
                 if (u.identity_document_url) imgs.push(`<a href="${esc(u.identity_document_url)}" target="_blank"><img src="${esc(u.identity_document_url)}" style="width:180px;height:120px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,.15)"></a>`);
@@ -1444,8 +1445,8 @@
                     </div>
                     <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">${imgs.join('') || '<span style="color:rgba(255,255,255,.4)">Pas d\'image</span>'}</div>
                     <div class="row-actions">
-                        <button class="act act-ok" onclick="approveKycUser('${u.id}','${esc(u.first_name+' '+u.last_name)}')">✅ Approuver</button>
-                        <button class="act act-del" onclick="rejectKycUser('${u.id}','${esc(u.first_name+' '+u.last_name)}')">✖ Refuser</button>
+                        <button class="act act-ok" onclick="approveKycUser('${u.id}','${esc(u.first_name+' '+u.last_name)}')">Approuver</button>
+                        <button class="act act-del" onclick="rejectKycUser('${u.id}','${esc(u.first_name+' '+u.last_name)}')">Refuser</button>
                     </div>
                 </div>`;
             }).join('');
@@ -1497,16 +1498,16 @@
             if (!gps.length) { toast('Aucun GP disponible.', 'err'); return; }
             const region = (country) => {
                 const c = String(country||'').toLowerCase();
-                if (/france|espagne|spain|itali|allemagne|german|belg|portugal|royaume|angleterre|england|uk|pays-bas|suisse|europe/.test(c)) return '🇪🇺 Europe';
-                if (/usa|état|etats|united states|canada|amériq|ameriq|brés|bres|mexi/.test(c)) return '🌎 Amérique';
-                if (/sénégal|senegal|mali|côte|cote|ivoire|maroc|moroc|tunis|algér|alger|guin|afriq|gambie|mauritanie|bénin|benin|togo|burkina|niger|cameroun/.test(c)) return '🌍 Afrique';
-                return '🌐 Autres';
+                if (/france|espagne|spain|itali|allemagne|german|belg|portugal|royaume|angleterre|england|uk|pays-bas|suisse|europe/.test(c)) return 'Europe';
+                if (/usa|état|etats|united states|canada|amériq|ameriq|brés|bres|mexi/.test(c)) return 'Amérique';
+                if (/sénégal|senegal|mali|côte|cote|ivoire|maroc|moroc|tunis|algér|alger|guin|afriq|gambie|mauritanie|bénin|benin|togo|burkina|niger|cameroun/.test(c)) return 'Afrique';
+                return 'Autres';
             };
             const groups = {};
             gps.forEach(g => { const r = region(g.country); (groups[r] = groups[r] || []).push(g); });
             const opt = g => `<option value="${g.id}">${esc(g.first_name+' '+g.last_name)} · ${esc(g.city||g.country||'—')}`
-                + `${g.average_rating ? ' · ⭐'+g.average_rating : ''}</option>`;
-            const opts = ['🇪🇺 Europe','🌎 Amérique','🌍 Afrique','🌐 Autres']
+                + `${g.average_rating ? ' ·'+g.average_rating : ''}</option>`;
+            const opts = ['Europe','Amérique','Afrique','Autres']
                 .filter(r => groups[r])
                 .map(r => `<optgroup label="${r}">${groups[r].map(opt).join('')}</optgroup>`)
                 .join('');
@@ -1526,13 +1527,13 @@
             if (h) await h(gpId);
         }
         function assignMission(id, code){
-            openGpPicker('🎯 Affecter la mission ' + code, 'Affecter & notifier', async (gpId) => {
+            openGpPicker('Affecter la mission ' + code, 'Affecter & notifier', async (gpId) => {
                 const { ok, json } = await api('/admin/missions/'+id+'/assign', { method:'POST', body: JSON.stringify({ gp_id: gpId }) });
                 notify(ok, 'Mission affectée — le GP a été notifié.', json); if (ok) loadList();
             });
         }
         function reassignMissionUI(id, code){
-            openGpPicker('🔄 Réassigner la mission ' + code, 'Réassigner & notifier', async (gpId) => {
+            openGpPicker('Réassigner la mission ' + code, 'Réassigner & notifier', async (gpId) => {
                 const { ok, json } = await api('/admin/missions/'+id+'/reassign', { method:'POST', body: JSON.stringify({ gp_id: gpId }) });
                 notify(ok, 'Mission réassignée — le GP a été notifié.', json); if (ok) loadList();
             });
@@ -1561,12 +1562,12 @@
             let reviews = [];
             try { const r = await api('/admin/scan-reviews'); if (r.ok) reviews = r.json.data || []; } catch (e) {}
             if (_revSeen) reviews.filter(g => !_revSeen.has(g.id)).forEach(g =>
-                toast('✅ ' + (g.gp_name || 'Un GP') + ' a terminé son scan — à valider', 'info'));
+                toast('' + (g.gp_name || 'Un GP') + ' a terminé son scan — à valider', 'info'));
             _revSeen = new Set(reviews.map(g => g.id));
             const ids = new Set(list.map(m => m.id));
             // Toast uniquement pour les nouvelles demandes (pas au premier chargement).
             if (_arrSeen) list.filter(m => !_arrSeen.has(m.id)).forEach(m =>
-                toast('🛬 ' + (m.gp_name || 'Un GP') + ' est arrivé à destination (' + m.mission_code + ') — à confirmer', 'info'));
+                toast('' + (m.gp_name || 'Un GP') + ' est arrivé à destination (' + m.mission_code + ') — à confirmer', 'info'));
             _arrSeen = ids;
             const cnt = document.getElementById('navArrCount');
             if (cnt) { cnt.textContent = list.length + reviews.length; cnt.style.display = (list.length + reviews.length) ? 'inline-flex' : 'none'; }
@@ -1575,19 +1576,19 @@
                 + reviews.length + ' GP ont terminé leur scan — validation requise (accès suspendu)</div>'
                 + reviews.map(g => {
                     const tel = String(g.gp_phone || '').replace(/[^\d]/g, '');
-                    const wa = tel ? `<a class="arr-wa" href="https://wa.me/${tel}" target="_blank" rel="noopener">💬 WhatsApp</a>` : '';
+                    const wa = tel ? `<a class="arr-wa" href="https://wa.me/${tel}" target="_blank" rel="noopener">WhatsApp</a>` : '';
                     return `<div class="arr-item"><div class="arr-info"><b>${esc(g.gp_name||'GP')}</b>`
                         + `<small>${g.delivered} colis livré(s) · ${g.remaining} restant(s) non livré(s)${g.gp_phone ? ' · ' + esc(g.gp_phone) : ''}</small></div>`
-                        + `<div class="arr-btns">${wa}<button class="arr-ok" onclick="releaseGp('${g.id}','${esc(g.gp_name||'')}')">✅ Voyage terminé — rendre l'accès</button></div></div>`;
+                        + `<div class="arr-btns">${wa}<button class="arr-ok" onclick="releaseGp('${g.id}','${esc(g.gp_name||'')}')">Voyage terminé — rendre l'accès</button></div></div>`;
                 }).join('') + '</div>';
             const arrHtml = !list.length ? '' : '<div class="arr-card"><div class="arr-head"><span class="pulse"></span>'
                 + list.length + ' GP' + (list.length > 1 ? ' ont' : ' a') + ' déclaré' + (list.length > 1 ? 's' : '') + ' être arrivé' + (list.length > 1 ? 's' : '') + ' à destination — confirmation requise</div>'
                 + list.map(m => {
                     const tel = String(m.gp_phone || '').replace(/[^\d]/g, '');
-                    const wa = tel ? `<a class="arr-wa" href="https://wa.me/${tel}" target="_blank" rel="noopener">💬 Appeler / WhatsApp</a>` : '';
+                    const wa = tel ? `<a class="arr-wa" href="https://wa.me/${tel}" target="_blank" rel="noopener">Appeler / WhatsApp</a>` : '';
                     return `<div class="arr-item"><div class="arr-info"><b>${esc(m.mission_code)}</b> · ${esc((m.departure_city||'?')+' → '+(m.arrival_city||'?'))}`
                         + `<small>GP : ${esc(m.gp_name||'—')}${m.gp_phone ? ' · ' + esc(m.gp_phone) : ''} · Expéditeur : ${esc(m.expediteur_name||'—')}${m.updated_at ? ' · depuis ' + esc(new Date(m.updated_at).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})) : ''}</small></div>`
-                        + `<div class="arr-btns">${wa}<button class="arr-ok" onclick="confirmArrival('${m.id}','${esc(m.mission_code)}')">✅ Confirmer l'arrivée</button></div></div>`;
+                        + `<div class="arr-btns">${wa}<button class="arr-ok" onclick="confirmArrival('${m.id}','${esc(m.mission_code)}')">Confirmer l'arrivée</button></div></div>`;
                 }).join('') + '</div>';
             box.innerHTML = arrHtml + revHtml;
         }
@@ -1616,7 +1617,7 @@
               + `<div style="font-size:12px;color:rgba(255,255,255,.5)">${esc(email||'')}</div></div>`;
             // Timeline from mission_tracking
             const tl = (d.tracking||[]).map(t => {
-                const gps = (t.latitude && t.longitude) ? ` · 📍 <a href="https://www.google.com/maps?q=${t.latitude},${t.longitude}" target="_blank">${(+t.latitude).toFixed(4)}, ${(+t.longitude).toFixed(4)}</a>` : '';
+                const gps = (t.latitude && t.longitude) ? ` · <a href="https://www.google.com/maps?q=${t.latitude},${t.longitude}" target="_blank">${(+t.latitude).toFixed(4)}, ${(+t.longitude).toFixed(4)}</a>` : '';
                 return `<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)">
                     <div style="display:flex;justify-content:space-between;gap:8px"><span class="badge ${badgeFor(t.status)}">${esc(t.status)}</span>
                     <span style="font-size:11px;color:rgba(255,255,255,.5)">${new Date(t.created_at).toLocaleString('fr-FR')}</span></div>
@@ -1634,7 +1635,7 @@
                 ? `<button class="btn-confirm" onclick="closeModal();reassignMissionUI('${m.id}','${esc(m.mission_code)}')">Réassigner</button>` : '';
             openModal(
                 `<h3>${esc(m.mission_code)} <span class="badge ${badgeFor(m.status)}">${esc(m.status)}</span></h3>`
-              + `<p class="hint">${esc((m.departure_city||'?')+' → '+(m.arrival_city||'?'))} · ${fcfa(m.final_price || m.offered_price)} · ${esc(String(m.package_weight||'?'))} kg${m.arrival_confirmed?' · ✅ arrivée confirmée':''}</p>`
+              + `<p class="hint">${esc((m.departure_city||'?')+' → '+(m.arrival_city||'?'))} · ${fcfa(m.final_price || m.offered_price)} · ${esc(String(m.package_weight||'?'))} kg${m.arrival_confirmed?' · arrivée confirmée':''}</p>`
               + `<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px">`
               + party('Expéditeur', m.expediteur_name, m.expediteur_phone, m.expediteur_email)
               + party('Gros Porteur', m.gp_name, m.gp_phone, m.gp_email)
@@ -1784,7 +1785,7 @@
             const replyBox = canWrite ? `<label>Répondre</label>
                 <textarea id="claimReply" rows="2" placeholder="Votre réponse au demandeur…"></textarea>
                 <div class="modal-actions"><button class="btn-confirm" onclick="sendClaimReply('${c.id}')">Envoyer</button>
-                <button class="btn-cancel" onclick="compensateClaimUI('${c.id}')">💰 Compenser</button>
+                <button class="btn-cancel" onclick="compensateClaimUI('${c.id}')">Compenser</button>
                 <button class="btn-cancel" onclick="closeModal()">Fermer</button></div>`
               : `<div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Fermer</button></div>`;
             openModal(
@@ -1827,8 +1828,8 @@
         }
 
         // ---------- Roles & Admins ----------
-        const ROLE_ICON = { super_admin:['🛡️','#8b5cf6'], operations:['💼','#34d399'], finance:['💳','#38bdf8'],
-            support:['🎧','#fb7185'], verification:['🪪','#22d3ee'], analyst:['📊','#a78bfa'] };
+        const ROLE_ICON = { super_admin:[SengpIcons.svg('shield',18),'#8b5cf6'], operations:[SengpIcons.svg('briefcase',18),'#34d399'], finance:[SengpIcons.svg('card',18),'#38bdf8'],
+            support:[SengpIcons.svg('headset',18),'#fb7185'], verification:[SengpIcons.svg('idcard',18),'#22d3ee'], analyst:[SengpIcons.svg('chart',18),'#a78bfa'] };
         let _roles = [];
         async function renderRoles(main){
             main.innerHTML = '<div class="loading">Chargement des rôles…</div>';
@@ -1848,15 +1849,15 @@
                     <div class="head-tools">${createBtn}</div>
                 </div>
                 <div class="kpi-grid">
-                    ${kcard('🛡️','#8b5cf6','Total rôles', _roles.length, 'système + personnalisés')}
-                    ${kcard('👤','#38bdf8','Administrateurs', admins, 'comptes admin actifs')}
-                    ${kcard('🔑','#34d399','Permissions', allPerms.length, 'permissions disponibles')}
-                    ${kcard('🧩','#fbbf24','Modules', modules, 'ressources couvertes')}
+                    ${kcard(SengpIcons.svg('shield',18),'#8b5cf6','Total rôles', _roles.length, 'système + personnalisés')}
+                    ${kcard(SengpIcons.svg('user',18),'#38bdf8','Administrateurs', admins, 'comptes admin actifs')}
+                    ${kcard(SengpIcons.svg('key',18),'#34d399','Permissions', allPerms.length, 'permissions disponibles')}
+                    ${kcard(SengpIcons.svg('puzzle',18),'#fbbf24','Modules', modules, 'ressources couvertes')}
                 </div>
                 <div class="toolbar">
                     <input id="roleSearch" placeholder="Rechercher un rôle…" oninput="renderRolesTable()">
                     <select id="roleType" onchange="renderRolesTable()"><option value="">Tous les types</option><option value="system">Système</option><option value="custom">Personnalisé</option></select>
-                    <span style="margin-left:auto"></span><button class="pill-btn" onclick="exportRolesCsv()">⬇ Exporter</button>
+                    <span style="margin-left:auto"></span><button class="pill-btn" onclick="exportRolesCsv()">Exporter</button>
                 </div>
                 <div id="tableArea"></div>`;
             renderRolesTable();
@@ -1869,7 +1870,7 @@
             let rows = _roles.filter(r => (!q || (r.name+' '+r.key+' '+(r.description||'')).toLowerCase().includes(q))
                 && (!tf || (tf==='system'?r.is_system:!r.is_system)));
             const body = rows.map(r => {
-                const ic = ROLE_ICON[r.key] || ['🧩','#64748b'];
+                const ic = ROLE_ICON[r.key] || [SengpIcons.svg('puzzle',18),'#64748b'];
                 const perms = Array.isArray(r.permissions)?r.permissions:[];
                 const permCell = perms.includes('*')
                     ? `<div>Toutes</div><span class="badge b-yellow">Accès complet</span>`
@@ -1925,16 +1926,16 @@
                         <input id="bcTitle" maxlength="120" placeholder="Ex. Maintenance planifiée">
                         <label>Message</label>
                         <textarea id="bcMsg" rows="5" placeholder="Votre message aux utilisateurs…"></textarea>
-                        <div class="modal-actions"><button class="btn-confirm" onclick="sendBroadcast()">📣 Envoyer la diffusion</button></div>
+                        <div class="modal-actions"><button class="btn-confirm" onclick="sendBroadcast()">Envoyer la diffusion</button></div>
                     </div>
                     <div class="panel">
                         <div class="panel-head"><h3>À savoir</h3></div>
                         <div class="feed">
-                            <div class="feed-item"><div class="feed-ico" style="background:#38bdf820;color:#38bdf8">🔔</div><div class="feed-main"><div class="feed-title">Notification in-app</div><div class="feed-sub">Chaque destinataire reçoit une notification dans l'application.</div></div></div>
-                            <div class="feed-item"><div class="feed-ico" style="background:#fbbf2420;color:#fbbf24">🎯</div><div class="feed-main"><div class="feed-title">Ciblage</div><div class="feed-sub">Choisissez le segment avant d'envoyer — l'envoi est immédiat et non annulable.</div></div></div>
-                            <div class="feed-item"><div class="feed-ico" style="background:#8b5cf620;color:#8b5cf6">📲</div><div class="feed-main"><div class="feed-title">Push (Web Push / VAPID)</div><div class="feed-sub">Auto-hébergé sur AWS, sans Firebase. Les utilisateurs qui ont installé la PWA et autorisé les notifications reçoivent un push.</div></div></div>
+                            <div class="feed-item"><div class="feed-ico" style="background:#38bdf820;color:#38bdf8"><span data-icon="bell" data-size="18"></span></div><div class="feed-main"><div class="feed-title">Notification in-app</div><div class="feed-sub">Chaque destinataire reçoit une notification dans l'application.</div></div></div>
+                            <div class="feed-item"><div class="feed-ico" style="background:#fbbf2420;color:#fbbf24"><span data-icon="target" data-size="18"></span></div><div class="feed-main"><div class="feed-title">Ciblage</div><div class="feed-sub">Choisissez le segment avant d'envoyer — l'envoi est immédiat et non annulable.</div></div></div>
+                            <div class="feed-item"><div class="feed-ico" style="background:#8b5cf620;color:#8b5cf6"><span data-icon="phone" data-size="18"></span></div><div class="feed-main"><div class="feed-title">Push (Web Push / VAPID)</div><div class="feed-sub">Auto-hébergé sur AWS, sans Firebase. Les utilisateurs qui ont installé la PWA et autorisé les notifications reçoivent un push.</div></div></div>
                         </div>
-                        <div class="modal-actions"><button class="btn-cancel" onclick="window.sengpEnablePush && window.sengpEnablePush()">🔔 Activer les notifications sur cet appareil</button></div>
+                        <div class="modal-actions"><button class="btn-cancel" onclick="window.sengpEnablePush && window.sengpEnablePush()">Activer les notifications sur cet appareil</button></div>
                     </div>
                 </div>`;
         }
