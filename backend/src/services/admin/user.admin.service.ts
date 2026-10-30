@@ -234,7 +234,7 @@ export class AdminUserService {
       await NotificationService.create({
         user_id: userId,
         notification_type: NotificationType.ACCOUNT_VERIFIED,
-        title: 'Identité vérifiée ✅',
+        title: 'Identité vérifiée',
         message: 'Votre pièce d\'identité a été validée. Votre compte est maintenant vérifié.',
         action_url: 'profile.html',
       });

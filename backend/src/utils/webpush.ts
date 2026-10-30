@@ -14,7 +14,7 @@ let vapid: { publicKey: string; privateKey: string } | null = null;
  */
 async function ensureVapid(): Promise<{ publicKey: string; privateKey: string }> {
   if (vapid) return vapid;
-  let row = await pool.query(`SELECT value FROM platform_setting WHERE key = 'vapid_keys'`);
+  const row = await pool.query(`SELECT value FROM platform_setting WHERE key = 'vapid_keys'`);
   let keys = row.rows[0]?.value;
   if (typeof keys === 'string') { try { keys = JSON.parse(keys); } catch { keys = null; } }
   if (!keys || !keys.publicKey || !keys.privateKey) {

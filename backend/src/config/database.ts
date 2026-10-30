@@ -63,10 +63,10 @@ export const testConnection = async (): Promise<boolean> => {
     const client = await pool.connect();
     await client.query('SELECT NOW()');
     client.release();
-    console.log('✅ Database connected successfully');
+    console.log('Database connected successfully');
     return true;
   } catch (error) {
-    console.error('❌ Database connection failed:', error);
+    console.error('Database connection failed:', error);
     return false;
   }
 };

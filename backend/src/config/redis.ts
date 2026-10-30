@@ -15,12 +15,12 @@ const redisClient = createClient({
   database: parseInt(process.env.REDIS_DB || '0'),
 });
 
-redisClient.on('error', (err) => {
+redisClient.on('error', () => {
   // Don't log errors, handled in server.ts
 });
 
 redisClient.on('connect', () => {
-  console.log('✅ Redis connected successfully');
+  console.log('Redis connected successfully');
 });
 
 export const connectRedis = async () => {

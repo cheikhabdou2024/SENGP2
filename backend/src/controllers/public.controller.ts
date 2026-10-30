@@ -37,7 +37,7 @@ export class PublicController {
   static paymentResultPage(ok: boolean): (req: Request, res: Response) => void {
     return (_req: Request, res: Response): void => {
       const title = ok ? 'Paiement réussi' : 'Paiement non abouti';
-      const icon = ok ? '✅' : '❌';
+      const icon = ok ? '✓' : '✕';
       const color = ok ? '#7ee081' : '#ff8f8f';
       const msg = ok
         ? "Votre paiement a bien été reçu. Vous pouvez fermer cette page et revenir à l'application SEN GP — votre envoi y apparaîtra."
@@ -179,19 +179,19 @@ a.btn{display:inline-block;margin-top:14px;padding:12px 20px;border-radius:12px;
 </head>
 <body>
 <div class="wrap">
-  <div class="brand"><div class="logo">📦</div><h1>Réception du colis</h1></div>
+  <div class="brand"><div class="logo">SG</div><h1>Réception du colis</h1></div>
   <div id="content"><div class="loading">Chargement…</div></div>
   <div class="note">SEN GP · Confirmez uniquement après avoir reçu le colis.</div>
 </div>
 <script>
   var TOKEN=${JSON.stringify(token)};
   var FLAGS={'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱'};
-  function flag(c){return FLAGS[c]||'🌍'}
+  function flag(c){return FLAGS[c]||''}
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
   function load(){
     fetch('/api/v1/public/delivery/'+encodeURIComponent(TOKEN)).then(function(r){return r.json().catch(function(){return {}}).then(function(j){return {status:r.status,ok:r.ok,j:j}})}).then(function(res){
       if(res.status===429){document.getElementById('content').innerHTML='<div class="loading">Beaucoup de demandes… nouvelle tentative.</div>';setTimeout(load,6000);return}
-      if(!res.ok||!res.j.success){document.getElementById('content').innerHTML='<div class="empty">📭<br>Code de livraison invalide.</div>';return}
+      if(!res.ok||!res.j.success){document.getElementById('content').innerHTML='<div class="empty">Code de livraison invalide.</div>';return}
       var m=res.j.data;
       if(String(m.status).toLowerCase()==='delivered'){showDone();return}
       if(String(m.status).toLowerCase()==='cancelled'){document.getElementById('content').innerHTML='<div class="empty">Cet envoi a été annulé.</div>';return}
@@ -204,7 +204,7 @@ a.btn{display:inline-block;margin-top:14px;padding:12px 20px;border-radius:12px;
         +'<button class="btn" id="cbtn" onclick="confirmIt()">✓ Confirmer la réception</button></div>';
     }).catch(function(){document.getElementById('content').innerHTML='<div class="empty">Erreur de connexion.</div>'});
   }
-  function showDone(){document.getElementById('content').innerHTML='<div class="card ok"><div class="ic">✅</div><div style="font-size:20px;font-weight:800;margin-bottom:6px">Livraison confirmée</div><div class="muted">Merci ! Le colis a bien été marqué comme livré.</div></div>'}
+  function showDone(){document.getElementById('content').innerHTML='<div class="card ok"><div class="ic">✓</div><div style="font-size:20px;font-weight:800;margin-bottom:6px">Livraison confirmée</div><div class="muted">Merci ! Le colis a bien été marqué comme livré.</div></div>'}
   function post(coords){
     var btn=document.getElementById('cbtn'); if(btn){btn.disabled=true;btn.textContent='Confirmation…'}
     fetch('/api/v1/public/delivery/'+encodeURIComponent(TOKEN)+'/confirm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(coords||{})})
@@ -266,14 +266,14 @@ a.btn{display:inline-block;margin-top:14px;padding:12px 20px;border-radius:12px;
 </head>
 <body>
 <div class="wrap">
-  <div class="brand"><div class="logo">📦</div><h1>Suivi de votre colis</h1></div>
+  <div class="brand"><div class="logo">SG</div><h1>Suivi de votre colis</h1></div>
   <div id="content"><div class="loading">Chargement du suivi…</div></div>
   <div class="foot">SEN GP · Suivi en temps réel</div>
 </div>
 <script>
   var TOKEN = ${JSON.stringify(token)};
   var FLAGS={'Sénégal':'🇸🇳','Senegal':'🇸🇳','France':'🇫🇷','Espagne':'🇪🇸','Italie':'🇮🇹','USA':'🇺🇸','États-Unis':'🇺🇸','Canada':'🇨🇦','Royaume-Uni':'🇬🇧','Allemagne':'🇩🇪','Maroc':'🇲🇦','Mali':'🇲🇱'};
-  function flag(c){return FLAGS[c]||'🌍'}
+  function flag(c){return FLAGS[c]||''}
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
   function dt(d){return d?new Date(d).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}
   var STATUS={pending:['En attente','b-yellow'],matched:['Pris en charge','b-yellow'],accepted:['Accepté','b-blue'],picked_up:['Récupéré','b-blue'],in_transit:['En transit','b-blue'],in_customs:['En douane','b-blue'],out_for_delivery:['En livraison','b-blue'],delivered:['Livré','b-green'],cancelled:['Annulé','b-red'],disputed:['Litige','b-red'],location:['Position','b-blue']};
@@ -284,7 +284,7 @@ a.btn{display:inline-block;margin-top:14px;padding:12px 20px;border-radius:12px;
   function load(){
     fetch('/api/v1/public/track/'+encodeURIComponent(TOKEN)).then(function(r){return r.json().catch(function(){return {}}).then(function(j){return {status:r.status,ok:r.ok,j:j}})}).then(function(res){
       if(res.status===429){document.getElementById('content').innerHTML='<div class="loading">Beaucoup de demandes en ce moment… nouvelle tentative.</div>';setTimeout(load,6000);return}
-      if(!res.ok||!res.j.success){document.getElementById('content').innerHTML='<div class="empty">📭<br>Aucun suivi trouvé pour ce code.</div>';return}
+      if(!res.ok||!res.j.success){document.getElementById('content').innerHTML='<div class="empty">Aucun suivi trouvé pour ce code.</div>';return}
       render(res.j.data.mission,res.j.data.tracking||[]);
     }).catch(function(){document.getElementById('content').innerHTML='<div class="empty">Erreur de connexion. Réessayez.</div>'});
   }
@@ -294,18 +294,18 @@ a.btn{display:inline-block;margin-top:14px;padding:12px 20px;border-radius:12px;
     var mapBlock;
     if(gps){var la=Number(gps.latitude),lo=Number(gps.longitude),d=0.05;
       mapBlock='<iframe class="map" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox='+(lo-d)+'%2C'+(la-d)+'%2C'+(lo+d)+'%2C'+(la+d)+'&layer=mapnik&marker='+la+'%2C'+lo+'"></iframe>'
-        +'<div class="muted-txt">📍 Dernière position · '+dt(gps.created_at)+'</div>';
+        +'<div class="muted-txt">Dernière position · '+dt(gps.created_at)+'</div>';
     } else {mapBlock='<div class="muted-txt">Position GPS pas encore disponible. Itinéraire prévu :</div>';}
     var mapsUrl='https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent((m.departure_city||'')+', '+(m.departure_country||''))+'&destination='+encodeURIComponent((m.arrival_city||'')+', '+(m.arrival_country||''));
     var events=tracking.filter(function(t){return String(t.status||'').toLowerCase()!=='location'});
-    var tl=events.length?events.map(function(t,idx){return '<div class="tl '+(idx>0?'muted':'')+'"><div class="s">'+esc(lab(t.status))+'</div>'+(t.description?'<div class="d">'+esc(t.description)+'</div>':'')+(t.location?'<div class="d">📍 '+esc(t.location)+'</div>':'')+'<div class="t">'+dt(t.created_at)+'</div></div>'}).join(''):'<div class="tl"><div class="s">'+esc(lab(m.status))+'</div><div class="t">'+dt(m.created_at)+'</div></div>';
+    var tl=events.length?events.map(function(t,idx){return '<div class="tl '+(idx>0?'muted':'')+'"><div class="s">'+esc(lab(t.status))+'</div>'+(t.description?'<div class="d">'+esc(t.description)+'</div>':'')+(t.location?'<div class="d">'+esc(t.location)+'</div>':'')+'<div class="t">'+dt(t.created_at)+'</div></div>'}).join(''):'<div class="tl"><div class="s">'+esc(lab(m.status))+'</div><div class="t">'+dt(m.created_at)+'</div></div>';
 
     document.getElementById('content').innerHTML=
       '<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:12px;color:rgba(255,255,255,.5)">Code de suivi</div><div style="font-weight:700">'+esc(m.tracking_number||m.mission_code||'')+'</div></div>'+badge(m.status)+'</div>'
       +'<div class="route"><div class="loc"><div class="flag">'+flag(m.departure_country)+'</div><div class="city">'+esc(m.departure_city||'—')+'</div><div class="country">'+esc(m.departure_country||'')+'</div></div><div class="arrow">→</div><div class="loc"><div class="flag">'+flag(m.arrival_country)+'</div><div class="city">'+esc(m.arrival_city||'—')+'</div><div class="country">'+esc(m.arrival_country||'')+'</div></div></div>'
       +(m.gp_first_name?'<div class="muted-txt">Transporté par '+esc(m.gp_first_name)+'</div>':'')+'</div>'
-      +'<div class="card"><div class="title">🗺️ Suivi en temps réel</div>'+mapBlock+'<a class="map-btn" href="'+mapsUrl+'" target="_blank" rel="noopener">Voir l\\'itinéraire sur la carte</a></div>'
-      +'<div class="card"><div class="title">📡 Historique</div><div class="timeline">'+tl+'</div></div>';
+      +'<div class="card"><div class="title">Suivi en temps réel</div>'+mapBlock+'<a class="map-btn" href="'+mapsUrl+'" target="_blank" rel="noopener">Voir l\\'itinéraire sur la carte</a></div>'
+      +'<div class="card"><div class="title">Historique</div><div class="timeline">'+tl+'</div></div>';
 
     if(ACTIVE.indexOf(String(m.status||'').toLowerCase())>=0){setTimeout(function(){if(!document.hidden)load()},60000)}
   }

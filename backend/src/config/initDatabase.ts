@@ -20,7 +20,7 @@ export async function initDatabase(): Promise<void> {
     const tablesExist = result.rows[0].exists;
 
     if (!tablesExist) {
-      logger.info('📊 Tables not found. Creating database schema...');
+      logger.info('Tables not found. Creating database schema...');
 
       // Read SQL migration file
       const sqlPath = path.join(__dirname, '../migrations/001_initial_schema.sql');
@@ -29,9 +29,9 @@ export async function initDatabase(): Promise<void> {
       // Execute SQL
       await pool.query(sql);
 
-      logger.info('✅ Database schema created successfully!');
+      logger.info('Database schema created successfully!');
     } else {
-      logger.info('✅ Database tables already exist');
+      logger.info('Database tables already exist');
     }
 
     // Idempotent schema patches: email/Google auth makes phone + password optional.
@@ -60,7 +60,7 @@ export async function initDatabase(): Promise<void> {
     await pool.query('ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS payout_proof_url VARCHAR(500)');
     await pool.query('ALTER TABLE payments ADD COLUMN IF NOT EXISTS refund_reason TEXT');
     await pool.query('ALTER TABLE payments ADD COLUMN IF NOT EXISTS refunded_at TIMESTAMP');
-    // Phase 5 (Support): claim discussion thread (admin ↔ claimant).
+    // Phase 5 (Support): claim discussion thread (admin claimant).
     await pool.query(`CREATE TABLE IF NOT EXISTS claim_messages (
       id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
       claim_id UUID NOT NULL REFERENCES claims(id) ON DELETE CASCADE,
@@ -80,23 +80,23 @@ export async function initDatabase(): Promise<void> {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`);
     await pool.query('CREATE INDEX IF NOT EXISTS idx_push_subs_user ON push_subscriptions(user_id)');
-    logger.info('✅ Schema patches applied (phone/password nullable, delivery_token, recipient, mission_assigned, qr_code_url TEXT, payout_proof/refund)');
+    logger.info('Schema patches applied (phone/password nullable, delivery_token, recipient, mission_assigned, qr_code_url TEXT, payout_proof/refund)');
 
     // Incremental migration files (idempotent — safe to run on every boot).
     try {
       const rbacPath = path.join(__dirname, '../migrations/002_admin_rbac.sql');
       await pool.query(fs.readFileSync(rbacPath, 'utf8'));
-      logger.info('✅ RBAC migration (002_admin_rbac) applied');
+      logger.info('RBAC migration (002_admin_rbac) applied');
     } catch (mErr) {
-      logger.error('❌ RBAC migration (002_admin_rbac) failed:', mErr);
-      logger.warn('⚠️  Admin role features may be unavailable until this is resolved.');
+      logger.error('RBAC migration (002_admin_rbac) failed:', mErr);
+      logger.warn('Admin role features may be unavailable until this is resolved.');
     }
   } catch (error) {
-    logger.error('❌ Error initializing database:', error);
+    logger.error('Error initializing database:', error);
 
     // Don't throw error, just log it
     // The app can still start, migrations can be run manually
-    logger.warn('⚠️  Please run migrations manually:');
-    logger.warn('   sudo -u postgres psql -d sengp_db -f backend/src/migrations/001_initial_schema.sql');
+    logger.warn('Please run migrations manually:');
+    logger.warn('sudo -u postgres psql -d sengp_db -f backend/src/migrations/001_initial_schema.sql');
   }
 }

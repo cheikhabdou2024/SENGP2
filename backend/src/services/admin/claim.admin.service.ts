@@ -60,7 +60,7 @@ export class AdminClaimService {
     return result.rows[0];
   }
 
-  /** Claim discussion thread: the claim + its messages (admin ↔ claimant). */
+  /** Claim discussion thread: the claim + its messages (admin claimant). */
   static async getClaimThread(claimId: string) {
     const c = await pool.query(
       `SELECT c.*, u.first_name || ' ' || u.last_name AS claimant_name, u.email AS claimant_email,

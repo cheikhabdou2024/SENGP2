@@ -6,6 +6,7 @@ import QRCode from 'qrcode';
 import crypto from 'crypto';
 import axios from 'axios';
 import { NotificationService } from './notification.service';
+import { missionIdFromPackageQr, tokenFromRecipientQr } from '../utils/qr';
 
 export class MissionService {
   /**
@@ -803,7 +804,7 @@ export class MissionService {
       await NotificationService.create({
         user_id: mission.expediteur_id,
         notification_type: NotificationType.MISSION_DELIVERED,
-        title: 'Colis livré ✅',
+        title: 'Colis livré',
         message: `Votre colis ${mission.mission_code} a été remis${mission.recipient_name ? ' à ' + mission.recipient_name : ' au destinataire'} (QR confirmé).`,
         action_url: 'suivi.html',
         metadata: { mission_id: missionId, mission_code: mission.mission_code },
@@ -838,20 +839,6 @@ export class MissionService {
     return (await this.getById(missionId)) as Mission;
   }
 
-  /** Extract the mission id from a package QR (JSON {id, mission_code, ...}). */
-  private static missionIdFromPackageQr(qr: string): string | null {
-    try { const j = JSON.parse(qr); return j && j.id ? String(j.id) : null; } catch { return null; }
-  }
-
-  /** Extract the delivery token from a recipient QR (URL .../d/<token>, JSON {token} or raw token). */
-  private static tokenFromRecipientQr(qr: string): string | null {
-    const s = String(qr || '').trim();
-    const m = s.match(/\/d\/([A-Za-z0-9_-]{8,100})/);
-    if (m) return m[1];
-    try { const j = JSON.parse(s); if (j && j.token) return String(j.token); } catch { /* not JSON */ }
-    return /^[A-Za-z0-9_-]{16,100}$/.test(s) ? s : null;
-  }
-
   /**
    * Compare the colis QR with the recipient's QR. Same mission → delivery is confirmed
    * (green check); otherwise match=false (red cross) and nothing is changed.
@@ -863,9 +850,9 @@ export class MissionService {
   ): Promise<{ match: boolean; reason?: string; mission?: Mission }> {
     // Les deux QR peuvent être le même lien /d/<jeton> (ou l'ancien QR JSON du colis).
     const resolve = async (qr: string): Promise<string | null> => {
-      const jsonId = this.missionIdFromPackageQr(qr);
+      const jsonId = missionIdFromPackageQr(qr);
       if (jsonId) return jsonId;
-      const tok = this.tokenFromRecipientQr(qr);
+      const tok = tokenFromRecipientQr(qr);
       if (!tok) return null;
       const r = await pool.query('SELECT id FROM missions WHERE delivery_token = $1', [tok]);
       return r.rows.length ? String(r.rows[0].id) : null;

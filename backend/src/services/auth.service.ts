@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import pool from '../config/database';
-import { User, UserType, TokenPayload } from '../types';
+import { User, UserType } from '../types';
 import { Helpers } from '../utils/helpers';
 import logger from '../utils/logger';
 import { OAuth2Client } from 'google-auth-library';
@@ -374,7 +374,6 @@ export class AuthService {
       return 'If the email exists, a reset link will be sent';
     }
 
-    const user = result.rows[0];
 
     // Generate reset token (valid for 1 hour)
     const resetToken = Helpers.generateVerificationCode(6);

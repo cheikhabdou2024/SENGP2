@@ -6,7 +6,7 @@ export class ErrorMiddleware {
   /**
    * Global error handler
    */
-  static handle(err: any, req: Request, res: Response, next: NextFunction): void {
+  static handle(err: any, req: Request, res: Response, _next: NextFunction): void {
     logger.error('Error occurred:', {
       error: err.message,
       stack: err.stack,
