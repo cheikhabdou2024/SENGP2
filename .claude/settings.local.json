@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(aws apprunner update-service:*)",
+      "Bash(aws apprunner describe-service:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,78 +1,43 @@
-# 🇸🇳 SEN GP - Plateforme de Livraison Collaborative
+# SEN GP
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-%3E%3D14.0-blue.svg)
+Plateforme de mise en relation entre expéditeurs de colis et voyageurs (GP) entre le Sénégal et le reste du monde. Le paiement est conservé jusqu'à la remise du colis, vérifiée par un double contrôle de QR code.
 
-**SEN GP** est une plateforme innovante qui connecte les expéditeurs de colis avec des voyageurs internationaux (GPs - Grands Passagers) pour faciliter l'envoi de colis entre le Sénégal et le reste du monde.
+| Dossier | Contenu | Hébergement |
+|---|---|---|
+| [`backend/`](backend) | API REST Node.js / TypeScript / PostgreSQL | AWS App Runner (image ECR), RDS, S3 |
+| [`frontend/`](frontend) | Application web progressive (HTML/JS) empaquetée avec Capacitor (Android, iOS) | Vercel |
+| [`website/`](website) | Site vitrine statique, généré par `build.mjs` | Vercel |
+| [`docs/`](docs) | Architecture, guides de mise en production | |
 
-## 🚀 Démarrage Rapide
+L'architecture est décrite dans [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-### Installation Locale
+## Démarrage en local
 
-\`\`\`bash
-# Installer les dépendances
-npm install
-cd backend && npm install && cd ..
+Prérequis : Node.js 18 ou plus, PostgreSQL 14 ou plus.
 
-# Configurer l'environnement
-cp backend/.env.example backend/.env
-# Éditez backend/.env avec vos configurations
+```bash
+cd backend
+cp .env.example .env        # renseigner la base de données et les secrets JWT
+npm ci
+npm run dev                 # API sur http://localhost:5000, schéma créé au démarrage
 
-# Lancer l'application
-npm run dev:backend    # Terminal 1 - Backend sur :5000
-npm run dev:frontend   # Terminal 2 - Frontend sur :8100
-\`\`\`
+cd ../frontend
+npm run ionic:serve         # application sur http://localhost:8100 (après `npm run build`)
+```
 
-**Voir** : [QUICK_START.md](./QUICK_START.md) pour le guide détaillé
+## Qualité
 
-### Déploiement sur Render
+```bash
+cd backend
+npm run lint                # ESLint
+npm run typecheck           # tsc --noEmit
+npm test                    # tests unitaires (Jest)
+```
 
-\`\`\`bash
-# 1. Pousser sur GitHub
-git push origin main
+Ces trois commandes sont exécutées à chaque push par GitHub Actions (`.github/workflows/ci.yml`).
 
-# 2. Sur Render.com : New → Blueprint
-# 3. Connecter le repository
-# 4. Render détecte render.yaml et déploie automatiquement
-\`\`\`
+## Documentation
 
-**Voir** : [DEPLOYMENT.md](./DEPLOYMENT.md) pour le guide complet
-
-## 🌟 Fonctionnalités
-
-### Expéditeurs 📦
-✅ Créer un envoi | ✅ Suivi en temps réel | ✅ Paiement sécurisé | ✅ Réclamations
-
-### GPs (Voyageurs) ✈️
-✅ Créer un trajet | ✅ Accepter des missions | ✅ Suivre les livraisons | ✅ Consulter les gains
-
-## 📚 Documentation
-
-- **[QUICK_START.md](./QUICK_START.md)** - Installation et développement local
-- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Déploiement en production (Render, Railway, etc.)
-- **API** : http://localhost:5000/ (quand backend lancé)
-
-## 🏗️ Stack Technique
-
-**Backend** : Node.js • Express • TypeScript • PostgreSQL • JWT  
-**Frontend** : HTML/CSS/JS • Ionic • Capacitor  
-**Hosting** : Render.com • PostgreSQL managed  
-
-## 📦 Scripts
-
-\`\`\`bash
-npm run build:all         # Build frontend + backend
-npm run dev:frontend      # Dev frontend (:8100)
-npm run dev:backend       # Dev backend (:5000)
-npm start                 # Production
-\`\`\`
-
-## 📞 Support
-
-📧 support@sengp.com | 🌐 https://sengp.com  
-
----
-
-**Fait avec ❤️ au Sénégal 🇸🇳**
+- [Architecture](docs/ARCHITECTURE.md)
+- [Mise en production des paiements](docs/go-live-payments.md)
+- [Build iOS](docs/ios-build.md)
