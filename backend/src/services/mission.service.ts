@@ -79,6 +79,13 @@ export class MissionService {
 
       logger.info(`Mission created: ${mission.mission_code} by user ${expediteurId}`);
 
+      await NotificationService.notifyAdmins({
+        notification_type: NotificationType.SYSTEM_ALERT,
+        title: 'Nouvelle mission à affecter',
+        message: `Mission ${mission.mission_code} : ${mission.departure_city} → ${mission.arrival_city}, ${mission.package_weight} kg. Affectez-la à un GP qui voyage vers cette destination.`,
+        metadata: { kind: 'mission_created', mission_id: mission.id },
+      });
+
       return mission;
     } catch (error) {
       await client.query('ROLLBACK');
@@ -271,27 +278,30 @@ export class MissionService {
       // Update mission
       const result = await client.query(
         `UPDATE missions
-         SET status = 'accepted', gp_id = $1, trip_id = $2
+         SET status = 'accepted', gp_id = $1, trip_id = COALESCE($2, trip_id)
          WHERE id = $3
          RETURNING *`,
-        [gpId, tripId, missionId]
+        [gpId, tripId || null, missionId]
       );
 
       const mission = result.rows[0];
 
-      // Update trip if provided
-      if (tripId) {
+      // Update the trip (given explicitly or linked at assignment)
+      const linkedTripId = tripId || mission.trip_id;
+      if (linkedTripId) {
         await client.query(
           `UPDATE trips
            SET current_packages = current_packages + 1
            WHERE id = $1`,
-          [tripId]
+          [linkedTripId]
         );
       }
 
       await client.query('COMMIT');
 
       logger.info(`Mission ${missionId} accepted by GP ${gpId}`);
+
+      await this.alertAdminsOfResponse(mission, gpId, true);
 
       return mission;
     } catch (error) {
@@ -319,7 +329,22 @@ export class MissionService {
       throw new Error('Mission not found or not awaiting your response');
     }
     logger.info(`Mission ${missionId} declined by GP ${gpId} — released to pool`);
+    await this.alertAdminsOfResponse(result.rows[0], gpId, false);
     return result.rows[0];
+  }
+
+  /** Alert the admins that a GP accepted or declined an assigned mission. */
+  private static async alertAdminsOfResponse(mission: any, gpId: string, accepted: boolean): Promise<void> {
+    const gp = await pool.query('SELECT first_name, last_name FROM users WHERE id = $1', [gpId]);
+    const gpName = gp.rows[0] ? `${gp.rows[0].first_name} ${gp.rows[0].last_name}` : 'Le GP';
+    await NotificationService.notifyAdmins({
+      notification_type: accepted ? NotificationType.MISSION_ACCEPTED : NotificationType.SYSTEM_ALERT,
+      title: accepted ? 'Mission acceptée' : 'Mission déclinée',
+      message: accepted
+        ? `${gpName} a accepté la mission ${mission.mission_code} (${mission.departure_city} → ${mission.arrival_city}).`
+        : `${gpName} a décliné la mission ${mission.mission_code}. Elle est de nouveau à affecter.`,
+      metadata: { kind: accepted ? 'mission_accepted' : 'mission_declined', mission_id: mission.id, gp_id: gpId },
+    });
   }
 
   /**
@@ -540,6 +565,21 @@ export class MissionService {
         } catch (e: any) {
           logger.warn('Failed to create earnings notification:', e.message);
         }
+      }
+
+      // Journey stages reported by the GP: keep the admins informed at every step.
+      const stageLabels: Record<string, string> = {
+        picked_up: 'Colis récupéré',
+        in_transit: 'Colis en transit',
+        in_customs: 'Colis en douane',
+      };
+      if (stageLabels[status] && !opts.internal) {
+        await NotificationService.notifyAdmins({
+          notification_type: status === MissionStatus.PICKED_UP ? NotificationType.MISSION_PICKUP : NotificationType.MISSION_TRANSIT,
+          title: stageLabels[status],
+          message: `Mission ${mission.mission_code} : ${stageLabels[status].toLowerCase()} (${mission.departure_city} → ${mission.arrival_city}).`,
+          metadata: { kind: 'mission_' + status, mission_id: id },
+        });
       }
 
       // Arrived at destination: reset the admin-confirmation gate and notify the

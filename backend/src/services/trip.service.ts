@@ -1,5 +1,6 @@
 import pool from '../config/database';
-import { Trip, TripStatus, PaginatedResult } from '../types';
+import { Trip, TripStatus, PaginatedResult, NotificationType } from '../types';
+import { NotificationService } from './notification.service';
 import { Helpers } from '../utils/helpers';
 import logger from '../utils/logger';
 
@@ -45,6 +46,15 @@ export class TripService {
     const trip = result.rows[0];
 
     logger.info(`Trip created: ${trip.trip_code} by GP ${gpId}`);
+
+    const gp = await pool.query('SELECT first_name, last_name FROM users WHERE id = $1', [gpId]);
+    const gpName = gp.rows[0] ? `${gp.rows[0].first_name} ${gp.rows[0].last_name}` : 'Un GP';
+    await NotificationService.notifyAdmins({
+      notification_type: NotificationType.SYSTEM_ALERT,
+      title: 'Nouveau trajet à exploiter',
+      message: `${gpName} a créé le trajet ${trip.departure_city} → ${trip.arrival_city} (${trip.trip_code}) et attend des missions. ${trip.available_weight} kg disponibles.`,
+      metadata: { kind: 'trip_created', trip_id: trip.id, gp_id: gpId },
+    });
 
     return trip;
   }

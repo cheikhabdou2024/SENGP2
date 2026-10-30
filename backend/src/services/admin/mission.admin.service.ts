@@ -100,8 +100,12 @@ export class AdminMissionService {
    * double-assignment. The GP notification is best-effort (assignment is the
    * source of truth and must not roll back if the notification insert fails).
    */
-  static async assignMission(missionId: string, gpId: string) {
+  static async assignMission(missionId: string, gpId: string, tripId?: string) {
     if (!gpId) throw new Error('gp_id is required');
+    if (tripId) {
+      const owns = await pool.query('SELECT 1 FROM trips WHERE id = $1 AND gp_id = $2', [tripId, gpId]);
+      if (owns.rows.length === 0) throw new Error("Ce trajet n'appartient pas à ce GP");
+    }
 
     // The GP must exist and actually be a GP.
     const gp = await pool.query(
@@ -113,11 +117,11 @@ export class AdminMissionService {
     // Atomically claim the mission only if it is still pending.
     const upd = await pool.query(
       `UPDATE missions
-       SET gp_id = $1, status = 'matched', updated_at = CURRENT_TIMESTAMP
+       SET gp_id = $1, status = 'matched', trip_id = COALESCE($3, trip_id), updated_at = CURRENT_TIMESTAMP
        WHERE id = $2 AND status = 'pending'
        RETURNING id, mission_code, departure_city, arrival_city, arrival_country,
                  package_weight, offered_price, final_price, desired_departure_date`,
-      [gpId, missionId]
+      [gpId, missionId, tripId || null]
     );
     if (upd.rows.length === 0) {
       const exists = await pool.query('SELECT 1 FROM missions WHERE id = $1', [missionId]);

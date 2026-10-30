@@ -49,6 +49,8 @@ router.get('/missions/status-series', requirePermission('missions:read'), AdminC
 router.get('/missions/:id', requirePermission('missions:read'), AdminController.getMissionDetail);
 router.put('/missions/:id', requirePermission('missions:write'), AdminController.updateMission);
 router.post('/missions/:id/assign', requirePermission('missions:assign'), AdminController.assignMission);
+router.get('/matching', requirePermission('missions:assign'), AdminController.getMatching);
+router.post('/assignments', requirePermission('missions:assign'), AdminController.bulkAssign);
 router.post('/missions/:id/reassign', requirePermission('missions:assign'), AdminController.reassignMission);
 router.post('/missions/:id/confirm-arrival', requirePermission('missions:write'), AdminController.confirmArrival);
 router.get('/scan-reviews', requirePermission('missions:read'), AdminController.listScanReviews);

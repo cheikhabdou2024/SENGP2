@@ -9,6 +9,7 @@ import { AdminTripService } from './trip.admin.service';
 import { AdminPaymentService } from './payment.admin.service';
 import { AdminClaimService } from './claim.admin.service';
 import { AdminAnalyticsService } from './analytics.admin.service';
+import { AdminMatchingService } from './matching.admin.service';
 import { AdminRoleService } from './role.admin.service';
 import { AdminSystemService } from './system.admin.service';
 
@@ -61,6 +62,8 @@ export class AdminService {
   static updateRole = AdminRoleService.updateRole.bind(AdminRoleService);
   static deleteRole = AdminRoleService.deleteRole.bind(AdminRoleService);
   static setUserRole = AdminRoleService.setUserRole.bind(AdminRoleService);
+  static getMatching = AdminMatchingService.getMatching.bind(AdminMatchingService);
+  static bulkAssign = AdminMatchingService.bulkAssign.bind(AdminMatchingService);
   static listAudit = AdminSystemService.listAudit.bind(AdminSystemService);
   static sendBroadcast = AdminSystemService.sendBroadcast.bind(AdminSystemService);
   static readonly SETTING_DEFAULTS = AdminSystemService.SETTING_DEFAULTS;

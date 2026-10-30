@@ -143,6 +143,7 @@
         .tj-view { flex-shrink: 0; min-height: 44px; display: inline-flex; align-items: center; gap: 4px; padding: 0 14px; border: 0; border-radius: 14px; background: #E8F1FF; color: #1D5FD6; font-size: 15.5px; font-weight: 800; cursor: pointer; white-space: nowrap; }
         .tj-view .tj-i { width: 18px; height: 18px; stroke-width: 2.6; }
         .tj-view:active { transform: scale(0.98); }
+        .tj-wait { margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; background: #FFF4DC; color: #8A5A00; font-size: 13px; line-height: 1.45; }
         .tj-menu { display: flex; flex-direction: column; gap: 10px; }
         .tj-menu .tj-btn { min-height: 56px; }
 
@@ -452,6 +453,7 @@
             ['active', 'upcoming', 'completed'].forEach(b => $('tab-' + b).setAttribute('aria-selected', String(b === currentBucket)));
         }
 
+        const WAIT_NOTE = '<p class="tj-wait">En attente d’une mission : l’administration vous affectera des colis vers cette destination. Vous serez notifié et pourrez accepter ou refuser chaque mission.</p>';
         function tripCard(t, i, inSheet) {
             const st = statusMeta(t.status);
             const cap = `${t.current_packages || 0}/${t.max_packages || 0} colis`;
@@ -459,7 +461,7 @@
             const buttons = inSheet ? '' : `
                 <div class="tj-actions">
                     <button type="button" class="tj-btn tj-btn--ghost" onclick="viewTripDetails('${esc(t.id)}')">Détails</button>
-                    <button type="button" class="tj-btn tj-btn--main" onclick="navigateTo('missions')">${isOpen ? 'Chercher colis' : 'Voir missions'}</button>
+                    ${isOpen ? '' : `<button type="button" class="tj-btn tj-btn--main" onclick="navigateTo('missions')">Voir missions</button>`}
                 </div>`;
             return `
             <article class="tj-card" style="--i:${Math.min(i || 0, 8)};--tj-acc:${st.acc};--tj-chipbg:${st.bg};--tj-chipfg:${st.fg}">
@@ -474,7 +476,7 @@
                     <div class="tj-fact"><small>Arrivée</small><b>${formatDateTime(t.arrival_date)}</b></div>
                     <div class="tj-fact"><small>Capacité</small><b>${parseFloat(t.available_weight) || 0} kg</b></div>
                     <div class="tj-fact"><small>Colis acceptés</small><b>${cap}</b></div>
-                </div>${buttons}
+                </div>${buttons}${isOpen && !inSheet ? WAIT_NOTE : ''}
             </article>`;
         }
 
@@ -630,7 +632,7 @@
             $('sheetSub').textContent = t.trip_code || '';
             $('sheetBody').innerHTML = '<div class="tj-menu">' +
                 '<button type="button" class="tj-btn tj-btn--ghost" onclick="viewTripDetails(\'' + esc(t.id) + '\')">Voir les détails</button>' +
-                '<button type="button" class="tj-btn tj-btn--main" onclick="closeSheet();navigateTo(\'missions\')">' + (open ? 'Chercher des colis' : 'Voir les missions') + '</button></div>';
+                (open ? WAIT_NOTE : '<button type="button" class="tj-btn tj-btn--main" onclick="closeSheet();navigateTo(\'missions\')">Voir les missions</button>') + '</div>';
             $('sheetOverlay').classList.add('show');
             $('scroller').classList.add('is-locked');
         }
@@ -641,7 +643,9 @@
             $('sheetTitle').textContent = 'Détails du trajet';
             $('sheetSub').textContent = t.trip_code || '';
             $('sheetBody').innerHTML = tripCard(t, 0, true) +
-                `<div class="tj-actions" style="grid-template-columns:1fr;margin-top:12px"><button type="button" class="tj-btn tj-btn--main" onclick="closeSheet();navigateTo('missions')">${(t.status === 'published' || t.status === 'draft') ? 'Chercher colis' : 'Voir missions'}</button></div>`;
+                ((t.status === 'published' || t.status === 'draft')
+                    ? WAIT_NOTE
+                    : `<div class="tj-actions" style="grid-template-columns:1fr;margin-top:12px"><button type="button" class="tj-btn tj-btn--main" onclick="closeSheet();navigateTo('missions')">Voir missions</button></div>`);
             $('sheetOverlay').classList.add('show');
             $('scroller').classList.add('is-locked');
         }

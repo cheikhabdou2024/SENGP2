@@ -65,6 +65,27 @@ export class NotificationService {
   }
 
   /**
+   * Alert every active administrator. Best-effort: a failure is logged and never
+   * propagates to the business operation that triggered the alert.
+   */
+  static async notifyAdmins(data: {
+    notification_type: NotificationType;
+    title: string;
+    message: string;
+    action_url?: string;
+    metadata?: any;
+  }): Promise<void> {
+    try {
+      const admins = await pool.query(`SELECT id FROM users WHERE user_type = 'admin' AND deleted_at IS NULL`);
+      for (const a of admins.rows) {
+        await this.create({ ...data, user_id: a.id });
+      }
+    } catch (e: any) {
+      logger.warn(`Admin alert failed (${data.title}): ${e.message}`);
+    }
+  }
+
+  /**
    * Get a user's notifications (paginated, newest first).
    */
   static async getByUser(

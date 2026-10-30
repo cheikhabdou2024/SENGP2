@@ -216,6 +216,28 @@ export class AdminController {
       ResponseUtil.badRequest(res, e.message || 'Assignment failed');
     }
   }
+  /** GET /admin/matching — missions à affecter + trajets compatibles. */
+  static async getMatching(_req: AuthRequest, res: Response): Promise<void> {
+    try {
+      ResponseUtil.success(res, await AdminService.getMatching());
+    } catch (e: any) {
+      ResponseUtil.badRequest(res, e.message || 'Matching failed');
+    }
+  }
+  /** POST /admin/assignments { assignments: [{ mission_id, gp_id, trip_id? }] } */
+  static async bulkAssign(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const list = Array.isArray(req.body?.assignments) ? req.body.assignments : [];
+      if (list.length === 0 || list.length > 50) return void ResponseUtil.badRequest(res, 'Between 1 and 50 assignments required');
+      const results = await AdminService.bulkAssign(list);
+      for (const r of results.filter(x => x.ok)) {
+        void logAdminAction({ req, action: 'mission.assign', entityType: 'mission', entityId: r.mission_id });
+      }
+      ResponseUtil.success(res, results, 'Assignments processed');
+    } catch (e: any) {
+      ResponseUtil.badRequest(res, e.message || 'Bulk assignment failed');
+    }
+  }
   static async confirmArrival(req: AuthRequest, res: Response): Promise<void> {
     try {
       const m = await AdminService.confirmArrival(req.params.id);
