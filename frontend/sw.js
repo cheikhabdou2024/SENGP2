@@ -1,7 +1,8 @@
 // SEN GP - Service Worker (PWA)
 // Stratégie : réseau d'abord, cache en secours (offline minimal).
 // Jamais mis en cache : appels API, requêtes non-GET, vidéos.
-const CACHE_NAME = 'sengp-v1';
+// L'identifiant est remplace au build (scripts/build.js) : chaque deploiement purge l'ancien cache.
+const CACHE_NAME = 'sengp-__BUILD_ID__';
 
 const PRECACHE = [
     './',
@@ -10,6 +11,7 @@ const PRECACHE = [
     'inscrire.html',
     'manifest.json',
     'config.js',
+    'api.js',
     'theme.css',
     'responsive.css',
     'ui.js',

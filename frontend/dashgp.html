@@ -376,6 +376,7 @@
         .jm-wait { font-size:13.5px; line-height:1.6; color:#FFD27A; background:rgba(255,215,0,.1); border:1px solid rgba(255,215,0,.3); border-radius:14px; padding:14px; display:flex; align-items:center; gap:10px; text-align:left; }
         .jm-wait svg { width:22px; height:22px; flex-shrink:0; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
     </style>
+    <script src="api.js"></script>
     <script src="config.js"></script>
     <script src="ui.js"></script>
     <script src="icons.js"></script>
@@ -547,7 +548,7 @@
         };
         let journey = { open:false, card:null, close:null, missions:[], poll:null };
 
-        function jEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+        function jEsc(s){ return window.sengpEsc(s); }
 
         async function fetchJourneyMissions(){
             try {

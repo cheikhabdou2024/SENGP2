@@ -560,6 +560,7 @@
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
         </style>
+    <script src="api.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -809,23 +810,23 @@
             };
 
             return `
-                <div class="claim-card" onclick="viewClaimDetails('${claim.id}')">
+                <div class="claim-card" onclick="viewClaimDetails('${window.sengpEsc(claim.id)}')">
                     <div class="claim-header">
                         <div class="claim-type">
                             <div class="claim-icon">${typeIcons[claim.claim_type] || '<svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>'}</div>
                             <div class="claim-info">
-                                <h3>${claim.claim_type ? claim.claim_type.replace(/_/g, ' ') : 'Réclamation'}</h3>
-                                <div class="claim-id">#${claim.id || 'N/A'}</div>
+                                <h3>${window.sengpEsc(claim.claim_type ? claim.claim_type.replace(/_/g, ' ') : 'Réclamation')}</h3>
+                                <div class="claim-id">#${window.sengpEsc(claim.id || 'N/A')}</div>
                             </div>
                         </div>
                         <span class="claim-status ${statusClasses[claim.status] || 'status-pending'}">
                             ${statusLabels[claim.status] || 'En attente'}
                         </span>
                     </div>
-                    <div class="claim-description">${claim.description || 'Aucune description'}</div>
+                    <div class="claim-description">${window.sengpEsc(claim.description || 'Aucune description')}</div>
                     <div class="claim-footer">
                         <div class="claim-date">Créée le ${new Date(claim.created_at).toLocaleDateString('fr-FR')}</div>
-                        <div class="claim-shipment">Mission: ${claim.mission_code || 'N/A'}</div>
+                        <div class="claim-shipment">Mission: ${window.sengpEsc(claim.mission_code || 'N/A')}</div>
                     </div>
                 </div>
             `;

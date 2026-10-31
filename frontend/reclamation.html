@@ -503,6 +503,7 @@
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
         </style>
+    <script src="api.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -682,7 +683,7 @@
                 sel.innerHTML = '<option value="">Sélectionnez le colis</option>' + data.map(function(m){
                     const type = (m.package_description || 'Colis').toString();
                     const route = (m.departure_city || '') + ' → ' + (m.arrival_city || '');
-                    return '<option value="' + m.id + '">' + type + ' · ' + route + '</option>';
+                    return '<option value="' + window.sengpEsc(m.id) + '">' + window.sengpEsc(type) + ' · ' + window.sengpEsc(route) + '</option>';
                 }).join('');
             } catch (e) {
                 sel.innerHTML = '<option value="">Erreur de chargement</option>';
@@ -799,15 +800,15 @@
             };
 
             return `
-                <div class="claim-card" onclick="viewClaimDetails('${claim.claim_id}')">
+                <div class="claim-card" onclick="viewClaimDetails('${window.sengpEsc(claim.claim_id)}')">
                     <div class="claim-header">
-                        <div class="claim-id">#${claim.claim_id}</div>
+                        <div class="claim-id">#${window.sengpEsc(claim.claim_id)}</div>
                         <span class="claim-status" style="background: ${statusColors[claim.status]}20; color: ${statusColors[claim.status]}">
                             ${statusLabels[claim.status]}
                         </span>
                     </div>
-                    <div class="claim-type">${claim.claim_type}</div>
-                    <div class="claim-description">${claim.description || 'Aucune description'}</div>
+                    <div class="claim-type">${window.sengpEsc(claim.claim_type)}</div>
+                    <div class="claim-description">${window.sengpEsc(claim.description || 'Aucune description')}</div>
                     <div class="claim-date">Créée le ${new Date(claim.created_at).toLocaleDateString('fr-FR')}</div>
                 </div>
             `;

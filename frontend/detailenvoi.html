@@ -72,6 +72,7 @@
         .share-opt .ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px}
         .ic-wa{background:#25D366}.ic-mail{background:#EA4335}.ic-copy{background:rgba(255,255,255,.15)}
     </style>
+    <script src="api.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -118,7 +119,7 @@
         let mission = null;
 
         const flag = c => (window.SengpGeo ? SengpGeo.flag(c) : '');
-        const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const esc = window.sengpEsc;
         const fcfa = n => (Number(n)||0).toLocaleString('fr-FR')+' FCFA';
         const dt = d => d ? new Date(d).toLocaleString('fr-FR',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
 

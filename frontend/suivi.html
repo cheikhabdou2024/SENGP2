@@ -248,6 +248,7 @@
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
 </style>
+<script src="api.js"></script>
 <script src="config.js"></script>
 <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -373,7 +374,7 @@
   };
 
   const flag = c => (window.SengpGeo ? SengpGeo.flag(c) : '');
-  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const esc = window.sengpEsc;
   const st = m => String(m.status || '').toLowerCase();
   const validDate = d => { const x = d ? new Date(d) : null; return x && !isNaN(x.getTime()) ? x : null; };
   const fmtDate = d => { const x = validDate(d); return x ? x.toLocaleDateString('fr-FR') : '—'; };

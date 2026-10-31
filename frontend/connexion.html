@@ -272,6 +272,7 @@
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
     </style>
+    <script src="api.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -429,6 +430,11 @@
             return null;
         })();
         function typeLabel(t) { return t === 'gp' ? 'Gros Porteur' : 'Expéditeur'; }
+
+        // api.js renvoie ici quand l'API refuse la session (expiree, compte suspendu, sessions revoquees).
+        if (new URLSearchParams(window.location.search).get('expired') === '1') {
+            setTimeout(() => alert('Votre session a expiré. Merci de vous reconnecter.'), 300);
+        }
         function enforceAccountType(user) {
             if (EXPECTED_TYPE && user && user.user_type !== EXPECTED_TYPE) {
                 alert(`Ce compte est un compte « ${typeLabel(user.user_type)} ». Vous avez choisi « ${typeLabel(EXPECTED_TYPE)} ». Connectez-vous avec le profil correspondant.`);

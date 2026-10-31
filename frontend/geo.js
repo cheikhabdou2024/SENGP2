@@ -8,7 +8,7 @@
   function flagOf(iso) {
     return String.fromCodePoint.apply(null, iso.toUpperCase().split('').map(function (c) { return 127397 + c.charCodeAt(0); }));
   }
-  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function esc(s) { return window.sengpEsc(s); }
   function norm(s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(); }
   function fcfa(n) { return n == null ? 'Tarif à définir' : String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA/kg'; }
 

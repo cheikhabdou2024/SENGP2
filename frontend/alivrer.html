@@ -48,6 +48,7 @@
         .done-btn { width:100%; margin-top:6px; padding:16px; border:none; border-radius:14px; font-size:16px; font-weight:800; cursor:pointer; background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; }
         .done-note { font-size:12px; color:rgba(255,255,255,.6); margin:8px 2px 0; line-height:1.5; text-align:center; }
     </style>
+    <script src="api.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -106,7 +107,7 @@
         let scannerAutoOpened = false;
 
         const flag = c => (window.SengpGeo ? SengpGeo.flag(c) : '');
-        const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const esc = window.sengpEsc;
         const ACTIVE=['accepted','picked_up','in_transit','in_customs','out_for_delivery'];
         const STATUS={accepted:['Accepté','b-blue'],picked_up:['Récupéré','b-blue'],in_transit:['En transit','b-blue'],in_customs:['En douane','b-blue'],out_for_delivery:['En livraison','b-blue']};
         // Étape suivante (le statut 'delivered' final est confirmé par le destinataire via QR).
@@ -194,6 +195,8 @@
             return new Promise(resolve => {
                 const s = document.createElement('script');
                 s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+                s.integrity = 'sha384-b5Ya4Bq3qCyz39m2ISh+4DxjAIljdeFwK/BsXLuj9gugaNwAcj/ia15fxNZL9Nlx';
+                s.crossOrigin = 'anonymous';
                 s.onload = () => resolve(true);
                 s.onerror = () => resolve(false);
                 document.head.appendChild(s);

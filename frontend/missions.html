@@ -521,6 +521,7 @@
         .missions-state .state-icon { font-size: 44px; margin-bottom: 12px; }
         .missions-state .state-text { font-size: 14px; line-height: 1.5; }
         </style>
+    <script src="api.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -638,11 +639,7 @@
         };
         function flagFor(country) { return FLAGS[country] || (window.SengpGeo ? SengpGeo.flag(country) : ''); }
 
-        function esc(s) {
-            return String(s == null ? '' : s)
-                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
-        }
+        function esc(s) { return window.sengpEsc(s); }
 
         function initials(name) {
             if (!name) return '–';

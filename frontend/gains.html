@@ -413,6 +413,7 @@
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
         </style>
+    <script src="api.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -590,7 +591,7 @@
                             <div class="transaction-icon ${cls}">${icon}</div>
                             <div class="transaction-info">
                                 <div class="transaction-title">${titles[tx.direction] || 'Transaction'}</div>
-                                <div class="transaction-details">${tx.method || ''} • ${tx.reference || ''}</div>
+                                <div class="transaction-details">${window.sengpEsc(tx.method || '')} • ${window.sengpEsc(tx.reference || '')}</div>
                             </div>
                             <div class="transaction-amount">
                                 <div class="amount-value ${cls}">${sign}${formatFCFA(tx.amount)}</div>

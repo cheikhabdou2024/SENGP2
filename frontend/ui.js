@@ -51,11 +51,7 @@
         (document.head || document.documentElement).appendChild(st);
     }
 
-    function esc(s) {
-        return String(s == null ? '' : s).replace(/[&<>]/g, function (c) {
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c];
-        });
-    }
+    function esc(s) { return window.sengpEsc(s); }
 
     function root() {
         var r = document.getElementById('sengpModalRoot');

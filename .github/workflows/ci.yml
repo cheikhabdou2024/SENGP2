@@ -73,5 +73,7 @@ jobs:
           node-version: 20
       - name: Syntax check every script
         run: for f in *.js; do node --check "$f" || exit 1; done
+      - name: Frontend tests (session 401, esc, SRI, headers, service worker)
+        run: npm test
       - name: Static build
         run: npm run build

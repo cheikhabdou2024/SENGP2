@@ -238,6 +238,7 @@
             .tj-cta { padding: 0 24px; font-size: 17px; }
         }
     </style>
+    <script src="api.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -385,9 +386,7 @@
             if (!FLAGS[k] && window.SengpGeo && SengpGeo.find(c)) return '<span class="tj-flag" style="align-items:center;justify-content:center;font-size:16px;line-height:1">' + SengpGeo.flag(c) + '</span>';
             return '<span class="tj-flag"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + (FLAGS[k] || GLOBE) + '</svg></span>';
         }
-        function esc(s) {
-            return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        }
+        function esc(s) { return window.sengpEsc(s); }
         function formatDateTime(d) {
             if (!d) return '—';
             try {
