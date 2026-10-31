@@ -32,6 +32,10 @@ cd backend
 npm run lint                # ESLint
 npm run typecheck           # tsc --noEmit
 npm test                    # tests unitaires (Jest)
+npm run test:integration    # PostgreSQL requis, voir docs/testing.md
+
+cd ../frontend
+npm test                    # api.js et contrôles des pages
 ```
 
 Ces trois commandes sont exécutées à chaque push par GitHub Actions (`.github/workflows/ci.yml`).
@@ -39,5 +43,11 @@ Ces trois commandes sont exécutées à chaque push par GitHub Actions (`.github
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md)
+- [API](docs/api.md)
+- [Base de données](docs/database.md)
+- [Variables d'environnement](docs/environment.md)
+- [Tests](docs/testing.md)
+- [Exploitation (déploiement, retour arrière, incidents)](docs/runbook.md)
+- [Dette technique](docs/tech-debt.md)
 - [Mise en production des paiements](docs/go-live-payments.md)
 - [Build iOS](docs/ios-build.md)

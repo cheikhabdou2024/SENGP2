@@ -58,6 +58,10 @@ vercel redeploy <url-de-previsualisation> --environment production --scope nii-p
 
 Retour arrière : `vercel rollback` ou redéployer la prévisualisation précédente.
 
+Le build exécute `npm run build` (`frontend/scripts/build.js`) : il doit exister sur Vercel. Le fichier
+`frontend/.vercelignore` ne doit donc pas exclure `scripts/build.js` (le premier déploiement du lot 6 a échoué pour cette raison).
+Vérifier la prévisualisation avant promotion : `/api.js` et `/sw.js` répondent 200, et `sw.js` contient `sengp-<identifiant>`.
+
 ## Incidents courants
 
 - **L'API répond 5xx après un déploiement** : lire les journaux CloudWatch du service

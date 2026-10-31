@@ -37,13 +37,14 @@ Les services d'administration sont découpés par domaine dans `services/admin/`
 
 ## Frontend (`frontend/`)
 
-Application multipage sans framework, volontairement légère pour les réseaux mobiles. Le dossier reste plat car `npm run build` copie `*.html`, `*.js`, `*.css` dans `www/`.
+Application multipage sans framework, volontairement légère pour les réseaux mobiles. Le dossier reste plat car `npm run build` (`scripts/build.js`, portable) copie `*.html`, `*.js`, `*.css` dans `www/` et donne au service worker un identifiant de build. Les gros scripts de `admin`, `creenvoi` et `index` vivent dans `page-*.js`.
 
 Modules partagés (chargés par les pages) :
 
 | Fichier | Rôle |
 |---|---|
 | `config.js` | URL de l'API selon l'environnement. |
+| `api.js` | `sengpEsc` (échappement HTML unique) et `fetch` conscient de la session : un 401 sur un appel authentifié efface la session et renvoie vers la connexion. |
 | `ui.js` | Toasts, boîtes de dialogue, helpers d'interface. |
 | `icons.js` | Jeu d'icônes SVG (`SengpIcons.svg('package')` ou `<span data-icon="package">`). Pas d'emojis dans l'interface. |
 | `geo-data.js`, `geo.js` | Continents, pays, régions, tarifs par continent ; sélecteur de destination. |
@@ -51,13 +52,21 @@ Modules partagés (chargés par les pages) :
 | `pwa.js`, `sw.js`, `ptr.js` | Installation, cache hors ligne, tirer pour rafraîchir. |
 | `theme.css`, `responsive.css` | Styles communs. |
 
+### Sécurité du frontend
+
+En-têtes dans `frontend/vercel.json` (`nosniff`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`) et une CSP en `Report-Only`. Les scripts de CDN portent une empreinte SRI. Toute donnée venue de l'API injectée dans `innerHTML` passe par `sengpEsc`.
+
 ## Site vitrine (`website/`)
 
 Pages sources dans `src/`, assemblées par `build.mjs` avec `site.config.json`. Le site reste en mode relecture (`live: false`, `legalReviewed: false`) tant que les mentions légales ne sont pas validées.
 
 ## Données
 
-Le schéma est créé et corrigé de façon idempotente au démarrage (`config/initDatabase.ts`). Les migrations SQL de `migrations/` décrivent l'état initial et le RBAC.
+Le schéma est créé et corrigé de façon idempotente au démarrage, sous verrou consultatif, puis les migrations numérotées (à partir de 003) sont appliquées. Détail, tables et garde-fous financiers : [`database.md`](database.md).
+
+## Documentation associée
+
+[API](api.md) · [Base de données](database.md) · [Variables d'environnement](environment.md) · [Tests](testing.md) · [Exploitation](runbook.md) · [Dette technique](tech-debt.md)
 
 ## Déploiement
 
