@@ -91,7 +91,7 @@ export class AuthService {
       await client.query('COMMIT');
 
       // Generate JWT token
-      const token = this.generateToken(user);
+      const token = await this.generateToken(user);
 
       logger.info(`New user registered: ${user.email} (${user.user_type})`);
 
@@ -152,7 +152,7 @@ export class AuthService {
         [user.id]
       );
       const perms = await this.resolvePermissions(user);
-      const token = this.generateToken(user, perms);
+      const token = await this.generateToken(user, perms);
       logger.info(`Google login: ${email}`);
       return { user, token, isNew: false };
     }
@@ -187,7 +187,7 @@ export class AuthService {
 
       await client.query('COMMIT');
 
-      const token = this.generateToken(user);
+      const token = await this.generateToken(user);
       logger.info(`Google signup: ${email} (${finalType})`);
       return { user, token, isNew: true };
     } catch (error) {
@@ -246,7 +246,7 @@ export class AuthService {
 
     // Generate JWT token (with admin permissions when applicable)
     const perms = await this.resolvePermissions(user);
-    const token = this.generateToken(user, perms);
+    const token = await this.generateToken(user, perms);
 
     logger.info(`User logged in: ${user.email}`);
 
@@ -282,7 +282,7 @@ export class AuthService {
   /**
    * Generate JWT token
    */
-  private static generateToken(user: Partial<User>, perms?: string[]): string {
+  private static async generateToken(user: Partial<User>, perms?: string[]): Promise<string> {
     const secret = process.env.JWT_SECRET;
     if (!secret) {
       throw new Error('JWT_SECRET is not defined');
@@ -294,6 +294,8 @@ export class AuthService {
       role: user.user_type!,
     };
     if (perms && perms.length) payload.perms = perms;
+    const tv = await pool.query('SELECT COALESCE(token_version, 0) AS tv FROM users WHERE id = $1', [user.id]);
+    payload.tv = Number(tv.rows[0]?.tv) || 0;
 
     const expiresIn = process.env.JWT_EXPIRES_IN || '24h';
 
@@ -353,7 +355,7 @@ export class AuthService {
 
     // Update password
     await pool.query(
-      'UPDATE users SET password_hash = $1 WHERE id = $2',
+      'UPDATE users SET password_hash = $1, token_version = COALESCE(token_version, 0) + 1 WHERE id = $2',
       [newPasswordHash, userId]
     );
 

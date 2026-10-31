@@ -271,6 +271,8 @@ export interface TokenPayload {
   role: UserType;
   // Admin permission list embedded at login (['*'] for super admins).
   perms?: string[];
+  // Token version: bumping users.token_version revokes every older token.
+  tv?: number;
   iat?: number;
   exp?: number;
 }

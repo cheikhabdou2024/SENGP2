@@ -8,6 +8,7 @@ import path from 'path';
 import { ErrorMiddleware } from './middlewares/error.middleware';
 import { RateLimitMiddleware } from './middlewares/rateLimit.middleware';
 import logger from './utils/logger';
+import { resolveAllowedOrigins, isOriginAllowed } from './config/cors';
 
 // Import routes
 import authRoutes from './routes/auth.routes';
@@ -36,21 +37,14 @@ app.set('trust proxy', 1);
 app.use(helmet());
 
 // Parse CORS origins (support multiple origins separated by comma)
-const allowedOrigins = process.env.FRONTEND_URL
-  ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
-  : ['*'];
+const allowedOrigins = resolveAllowedOrigins(process.env.FRONTEND_URL, process.env.NODE_ENV);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, curl, etc.)
+    // Requests with no Origin header (native apps, curl, server-to-server webhooks) pass.
     if (!origin) return callback(null, true);
-
-    // Check if origin is in allowed list or if we allow all
-    if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
-    }
+    // A disallowed origin simply gets no CORS headers, so the browser blocks it.
+    callback(null, isOriginAllowed(origin, allowedOrigins));
   },
   credentials: true,
 }));

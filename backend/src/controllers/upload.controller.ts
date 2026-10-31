@@ -4,6 +4,7 @@ import { AuthRequest } from '../types';
 import { ResponseUtil } from '../utils/response';
 import { uploadBuffer, isS3Configured } from '../utils/s3';
 import logger from '../utils/logger';
+import { detectFileType } from '../utils/fileType';
 
 export class UploadController {
   /**
@@ -17,12 +18,15 @@ export class UploadController {
       const file = (req as any).file;
       if (!file || !file.buffer) { ResponseUtil.badRequest(res, 'Aucun fichier reçu'); return; }
 
-      const mime = file.mimetype || 'application/octet-stream';
-      if (!/^audio\/|^image\//.test(mime)) {
+      // The type comes from the file's own bytes, never from the client-declared
+      // MIME type or file name (an HTML or SVG file renamed .png must not get in).
+      const detected = detectFileType(file.buffer);
+      if (!detected) {
         ResponseUtil.badRequest(res, 'Type de fichier non autorisé');
         return;
       }
-      const ext = (mime.split('/')[1] || 'bin').split(';')[0].replace(/[^a-z0-9]/gi, '') || 'bin';
+      const mime = detected.mime;
+      const ext = detected.ext;
       const key = `claims/${req.user.id}/${Date.now()}-${crypto.randomBytes(6).toString('hex')}.${ext}`;
 
       await uploadBuffer(key, file.buffer, mime);

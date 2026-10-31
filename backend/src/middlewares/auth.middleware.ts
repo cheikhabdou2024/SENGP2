@@ -4,12 +4,31 @@ import { AuthRequest, TokenPayload, UserType } from '../types';
 import { ResponseUtil } from '../utils/response';
 import { hasPermission } from '../utils/permissions';
 import logger from '../utils/logger';
+import pool from '../config/database';
+
+/**
+ * A signed token is only trusted while the account behind it is still valid:
+ * not deleted or suspended, same role, and not revoked by a password change
+ * (users.token_version). Tokens issued before token versions existed carry no
+ * `tv` and count as version 0, so nobody is logged out when this ships.
+ */
+async function sessionIsValid(decoded: TokenPayload): Promise<boolean> {
+  const r = await pool.query(
+    'SELECT user_type, status, deleted_at, COALESCE(token_version, 0) AS token_version FROM users WHERE id = $1',
+    [decoded.sub]
+  );
+  const u = r.rows[0];
+  if (!u || u.deleted_at) return false;
+  if (u.status === 'suspended' || u.status === 'deleted') return false;
+  if (u.user_type !== decoded.role) return false;
+  return Number(u.token_version) === Number(decoded.tv ?? 0);
+}
 
 export class AuthMiddleware {
   /**
    * Verify JWT token and attach user to request
    */
-  static verifyToken(req: AuthRequest, res: Response, next: NextFunction): void {
+  static async verifyToken(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const authHeader = req.headers.authorization;
 
@@ -28,6 +47,11 @@ export class AuthMiddleware {
       }
 
       const decoded = jwt.verify(token, secret) as TokenPayload;
+
+      if (!(await sessionIsValid(decoded))) {
+        ResponseUtil.unauthorized(res, 'Session expired or revoked');
+        return;
+      }
 
       // Attach user info to request
       req.user = {
@@ -74,7 +98,7 @@ export class AuthMiddleware {
   /**
    * Optional authentication - doesn't fail if no token
    */
-  static optionalAuth(req: AuthRequest, res: Response, next: NextFunction): void {
+  static async optionalAuth(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const authHeader = req.headers.authorization;
 
@@ -92,6 +116,10 @@ export class AuthMiddleware {
       }
 
       const decoded = jwt.verify(token, secret) as TokenPayload;
+      if (!(await sessionIsValid(decoded))) {
+        next();
+        return;
+      }
 
       req.user = {
         id: decoded.sub,

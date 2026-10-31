@@ -119,7 +119,7 @@ export class AdminSystemService {
     }
     const hash = await bcrypt.hash(String(newPassword), 12);
     const result = await pool.query(
-      `UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP
+      `UPDATE users SET password_hash = $1, token_version = COALESCE(token_version, 0) + 1, updated_at = CURRENT_TIMESTAMP
        WHERE email = $2 AND deleted_at IS NULL
        RETURNING id, email, user_type`,
       [hash, String(email).toLowerCase()]
