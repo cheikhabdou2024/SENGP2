@@ -38,6 +38,7 @@ sur `DATABASE_URL`. Les tests tronquent les tables : ne jamais les pointer vers 
   webhook vérifié, remboursement refusé une fois le GP crédité.
 - `session-security.test.ts` : sessions révoquées (suppression, suspension, changement de rôle ou de mot de passe).
 - `operations.test.ts` : `/health/ready`, lanceur de migrations, verrou consultatif, rejeu sans effet.
+- `settings.test.ts` : `GET/PUT /admin/settings` n'exposent ni n'écrasent la clé privée VAPID de `platform_setting`.
 - `dispatch.test.ts` : affectation, acceptation (y compris deux acceptations simultanées), refus pour un autre GP,
   409 « déjà payé », `withTransaction` (validation et annulation).
 

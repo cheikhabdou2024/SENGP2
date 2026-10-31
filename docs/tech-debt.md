@@ -4,9 +4,10 @@
 
 ## 1. Constat à corriger
 
+(Vérifié : `GET/PUT /admin/settings` ne manipulent que les quatre réglages de `SETTING_DEFAULTS`. La clé privée VAPID stockée dans `platform_setting` n'est ni lisible ni modifiable par ces routes, ce que `tests/integration/settings.test.ts` garantit.)
+
 | Sujet | Risque | Effort |
 |---|---|---|
-| `GET /admin/settings` renvoie toutes les lignes de `platform_setting`, dont `vapid_keys` (clé privée des notifications Web Push). `PUT /admin/settings` peut aussi les écraser. | Un administrateur disposant de `settings:read` obtient la clé privée. Filtrer ou déplacer ces clés. | S |
 | La commission réglable dans l'admin (`commission_pct`) n'est pas utilisée par le calcul de paiement, qui lit `PLATFORM_COMMISSION_PERCENTAGE`. | L'écran d'administration laisse croire qu'un changement s'applique. | S |
 
 ## 2. Actions du propriétaire (hors code)
