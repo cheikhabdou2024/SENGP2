@@ -1,4 +1,17 @@
 /* Script de creenvoi.html, extrait a l'identique de la page (aucun changement de comportement). */
+
+// Cet ecran ne sert qu'aux expediteurs : l'API refuse la creation d'une mission a un GP ou a un admin (403).
+// On le dit des l'ouverture plutot qu'a la derniere etape.
+(function guardAccountType() {
+    var user = null;
+    try { if (localStorage.getItem('authToken')) user = JSON.parse(localStorage.getItem('userData') || 'null'); } catch (e) { /* ignore */ }
+    if (!user || !user.user_type || user.user_type === 'expediteur') return;
+    var home = user.user_type === 'gp' ? 'dashgp.html' : (user.user_type === 'admin' ? 'admin.html' : 'index.html');
+    var msg = 'Cet écran est réservé aux comptes Expéditeur. Vous êtes connecté avec un compte « ' + (user.user_type === 'gp' ? 'Gros Porteur' : user.user_type) + ' ».\n\nPour créer un envoi, connectez-vous avec un compte Expéditeur.';
+    var go = function () { window.location.replace(home); };
+    if (typeof window.sengpAlert === 'function') window.sengpAlert(msg, 'Compte non autorisé').then(go, go);
+    else { alert(msg); go(); }
+})();
         let currentStep = 1;
         const totalSteps = 4;
 
@@ -893,6 +906,9 @@
                     })
                 });
                 const missionResult = await missionRes.json();
+                if (missionRes.status === 403) {
+                    throw new Error('Votre compte n’est pas un compte Expéditeur : seuls les expéditeurs peuvent créer un envoi. Connectez-vous avec un compte Expéditeur.');
+                }
                 if (!missionRes.ok || !missionResult.success) {
                     throw new Error(missionResult.error || 'Création de la mission échouée');
                 }

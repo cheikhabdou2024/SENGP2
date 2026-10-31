@@ -76,3 +76,35 @@ test('le service worker est versionne au build', () => {
   assert.ok(!/sengp-v\d+/.test(sw), 'ancien nom de cache fixe');
   assert.match(sw, /'api\.js'/);
 });
+
+test('creenvoi : un compte GP ou admin est renvoye avec un message clair, un expediteur reste', async () => {
+  const vm = require('node:vm');
+  const src = read('page-creenvoi.js');
+  const start = src.indexOf('(function guardAccountType');
+  const end = src.indexOf('})();', start) + 5;
+  assert.ok(start >= 0 && end > start, 'garde introuvable');
+  const guard = src.slice(start, end);
+
+  function run(user, token = 'tok') {
+    const calls = { alert: null, replaced: null };
+    const store = { authToken: token, userData: user ? JSON.stringify(user) : null };
+    const win = {
+      localStorage: { getItem: k => store[k] ?? null },
+      sengpAlert: (m, t) => { calls.alert = { m, t }; return Promise.resolve(); },
+      location: { replace: u => { calls.replaced = u; } },
+    };
+    vm.runInNewContext(guard, { window: win, localStorage: win.localStorage, alert: () => {} });
+    return new Promise(r => setTimeout(() => r(calls), 0));
+  }
+
+  const exp = await run({ user_type: 'expediteur' });
+  assert.equal(exp.alert, null); assert.equal(exp.replaced, null);
+  const gp = await run({ user_type: 'gp' });
+  assert.match(gp.alert.m, /réservé aux comptes Expéditeur/); assert.equal(gp.replaced, 'dashgp.html');
+  const admin = await run({ user_type: 'admin' });
+  assert.equal(admin.replaced, 'admin.html');
+  const anon = await run(null);
+  assert.equal(anon.alert, null);
+
+  assert.match(src, /missionRes\.status === 403/);
+});
