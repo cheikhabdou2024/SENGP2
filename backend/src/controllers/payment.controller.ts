@@ -115,9 +115,9 @@ export class PaymentController {
       res.status(result.status).json({ success: result.status < 400, message: result.message });
     } catch (error: any) {
       logger.error(`Webhook ${key} error:`, error);
-      // Respond 200 so the provider does not retry a permanent application error,
-      // but log it for investigation.
-      res.status(200).json({ success: false, message: 'Webhook processing error' });
+      // 500 so the provider retries: settlement is idempotent, and answering 200
+      // here would silently lose a payment on a transient failure (DB down, timeout).
+      res.status(500).json({ success: false, message: 'Webhook processing error' });
     }
   }
 }

@@ -39,6 +39,8 @@ export interface ParsedWebhook {
   reference?: string;
   /** The provider's transaction id. */
   providerTxnId?: string;
+  /** Amount the provider says it collected, when the callback carries one. */
+  amount?: number;
   /**
    * Per-transaction secret used to correlate + authenticate the callback when
    * there is no reference echoed back (Orange `notif_token`). The service looks

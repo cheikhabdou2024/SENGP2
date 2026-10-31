@@ -449,13 +449,18 @@ export class MissionService {
 
       // Load current state for authorization + transition validation.
       const cur = await client.query(
-        `SELECT status, gp_id, expediteur_id FROM missions WHERE id = $1`,
+        `SELECT status, gp_id, expediteur_id FROM missions WHERE id = $1 FOR UPDATE`,
         [id]
       );
       if (cur.rows.length === 0) {
         throw new Error('Mission not found');
       }
       const current = String(cur.rows[0].status || '').toLowerCase();
+      // Two concurrent deliveries are serialised by the row lock above; the second
+      // one must not credit the GP again.
+      if (status === MissionStatus.DELIVERED && current === 'delivered') {
+        throw new Error('La mission est déjà livrée');
+      }
       const gpId = cur.rows[0].gp_id;
       const expediteurId = cur.rows[0].expediteur_id;
 
@@ -533,10 +538,16 @@ export class MissionService {
         // Credit the GP wallet from the mission's completed (upfront) payment.
         if (mission.gp_id) {
           const payRes = await client.query(
-            `SELECT net_amount FROM payments
-             WHERE mission_id = $1 AND status = 'completed' AND transaction_type = 'mission_payment'
-             ORDER BY completed_at DESC LIMIT 1`,
-            [id]
+            `UPDATE payments SET credited_at = CURRENT_TIMESTAMP, payee_id = $2
+             WHERE id = (
+               SELECT id FROM payments
+               WHERE mission_id = $1 AND status = 'completed' AND transaction_type = 'mission_payment'
+                 AND credited_at IS NULL
+               ORDER BY completed_at DESC LIMIT 1
+               FOR UPDATE
+             )
+             RETURNING net_amount`,
+            [id, mission.gp_id]
           );
 
           if (payRes.rows.length > 0) {

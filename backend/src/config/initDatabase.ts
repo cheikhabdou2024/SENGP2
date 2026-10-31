@@ -80,6 +80,17 @@ export async function initDatabase(): Promise<void> {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`);
     await pool.query('CREATE INDEX IF NOT EXISTS idx_push_subs_user ON push_subscriptions(user_id)');
+    // Lot 2 (money integrity): a payment credits the GP wallet at most once, and a
+    // mission has at most one completed payment.
+    await pool.query('ALTER TABLE payments ADD COLUMN IF NOT EXISTS credited_at TIMESTAMP');
+    try {
+      await pool.query(
+        `CREATE UNIQUE INDEX IF NOT EXISTS uniq_completed_mission_payment ON payments(mission_id)
+         WHERE status = 'completed' AND transaction_type = 'mission_payment'`
+      );
+    } catch (idxErr) {
+      logger.warn('uniq_completed_mission_payment not created (duplicate completed payments exist?):', idxErr);
+    }
     logger.info('Schema patches applied (phone/password nullable, delivery_token, recipient, mission_assigned, qr_code_url TEXT, payout_proof/refund)');
 
     // Incremental migration files (idempotent — safe to run on every boot).

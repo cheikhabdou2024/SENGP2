@@ -43,13 +43,17 @@ export class AdminPaymentService {
     const r = await pool.query(
       `UPDATE payments
           SET status = 'refunded', refund_reason = $2, refunded_at = CURRENT_TIMESTAMP
-        WHERE id = $1 AND status = 'completed'
+        WHERE id = $1 AND status = 'completed' AND credited_at IS NULL
         RETURNING id, payment_code, payer_id, amount`,
       [id, reason || null]
     );
     if (r.rows.length === 0) {
-      const exists = await pool.query('SELECT status FROM payments WHERE id = $1', [id]);
-      throw new Error(exists.rows.length === 0 ? 'Payment not found' : 'Only completed payments can be refunded');
+      const exists = await pool.query('SELECT status, credited_at FROM payments WHERE id = $1', [id]);
+      if (exists.rows.length === 0) throw new Error('Payment not found');
+      if (exists.rows[0].status === 'completed' && exists.rows[0].credited_at) {
+        throw new Error('Payment already credited to the GP: handle it as a claim or compensation');
+      }
+      throw new Error('Only completed payments can be refunded');
     }
     const p = r.rows[0];
     if (p.payer_id) {

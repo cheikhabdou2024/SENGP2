@@ -110,9 +110,12 @@ export class WaveProvider implements PaymentProvider {
       status = 'failed';
     }
 
+    const amount = obj.amount !== undefined && obj.amount !== null ? Number(obj.amount) : undefined;
+
     return {
       reference: obj.client_reference,
       providerTxnId: obj.id,
+      amount: Number.isFinite(amount) ? amount : undefined,
       status,
     };
   }

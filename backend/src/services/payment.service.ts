@@ -40,10 +40,30 @@ export class PaymentService {
       throw new Error('You can only pay for your own missions');
     }
 
-    const amount = data.amount ? Number(data.amount) : Number(mission.offered_price);
+    // The amount is always the mission price held by the server; a client-supplied
+    // amount is ignored so nobody can pay less than the agreed price.
+    const amount = Number(mission.final_price ?? mission.offered_price);
     if (!amount || amount <= 0) {
       throw new Error('Invalid payment amount');
     }
+    if (data.amount !== undefined && Number(data.amount) !== amount) {
+      logger.warn(`Payment amount mismatch for mission ${mission.mission_code}: client sent ${data.amount}, price is ${amount}`);
+    }
+
+    const alreadyPaid = await pool.query(
+      `SELECT 1 FROM payments
+        WHERE mission_id = $1 AND transaction_type = 'mission_payment' AND status = 'completed'`,
+      [mission.id]
+    );
+    if (alreadyPaid.rows.length > 0) {
+      throw new Error('This mission has already been paid');
+    }
+    // A new attempt supersedes abandoned ones.
+    await pool.query(
+      `UPDATE payments SET status = 'failed', failure_reason = 'Superseded by a new attempt'
+        WHERE mission_id = $1 AND transaction_type = 'mission_payment' AND status = 'pending'`,
+      [mission.id]
+    );
 
     const commissionPct = Number(process.env.PLATFORM_COMMISSION_PERCENTAGE) || 15;
     const commission = Helpers.calculateCommission(amount, commissionPct);
@@ -160,6 +180,17 @@ export class PaymentService {
       return { status: 200, message: 'Already processed' };
     }
 
+    // A refunded payment is final; a late callback must not resurrect it.
+    if (payment.status === 'refunded') {
+      return { status: 200, message: 'Already refunded' };
+    }
+
+    // The provider must have collected exactly what we asked for.
+    if (parsed.status === 'completed' && parsed.amount !== undefined && parsed.amount !== Number(payment.amount)) {
+      logger.error(`Webhook ${webhookKey}: amount mismatch for ${payment.payment_code} (got ${parsed.amount}, expected ${payment.amount})`);
+      return { status: 400, message: 'Amount mismatch' };
+    }
+
     if (parsed.status === 'completed') {
       await this.markCompleted(payment, parsed.providerTxnId);
       return { status: 200, message: 'Completed' };
@@ -189,7 +220,7 @@ export class PaymentService {
         `UPDATE payments
          SET status = 'completed', external_transaction_id = $1,
              processed_at = CURRENT_TIMESTAMP, completed_at = CURRENT_TIMESTAMP
-         WHERE id = $2 AND status <> 'completed'
+         WHERE id = $2 AND status IN ('pending', 'failed')
          RETURNING *`,
         [providerTxnId || null, payment.id]
       );
