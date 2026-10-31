@@ -2,13 +2,14 @@ import pool from '../config/database';
 import { Payment, NotificationType } from '../types';
 import { Helpers } from '../utils/helpers';
 import logger from '../utils/logger';
+import { config } from '../config/env';
+import { withTransaction } from '../utils/transaction';
+import { AppError } from '../utils/AppError';
 import { getProvider, getProviderByWebhookKey } from './providers';
 import { NotificationService } from './notification.service';
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-const CURRENCY = process.env.PAYMENT_CURRENCY || 'XOF';
 
 export class PaymentService {
   /** Resolve a mission reference (UUID or human mission_code) to its row. */
@@ -56,7 +57,7 @@ export class PaymentService {
       [mission.id]
     );
     if (alreadyPaid.rows.length > 0) {
-      throw new Error('This mission has already been paid');
+      throw AppError.conflict('This mission has already been paid');
     }
     // A new attempt supersedes abandoned ones.
     await pool.query(
@@ -65,7 +66,7 @@ export class PaymentService {
       [mission.id]
     );
 
-    const commissionPct = Number(process.env.PLATFORM_COMMISSION_PERCENTAGE) || 15;
+    const commissionPct = config.commissionPct;
     const commission = Helpers.calculateCommission(amount, commissionPct);
     const net_amount = amount - commission;
     const payment_code = Helpers.generateCode('PAY');
@@ -85,7 +86,7 @@ export class PaymentService {
         payerId,
         mission.gp_id || null,
         amount,
-        CURRENCY,
+        config.currency,
         commission,
         net_amount,
         data.payment_method,
@@ -101,7 +102,7 @@ export class PaymentService {
 
       const checkout = await provider.createCheckout({
         amount,
-        currency: CURRENCY,
+        currency: config.currency,
         reference: payment_code,
         successUrl,
         errorUrl,
@@ -212,10 +213,7 @@ export class PaymentService {
    * out of this payment when the mission is delivered (see MissionService).
    */
   private static async markCompleted(payment: any, providerTxnId?: string): Promise<void> {
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-
+    const settled = await withTransaction(async client => {
       const upd = await client.query(
         `UPDATE payments
          SET status = 'completed', external_transaction_id = $1,
@@ -226,23 +224,15 @@ export class PaymentService {
       );
 
       // Another concurrent webhook won the race — nothing to do.
-      if (upd.rows.length === 0) {
-        await client.query('COMMIT');
-        return;
-      }
+      if (upd.rows.length === 0) return false;
 
       await client.query(
         `UPDATE expediteur_profiles SET total_spent = total_spent + $1 WHERE user_id = $2`,
         [payment.amount, payment.payer_id]
       );
-
-      await client.query('COMMIT');
-    } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-    } finally {
-      client.release();
-    }
+      return true;
+    });
+    if (!settled) return;
 
     logger.info(`Payment completed: ${payment.payment_code}`);
 

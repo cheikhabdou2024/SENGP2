@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { MissionService } from '../services/mission.service';
+import { MissionDeliveryService } from '../services/mission-delivery.service';
 import { ResponseUtil } from '../utils/response';
 import logger from '../utils/logger';
 import QRCode from 'qrcode';
@@ -74,7 +75,7 @@ export class PublicController {
     try {
       const token = sanitizeToken(req.params.token);
       if (!token) { ResponseUtil.badRequest(res, 'Invalid token'); return; }
-      const data = await MissionService.getDeliveryInfo(token);
+      const data = await MissionDeliveryService.getDeliveryInfo(token);
       ResponseUtil.success(res, data);
     } catch (e: any) {
       if (e.message === 'Not found') { ResponseUtil.notFound(res, 'Colis introuvable'); return; }
@@ -93,7 +94,7 @@ export class PublicController {
       if (!token) { ResponseUtil.badRequest(res, 'Invalid token'); return; }
       const lat = req.body && req.body.lat != null ? parseFloat(req.body.lat) : undefined;
       const lng = req.body && req.body.lng != null ? parseFloat(req.body.lng) : undefined;
-      const r = await MissionService.confirmDeliveryByToken(token, {
+      const r = await MissionDeliveryService.confirmDeliveryByToken(token, {
         lat: Number.isNaN(lat as number) ? undefined : lat,
         lng: Number.isNaN(lng as number) ? undefined : lng,
       });
@@ -114,7 +115,7 @@ export class PublicController {
     const token = sanitizeToken(req.params.token);
     const esc = (s: any) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     try {
-      const info = await MissionService.getDeliveryInfo(token);
+      const info = await MissionDeliveryService.getDeliveryInfo(token);
       const qr = await QRCode.toDataURL(`${req.protocol}://${req.get('host')}/d/${token}`, { margin: 1, width: 360 });
       const html = `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">

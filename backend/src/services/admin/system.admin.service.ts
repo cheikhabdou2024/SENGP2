@@ -1,3 +1,4 @@
+import { config } from '../../config/env';
 import pool from '../../config/database';
 import bcrypt from 'bcryptjs';
 import { Helpers } from '../../utils/helpers';
@@ -54,7 +55,7 @@ export class AdminSystemService {
 
   // ---------- Platform settings ----------
   static SETTING_DEFAULTS: Record<string, any> = {
-    commission_pct: Number(process.env.PLATFORM_COMMISSION_PERCENTAGE) || 15,
+    commission_pct: config.commissionPct,
     insurance_pct: Number(process.env.INSURANCE_FEE_PERCENTAGE) || 2,
     min_withdrawal: Number(process.env.MIN_WITHDRAWAL_AMOUNT) || 5000,
     supported_countries: ['Sénégal', 'France', 'USA', 'Canada', 'Maroc', 'Côte d\'Ivoire', 'Mali'],

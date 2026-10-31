@@ -1,5 +1,6 @@
 import { MissionController } from '../src/controllers/mission.controller';
 import { MissionService } from '../src/services/mission.service';
+import { MissionDeliveryService } from '../src/services/mission-delivery.service';
 
 jest.mock('../src/services/mission.service', () => ({
   MissionService: {
@@ -8,6 +9,10 @@ jest.mock('../src/services/mission.service', () => ({
     update: jest.fn(),
     getTrackingHistory: jest.fn(),
     trackByNumber: jest.fn(),
+  },
+}));
+jest.mock('../src/services/mission-delivery.service', () => ({
+  MissionDeliveryService: {
     generateDeliveryQR: jest.fn(),
   },
 }));
@@ -17,6 +22,7 @@ jest.mock('../src/utils/logger', () => ({
 }));
 
 const svc = MissionService as jest.Mocked<typeof MissionService>;
+const delivery = MissionDeliveryService as jest.Mocked<typeof MissionDeliveryService>;
 
 function makeRes() {
   const res: any = { statusCode: 200, body: undefined };
@@ -165,7 +171,7 @@ describe('QR et suivi', () => {
     const res = makeRes();
     await MissionController.generateQRCode(makeReq(stranger, { params: { id: 'm1' } }), res);
     expect(res.statusCode).toBe(404);
-    expect(svc.generateDeliveryQR).not.toHaveBeenCalled();
+    expect(delivery.generateDeliveryQR).not.toHaveBeenCalled();
   });
 
   it('n’expose pas l’historique de suivi à un tiers', async () => {

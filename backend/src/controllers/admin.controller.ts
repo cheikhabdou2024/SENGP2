@@ -208,7 +208,7 @@ export class AdminController {
   }
   static async assignMission(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const m = await AdminService.assignMission(req.params.id, req.body.gp_id);
+      const m = await AdminService.assignMission(req.params.id, req.body.gp_id, req.body.trip_id);
       void logAdminAction({ req, action: 'mission.assign', entityType: 'mission', entityId: req.params.id, metadata: { gp_id: req.body.gp_id } });
       ResponseUtil.success(res, m, 'Mission assigned and GP notified');
     } catch (e: any) {

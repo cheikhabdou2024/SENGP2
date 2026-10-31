@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { MissionService } from '../services/mission.service';
+import { MissionDeliveryService } from '../services/mission-delivery.service';
 import { ResponseUtil } from '../utils/response';
 import { AuthRequest, UserType } from '../types';
 import logger from '../utils/logger';
@@ -271,7 +272,7 @@ export class MissionController {
         return;
       }
       const baseUrl = `${req.protocol}://${req.get('host')}`;
-      const data = await MissionService.generateDeliveryQR(req.params.id, baseUrl);
+      const data = await MissionDeliveryService.generateDeliveryQR(req.params.id, baseUrl);
       ResponseUtil.success(res, data, 'Delivery QR ready');
     } catch (error: any) {
       logger.error('Delivery QR error:', error);
@@ -286,7 +287,7 @@ export class MissionController {
   static async setRecipient(req: AuthRequest, res: Response): Promise<void> {
     try {
       if (!req.user) { ResponseUtil.unauthorized(res); return; }
-      const data = await MissionService.setRecipient(
+      const data = await MissionDeliveryService.setRecipient(
         req.params.id, req.user.id, req.body.name, req.body.phone
       );
       ResponseUtil.success(res, data, 'Destinataire enregistré');
@@ -367,7 +368,7 @@ export class MissionController {
       }
       // Un seul QR par envoi : le même code sert au colis et au destinataire (lien /d/<jeton>).
       const baseUrl = `${req.protocol}://${req.get('host')}`;
-      const data = await MissionService.generateDeliveryQR(req.params.id, baseUrl);
+      const data = await MissionDeliveryService.generateDeliveryQR(req.params.id, baseUrl);
 
       ResponseUtil.success(res, { qr_code_url: data.qr_code_url }, 'QR Code generated');
     } catch (error: any) {
@@ -380,7 +381,7 @@ export class MissionController {
   static async gpLock(req: AuthRequest, res: Response): Promise<void> {
     try {
       if (!req.user) { ResponseUtil.unauthorized(res); return; }
-      const locked = req.user.user_type === UserType.GP ? await MissionService.isGpLocked(req.user.id) : false;
+      const locked = req.user.user_type === UserType.GP ? await MissionDeliveryService.isGpLocked(req.user.id) : false;
       ResponseUtil.success(res, { locked });
     } catch (error: any) {
       ResponseUtil.badRequest(res, error.message || 'Failed');
@@ -393,7 +394,7 @@ export class MissionController {
       if (!req.user) { ResponseUtil.unauthorized(res); return; }
       const { package_qr, recipient_qr } = req.body || {};
       if (!package_qr || !recipient_qr) { ResponseUtil.badRequest(res, 'Les deux QR codes sont requis'); return; }
-      const r = await MissionService.verifyPair(String(package_qr), String(recipient_qr), req.user.id);
+      const r = await MissionDeliveryService.verifyPair(String(package_qr), String(recipient_qr), req.user.id);
       ResponseUtil.success(res, r, r.match ? 'QR compatibles — livraison confirmée' : 'QR incompatibles');
     } catch (error: any) {
       logger.error('Verify pair error:', error);
@@ -405,7 +406,7 @@ export class MissionController {
   static async scanComplete(req: AuthRequest, res: Response): Promise<void> {
     try {
       if (!req.user) { ResponseUtil.unauthorized(res); return; }
-      const r = await MissionService.completeScan(req.user.id);
+      const r = await MissionDeliveryService.completeScan(req.user.id);
       ResponseUtil.success(res, r, 'Scan terminé — en attente de validation par l\'administration');
     } catch (error: any) {
       ResponseUtil.badRequest(res, error.message || 'Échec');
@@ -434,7 +435,7 @@ export class MissionController {
         return;
       }
 
-      const mission = await MissionService.verifyDeliveryByQR(qr_data, req.user.id);
+      const mission = await MissionDeliveryService.verifyDeliveryByQR(qr_data, req.user.id);
 
       ResponseUtil.success(res, { mission }, 'Livraison confirmée avec succès');
     } catch (error: any) {

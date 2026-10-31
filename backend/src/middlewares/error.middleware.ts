@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ResponseUtil } from '../utils/response';
 import logger from '../utils/logger';
+import { AppError } from '../utils/AppError';
 
 export class ErrorMiddleware {
   /**
@@ -14,6 +15,12 @@ export class ErrorMiddleware {
       method: req.method,
       ip: req.ip,
     });
+
+    // Errors raised on purpose with their own HTTP status
+    if (err instanceof AppError) {
+      res.status(err.statusCode).json({ success: false, error: err.message });
+      return;
+    }
 
     // Database errors
     if (err.code === '23505') {

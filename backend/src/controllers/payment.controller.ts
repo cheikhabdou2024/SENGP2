@@ -1,3 +1,4 @@
+import { AppError } from '../utils/AppError';
 import { Response } from 'express';
 import { PaymentService } from '../services/payment.service';
 import { ResponseUtil } from '../utils/response';
@@ -21,6 +22,11 @@ export class PaymentController {
       ResponseUtil.created(res, { payment, redirect_url }, 'Payment initiated');
     } catch (error: any) {
       logger.error('Payment creation error:', error);
+
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({ success: false, error: error.message });
+        return;
+      }
 
       if (error.message === 'Mission not found') {
         ResponseUtil.notFound(res, error.message);
