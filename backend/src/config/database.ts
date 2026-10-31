@@ -52,9 +52,10 @@ if (process.env.RDS_HOSTNAME) {
 const pool = new Pool(poolConfig);
 
 // Handle pool errors
+// An error on an idle client (network blip, RDS failover) is logged and the pool
+// replaces the connection; exiting here would turn a transient glitch into an outage.
 pool.on('error', (err) => {
   console.error('Unexpected error on idle client', err);
-  process.exit(-1);
 });
 
 // Test database connection

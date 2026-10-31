@@ -1,0 +1,20 @@
+version: 0.2
+
+# Source of truth for the `sengp-build` CodeBuild project (the project holds an inline
+# copy: re-apply it with scripts/apply-buildspec.sh after editing this file).
+#
+# Every build is pushed under an immutable tag (build-<number>) AND as :latest, which is
+# what App Runner runs. Rolling back = pointing :latest at an older build-<number> tag
+# (see scripts/rollback-backend.sh and docs/runbook.md).
+
+phases:
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_URI
+  build:
+    commands:
+      - docker build -t $ECR_URI:latest -t $ECR_URI:build-$CODEBUILD_BUILD_NUMBER .
+  post_build:
+    commands:
+      - docker push $ECR_URI:build-$CODEBUILD_BUILD_NUMBER
+      - docker push $ECR_URI:latest

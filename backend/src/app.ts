@@ -8,6 +8,7 @@ import path from 'path';
 import { ErrorMiddleware } from './middlewares/error.middleware';
 import { RateLimitMiddleware } from './middlewares/rateLimit.middleware';
 import logger from './utils/logger';
+import pool from './config/database';
 import { resolveAllowedOrigins, isOriginAllowed } from './config/cors';
 
 // Import routes
@@ -124,6 +125,18 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
   });
+});
+
+// Readiness: the instance can serve traffic only if the database answers.
+// /health stays a pure liveness probe (no dependency), this one is for monitors and runbooks.
+app.get('/health/ready', async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.status(200).json({ success: true, database: 'up' });
+  } catch (error) {
+    logger.error('Readiness check failed:', error);
+    res.status(503).json({ success: false, database: 'down' });
+  }
 });
 
 // API Routes

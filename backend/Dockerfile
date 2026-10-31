@@ -1,42 +1,42 @@
 # Build stage
-FROM public.ecr.aws/docker/library/node:18-alpine AS builder
+FROM public.ecr.aws/docker/library/node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
 
-# Install all dependencies (including devDependencies for building)
+# All dependencies (devDependencies are needed to compile TypeScript)
 RUN npm ci && npm cache clean --force
 
-# Copy source code
 COPY . .
 
-# Build TypeScript
 RUN npm run build
 
 # Production stage
-FROM public.ecr.aws/docker/library/node:18-alpine
+FROM public.ecr.aws/docker/library/node:20-alpine
 
+ENV NODE_ENV=production
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
 
-# Install production dependencies only
-RUN npm ci --only=production && npm cache clean --force
+# Production dependencies only
+RUN npm ci --omit=dev && npm cache clean --force
 
-# Copy built files from builder
 COPY --from=builder /app/dist ./dist
 
-# Copy migrations folder
+# SQL migrations are read at runtime from dist/migrations
 COPY --from=builder /app/src/migrations ./dist/migrations
 
-# Create uploads directory
-RUN mkdir -p uploads logs
+# Runtime folders, owned by the unprivileged user
+RUN mkdir -p uploads logs && chown -R node:node /app
 
-# Expose port
+USER node
+
 EXPOSE 5000
 
-# Start the application
-CMD ["npm", "start"]
+# Liveness only (no database call): the platform restarts the container if this fails
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+  CMD wget -qO- "http://127.0.0.1:${PORT:-5000}/health" > /dev/null || exit 1
+
+CMD ["node", "dist/server.js"]
