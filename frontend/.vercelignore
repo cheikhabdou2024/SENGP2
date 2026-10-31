@@ -3,5 +3,5 @@ www
 android
 ios
 ci
-scripts
+scripts/patch-ios.js
 * - Copie.html
