@@ -5,9 +5,10 @@ set -euo pipefail
 REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 PROJECT="${SENGP_BUILD_PROJECT:-sengp-build}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+PY="$(command -v python3 || command -v python)"
 SPEC="$(cat "$ROOT/backend/buildspec.yml")"
 
 SRC=$(aws codebuild batch-get-projects --names "$PROJECT" --region "$REGION" --query 'projects[0].source' --output json)
-NEW=$(echo "$SRC" | SPEC="$SPEC" python3 -c 'import json,os,sys; s=json.load(sys.stdin); s["buildspec"]=os.environ["SPEC"]; print(json.dumps(s))')
+NEW=$(echo "$SRC" | SPEC="$SPEC" "$PY" -c 'import json,os,sys; s=json.load(sys.stdin); s["buildspec"]=os.environ["SPEC"]; print(json.dumps(s))')
 aws codebuild update-project --name "$PROJECT" --region "$REGION" --source "$NEW" --query 'project.name' --output text
 echo "buildspec updated for $PROJECT"
