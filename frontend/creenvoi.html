@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>SEN GP - Créer un Envoi</title>
+    <title data-i18n="cr.page_title">SEN GP - Créer un Envoi</title>
     <style>
         * {
             margin: 0;
@@ -1337,6 +1337,17 @@
         .fd__chev { width: 22px; height: 22px; color: var(--cr-navy); }
 
         .fd__phone { padding-left: 14px; }
+
+        /* Droite a gauche (arabe) */
+        [dir="rtl"] .stepper-progress { left: auto; right: 12.5%; }
+        [dir="rtl"] .pc-ok { left: auto; right: 10px; }
+        [dir="rtl"] .pc-change, [dir="rtl"] .remove-media-btn { right: auto; left: 10px; }
+        [dir="rtl"] .ty__ck { right: auto; left: 5px; }
+        [dir="rtl"] .fd__phone { padding-left: 0; padding-right: 14px; }
+        [dir="rtl"] .rc-place--r { text-align: left; }
+        [dir="rtl"] .rc-row span:last-child, [dir="rtl"] .rc-total span:last-child { text-align: left; }
+        [dir="rtl"] .rc-col + .rc-col { padding-left: 0; padding-right: 14px; border-left: 0; border-right: 1px solid #E3EAF3; }
+        [dir="rtl"] .back-btn svg, [dir="rtl"] #prevBtn svg, [dir="rtl"] #nextBtn svg { transform: scaleX(-1); }
         .fd__code { display: flex; align-items: center; gap: 8px; min-height: 58px; padding: 0; border: 0; background: none; font-size: 18px; font-weight: 600; color: var(--cr-navy); cursor: pointer; }
         .fd__code .selected-flag { font-size: 28px; }
         .fd__code .selected-code { flex: none; font-size: 18px; font-weight: 600; color: var(--cr-navy); }
@@ -1513,6 +1524,8 @@
         body{padding:0!important;}
         </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
+    <link rel="stylesheet" href="i18n.css">
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -1542,12 +1555,12 @@
                 </picture>
                 <div class="cr-hero__in">
                     <div class="header">
-                        <button type="button" class="back-btn" onclick="goBack()" aria-label="Retour">
+                        <button type="button" class="back-btn" onclick="goBack()" aria-label="Retour" data-i18n-attr="aria-label:cr.retour">
                             <svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
                         </button>
                         <div class="header-title">
-                            <h1>Créer un envoi</h1>
-                            <p id="stepDescription">Détails du colis</p>
+                            <h1 data-i18n="cr.creer_un_envoi">Créer un envoi</h1>
+                            <p id="stepDescription" data-i18n="cr.details_du_colis">Détails du colis</p>
                         </div>
                     </div>
 
@@ -1556,22 +1569,22 @@
 
                         <div class="step active" data-step="1">
                             <div class="step-circle">1</div>
-                            <div class="step-label">Colis</div>
+                            <div class="step-label" data-i18n="cr.colis">Colis</div>
                         </div>
 
                         <div class="step" data-step="2">
                             <div class="step-circle">2</div>
-                            <div class="step-label">Adresses</div>
+                            <div class="step-label" data-i18n="cr.adresses">Adresses</div>
                         </div>
 
                         <div class="step" data-step="3">
                             <div class="step-circle">3</div>
-                            <div class="step-label">Récap</div>
+                            <div class="step-label" data-i18n="cr.recap">Récap</div>
                         </div>
 
                         <div class="step" data-step="4">
                             <div class="step-circle">4</div>
-                            <div class="step-label">Paiement</div>
+                            <div class="step-label" data-i18n="cr.paiement">Paiement</div>
                         </div>
                     </div>
                 </div>
@@ -1590,8 +1603,8 @@
                             <img class="pc-box" src="im/sengp-box-3d.png" alt="" width="378" height="255" decoding="async">
                         </picture>
                         <div>
-                            <h2 id="pcTitle">Votre colis</h2>
-                            <p>Prenez une photo de votre colis pour un traitement plus rapide.</p>
+                            <h2 id="pcTitle" data-i18n="cr.votre_colis">Votre colis</h2>
+                            <p data-i18n="cr.prenez_une_photo_de">Prenez une photo de votre colis pour un traitement plus rapide.</p>
                         </div>
                     </div>
 
@@ -1599,8 +1612,8 @@
 
                     <button type="button" class="pc-drop" id="mediaUploadSection" onclick="document.getElementById('mediaInput').click()">
                         <span class="pc-drop__ic"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></span>
-                        <span class="pc-drop__t" id="dropTitle">Prendre une photo du colis</span>
-                        <span class="pc-drop__s" id="dropSub">Une seule photo (max 50MB)</span>
+                        <span class="pc-drop__t" id="dropTitle" data-i18n="cr.prendre_une_photo_du">Prendre une photo du colis</span>
+                        <span class="pc-drop__s" id="dropSub" data-i18n="cr.une_seule_photo_max">Une seule photo (max 50MB)</span>
                     </button>
 
                     <div class="pc-alert" id="photoAlert" role="alert" hidden>
@@ -1614,42 +1627,42 @@
 
                     <div class="pc-preview" id="mediaPreview" hidden>
                         <div id="previewContent"></div>
-                        <span class="pc-ok"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Photo validée</span>
-                        <button type="button" class="pc-change" onclick="removeMedia(); document.getElementById('mediaInput').click()">Changer</button>
-                        <button type="button" class="remove-media-btn" onclick="removeMedia()" aria-label="Supprimer la photo">×</button>
+                        <span class="pc-ok"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="cr.photo_validee">Photo validée</span></span>
+                        <button type="button" class="pc-change" onclick="removeMedia(); document.getElementById('mediaInput').click()" data-i18n="cr.changer">Changer</button>
+                        <button type="button" class="remove-media-btn" onclick="removeMedia()" aria-label="Supprimer la photo" data-i18n-attr="aria-label:cr.supprimer_la_photo">×</button>
                     </div>
                 </section>
 
                 <!-- Package type -->
                 <fieldset class="cr-card">
-                    <legend>Type de colis <span class="cr-req">*</span></legend>
-                    <div class="ty-grid" id="tyGrid" role="radiogroup" aria-label="Type de colis"></div>
+                    <legend><span data-i18n="cr.type_de_colis">Type de colis</span> <span class="cr-req">*</span></legend>
+                    <div class="ty-grid" id="tyGrid" role="radiogroup" aria-label="Type de colis" data-i18n-attr="aria-label:cr.type_de_colis"></div>
                     <button type="button" class="ty-more" id="tyMore" aria-expanded="false" onclick="toggleMoreTypes()">
-                        <span id="tyMoreLabel">Voir tous les types</span>
+                        <span id="tyMoreLabel" data-i18n="cr.voir_tous_les_types">Voir tous les types</span>
                         <svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                     </button>
-                    <div class="pc-danger" id="dangerNote" role="note" hidden>
+                    <div class="pc-danger" id="dangerNote" role="note" hidden data-i18n="cr.les_matieres_dangereuses_inflammables">
                         Les matières dangereuses (inflammables, explosifs, batteries au lithium…) sont soumises à des règles strictes de transport aérien. Indiquez précisément le contenu dans la description.
                     </div>
                     <!-- Kept for the existing form logic (summary, validation) -->
                     <select id="packageType" hidden onchange="validateForm()" tabindex="-1" aria-hidden="true">
-                        <option value="">Sélectionner...</option>
+                        <option value="" data-i18n="cr.selectionner">Sélectionner...</option>
                     </select>
                 </fieldset>
 
                 <!-- Weight -->
                 <section class="cr-card" aria-labelledby="wtTitle">
-                    <h2 id="wtTitle" style="margin-bottom: 12px;">Poids du colis <span class="cr-req">*</span></h2>
+                    <h2 id="wtTitle" style="margin-bottom: 12px;"><span data-i18n="cr.poids_du_colis">Poids du colis</span> <span class="cr-req">*</span></h2>
                     <div class="wt">
                         <svg class="cr-i wt__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 8h11a2 2 0 0 1 1.95 1.55l1.5 8A2 2 0 0 1 18.98 20H5.02a2 2 0 0 1-1.97-2.45l1.5-8A2 2 0 0 1 6.5 8z"/><circle cx="12" cy="5" r="2.2"/><text x="12" y="17" text-anchor="middle" font-size="6.5" font-weight="700" fill="currentColor" stroke="none" font-family="Inter, sans-serif">kg</text></svg>
-                        <button type="button" class="wt__btn" id="wtMinus" onclick="stepWeight(-1)" aria-label="Diminuer le poids" disabled>
+                        <button type="button" class="wt__btn" id="wtMinus" onclick="stepWeight(-1)" aria-label="Diminuer le poids" disabled data-i18n-attr="aria-label:cr.diminuer_le_poids">
                             <svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
                         </button>
                         <div class="wt__val">
-                            <input type="number" class="wt__in" id="packageWeight" min="0.1" step="0.1" inputmode="decimal" placeholder="0" aria-label="Poids du colis en kilogrammes" oninput="onWeightInput()" />
-                            <span class="wt__unit">kg</span>
+                            <input type="number" class="wt__in" id="packageWeight" min="0.1" step="0.1" inputmode="decimal" placeholder="0" aria-label="Poids du colis en kilogrammes" oninput="onWeightInput()"  data-i18n-attr="aria-label:cr.poids_du_colis_en"/>
+                            <span class="wt__unit" data-i18n="cr.kg">kg</span>
                         </div>
-                        <button type="button" class="wt__btn wt__btn--plus" id="wtPlus" onclick="stepWeight(1)" aria-label="Augmenter le poids">
+                        <button type="button" class="wt__btn wt__btn--plus" id="wtPlus" onclick="stepWeight(1)" aria-label="Augmenter le poids" data-i18n-attr="aria-label:cr.augmenter_le_poids">
                             <svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                         </button>
                     </div>
@@ -1657,8 +1670,8 @@
 
                 <!-- Description (text or audio) -->
                 <section class="cr-card" aria-labelledby="descTitle">
-                    <h2 id="descTitle">Description du colis</h2>
-                    <p class="cr-sub">Texte ou audio : décrivez le contenu (photo, texte ou audio suffit pour continuer).</p>
+                    <h2 id="descTitle" data-i18n="cr.description_du_colis">Description du colis</h2>
+                    <p class="cr-sub" data-i18n="cr.texte_ou_audio_decrivez">Texte ou audio : décrivez le contenu (photo, texte ou audio suffit pour continuer).</p>
                     <div class="form-group" style="margin: 12px 0 0;">
                     <div class="description-container">
                         <textarea
@@ -1667,13 +1680,13 @@
                             maxlength="500"
                             rows="4"
                             oninput="validateForm()"
-                        ></textarea>
-                        <button type="button" class="voice-btn" id="voiceBtn" onclick="openAudioControls()" title="Enregistrer un message audio">
+                         data-i18n-attr="placeholder:cr.decrivez_le_contenu_du"></textarea>
+                        <button type="button" class="voice-btn" id="voiceBtn" onclick="openAudioControls()" title="Enregistrer un message audio" data-i18n-attr="title:cr.enregistrer_un_message_audio">
                             <span class="voice-icon" data-icon="mic" data-size="18"></span>
                         </button>
                     </div>
                     <div class="char-counter">
-                        <span id="charCount">0</span> / 500 caractères
+                        <span id="charCount">0</span> <span data-i18n="cr.max_chars">/ 500 caractères</span>
                     </div>
 
                     <!-- WhatsApp-Style Audio Recording Controls -->
@@ -1682,7 +1695,7 @@
                             <div class="recording-mic-icon" data-icon="mic" data-size="34"></div>
                             <div class="recording-info">
                                 <div class="recording-timer" id="recordingTimer">0:00</div>
-                                <div class="recording-hint">Glissez pour annuler</div>
+                                <div class="recording-hint" data-i18n="cr.glissez_pour_annuler">Glissez pour annuler</div>
                             </div>
                             <div class="recording-actions">
                                 <button type="button" class="rec-action-btn pause" id="pauseBtn" onclick="pauseRecording()"><span data-icon="pause" data-size="20"></span></button>
@@ -1690,7 +1703,7 @@
                             </div>
                         </div>
 
-                        <button type="button" class="audio-btn audio-btn-start" id="startBtn" onclick="startRecording()" style="width: 100%; padding: 14px; border-radius: 12px; background: linear-gradient(135deg, #25D366 0%, #20BA5A 100%); color: white; border: none; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <button type="button" class="audio-btn audio-btn-start" id="startBtn" onclick="startRecording()" style="width: 100%; padding: 14px; border-radius: 12px; background: linear-gradient(135deg, #25D366 0%, #20BA5A 100%); color: white; border: none; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;" data-i18n="cr.commencer_l_enregistrement">
                             Commencer l'enregistrement
                         </button>
                     </div>
@@ -1710,7 +1723,7 @@
                                 </div>
                             </div>
                             <div class="audio-duration" id="audioDuration">0:00</div>
-                            <button type="button" class="delete-audio-btn" onclick="deleteAudio()" title="Supprimer l'audio"><span data-icon="trash" data-size="18"></span></button>
+                            <button type="button" class="delete-audio-btn" onclick="deleteAudio()" title="Supprimer l'audio" data-i18n-attr="title:cr.supprimer_l_audio"><span data-icon="trash" data-size="18"></span></button>
                         </div>
                     </div>
                     </div>
@@ -1724,32 +1737,32 @@
                     <div class="fd-head">
                         <span class="fd-tile fd-tile--peach" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
                         <div>
-                            <h2 id="rcTitle">Destinataire</h2>
-                            <p>Renseignez les informations du destinataire de votre colis.</p>
+                            <h2 id="rcTitle" data-i18n="cr.destinataire">Destinataire</h2>
+                            <p data-i18n="cr.renseignez_les_informations_du">Renseignez les informations du destinataire de votre colis.</p>
                         </div>
                     </div>
 
                     <div class="fd">
-                        <span class="fd__label" id="arrivalLabel">Pays et ville du destinataire <span class="cr-req">*</span></span>
+                        <span class="fd__label" id="arrivalLabel"><span data-i18n="cr.pays_et_ville_du">Pays et ville du destinataire</span> <span class="cr-req">*</span></span>
                         <button type="button" class="fd__box fd__pick" id="arrivalLocation" onclick="openLocationModal('arrival')" aria-labelledby="arrivalLabel arrivalName">
                             <span class="fd__flag" id="arrivalFlag"></span>
-                            <span class="fd__txt" id="arrivalName">Sélectionner...</span>
+                            <span class="fd__txt" id="arrivalName" data-i18n="cr.selectionner">Sélectionner...</span>
                             <svg class="cr-i fd__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
                     </div>
 
                     <div class="fd">
-                        <label class="fd__label" for="receiverName">Nom du destinataire <span class="cr-req">*</span></label>
+                        <label class="fd__label" for="receiverName"><span data-i18n="cr.nom_du_destinataire">Nom du destinataire</span> <span class="cr-req">*</span></label>
                         <div class="fd__box">
                             <svg class="cr-i fd__ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
-                            <input type="text" id="receiverName" placeholder="Ex: Awa Ndiaye" autocomplete="name" oninput="validateStep2()" />
+                            <input type="text" id="receiverName" placeholder="Ex: Awa Ndiaye" autocomplete="name" oninput="validateStep2()"  data-i18n-attr="placeholder:cr.ex_awa_ndiaye"/>
                         </div>
                     </div>
 
                     <div class="fd">
-                        <label class="fd__label" for="receiverPhone">Numéro de téléphone du destinataire <span class="cr-req">*</span></label>
+                        <label class="fd__label" for="receiverPhone"><span data-i18n="cr.numero_de_telephone_du">Numéro de téléphone du destinataire</span> <span class="cr-req">*</span></label>
                         <div class="fd__box fd__phone">
-                            <button type="button" class="fd__code" id="countryCodeBtn" onclick="openCountryCodeModal()" aria-label="Choisir l'indicatif du pays">
+                            <button type="button" class="fd__code" id="countryCodeBtn" onclick="openCountryCodeModal()" aria-label="Choisir l'indicatif du pays" data-i18n-attr="aria-label:cr.choisir_l_indicatif_du">
                                 <span class="selected-flag" id="selectedFlag">🇸🇳</span>
                                 <span class="selected-code" id="selectedCode">+221</span>
                                 <svg class="cr-i fd__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
@@ -1761,10 +1774,10 @@
                     </div>
 
                     <div class="fd" style="margin-bottom: 4px;">
-                        <label class="fd__label" for="deliveryAddress">Adresse de livraison <span class="cr-req">*</span></label>
+                        <label class="fd__label" for="deliveryAddress"><span data-i18n="cr.adresse_de_livraison">Adresse de livraison</span> <span class="cr-req">*</span></label>
                         <div class="fd__box">
                             <svg class="cr-i fd__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                            <input type="text" id="deliveryAddress" placeholder="Adresse complète de livraison" autocomplete="street-address" oninput="validateStep2()" />
+                            <input type="text" id="deliveryAddress" placeholder="Adresse complète de livraison" autocomplete="street-address" oninput="validateStep2()"  data-i18n-attr="placeholder:cr.adresse_complete_de_livraison"/>
                         </div>
                     </div>
                 </section>
@@ -1774,30 +1787,30 @@
                     <div class="fd-head">
                         <span class="fd-tile fd-tile--blue" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
                         <div>
-                            <h2 id="pkTitle">Retrait et départ</h2>
-                            <p>Où récupérer votre colis et quand le faire partir.</p>
+                            <h2 id="pkTitle" data-i18n="cr.retrait_et_depart">Retrait et départ</h2>
+                            <p data-i18n="cr.ou_recuperer_votre_colis">Où récupérer votre colis et quand le faire partir.</p>
                         </div>
                     </div>
 
                     <div class="fd">
-                        <span class="fd__label" id="departureLabel">Pays et ville de départ <span class="cr-req">*</span></span>
+                        <span class="fd__label" id="departureLabel"><span data-i18n="cr.pays_et_ville_de">Pays et ville de départ</span> <span class="cr-req">*</span></span>
                         <button type="button" class="fd__box fd__pick" id="departureLocation" onclick="openLocationModal('departure')" aria-labelledby="departureLabel departureName">
                             <span class="fd__flag" id="departureFlag"></span>
-                            <span class="fd__txt" id="departureName">Sélectionner...</span>
+                            <span class="fd__txt" id="departureName" data-i18n="cr.selectionner">Sélectionner...</span>
                             <svg class="cr-i fd__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
                     </div>
 
                     <div class="fd">
-                        <label class="fd__label" for="pickupAddress">Adresse de ramassage <span class="cr-req">*</span></label>
+                        <label class="fd__label" for="pickupAddress"><span data-i18n="cr.adresse_de_ramassage">Adresse de ramassage</span> <span class="cr-req">*</span></label>
                         <div class="fd__box">
                             <svg class="cr-i fd__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg>
-                            <input type="text" id="pickupAddress" placeholder="Adresse complète de ramassage" autocomplete="street-address" oninput="validateStep2()" />
+                            <input type="text" id="pickupAddress" placeholder="Adresse complète de ramassage" autocomplete="street-address" oninput="validateStep2()"  data-i18n-attr="placeholder:cr.adresse_complete_de_ramassage"/>
                         </div>
                     </div>
 
                     <div class="fd" style="margin-bottom: 4px;">
-                        <label class="fd__label" for="desiredDepartureDate">Date de départ souhaitée <span class="cr-req">*</span></label>
+                        <label class="fd__label" for="desiredDepartureDate"><span data-i18n="cr.date_de_depart_souhaitee">Date de départ souhaitée</span> <span class="cr-req">*</span></label>
                         <div class="fd__box">
                             <svg class="cr-i fd__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
                             <input type="date" id="desiredDepartureDate" oninput="validateStep2()" onchange="validateStep2()" />
@@ -1809,40 +1822,40 @@
             <div class="step-content" data-step="3">
 
                 <div class="rc-intro">
-                    <h2>Récapitulatif de votre envoi</h2>
-                    <p>Vérifiez les informations avant le paiement.</p>
+                    <h2 data-i18n="cr.recapitulatif_de_votre_envoi">Récapitulatif de votre envoi</h2>
+                    <p data-i18n="cr.verifiez_les_informations_avant">Vérifiez les informations avant le paiement.</p>
                 </div>
 
                 <!-- Package -->
-                <section class="rc-card" aria-label="Colis">
+                <section class="rc-card" aria-label="Colis" data-i18n-attr="aria-label:cr.colis">
                     <div class="rc-pkg">
                         <div class="rc-pkg__img"><img id="summaryPhoto" src="im/sengp-box-3d.png" alt="" width="378" height="255" decoding="async"></div>
                         <div class="rc-pkg__main">
                             <div class="rc-pkg__type">
                                 <span class="rc-ic rc-ic--blue" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
-                                <div><span class="rc-k">Type de colis</span><span class="rc-v" id="summaryPackageType">-</span></div>
+                                <div><span class="rc-k" data-i18n="cr.type_de_colis">Type de colis</span><span class="rc-v" id="summaryPackageType">-</span></div>
                             </div>
-                            <button type="button" class="rc-edit" onclick="editStep(1)" aria-label="Modifier le colis"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Modifier</button>
+                            <button type="button" class="rc-edit" onclick="editStep(1)" aria-label="Modifier le colis" data-i18n-attr="aria-label:cr.modifier_le_colis"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span data-i18n="cr.modifier">Modifier</span></button>
                         </div>
                     </div>
                     <div class="rc-cols">
                         <div class="rc-col">
                             <span class="rc-ic rc-ic--grey" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><path d="M6.5 8h11a2 2 0 0 1 1.95 1.55l1.5 8A2 2 0 0 1 18.98 20H5.02a2 2 0 0 1-1.97-2.45l1.5-8A2 2 0 0 1 6.5 8z"/><circle cx="12" cy="5" r="2.2"/></svg></span>
-                            <div><span class="rc-k">Poids</span><span class="rc-v" id="summaryWeight">-</span></div>
+                            <div><span class="rc-k" data-i18n="cr.poids">Poids</span><span class="rc-v" id="summaryWeight">-</span></div>
                         </div>
                         <div class="rc-col">
                             <span class="rc-ic rc-ic--grey" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></span>
-                            <div><span class="rc-k">Description</span><span class="rc-v" id="summaryDesc">-</span></div>
+                            <div><span class="rc-k" data-i18n="cr.description">Description</span><span class="rc-v" id="summaryDesc">-</span></div>
                         </div>
                     </div>
                 </section>
 
                 <!-- Route -->
-                <section class="rc-card" aria-label="Trajet">
+                <section class="rc-card" aria-label="Trajet" data-i18n-attr="aria-label:cr.trajet">
                     <div class="rc-head">
                         <span class="rc-ic rc-ic--red" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
-                        <div class="rc-head__t"><span class="rc-k">Trajet</span><span class="rc-v" id="summaryRoute">-</span></div>
-                        <button type="button" class="rc-edit" onclick="editStep(2)" aria-label="Modifier le trajet"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Modifier</button>
+                        <div class="rc-head__t"><span class="rc-k" data-i18n="cr.trajet">Trajet</span><span class="rc-v" id="summaryRoute">-</span></div>
+                        <button type="button" class="rc-edit" onclick="editStep(2)" aria-label="Modifier le trajet" data-i18n-attr="aria-label:cr.modifier_le_trajet"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span data-i18n="cr.modifier">Modifier</span></button>
                     </div>
                     <div class="rc-route">
                         <div class="rc-place"><span class="rc-flag" id="sumFromFlag"></span><div><b id="sumFromCity">-</b><small id="sumFromCountry"></small></div></div>
@@ -1852,61 +1865,61 @@
                 </section>
 
                 <!-- Recipient -->
-                <section class="rc-card" aria-label="Destinataire">
+                <section class="rc-card" aria-label="Destinataire" data-i18n-attr="aria-label:cr.destinataire">
                     <div class="rc-head">
                         <span class="rc-ic rc-ic--blue" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
-                        <div class="rc-head__t"><span class="rc-k">Destinataire</span></div>
-                        <button type="button" class="rc-edit" onclick="editStep(2)" aria-label="Modifier le destinataire"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Modifier</button>
+                        <div class="rc-head__t"><span class="rc-k" data-i18n="cr.destinataire">Destinataire</span></div>
+                        <button type="button" class="rc-edit" onclick="editStep(2)" aria-label="Modifier le destinataire" data-i18n-attr="aria-label:cr.modifier_le_destinataire"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span data-i18n="cr.modifier">Modifier</span></button>
                     </div>
                     <div class="rc-cols">
                         <div class="rc-col">
                             <span class="rc-ic rc-ic--grey" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
-                            <div><span class="rc-k">Nom</span><span class="rc-v" id="summaryName">-</span></div>
+                            <div><span class="rc-k" data-i18n="cr.nom">Nom</span><span class="rc-v" id="summaryName">-</span></div>
                         </div>
                         <div class="rc-col">
                             <span class="rc-ic rc-ic--grey" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
-                            <div><span class="rc-k">Téléphone</span><span class="rc-v" id="summaryPhone">-</span></div>
+                            <div><span class="rc-k" data-i18n="cr.telephone">Téléphone</span><span class="rc-v" id="summaryPhone">-</span></div>
                         </div>
                     </div>
                 </section>
 
                 <!-- Shipping -->
-                <section class="rc-card" aria-label="Expédition">
+                <section class="rc-card" aria-label="Expédition" data-i18n-attr="aria-label:cr.expedition">
                     <div class="rc-head">
                         <span class="rc-ic rc-ic--orange" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg></span>
-                        <div class="rc-head__t"><span class="rc-k">Expédition</span></div>
-                        <button type="button" class="rc-edit" onclick="editStep(2)" aria-label="Modifier l'expédition"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Modifier</button>
+                        <div class="rc-head__t"><span class="rc-k" data-i18n="cr.expedition">Expédition</span></div>
+                        <button type="button" class="rc-edit" onclick="editStep(2)" aria-label="Modifier l'expédition" data-i18n-attr="aria-label:cr.modifier_l_expedition"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span data-i18n="cr.modifier">Modifier</span></button>
                     </div>
                     <div class="rc-cols">
                         <div class="rc-col">
                             <span class="rc-ic rc-ic--grey" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg></span>
-                            <div><span class="rc-k">Date de départ</span><span class="rc-v" id="summaryDate">-</span></div>
+                            <div><span class="rc-k" data-i18n="cr.date_de_depart">Date de départ</span><span class="rc-v" id="summaryDate">-</span></div>
                         </div>
                         <div class="rc-col">
                             <span class="rc-ic rc-ic--blue" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><path d="M6.5 8h11a2 2 0 0 1 1.95 1.55l1.5 8A2 2 0 0 1 18.98 20H5.02a2 2 0 0 1-1.97-2.45l1.5-8A2 2 0 0 1 6.5 8z"/><circle cx="12" cy="5" r="2.2"/></svg></span>
-                            <div><span class="rc-k">GP sélectionné</span><span class="rc-v" id="summaryGP">Ouvert à tous les GP</span></div>
+                            <div><span class="rc-k" data-i18n="cr.gp_selectionne">GP sélectionné</span><span class="rc-v" id="summaryGP" data-i18n="cr.ouvert_a_tous_les">Ouvert à tous les GP</span></div>
                         </div>
                     </div>
                 </section>
 
                 <!-- Price -->
-                <section class="rc-card" aria-label="Détail du prix">
+                <section class="rc-card" aria-label="Détail du prix" data-i18n-attr="aria-label:cr.detail_du_prix">
                     <div class="rc-head">
                         <span class="rc-ic rc-ic--purple" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
-                        <div class="rc-head__t"><span class="rc-k">Détail du prix</span></div>
-                        <button type="button" class="rc-edit" id="priceEditBtn" onclick="togglePriceEdit()" aria-expanded="false" aria-controls="priceEdit"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Modifier</button>
+                        <div class="rc-head__t"><span class="rc-k" data-i18n="cr.detail_du_prix">Détail du prix</span></div>
+                        <button type="button" class="rc-edit" id="priceEditBtn" onclick="togglePriceEdit()" aria-expanded="false" aria-controls="priceEdit"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span data-i18n="cr.modifier">Modifier</span></button>
                     </div>
                     <div class="rc-pedit" id="priceEdit" hidden>
-                        <label for="offeredPrice">Prix proposé (FCFA)</label>
-                        <input type="number" id="offeredPrice" min="1" step="500" inputmode="numeric" oninput="recomputeTotal()" placeholder="Ex: 15000" />
-                        <p>Un prix attractif aide un GP à accepter plus vite votre colis.</p>
+                        <label for="offeredPrice" data-i18n="cr.prix_propose_fcfa">Prix proposé (FCFA)</label>
+                        <input type="number" id="offeredPrice" min="1" step="500" inputmode="numeric" oninput="recomputeTotal()" placeholder="Ex: 15000"  data-i18n-attr="placeholder:cr.ex_15000"/>
+                        <p data-i18n="cr.un_prix_attractif_aide">Un prix attractif aide un GP à accepter plus vite votre colis.</p>
                     </div>
                     <div class="rc-rows">
-                        <div class="rc-row"><span>Frais de transport</span><span id="summaryTransport">0 FCFA</span></div>
-                        <div class="rc-row"><span>Frais de service</span><span>Inclus</span></div>
+                        <div class="rc-row"><span data-i18n="cr.frais_de_transport">Frais de transport</span><span id="summaryTransport">0 FCFA</span></div>
+                        <div class="rc-row"><span data-i18n="cr.frais_de_service">Frais de service</span><span data-i18n="cr.inclus">Inclus</span></div>
                     </div>
                     <div class="rc-sep"></div>
-                    <div class="rc-total"><span>Total à payer</span><span id="summaryTotal">0 FCFA</span></div>
+                    <div class="rc-total"><span data-i18n="cr.total_a_payer">Total à payer</span><span id="summaryTotal">0 FCFA</span></div>
                 </section>
 
             </div>
@@ -1915,15 +1928,15 @@
             <div class="step-content" data-step="4">
 
                 <div class="rc-intro">
-                    <h2>Paiement</h2>
-                    <p>Choisissez comment payer votre envoi.</p>
+                    <h2 data-i18n="cr.paiement">Paiement</h2>
+                    <p data-i18n="cr.choisissez_comment_payer_votre">Choisissez comment payer votre envoi.</p>
                 </div>
 
-                <section class="rc-card" aria-label="Montant à payer">
+                <section class="rc-card" aria-label="Montant à payer" data-i18n-attr="aria-label:cr.montant_a_payer">
                     <div class="rc-head">
                         <span class="rc-ic rc-ic--purple" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
-                        <div class="rc-head__t"><span class="rc-k">Montant à payer</span><span class="rc-v rc-big" id="payTotal">0 FCFA</span></div>
-                        <button type="button" class="rc-edit" onclick="editStep(3)" aria-label="Revoir le récapitulatif">Revoir</button>
+                        <div class="rc-head__t"><span class="rc-k" data-i18n="cr.montant_a_payer">Montant à payer</span><span class="rc-v rc-big" id="payTotal">0 FCFA</span></div>
+                        <button type="button" class="rc-edit" onclick="editStep(3)" aria-label="Revoir le récapitulatif" data-i18n="cr.revoir" data-i18n-attr="aria-label:cr.revoir_le_recapitulatif">Revoir</button>
                     </div>
                 </section>
 
@@ -1931,14 +1944,14 @@
                 <section class="rc-card" aria-labelledby="payTitle">
                     <div class="rc-head">
                         <span class="rc-ic rc-ic--green" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></span>
-                        <div class="rc-head__t"><span class="rc-k" id="payTitle">Mode de paiement</span></div>
+                        <div class="rc-head__t"><span class="rc-k" id="payTitle" data-i18n="cr.mode_de_paiement">Mode de paiement</span></div>
                     </div>
                     <div class="rc-pay" role="radiogroup" aria-labelledby="payTitle">
                         <label class="rc-opt">
                             <input type="radio" name="payMethod" value="wave" onchange="selectPaymentMethod('wave')">
                             <span class="rc-opt__in">
                                 <span class="rc-opt__logo"><img src="im/wave.jpg" alt="" width="46" height="46"></span>
-                                <span class="rc-opt__t"><b>Wave</b><small>Transfert instantané</small></span>
+                                <span class="rc-opt__t"><b data-i18n="cr.wave">Wave</b><small data-i18n="cr.transfert_instantane">Transfert instantané</small></span>
                                 <span class="rc-opt__radio" aria-hidden="true"></span>
                             </span>
                         </label>
@@ -1946,7 +1959,7 @@
                             <input type="radio" name="payMethod" value="cod" onchange="selectPaymentMethod('cod')">
                             <span class="rc-opt__in">
                                 <span class="rc-opt__logo"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></span>
-                                <span class="rc-opt__t"><b>Paiement à la livraison</b><small>Espèces au destinataire</small></span>
+                                <span class="rc-opt__t"><b data-i18n="cr.paiement_a_la_livraison">Paiement à la livraison</b><small data-i18n="cr.especes_au_destinataire">Espèces au destinataire</small></span>
                                 <span class="rc-opt__radio" aria-hidden="true"></span>
                             </span>
                         </label>
@@ -1954,7 +1967,7 @@
                             <input type="radio" name="payMethod" value="orange" disabled>
                             <span class="rc-opt__in">
                                 <span class="rc-opt__logo"><img src="im/orange-money.png" alt="" width="46" height="46"></span>
-                                <span class="rc-opt__t"><b>Orange Money</b><small>Bientôt disponible</small></span>
+                                <span class="rc-opt__t"><b data-i18n="cr.orange_money">Orange Money</b><small data-i18n="cr.bientot_disponible">Bientôt disponible</small></span>
                                 <span class="rc-opt__radio" aria-hidden="true"></span>
                             </span>
                         </label>
@@ -1962,14 +1975,14 @@
                 </section>
 
                 <!-- Terms -->
-                <section class="rc-card" aria-label="Conditions">
+                <section class="rc-card" aria-label="Conditions" data-i18n-attr="aria-label:cr.conditions">
                     <label class="rc-terms">
                         <input type="checkbox" id="termsAccepted" onchange="togglePayButton()" />
                         <span class="rc-terms__box" aria-hidden="true"><svg class="cr-i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
-                        <span>J'accepte les <a href="#" onclick="showTerms()">conditions générales</a> et la <a href="#" onclick="showPrivacy()">politique de confidentialité</a></span>
+                        <span data-i18n-rich="cr.accept_terms">J'accepte les <a href="#" data-slot="terms" onclick="showTerms()" data-i18n="cr.conditions_generales">conditions générales</a> et la <a href="#" data-slot="privacy" onclick="showPrivacy()" data-i18n="cr.politique_de_confidentialite">politique de confidentialité</a></span>
                     </label>
                     <div class="rc-hint" id="payHint" role="status" hidden></div>
-                    <div class="rc-secure"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Paiement 100% sécurisé</div>
+                    <div class="rc-secure"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="cr.paiement_100_securise">Paiement 100% sécurisé</span></div>
                 </section>
             </div>
         </div>
@@ -1979,11 +1992,11 @@
         <!-- Bottom Actions -->
         <div class="bottom-actions">
             <div class="button-group">
-                <button class="btn btn-secondary" id="prevBtn" onclick="previousStep()" style="display: none;">
+                <button class="btn btn-secondary" id="prevBtn" onclick="previousStep()" style="display: none;" data-i18n="cr.retour">
                     Retour
                 </button>
                 <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">
-                    <span id="nextLabel">Suivant</span>
+                    <span id="nextLabel" data-i18n="cr.suivant">Suivant</span>
                     <svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </button>
             </div>
@@ -1995,12 +2008,12 @@
             <div class="modal" id="countryCodeModal" onclick="closeCountryCodeModal(event)">
                 <div class="modal-content location-modal-content" onclick="event.stopPropagation()">
                     <div class="modal-header">
-                        <h3>Sélectionner l'indicatif</h3>
+                        <h3 data-i18n="cr.selectionner_l_indicatif">Sélectionner l'indicatif</h3>
                         <button class="modal-close" onclick="closeCountryCodeModal()">×</button>
                     </div>
 
                     <div class="search-box">
-                        <input type="text" id="countryCodeSearch" placeholder="Rechercher un pays..." onkeyup="filterCountryCodes()" />
+                        <input type="text" id="countryCodeSearch" placeholder="Rechercher un pays..." onkeyup="filterCountryCodes()"  data-i18n-attr="placeholder:cr.rechercher_un_pays"/>
                     </div>
 
                     <div class="locations-list" id="countryCodesList">
@@ -2014,11 +2027,11 @@
     <div class="qr-modal" id="qrModal">
         <div class="qr-content">
             <div class="qr-success-icon">✓</div>
-            <h2 class="qr-title">Paiement réussi !</h2>
-            <p class="qr-subtitle">Votre envoi a été confirmé avec succès</p>
+            <h2 class="qr-title" data-i18n="cr.paiement_reussi">Paiement réussi !</h2>
+            <p class="qr-subtitle" data-i18n="cr.votre_envoi_a_ete">Votre envoi a été confirmé avec succès</p>
 
             <div class="serial-number-box">
-                <div class="serial-label">Numéro de série</div>
+                <div class="serial-label" data-i18n="cr.numero_de_serie">Numéro de série</div>
                 <div class="serial-number" id="serialNumber">-</div>
             </div>
 
@@ -2027,21 +2040,21 @@
             </div>
 
             <div class="qr-actions">
-                <button class="qr-btn qr-btn-secondary" onclick="downloadQRCode()">
+                <button class="qr-btn qr-btn-secondary" onclick="downloadQRCode()" data-i18n="cr.telecharger">
                     Télécharger
                 </button>
-                <button class="qr-btn qr-btn-secondary" onclick="shareQRCode()">
+                <button class="qr-btn qr-btn-secondary" onclick="shareQRCode()" data-i18n="cr.partager">
                     Partager
                 </button>
             </div>
 
-            <button class="qr-btn qr-btn-primary" onclick="goToDashboard()" style="width: 100%;">
+            <button class="qr-btn qr-btn-primary" onclick="goToDashboard()" style="width: 100%;" data-i18n="cr.retour_au_tableau_de">
                 Retour au tableau de bord
             </button>
 
             <p class="qr-info-text" style="margin-top: 16px;">
-                Conservez ce QR code et ce numéro de série.<br>
-                Le destinataire en aura besoin pour récupérer le colis.
+                <span data-i18n="cr.qr_keep">Conservez ce QR code et ce numéro de série.</span><br>
+                <span data-i18n="cr.qr_need">Le destinataire en aura besoin pour récupérer le colis.</span>
             </p>
         </div>
     </div>

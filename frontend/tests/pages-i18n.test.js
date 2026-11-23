@@ -67,6 +67,7 @@ test('les cles utilisees dans les scripts (sengpT) existent dans les cinq langue
       if (!/sengpT\(|i18nText\(|i18nHtml\(|data-i18n-attr/.test(line)) continue;
       for (const m of line.matchAll(/'((?:[a-z0-9_]+\.)+[a-z0-9_]+)'/g)) {
         if (/\.(html|js|css|json|png|jpg|webp|svg)$/.test(m[1])) continue; // chemin de fichier, pas une cle
+        if (/[_.]$/.test(m[1])) continue; // prefixe de cle composee dynamiquement (cr.type_ + id) : verifie par un test dedie
         for (const l of LANGS) assert.ok(hasKey(l, m[1]), `${f} : ${m[1]} absent de ${l}`);
         checked++;
       }
@@ -130,4 +131,16 @@ test('geo : sans traduction chargee, les textes francais d\'origine restent', ()
   const geo = loadGeo({});
   assert.equal(geo.fcfa(null), 'Tarif à définir');
   assert.match(geo.fcfa(3500), /^3.500 FCFA\/kg$/);
+});
+
+test('creenvoi : chaque type de colis et chaque code de refus de photo a son texte dans les cinq langues', () => {
+  const src = read('page-creenvoi.js');
+  const ids = [...src.matchAll(/\['([a-z-]+)', '[^']+'\]/g)].map(m => m[1]).filter(id => /^(carton|enveloppe|colis-souple|caisse|bagage|palette|tube|autre|volumineux|refrigere|dangereux|documents|electronique|fragile|textile|materiau)$/.test(id));
+  assert.equal(new Set(ids).size, 16, 'les 16 types de colis sont attendus');
+  const codes = [...src.matchAll(/photoError\('([a-z_]+)'/g)].map(m => m[1]);
+  assert.ok(codes.length >= 9);
+  for (const l of LANGS) {
+    for (const id of ids) assert.ok(`cr.type_${id}` in dict[l], `${l} : type ${id}`);
+    for (const c of new Set(codes)) assert.ok(`cr.photo_${c}_msg` in dict[l], `${l} : photo ${c}`);
+  }
 });

@@ -7,24 +7,30 @@
     try { if (localStorage.getItem('authToken')) user = JSON.parse(localStorage.getItem('userData') || 'null'); } catch (e) { /* ignore */ }
     if (!user || !user.user_type || user.user_type === 'expediteur') return;
     var home = user.user_type === 'gp' ? 'dashgp.html' : (user.user_type === 'admin' ? 'admin.html' : 'index.html');
-    var msg = 'Cet écran est réservé aux comptes Expéditeur. Vous êtes connecté avec un compte « ' + (user.user_type === 'gp' ? 'Gros Porteur' : user.user_type) + ' ».\n\nPour créer un envoi, connectez-vous avec un compte Expéditeur.';
     var go = function () { window.location.replace(home); };
-    if (typeof window.sengpAlert === 'function') window.sengpAlert(msg, 'Compte non autorisé').then(go, go);
-    else { alert(msg); go(); }
+    SengpI18n.ready.then(function () {
+        var type = sengpT(user.user_type === 'gp' ? 'roles.gp' : (user.user_type === 'admin' ? 'roles.admin' : 'roles.expediteur'));
+        var msg = sengpT('errors.expediteur_only', { type: type });
+        if (typeof window.sengpAlert === 'function') window.sengpAlert(msg, sengpT('errors.account_not_allowed')).then(go, go);
+        else { alert(msg); go(); }
+    });
 })();
         let currentStep = 1;
         const totalSteps = 4;
 
+        // Texte d'un element modifie par le script : sa cle est memorisee pour suivre un changement de langue.
+        function setI18n(el, key, params) { el.setAttribute('data-i18n', key); el.textContent = sengpT(key, params); }
+
         const stepDescriptions = {
-            1: 'Détails du colis',
-            2: 'Destinataire, retrait et départ',
-            3: 'Récapitulatif de votre envoi',
-            4: 'Paiement et confirmation'
+            1: 'cr.details_du_colis',
+            2: 'cr.step2',
+            3: 'cr.recapitulatif_de_votre_envoi',
+            4: 'cr.step4'
         };
 
         function updateStep() {
             // Update step description
-            document.getElementById('stepDescription').textContent = stepDescriptions[currentStep];
+            setI18n(document.getElementById('stepDescription'), stepDescriptions[currentStep]);
 
             // Update stepper progress
             document.querySelector('.stepper').dataset.current = currentStep;
@@ -55,7 +61,7 @@
 
             // Update buttons
             document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'flex';
-            setNextLabel(currentStep === totalSteps ? 'Confirmer et payer' : 'Suivant');
+            setNextLabel(currentStep === totalSteps ? 'cr.confirm_pay' : 'cr.suivant');
             document.getElementById('crScroll').scrollTo({ top: 0, behavior: 'smooth' });
 
             // Recap (step 3) is built from the form; the payment step shows the total and gates the CTA
@@ -81,7 +87,7 @@
             const weight = parseFloat($('packageWeight').value) || 0;
             $('summaryWeight').textContent = weight ? `${weight} kg` : '-';
             const description = $('description').value.trim();
-            $('summaryDesc').textContent = description || (hasAudioRecording ? 'Message audio' : (uploadedPhotoBlob ? 'Photo du colis' : '-'));
+            $('summaryDesc').textContent = description || (hasAudioRecording ? sengpT('cr.audio_message') : (uploadedPhotoBlob ? sengpT('cr.photo_of_parcel') : '-'));
             const photo = $('summaryPhoto');
             if (photoPreviewUrl) { photo.src = photoPreviewUrl; photo.classList.add('is-photo'); }
             else { photo.src = 'im/sengp-box-3d.png'; photo.classList.remove('is-photo'); }
@@ -91,10 +97,10 @@
             $('summaryRoute').textContent = from && to ? `${from.city} → ${to.city}` : '-';
             $('sumFromFlag').textContent = from ? from.flag : '';
             $('sumFromCity').textContent = from ? from.city : '-';
-            $('sumFromCountry').textContent = from ? from.country : '';
+            $('sumFromCountry').textContent = from ? SengpGeo.displayCountry(from.country) : '';
             $('sumToFlag').textContent = to ? to.flag : '';
             $('sumToCity').textContent = to ? to.city : '-';
-            $('sumToCountry').textContent = to ? to.country : '';
+            $('sumToCountry').textContent = to ? SengpGeo.displayCountry(to.country) : '';
 
             // Recipient
             $('summaryName').textContent = $('receiverName').value.trim() || '-';
@@ -104,7 +110,7 @@
             // Shipping (no GP step: the mission is open to every GP)
             const date = $('desiredDepartureDate').value;
             $('summaryDate').textContent = date ? date.split('-').reverse().join('/') : '-';
-            $('summaryGP').textContent = 'Ouvert à tous les GP';
+            $('summaryGP').textContent = sengpT('cr.ouvert_a_tous_les');
 
             // Prix suggéré = tarif de référence de la grille tarifaire SEN GP (FCFA/kg, départ de Dakar),
             // 1 kg minimum facturable ; le client peut le modifier ensuite.
@@ -121,7 +127,7 @@
 
         function recomputeTotal() {
             const offered = parseFloat(document.getElementById('offeredPrice').value) || 0;
-            const txt = `${offered.toLocaleString('fr-FR')} FCFA`;
+            const txt = SengpI18n.fmt.currency(offered);
             document.getElementById('summaryTransport').textContent = txt;
             document.getElementById('summaryTotal').textContent = txt;
             document.getElementById('payTotal').textContent = txt;
@@ -143,7 +149,7 @@
                 if (selectedPaymentMethod && document.getElementById('termsAccepted').checked) {
                     processPayment();
                 } else {
-                    alert('Veuillez sélectionner un mode de paiement et accepter les conditions.');
+                    alert(sengpT('cr.alert_pay_terms'));
                 }
             }
         }
@@ -253,7 +259,7 @@
 
             } catch (error) {
                 console.error('Erreur microphone:', error);
-                alert('Impossible d\'accéder au microphone. Veuillez autoriser l\'accès au microphone.');
+                alert(sengpT('cr.mic_denied'));
             }
         }
 
@@ -378,8 +384,11 @@
             blur: { minStd: 25, lapVar: 30, lapP99: 30 }  // variance du laplacien : peu de bords nets
         };
 
-        function photoError(code, cause, message, tip) {
-            return { ok: false, code, title: 'Photo refusée : ' + cause, message, tip };
+        // Refus de photo : textes dans la langue courante (cles cr.photo_<code>_cause / _msg / _tip).
+        function photoError(code, params) {
+            const base = 'cr.photo_' + code;
+            const family = code.startsWith('decode') ? 'cr.photo_decode' : base;
+            return { ok: false, code, title: sengpT('cr.photo_refused', { cause: sengpT(family + '_cause') }), message: sengpT(base + '_msg', params), tip: sengpT(code === 'decode_read' ? 'cr.photo_decode_read_tip' : (code.startsWith('decode') ? 'cr.photo_decode_other_tip' : base + '_tip')) };
         }
 
         async function decodePhoto(file) {
@@ -443,31 +452,31 @@
         async function analyzePhoto(file) {
             const R = PHOTO_RULES;
             if (!file.type || !file.type.startsWith('image/')) {
-                return photoError('type', 'format non accepté', 'Seules les photos sont acceptées (ni vidéo, ni document).', 'Prenez une photo du colis avec l’appareil photo.');
+                return photoError('type');
             }
             if (file.size > R.maxBytes) {
-                return photoError('size', 'fichier trop lourd', 'Le fichier dépasse 50 Mo.', 'Choisissez une photo plus légère ou réduisez la qualité de l’appareil photo.');
+                return photoError('size');
             }
             let bmp;
             try { bmp = await decodePhoto(file); }
-            catch (e) { return photoError('decode', 'image illisible', 'Cette image ne peut pas être lue (format non pris en charge ou fichier abîmé).', 'Utilisez une photo au format JPEG ou PNG.'); }
+            catch (e) { return photoError('decode_read'); }
 
             const sw = bmp.width, sh = bmp.height;
             if (Math.min(sw, sh) < R.minSide) {
-                return photoError('small', 'résolution trop faible', `La photo fait seulement ${sw} × ${sh} px : trop petite pour distinguer le colis.`, 'Reprenez la photo avec l’appareil photo en qualité normale, sans zoom numérique.');
+                return photoError('small', { w: sw, h: sh });
             }
             const m = measurePhoto(bmp, sw, sh);
             if (m.mean < R.dark.mean || m.p95 < R.dark.p95) {
-                return photoError('dark', 'trop sombre', 'Le colis est difficilement visible : l’image est trop sombre (ou l’objectif est masqué).', 'Prenez la photo dans un endroit mieux éclairé, ou activez le flash.');
+                return photoError('dark');
             }
             if (m.clip >= R.bright.clip && m.mean >= R.bright.mean) {
-                return photoError('bright', 'surexposée', 'Il y a trop de lumière : les détails du colis sont effacés.', 'Évitez le contre-jour, les reflets directs et un flash trop proche.');
+                return photoError('bright');
             }
             if (m.std < R.flat.std) {
-                return photoError('flat', 'colis non visible', 'L’image est presque uniforme : on ne distingue pas le colis.', 'Vérifiez que l’objectif n’est pas masqué et cadrez le colis en entier.');
+                return photoError('flat');
             }
             if (m.std >= R.blur.minStd && m.lapVar < R.blur.lapVar && m.lapP99 < R.blur.lapP99) {
-                return photoError('blur', 'floue', 'Le colis n’est pas net : l’image est floue (bougé ou mise au point manquée).', 'Tenez le téléphone stable, rapprochez-vous un peu et attendez la mise au point avant de photographier.');
+                return photoError('blur');
             }
             return { ok: true, metrics: m, bitmap: bmp };
         }
@@ -486,10 +495,8 @@
             const preview = document.getElementById('mediaPreview');
             drop.classList.toggle('is-analyzing', state === 'analyzing');
             drop.classList.toggle('is-error', state === 'error');
-            document.getElementById('dropTitle').textContent =
-                state === 'analyzing' ? 'Analyse de la photo…' : (state === 'error' ? 'Reprendre une photo' : 'Prendre une photo du colis');
-            document.getElementById('dropSub').textContent =
-                state === 'analyzing' ? 'Vérification de la netteté et de la luminosité' : 'Une seule photo (max 50MB)';
+            setI18n(document.getElementById('dropTitle'), state === 'analyzing' ? 'cr.analyzing' : (state === 'error' ? 'cr.retake' : 'cr.prendre_une_photo_du'));
+            setI18n(document.getElementById('dropSub'), state === 'analyzing' ? 'cr.analyzing_sub' : 'cr.une_seule_photo_max');
             drop.hidden = state === 'ok';
             preview.hidden = state !== 'ok';
         }
@@ -497,7 +504,7 @@
         function showPhotoAlert(res) {
             document.getElementById('photoAlertTitle').textContent = res.title;
             document.getElementById('photoAlertMsg').textContent = res.message;
-            document.getElementById('photoAlertTip').textContent = res.tip ? 'Conseil : ' + res.tip : '';
+            document.getElementById('photoAlertTip').textContent = res.tip ? sengpT('cr.photo_tip', { tip: res.tip }) : '';
             const el = document.getElementById('photoAlert');
             el.hidden = false;
             try { el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
@@ -522,7 +529,7 @@
 
             let res;
             try { res = await analyzePhoto(file); }
-            catch (e) { res = photoError('decode', 'image illisible', 'Cette image ne peut pas être analysée.', 'Essayez une autre photo (JPEG ou PNG).'); }
+            catch (e) { res = photoError('decode_analyze'); }
             input.value = '';   // permet de re-choisir le même fichier après un refus
 
             if (!res.ok) {
@@ -535,7 +542,7 @@
             const blob = await compressPhoto(res.bitmap);
             if (!blob) {
                 setPhotoState('error');
-                showPhotoAlert(photoError('decode', 'image illisible', 'Cette image ne peut pas être préparée pour l’envoi.', 'Essayez une autre photo (JPEG ou PNG).'));
+                showPhotoAlert(photoError('decode_prepare'));
                 validateForm();
                 return;
             }
@@ -543,7 +550,7 @@
             uploadedMedia = file;
             uploadedPhotoBlob = blob;
             photoPreviewUrl = URL.createObjectURL(blob);
-            document.getElementById('previewContent').innerHTML = `<img src="${photoPreviewUrl}" alt="Aperçu de la photo du colis" />`;
+            document.getElementById('previewContent').innerHTML = `<img src="${photoPreviewUrl}" alt="${window.sengpEsc(sengpT('cr.photo_preview_alt'))}" />`;
             setPhotoState('ok');
             validateForm();
         }
@@ -569,7 +576,7 @@
             const grid = document.getElementById('tyGrid');
             const select = document.getElementById('packageType');
             PACKAGE_TYPES.forEach(([id, label], i) => {
-                select.add(new Option(label, id));
+                const opt = new Option(sengpT('cr.type_' + id), id); opt.setAttribute('data-i18n', 'cr.type_' + id); select.add(opt);
                 const el = document.createElement('label');
                 el.className = 'ty';
                 if (i >= TYPES_VISIBLE) el.hidden = true;
@@ -577,7 +584,7 @@
                     `<input type="radio" name="pkgType" value="${id}">` +
                     `<span class="ty__in"><span class="ty__ck"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>` +
                     `<img src="im/types/${id}.webp" alt="" width="200" height="160" loading="lazy" decoding="async">` +
-                    `<span class="ty__t">${label}</span></span>`;
+                    `<span class="ty__t" data-i18n="cr.type_${id}">${window.sengpEsc(sengpT('cr.type_' + id))}</span></span>`;
                 grid.appendChild(el);
             });
             grid.addEventListener('change', e => { if (e.target.name === 'pkgType') selectType(e.target.value); });
@@ -594,7 +601,7 @@
             const expand = btn.getAttribute('aria-expanded') !== 'true';
             document.querySelectorAll('#tyGrid .ty').forEach((el, i) => { if (i >= TYPES_VISIBLE) el.hidden = !expand; });
             btn.setAttribute('aria-expanded', String(expand));
-            document.getElementById('tyMoreLabel').textContent = expand ? 'Voir moins' : 'Voir tous les types';
+            setI18n(document.getElementById('tyMoreLabel'), expand ? 'cr.see_less' : 'cr.voir_tous_les_types');
         }
 
         // === Poids (− / +) ===
@@ -614,7 +621,7 @@
             onWeightInput();
         }
 
-        function setNextLabel(text) { document.getElementById('nextLabel').textContent = text; }
+        function setNextLabel(key) { setI18n(document.getElementById('nextLabel'), key); }
 
         // Réserve la place de la bannière d'installation PWA (pwa.js) sous la barre d'actions
         (function trackInstallBanner() {
@@ -630,7 +637,7 @@
             sync();
         })();
 
-        buildTypeGrid();
+        SengpI18n.ready.then(buildTypeGrid);
         syncWeightButtons();
 
         // === Country Codes System ===
@@ -694,7 +701,7 @@
                 item.innerHTML = `
                     <span class="location-item-flag">${code.flag}</span>
                     <div class="location-item-info">
-                        <div class="location-item-country">${code.country}</div>
+                        <div class="location-item-country">${window.sengpEsc(SengpGeo.displayCountry(code.country))}</div>
                         <div class="location-item-city">${code.code}</div>
                     </div>
                 `;
@@ -706,7 +713,7 @@
         function filterCountryCodes() {
             const search = document.getElementById('countryCodeSearch').value.toLowerCase();
             const filtered = countryCodes.filter(code =>
-                code.country.toLowerCase().includes(search) ||
+                code.country.toLowerCase().includes(search) || SengpGeo.displayCountry(code.country).toLowerCase().includes(search) ||
                 code.code.includes(search)
             );
             populateCountryCodes(filtered);
@@ -729,7 +736,7 @@
             currentModalType = type;
             const cur = type === 'departure' ? selectedDeparture : selectedArrival;
             SengpGeo.open({
-                title: type === 'departure' ? 'Lieu de départ' : "Lieu d'arrivée",
+                title: sengpT(type === 'departure' ? 'dash.pick_departure' : 'dash.pick_arrival'),
                 country: cur && cur.country,
                 onPick: sel => selectLocation({ flag: sel.flag, country: sel.country, city: sel.region, continent: sel.continent })
             });
@@ -739,12 +746,14 @@
             if (currentModalType === 'departure') {
                 selectedDeparture = location;
                 document.getElementById('departureFlag').textContent = location.flag;
-                document.getElementById('departureName').textContent = `${location.city}, ${location.country}`;
+                document.getElementById('departureName').removeAttribute('data-i18n');
+                document.getElementById('departureName').textContent = `${location.city}, ${SengpGeo.displayCountry(location.country)}`;
                 document.getElementById('departureLocation').classList.add('is-filled');
             } else {
                 selectedArrival = location;
                 document.getElementById('arrivalFlag').textContent = location.flag;
-                document.getElementById('arrivalName').textContent = `${location.city}, ${location.country}`;
+                document.getElementById('arrivalName').removeAttribute('data-i18n');
+                document.getElementById('arrivalName').textContent = `${location.city}, ${SengpGeo.displayCountry(location.country)}`;
                 document.getElementById('arrivalLocation').classList.add('is-filled');
             }
 
@@ -814,8 +823,7 @@
             if (ok) { hint.hidden = true; }
             else {
                 hint.hidden = false;
-                hint.textContent = !selectedPaymentMethod && !termsAccepted ? 'Choisissez un mode de paiement et acceptez les conditions pour continuer.'
-                    : (!selectedPaymentMethod ? 'Choisissez un mode de paiement pour continuer.' : 'Acceptez les conditions pour continuer.');
+                setI18n(hint, !selectedPaymentMethod && !termsAccepted ? 'cr.pay_hint_both' : (!selectedPaymentMethod ? 'cr.pay_hint_method' : 'cr.pay_hint_terms'));
             }
         }
 
@@ -826,25 +834,25 @@
 
         function showTerms() {
             event.preventDefault();
-            alert('Conditions Générales d\'Utilisation\n\nDans la version complète, cela afficherait les CGU en modal.');
+            alert(sengpT('cr.terms_stub'));
         }
 
         function showPrivacy() {
             event.preventDefault();
-            alert('Politique de Confidentialité\n\nDans la version complète, cela afficherait la politique de confidentialité en modal.');
+            alert(sengpT('cr.privacy_stub'));
         }
 
         async function processPayment() {
             const token = localStorage.getItem('authToken');
             if (!token) {
-                alert('Session expirée. Veuillez vous reconnecter.');
+                alert(sengpT('errors.session_expired'));
                 window.location.href = 'connexion.html';
                 return;
             }
 
             // Gather + validate the required mission fields.
             const packageType = document.getElementById('packageType');
-            const packageTypeText = packageType.options[packageType.selectedIndex]?.text || '';
+            const packageTypeText = (PACKAGE_TYPES.find(t => t[0] === packageType.value) || [])[1] || '';   // libelle francais : valeur enregistree
             const description = document.getElementById('description').value.trim();
             const weight = parseFloat(document.getElementById('packageWeight').value);
             const pickup = document.getElementById('pickupAddress').value.trim();
@@ -852,23 +860,23 @@
             const date = document.getElementById('desiredDepartureDate').value;
             const offered = parseFloat(document.getElementById('offeredPrice').value);
 
-            if (!selectedDeparture || !selectedArrival) { alert('Veuillez sélectionner le départ et l\'arrivée.'); return; }
-            if (!weight || weight <= 0) { alert('Veuillez indiquer le poids du colis.'); return; }
-            if (!pickup || !delivery) { alert('Veuillez renseigner les adresses de ramassage et de livraison.'); return; }
-            if (!date) { alert('Veuillez choisir une date de départ.'); return; }
-            if (!offered || offered <= 0) { alert('Veuillez indiquer le prix proposé.'); return; }
+            if (!selectedDeparture || !selectedArrival) { alert(sengpT('cr.need_route')); return; }
+            if (!weight || weight <= 0) { alert(sengpT('cr.need_weight')); return; }
+            if (!pickup || !delivery) { alert(sengpT('cr.need_addresses')); return; }
+            if (!date) { alert(sengpT('cr.need_date')); return; }
+            if (!offered || offered <= 0) { alert(sengpT('cr.need_price')); return; }
 
-            if (!selectedPaymentMethod) { alert('Veuillez choisir un mode de paiement.'); return; }
+            if (!selectedPaymentMethod) { alert(sengpT('cr.need_payment')); return; }
 
             const nextBtn = document.getElementById('nextBtn');
             nextBtn.disabled = true;
-            setNextLabel('Traitement en cours...');
+            setNextLabel('cr.processing');
 
             // Photo du colis (facultative) : envoyée vers le stockage ; en cas d'échec, l'envoi est créé sans photo.
             let photoKey = null;
             if (uploadedPhotoBlob) {
                 try {
-                    setNextLabel('Envoi de la photo...');
+                    setNextLabel('cr.uploading_photo');
                     const fd = new FormData();
                     fd.append('file', uploadedPhotoBlob, 'colis.jpg');
                     const up = await fetch(`${window.API_BASE_URL}/uploads`, {
@@ -877,7 +885,7 @@
                     const uj = await up.json();
                     if (up.ok && uj.success && uj.data && uj.data.key) photoKey = uj.data.key;
                 } catch (e) { /* photo facultative */ }
-                setNextLabel('Traitement en cours...');
+                setNextLabel('cr.processing');
             }
 
             const recipientName = (document.getElementById('receiverName') ? document.getElementById('receiverName').value.trim() : '') || null;
@@ -907,25 +915,23 @@
                 });
                 const missionResult = await missionRes.json();
                 if (missionRes.status === 403) {
-                    throw new Error('Votre compte n’est pas un compte Expéditeur : seuls les expéditeurs peuvent créer un envoi. Connectez-vous avec un compte Expéditeur.');
+                    throw new Error(sengpT('cr.not_sender_403'));
                 }
                 if (!missionRes.ok || !missionResult.success) {
-                    throw new Error(missionResult.error || 'Création de la mission échouée');
+                    throw new Error(missionResult.error || sengpT('cr.mission_failed'));
                 }
                 const mission = missionResult.data;
 
                 // 2a. Paiement à la livraison : aucun paiement en ligne, récap + dashboard.
                 if (selectedPaymentMethod === 'cod') {
-                    alert(
-                        'Envoi créé\n\n' +
-                        'Type : ' + (packageTypeText || '—') + '\n' +
-                        'Trajet : ' + selectedDeparture.city + ' → ' + selectedArrival.city + '\n' +
-                        'Destinataire : ' + (recipientName || '—') + '\n' +
-                        'Poids : ' + weight + ' kg\n' +
-                        'Prix : ' + offered.toLocaleString('fr-FR') + ' FCFA\n' +
-                        'Paiement : à la livraison (espèces)\n' +
-                        'Suivi n° : ' + (mission.tracking_number || mission.mission_code || '')
-                    );
+                    alert(sengpT('cr.cod_summary', {
+                        type: (selectedTypeLabel() || '—'),
+                        route: selectedDeparture.city + ' → ' + selectedArrival.city,
+                        recipient: (recipientName || '—'),
+                        weight: weight,
+                        price: SengpI18n.fmt.currency(offered),
+                        tracking: (mission.tracking_number || mission.mission_code || '')
+                    }));
                     // Ouvre « Mes envois » sur cet envoi (le QR est disponible via la tuile « QR code »).
                     window.location.href = 'envois.html?open=' + encodeURIComponent(mission.id);
                     return;
@@ -940,7 +946,7 @@
                 });
                 const payResult = await payRes.json();
                 if (!payRes.ok || !payResult.success) {
-                    throw new Error(payResult.error || 'Initialisation du paiement échouée');
+                    throw new Error(payResult.error || sengpT('cr.payment_init_failed'));
                 }
 
                 // 3. Open the provider's payment page.
@@ -949,9 +955,9 @@
                 // Partage WhatsApp automatique au destinataire : déclenché (une fois le paiement confirmé) à l'ouverture de « Mes envois ».
                 try { localStorage.setItem('sg_pending_share', JSON.stringify({ id: mission.id, paymentId })); } catch (e) {}
                 if (!redirectUrl) {
-                    alert('Mission créée, mais aucune URL de paiement n\'a été reçue.');
+                    alert(sengpT('cr.no_payment_url'));
                     nextBtn.disabled = false;
-                    setNextLabel('Confirmer et payer');
+                    setNextLabel('cr.confirm_pay');
                     return;
                 }
 
@@ -973,9 +979,9 @@
                             if (status !== 'completed') await new Promise(res => setTimeout(res, 2000));
                         }
                         if (status === 'completed') {
-                            alert('Paiement réussi\n\nVotre envoi est créé.\nTrajet : ' + selectedDeparture.city + ' → ' + selectedArrival.city + '\nSuivi n° : ' + (mission.tracking_number || mission.mission_code || ''));
+                            alert(sengpT('cr.payment_ok', { route: selectedDeparture.city + ' → ' + selectedArrival.city, tracking: (mission.tracking_number || mission.mission_code || '') }));
                         } else {
-                            alert('Paiement en cours de validation. Votre envoi apparaîtra dès confirmation.');
+                            alert(sengpT('cr.payment_pending'));
                         }
                         // Ouvre « Mes envois » sur cet envoi (le QR est disponible via la tuile « QR code »).
                         window.location.href = 'envois.html?open=' + encodeURIComponent(mission.id);
@@ -988,9 +994,9 @@
                 }
             } catch (error) {
                 console.error('Payment flow error:', error);
-                alert('Erreur: ' + error.message);
+                alert(sengpT('envois.error', { message: error.message }));
                 nextBtn.disabled = false;
-                setNextLabel('Confirmer et payer');
+                setNextLabel('cr.confirm_pay');
             }
         }
 
@@ -1091,19 +1097,19 @@
                 canvas.toBlob((blob) => {
                     const file = new File([blob], `SENGP-${serialNumber}.png`, { type: 'image/png' });
                     navigator.share({
-                        title: 'SEN GP - Code de livraison',
-                        text: `Numéro de série: ${serialNumber}`,
+                        title: sengpT('cr.share_title'),
+                        text: sengpT('cr.serial_text', { serial: serialNumber }),
                         files: [file]
                     }).catch(() => {
-                        alert('Partage annulé');
+                        alert(sengpT('cr.share_cancelled'));
                     });
                 });
             } else {
                 // Fallback: copier le numéro de série
                 navigator.clipboard.writeText(serialNumber).then(() => {
-                    alert('Numéro de série copié dans le presse-papiers!');
+                    alert(sengpT('cr.serial_copied'));
                 }).catch(() => {
-                    alert('Impossible de partager. Numéro de série: ' + serialNumber);
+                    alert(sengpT('cr.share_failed', { serial: serialNumber }));
                 });
             }
         }
@@ -1115,7 +1121,7 @@
         // Old functions removed - using new implementation above
 
         // Initialize
-        updateStep();
+        SengpI18n.ready.then(updateStep);
         validateForm(); // Initialize form validation
 
         // Character counter for description
@@ -1138,3 +1144,15 @@
                 }
             });
         }
+
+// Libelle du type de colis choisi, dans la langue courante (affichage uniquement).
+function selectedTypeLabel() {
+    const v = document.getElementById('packageType').value;
+    return v ? sengpT('cr.type_' + v) : '';
+}
+
+// Changement de langue : le recapitulatif et les montants sont recalcules.
+window.addEventListener('sengp:languagechange', function () {
+    if (typeof updateStep === 'function') updateStep();
+    if (typeof recomputeTotal === 'function') recomputeTotal();
+});

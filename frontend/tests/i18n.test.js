@@ -288,3 +288,10 @@ test('selecteur de langue : monte une seule fois dans [data-i18n-switcher], chan
   assert.deepEqual(select.children.map(o => o.value), ['fr', 'en', 'ar', 'es', 'pt']);
   assert.deepEqual(select.children.map(o => o.textContent), ['Français', 'English', 'العربية', 'Español', 'Português']);
 });
+
+test('l\'instance expose les langues et leurs noms (feuille « Langue » du profil)', () => {
+  const { inst } = make({ languages: ['fr'] });
+  assert.deepEqual(inst.supported, ['fr', 'en', 'ar', 'es', 'pt']);
+  assert.equal(inst.nativeNames.ar, 'العربية');
+  assert.equal(inst.fmt.localeTag(), 'fr-FR');
+});

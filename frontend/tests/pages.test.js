@@ -94,7 +94,10 @@ test('creenvoi : un compte GP ou admin est renvoye avec un message clair, un exp
       sengpAlert: (m, t) => { calls.alert = { m, t }; return Promise.resolve(); },
       location: { replace: u => { calls.replaced = u; } },
     };
-    vm.runInNewContext(guard, { window: win, localStorage: win.localStorage, alert: () => {} });
+    // le garde attend les traductions (SengpI18n.ready) et lit les textes via sengpT : doublure fidele au francais
+    const fr = require('../locales/fr.json');
+    const sengpT = (k, p) => String(fr[k] || k).replace(/\{(\w+)\}/g, (m, n) => (p && n in p ? p[n] : m));
+    vm.runInNewContext(guard, { window: win, localStorage: win.localStorage, alert: () => {}, SengpI18n: { ready: Promise.resolve() }, sengpT });
     return new Promise(r => setTimeout(() => r(calls), 0));
   }
 
