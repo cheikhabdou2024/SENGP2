@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { ApiResponse } from '../types';
+import { tr } from '../i18n';
 
 export class ResponseUtil {
   static success<T>(res: Response, data?: T, message?: string, meta?: any): Response {
@@ -24,7 +25,7 @@ export class ResponseUtil {
   static badRequest(res: Response, message: string, errors?: any[]): Response {
     const response: ApiResponse = {
       success: false,
-      error: message,
+      error: tr(message),
       errors,
     };
     return res.status(400).json(response);
@@ -33,7 +34,7 @@ export class ResponseUtil {
   static unauthorized(res: Response, message: string = 'Unauthorized'): Response {
     const response: ApiResponse = {
       success: false,
-      error: message,
+      error: tr(message),
     };
     return res.status(401).json(response);
   }
@@ -41,7 +42,7 @@ export class ResponseUtil {
   static forbidden(res: Response, message: string = 'Forbidden'): Response {
     const response: ApiResponse = {
       success: false,
-      error: message,
+      error: tr(message),
     };
     return res.status(403).json(response);
   }
@@ -49,7 +50,7 @@ export class ResponseUtil {
   static notFound(res: Response, message: string = 'Resource not found'): Response {
     const response: ApiResponse = {
       success: false,
-      error: message,
+      error: tr(message),
     };
     return res.status(404).json(response);
   }
@@ -57,7 +58,7 @@ export class ResponseUtil {
   static conflict(res: Response, message: string): Response {
     const response: ApiResponse = {
       success: false,
-      error: message,
+      error: tr(message),
     };
     return res.status(409).json(response);
   }
@@ -65,7 +66,7 @@ export class ResponseUtil {
   static serverError(res: Response, message: string = 'Internal server error'): Response {
     const response: ApiResponse = {
       success: false,
-      error: message,
+      error: tr(message),
     };
     return res.status(500).json(response);
   }

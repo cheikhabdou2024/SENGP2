@@ -1,3 +1,4 @@
+import { languageMiddleware } from './i18n';
 import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -64,6 +65,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Compression Middleware
 app.use(compression());
+
+// Langue demandee (en-tete Accept-Language) : traduit les messages d'erreur et les notifications
+app.use(languageMiddleware);
 
 // Logging Middleware
 if (process.env.NODE_ENV !== 'test') {

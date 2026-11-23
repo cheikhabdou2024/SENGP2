@@ -1,0 +1,336 @@
+/**
+ * Catalogues de traduction cote serveur (fr, en, ar, es, pt).
+ *
+ *  - ERRORS    : message d'erreur d'origine (tel qu'ecrit dans le code) -> [fr, en, ar, es, pt]
+ *  - PATTERNS  : messages a variable ({1} = premiere capture de l'expression)
+ *  - TEMPLATES : notifications destinees aux utilisateurs (titre + message), rendues dans la langue du destinataire
+ *
+ * Les alertes destinees aux administrateurs (console d'administration) ne sont pas traduites.
+ * Ajouter une langue : ajouter une valeur a chaque tableau et a LANGS (index.ts) ; le test
+ * tests/i18n.test.ts verifie que rien ne manque.
+ */
+type Row = [string, string, string, string, string]; // fr, en, ar, es, pt
+
+export const ERRORS: Record<string, Row> = {
+  'Claim not found': ['Réclamation introuvable', 'Claim not found', 'الشكوى غير موجودة', 'Reclamación no encontrada', 'Reclamação não encontrada'],
+  'Mission not found': ['Mission introuvable', 'Mission not found', 'المهمة غير موجودة', 'Misión no encontrada', 'Missão não encontrada'],
+  'Mission introuvable': ['Mission introuvable', 'Mission not found', 'المهمة غير موجودة', 'Misión no encontrada', 'Missão não encontrada'],
+  'Not your mission': ["Ce n'est pas votre mission", 'Not your mission', 'هذه ليست مهمتك', 'Esta no es tu misión', 'Esta não é a sua missão'],
+  'Invalid token': ['Jeton invalide', 'Invalid token', 'رمز غير صالح', 'Token no válido', 'Token inválido'],
+  'Trip not found': ['Trajet introuvable', 'Trip not found', 'الرحلة غير موجودة', 'Viaje no encontrado', 'Viagem não encontrada'],
+  'Stockage de fichiers non configuré': ['Stockage de fichiers non configuré', 'File storage is not configured', 'تخزين الملفات غير مُهيّأ', 'El almacenamiento de archivos no está configurado', 'O armazenamento de ficheiros não está configurado'],
+  'Aucun fichier reçu': ['Aucun fichier reçu', 'No file received', 'لم يتم استلام أي ملف', 'No se ha recibido ningún archivo', 'Nenhum ficheiro recebido'],
+  'Type de fichier non autorisé': ['Type de fichier non autorisé', 'File type not allowed', 'نوع الملف غير مسموح به', 'Tipo de archivo no permitido', 'Tipo de ficheiro não permitido'],
+  'No token provided': ['Aucun jeton fourni', 'No token provided', 'لم يتم تقديم رمز', 'No se proporcionó token', 'Nenhum token fornecido'],
+  'Server configuration error': ['Erreur de configuration du serveur', 'Server configuration error', 'خطأ في إعداد الخادم', 'Error de configuración del servidor', 'Erro de configuração do servidor'],
+  'Session expired or revoked': ['Session expirée ou révoquée', 'Session expired or revoked', 'انتهت الجلسة أو تم إلغاؤها', 'Sesión caducada o revocada', 'Sessão expirada ou revogada'],
+  'Token expired': ['Jeton expiré', 'Token expired', 'انتهت صلاحية الرمز', 'Token caducado', 'Token expirado'],
+  'Authentication failed': ["Échec de l'authentification", 'Authentication failed', 'فشلت المصادقة', 'Error de autenticación', 'Falha na autenticação'],
+  'Authentication required': ['Authentification requise', 'Authentication required', 'المصادقة مطلوبة', 'Autenticación requerida', 'Autenticação necessária'],
+  'Insufficient permissions': ['Droits insuffisants', 'Insufficient permissions', 'صلاحيات غير كافية', 'Permisos insuficientes', 'Permissões insuficientes'],
+  'Resource already exists': ['La ressource existe déjà', 'Resource already exists', 'المورد موجود بالفعل', 'El recurso ya existe', 'O recurso já existe'],
+  'Invalid reference': ['Référence invalide', 'Invalid reference', 'مرجع غير صالح', 'Referencia no válida', 'Referência inválida'],
+  'Required field missing': ['Champ obligatoire manquant', 'Required field missing', 'حقل مطلوب مفقود', 'Falta un campo obligatorio', 'Campo obrigatório em falta'],
+  'File size too large': ['Fichier trop volumineux', 'File size too large', 'حجم الملف كبير جدًا', 'El archivo es demasiado grande', 'O ficheiro é demasiado grande'],
+  'Validation failed': ['Échec de la validation', 'Validation failed', 'فشل التحقق من البيانات', 'Error de validación', 'Falha na validação'],
+  'Email already registered': ['Cet email est déjà enregistré', 'Email already registered', 'هذا البريد الإلكتروني مسجّل بالفعل', 'Este correo ya está registrado', 'Este email já está registado'],
+  'Phone number already registered': ['Ce numéro de téléphone est déjà enregistré', 'Phone number already registered', 'رقم الهاتف هذا مسجّل بالفعل', 'Este número de teléfono ya está registrado', 'Este número de telefone já está registado'],
+  'Google auth is not configured': ["La connexion Google n'est pas configurée", 'Google auth is not configured', 'تسجيل الدخول عبر Google غير مُهيّأ', 'El inicio de sesión con Google no está configurado', 'O início de sessão com o Google não está configurado'],
+  'Invalid Google token': ['Jeton Google invalide', 'Invalid Google token', 'رمز Google غير صالح', 'Token de Google no válido', 'Token do Google inválido'],
+  'Account is suspended': ['Le compte est suspendu', 'Account is suspended', 'الحساب موقوف', 'La cuenta está suspendida', 'A conta está suspensa'],
+  'Account type mismatch': ['Type de compte incorrect', 'Account type mismatch', 'نوع الحساب غير مطابق', 'El tipo de cuenta no coincide', 'O tipo de conta não corresponde'],
+  'Invalid credentials': ['Identifiants invalides', 'Invalid credentials', 'بيانات الدخول غير صحيحة', 'Credenciales no válidas', 'Credenciais inválidas'],
+  'User not found': ['Utilisateur introuvable', 'User not found', 'المستخدم غير موجود', 'Usuario no encontrado', 'Utilizador não encontrado'],
+  'Invalid current password': ['Mot de passe actuel invalide', 'Invalid current password', 'كلمة المرور الحالية غير صحيحة', 'Contraseña actual no válida', 'Palavra-passe atual inválida'],
+  'You can only update your own claims': ['Vous ne pouvez modifier que vos propres réclamations', 'You can only update your own claims', 'يمكنك تعديل شكاواك فقط', 'Solo puedes modificar tus propias reclamaciones', 'Só pode alterar as suas próprias reclamações'],
+  'No fields to update': ['Aucun champ à mettre à jour', 'No fields to update', 'لا توجد حقول للتحديث', 'No hay campos que actualizar', 'Nenhum campo para atualizar'],
+  'Aucun champ à mettre à jour': ['Aucun champ à mettre à jour', 'No fields to update', 'لا توجد حقول للتحديث', 'No hay campos que actualizar', 'Nenhum campo para atualizar'],
+  'Not found': ['Introuvable', 'Not found', 'غير موجود', 'No encontrado', 'Não encontrado'],
+  'Mission not found or not yours': ['Mission introuvable ou qui ne vous appartient pas', 'Mission not found or not yours', 'المهمة غير موجودة أو ليست لك', 'Misión no encontrada o no es tuya', 'Missão não encontrada ou não é sua'],
+  'Mission cancelled': ['Mission annulée', 'Mission cancelled', 'تم إلغاء المهمة', 'Misión cancelada', 'Missão cancelada'],
+  'Format QR code invalide': ['Format QR code invalide', 'Invalid QR code format', 'تنسيق رمز QR غير صالح', 'Formato de código QR no válido', 'Formato de código QR inválido'],
+  'Données QR code invalides': ['Données QR code invalides', 'Invalid QR code data', 'بيانات رمز QR غير صالحة', 'Datos del código QR no válidos', 'Dados do código QR inválidos'],
+  'Ce colis ne fait pas partie de vos missions': ['Ce colis ne fait pas partie de vos missions', 'This parcel is not part of your missions', 'هذا الطرد ليس من مهامك', 'Este paquete no forma parte de tus misiones', 'Esta encomenda não faz parte das suas missões'],
+  'Ce colis a déjà été livré': ['Ce colis a déjà été livré', 'This parcel has already been delivered', 'تم تسليم هذا الطرد بالفعل', 'Este paquete ya ha sido entregado', 'Esta encomenda já foi entregue'],
+  'Cette mission a été annulée': ['Cette mission a été annulée', 'This mission has been cancelled', 'تم إلغاء هذه المهمة', 'Esta misión ha sido cancelada', 'Esta missão foi cancelada'],
+  "En attente de la confirmation d'arrivée par l'administration.": ["En attente de la confirmation d'arrivée par l'administration.", 'Waiting for the administration to confirm arrival.', 'في انتظار تأكيد الوصول من الإدارة.', 'A la espera de que la administración confirme la llegada.', 'À espera de que a administração confirme a chegada.'],
+  'Profil GP introuvable': ['Profil GP introuvable', 'GP profile not found', 'ملف الناقل غير موجود', 'Perfil de GP no encontrado', 'Perfil de GP não encontrado'],
+  'Aucun colis livré : scannez au moins un colis avant de terminer.': ['Aucun colis livré : scannez au moins un colis avant de terminer.', 'No parcel delivered: scan at least one parcel before finishing.', 'لم يتم تسليم أي طرد: امسح طردًا واحدًا على الأقل قبل الإنهاء.', 'Ningún paquete entregado: escanea al menos un paquete antes de terminar.', 'Nenhuma encomenda entregue: leia pelo menos uma encomenda antes de terminar.'],
+  'Cette mission ne vous a pas été assignée': ['Cette mission ne vous a pas été assignée', 'This mission has not been assigned to you', 'لم يتم إسناد هذه المهمة إليك', 'Esta misión no te ha sido asignada', 'Esta missão não lhe foi atribuída'],
+  'Mission not found or not awaiting your response': ["Mission introuvable ou n'attendant pas votre réponse", 'Mission not found or not awaiting your response', 'المهمة غير موجودة أو لا تنتظر ردك', 'Misión no encontrada o que no espera tu respuesta', 'Missão não encontrada ou que não aguarda a sua resposta'],
+  'Mission is not in transit': ["La mission n'est pas en transit", 'Mission is not in transit', 'المهمة ليست قيد النقل', 'La misión no está en tránsito', 'A missão não está em trânsito'],
+  'La mission est déjà livrée': ['La mission est déjà livrée', 'The mission has already been delivered', 'تم تسليم المهمة بالفعل', 'La misión ya está entregada', 'A missão já foi entregue'],
+  'La mission est déjà annulée': ['La mission est déjà annulée', 'The mission has already been cancelled', 'تم إلغاء المهمة بالفعل', 'La misión ya está cancelada', 'A missão já foi cancelada'],
+  "Vous n'êtes pas autorisé à modifier cette mission": ["Vous n'êtes pas autorisé à modifier cette mission", 'You are not allowed to modify this mission', 'غير مسموح لك بتعديل هذه المهمة', 'No tienes permiso para modificar esta misión', 'Não tem permissão para alterar esta missão'],
+  'Notification not found': ['Notification introuvable', 'Notification not found', 'الإشعار غير موجود', 'Notificación no encontrada', 'Notificação não encontrada'],
+  'You can only pay for your own missions': ['Vous ne pouvez payer que vos propres missions', 'You can only pay for your own missions', 'يمكنك الدفع لمهامك فقط', 'Solo puedes pagar tus propias misiones', 'Só pode pagar as suas próprias missões'],
+  'Invalid payment amount': ['Montant de paiement invalide', 'Invalid payment amount', 'مبلغ الدفع غير صالح', 'Importe de pago no válido', 'Montante de pagamento inválido'],
+  'This mission has already been paid': ['Cette mission a déjà été payée', 'This mission has already been paid', 'تم دفع هذه المهمة بالفعل', 'Esta misión ya ha sido pagada', 'Esta missão já foi paga'],
+  'Failed to initiate payment with provider': ["Impossible d'initier le paiement auprès du fournisseur", 'Failed to initiate payment with provider', 'تعذّر بدء الدفع لدى مزوّد الخدمة', 'No se pudo iniciar el pago con el proveedor', 'Não foi possível iniciar o pagamento junto do fornecedor'],
+  'You can only update your own trips': ['Vous ne pouvez modifier que vos propres trajets', 'You can only update your own trips', 'يمكنك تعديل رحلاتك فقط', 'Solo puedes modificar tus propios viajes', 'Só pode alterar as suas próprias viagens'],
+  'You can only cancel your own trips': ['Vous ne pouvez annuler que vos propres trajets', 'You can only cancel your own trips', 'يمكنك إلغاء رحلاتك فقط', 'Solo puedes cancelar tus propios viajes', 'Só pode cancelar as suas próprias viagens'],
+  'A completed trip cannot be cancelled': ['Un trajet terminé ne peut pas être annulé', 'A completed trip cannot be cancelled', 'لا يمكن إلغاء رحلة مكتملة', 'Un viaje completado no se puede cancelar', 'Uma viagem concluída não pode ser cancelada'],
+  'Withdrawal method is required': ['La méthode de retrait est obligatoire', 'Withdrawal method is required', 'طريقة السحب مطلوبة', 'El método de retiro es obligatorio', 'O método de levantamento é obrigatório'],
+  'Account number is required': ['Le numéro de compte est obligatoire', 'Account number is required', 'رقم الحساب مطلوب', 'El número de cuenta es obligatorio', 'O número da conta é obrigatório'],
+  'Insufficient available balance': ['Solde disponible insuffisant', 'Insufficient available balance', 'الرصيد المتاح غير كافٍ', 'Saldo disponible insuficiente', 'Saldo disponível insuficiente'],
+  'Withdrawal not found or not pending': ['Retrait introuvable ou non en attente', 'Withdrawal not found or not pending', 'عملية السحب غير موجودة أو ليست قيد الانتظار', 'Retiro no encontrado o no pendiente', 'Levantamento não encontrado ou não pendente'],
+  'Withdrawal not found or not in approved state': ['Retrait introuvable ou non approuvé', 'Withdrawal not found or not in approved state', 'عملية السحب غير موجودة أو غير معتمدة', 'Retiro no encontrado o no aprobado', 'Levantamento não encontrado ou não aprovado'],
+  'Withdrawal not found or not cancellable': ['Retrait introuvable ou non annulable', 'Withdrawal not found or not cancellable', 'عملية السحب غير موجودة أو لا يمكن إلغاؤها', 'Retiro no encontrado o no cancelable', 'Levantamento não encontrado ou não cancelável'],
+  'Failed to fetch profile': ['Impossible de charger le profil', 'Failed to fetch profile', 'تعذّر تحميل الملف الشخصي', 'No se pudo cargar el perfil', 'Não foi possível carregar o perfil'],
+  'Ce numéro de téléphone est déjà utilisé': ['Ce numéro de téléphone est déjà utilisé', 'This phone number is already in use', 'رقم الهاتف هذا مستخدم بالفعل', 'Este número de teléfono ya está en uso', 'Este número de telefone já está em uso'],
+  'Mise à jour échouée': ['Mise à jour échouée', 'Update failed', 'فشل التحديث', 'Error al actualizar', 'Falha na atualização'],
+  'This account belongs to a different profile type': ['Ce compte appartient à un autre type de profil', 'This account belongs to a different profile type', 'ينتمي هذا الحساب إلى نوع ملف شخصي آخر', 'Esta cuenta pertenece a otro tipo de perfil', 'Esta conta pertence a outro tipo de perfil'],
+  'Invalid email or password': ['Email ou mot de passe incorrect', 'Invalid email or password', 'البريد الإلكتروني أو كلمة المرور غير صحيحة', 'Correo o contraseña incorrectos', 'Email ou palavra-passe incorretos'],
+  'You cannot view this claim': ['Vous ne pouvez pas consulter cette réclamation', 'You cannot view this claim', 'لا يمكنك عرض هذه الشكوى', 'No puedes ver esta reclamación', 'Não pode consultar esta reclamação'],
+  'Only expediteurs can create missions': ['Seuls les expéditeurs peuvent créer des missions', 'Only expediteurs can create missions', 'يمكن للمرسِلين فقط إنشاء المهام', 'Solo los remitentes pueden crear misiones', 'Só os remetentes podem criar missões'],
+  'Invalid user type': ["Type d'utilisateur invalide", 'Invalid user type', 'نوع المستخدم غير صالح', 'Tipo de usuario no válido', 'Tipo de utilizador inválido'],
+  'Cette mission ne peut plus être modifiée': ['Cette mission ne peut plus être modifiée', 'This mission can no longer be modified', 'لم يعد بالإمكان تعديل هذه المهمة', 'Esta misión ya no se puede modificar', 'Esta missão já não pode ser alterada'],
+  'Aucun champ modifiable fourni': ['Aucun champ modifiable fourni', 'No editable field provided', 'لم يتم تقديم أي حقل قابل للتعديل', 'No se proporcionó ningún campo modificable', 'Nenhum campo editável fornecido'],
+  'Only GPs can accept missions': ['Seuls les GP peuvent accepter des missions', 'Only GPs can accept missions', 'يمكن للناقلين فقط قبول المهام', 'Solo los GP pueden aceptar misiones', 'Só os GP podem aceitar missões'],
+  'Only GPs can decline missions': ['Seuls les GP peuvent décliner des missions', 'Only GPs can decline missions', 'يمكن للناقلين فقط رفض المهام', 'Solo los GP pueden rechazar misiones', 'Só os GP podem recusar missões'],
+  'lat and lng are required': ['La latitude et la longitude sont obligatoires', 'lat and lng are required', 'خط العرض وخط الطول مطلوبان', 'La latitud y la longitud son obligatorias', 'A latitude e a longitude são obrigatórias'],
+  'Les deux QR codes sont requis': ['Les deux QR codes sont requis', 'Both QR codes are required', 'رمزا QR كلاهما مطلوبان', 'Se requieren los dos códigos QR', 'Os dois códigos QR são obrigatórios'],
+  'Only GPs can verify delivery': ['Seuls les GP peuvent vérifier une livraison', 'Only GPs can verify delivery', 'يمكن للناقلين فقط التحقق من التسليم', 'Solo los GP pueden verificar una entrega', 'Só os GP podem verificar uma entrega'],
+  'QR code data is required': ['Les données du QR code sont obligatoires', 'QR code data is required', 'بيانات رمز QR مطلوبة', 'Los datos del código QR son obligatorios', 'Os dados do código QR são obrigatórios'],
+  'Tracking number not found': ['Numéro de suivi introuvable', 'Tracking number not found', 'رقم التتبع غير موجود', 'Número de seguimiento no encontrado', 'Número de acompanhamento não encontrado'],
+  'Payment not found': ['Paiement introuvable', 'Payment not found', 'الدفعة غير موجودة', 'Pago no encontrado', 'Pagamento não encontrado'],
+  'You cannot view this payment': ['Vous ne pouvez pas consulter ce paiement', 'You cannot view this payment', 'لا يمكنك عرض هذه الدفعة', 'No puedes ver este pago', 'Não pode consultar este pagamento'],
+  'Envoi introuvable': ['Envoi introuvable', 'Shipment not found', 'الشحنة غير موجودة', 'Envío no encontrado', 'Envio não encontrado'],
+  'Colis introuvable': ['Colis introuvable', 'Parcel not found', 'الطرد غير موجود', 'Paquete no encontrado', 'Encomenda não encontrada'],
+  'Erreur de suivi': ['Erreur de suivi', 'Tracking error', 'خطأ في التتبع', 'Error de seguimiento', 'Erro de acompanhamento'],
+  'Erreur': ['Erreur', 'Error', 'خطأ', 'Error', 'Erro'],
+  'Only GPs can create trips': ['Seuls les GP peuvent créer des trajets', 'Only GPs can create trips', 'يمكن للناقلين فقط إنشاء الرحلات', 'Solo los GP pueden crear viajes', 'Só os GP podem criar viagens'],
+  'Arrival date must be after departure date': ["La date d'arrivée doit être postérieure à la date de départ", 'Arrival date must be after departure date', 'يجب أن يكون تاريخ الوصول بعد تاريخ المغادرة', 'La fecha de llegada debe ser posterior a la de salida', 'A data de chegada deve ser posterior à data de partida'],
+  'mission_id or mission_code is required': ['mission_id ou mission_code est obligatoire', 'mission_id or mission_code is required', 'مطلوب mission_id أو mission_code', 'Se requiere mission_id o mission_code', 'É obrigatório mission_id ou mission_code'],
+  'Invalid language': ['Langue invalide', 'Invalid language', 'لغة غير صالحة', 'Idioma no válido', 'Idioma inválido'],
+};
+
+/** Messages a variable : l'expression capture la partie variable, reinseree dans {1}. */
+export const PATTERNS: Array<{ re: RegExp; tpl: Row }> = [
+  {
+    re: /^Minimum withdrawal is (.+)$/,
+    tpl: ['Le retrait minimum est de {1}', 'Minimum withdrawal is {1}', 'الحد الأدنى للسحب هو {1}', 'El retiro mínimo es de {1}', 'O levantamento mínimo é de {1}'],
+  },
+  {
+    re: /^Transition de statut non autorisée : (.+)$/,
+    tpl: ['Transition de statut non autorisée : {1}', 'Status change not allowed: {1}', 'تغيير الحالة غير مسموح به: {1}', 'Cambio de estado no permitido: {1}', 'Mudança de estado não permitida: {1}'],
+  },
+];
+
+/** Notifications destinees aux utilisateurs. {param} = variable. */
+export const TEMPLATES: Record<string, { title: Row; message: Row }> = {
+  claim_reply: {
+    title: ['Réponse à votre réclamation {code}', 'Reply to your claim {code}', 'رد على شكواك {code}', 'Respuesta a tu reclamación {code}', 'Resposta à sua reclamação {code}'],
+    message: ['{text}', '{text}', '{text}', '{text}', '{text}'],
+  },
+  claim_resolved_credited: {
+    title: ['Réclamation {code} résolue', 'Claim {code} resolved', 'تمت معالجة الشكوى {code}', 'Reclamación {code} resuelta', 'Reclamação {code} resolvida'],
+    message: [
+      'Une compensation de {amount} a été créditée sur votre portefeuille.',
+      'A compensation of {amount} has been credited to your wallet.',
+      'تم إيداع تعويض قدره {amount} في محفظتك.',
+      'Se ha abonado una compensación de {amount} en tu monedero.',
+      'Foi creditada uma compensação de {amount} na sua carteira.',
+    ],
+  },
+  claim_resolved_granted: {
+    title: ['Réclamation {code} résolue', 'Claim {code} resolved', 'تمت معالجة الشكوى {code}', 'Reclamación {code} resuelta', 'Reclamação {code} resolvida'],
+    message: [
+      'Une compensation de {amount} vous a été accordée. Notre équipe vous contactera pour le versement.',
+      'A compensation of {amount} has been granted to you. Our team will contact you for the payment.',
+      'تم منحك تعويضًا قدره {amount}. سيتواصل معك فريقنا لإتمام الدفع.',
+      'Se te ha concedido una compensación de {amount}. Nuestro equipo te contactará para el pago.',
+      'Foi-lhe concedida uma compensação de {amount}. A nossa equipa irá contactá-lo para o pagamento.',
+    ],
+  },
+  mission_assigned: {
+    title: ['Mission assignée : {route}', 'Mission assigned: {route}', 'مهمة مُعيَّنة: {route}', 'Misión asignada: {route}', 'Missão atribuída: {route}'],
+    message: [
+      'Une nouvelle mission ({code}) vous a été assignée. Acceptez ou déclinez depuis vos notifications.',
+      'A new mission ({code}) has been assigned to you. Accept or decline from your notifications.',
+      'تم إسناد مهمة جديدة ({code}) إليك. اقبلها أو ارفضها من إشعاراتك.',
+      'Se te ha asignado una nueva misión ({code}). Acéptala o recházala desde tus notificaciones.',
+      'Foi-lhe atribuída uma nova missão ({code}). Aceite ou recuse a partir das suas notificações.',
+    ],
+  },
+  mission_reassigned: {
+    title: ['Mission réassignée : {route}', 'Mission reassigned: {route}', 'مهمة أُعيد إسنادها: {route}', 'Misión reasignada: {route}', 'Missão reatribuída: {route}'],
+    message: [
+      'La mission {code} vous a été (ré)assignée. Acceptez ou déclinez depuis vos notifications.',
+      'Mission {code} has been (re)assigned to you. Accept or decline from your notifications.',
+      'تم إسناد المهمة {code} إليك (من جديد). اقبلها أو ارفضها من إشعاراتك.',
+      'La misión {code} se te ha (re)asignado. Acéptala o recházala desde tus notificaciones.',
+      'A missão {code} foi-lhe (re)atribuída. Aceite ou recuse a partir das suas notificações.',
+    ],
+  },
+  arrival_confirmed: {
+    title: ['Arrivée confirmée', 'Arrival confirmed', 'تم تأكيد الوصول', 'Llegada confirmada', 'Chegada confirmada'],
+    message: [
+      'Arrivée confirmée pour {code}. Vous pouvez maintenant scanner le QR du destinataire pour livrer.',
+      'Arrival confirmed for {code}. You can now scan the recipient’s QR code to deliver.',
+      'تم تأكيد الوصول للمهمة {code}. يمكنك الآن مسح رمز QR الخاص بالمستلم للتسليم.',
+      'Llegada confirmada para {code}. Ya puedes escanear el QR del destinatario para entregar.',
+      'Chegada confirmada para {code}. Já pode ler o QR do destinatário para entregar.',
+    ],
+  },
+  access_restored: {
+    title: ['Accès rétabli', 'Access restored', 'تمت استعادة الوصول', 'Acceso restablecido', 'Acesso restabelecido'],
+    message: [
+      "L'administration a validé la fin de votre voyage. Vous pouvez de nouveau utiliser l'application.",
+      'The administration has validated the end of your trip. You can use the app again.',
+      'اعتمدت الإدارة انتهاء رحلتك. يمكنك استخدام التطبيق من جديد.',
+      'La administración ha validado el fin de tu viaje. Ya puedes volver a usar la aplicación.',
+      'A administração validou o fim da sua viagem. Já pode voltar a utilizar a aplicação.',
+    ],
+  },
+  payment_refunded: {
+    title: ['Paiement remboursé', 'Payment refunded', 'تم رد المبلغ المدفوع', 'Pago reembolsado', 'Pagamento reembolsado'],
+    message: [
+      'Votre paiement {code} de {amount} a été remboursé.',
+      'Your payment {code} of {amount} has been refunded.',
+      'تم رد دفعتك {code} البالغة {amount}.',
+      'Tu pago {code} de {amount} ha sido reembolsado.',
+      'O seu pagamento {code} de {amount} foi reembolsado.',
+    ],
+  },
+  payment_refunded_reason: {
+    title: ['Paiement remboursé', 'Payment refunded', 'تم رد المبلغ المدفوع', 'Pago reembolsado', 'Pagamento reembolsado'],
+    message: [
+      'Votre paiement {code} de {amount} a été remboursé : {reason}.',
+      'Your payment {code} of {amount} has been refunded: {reason}.',
+      'تم رد دفعتك {code} البالغة {amount}: {reason}.',
+      'Tu pago {code} de {amount} ha sido reembolsado: {reason}.',
+      'O seu pagamento {code} de {amount} foi reembolsado: {reason}.',
+    ],
+  },
+  identity_verified: {
+    title: ['Identité vérifiée', 'Identity verified', 'تم التحقق من الهوية', 'Identidad verificada', 'Identidade verificada'],
+    message: [
+      "Votre pièce d'identité a été validée. Votre compte est maintenant vérifié.",
+      'Your ID document has been validated. Your account is now verified.',
+      'تم اعتماد وثيقة هويتك. أصبح حسابك موثّقًا الآن.',
+      'Tu documento de identidad ha sido validado. Tu cuenta ya está verificada.',
+      'O seu documento de identificação foi validado. A sua conta está agora verificada.',
+    ],
+  },
+  identity_rejected: {
+    title: ["Pièce d'identité refusée", 'ID document rejected', 'تم رفض وثيقة الهوية', 'Documento de identidad rechazado', 'Documento de identificação recusado'],
+    message: [
+      "Votre pièce d'identité a été refusée. Merci de la soumettre à nouveau.",
+      'Your ID document has been rejected. Please submit it again.',
+      'تم رفض وثيقة هويتك. يرجى إرسالها من جديد.',
+      'Tu documento de identidad ha sido rechazado. Envíalo de nuevo.',
+      'O seu documento de identificação foi recusado. Submeta-o novamente.',
+    ],
+  },
+  identity_rejected_reason: {
+    title: ["Pièce d'identité refusée", 'ID document rejected', 'تم رفض وثيقة الهوية', 'Documento de identidad rechazado', 'Documento de identificação recusado'],
+    message: [
+      "Votre pièce d'identité a été refusée : {reason}. Merci de la soumettre à nouveau.",
+      'Your ID document has been rejected: {reason}. Please submit it again.',
+      'تم رفض وثيقة هويتك: {reason}. يرجى إرسالها من جديد.',
+      'Tu documento de identidad ha sido rechazado: {reason}. Envíalo de nuevo.',
+      'O seu documento de identificação foi recusado: {reason}. Submeta-o novamente.',
+    ],
+  },
+  parcel_delivered: {
+    title: ['Colis livré', 'Parcel delivered', 'تم تسليم الطرد', 'Paquete entregado', 'Encomenda entregue'],
+    message: [
+      'Votre colis {code} a été remis au destinataire (QR confirmé).',
+      'Your parcel {code} has been handed to the recipient (QR confirmed).',
+      'تم تسليم طردك {code} إلى المستلم (تم تأكيد رمز QR).',
+      'Tu paquete {code} ha sido entregado al destinatario (QR confirmado).',
+      'A sua encomenda {code} foi entregue ao destinatário (QR confirmado).',
+    ],
+  },
+  parcel_delivered_named: {
+    title: ['Colis livré', 'Parcel delivered', 'تم تسليم الطرد', 'Paquete entregado', 'Encomenda entregue'],
+    message: [
+      'Votre colis {code} a été remis à {name} (QR confirmé).',
+      'Your parcel {code} has been handed to {name} (QR confirmed).',
+      'تم تسليم طردك {code} إلى {name} (تم تأكيد رمز QR).',
+      'Tu paquete {code} ha sido entregado a {name} (QR confirmado).',
+      'A sua encomenda {code} foi entregue a {name} (QR confirmado).',
+    ],
+  },
+  earnings_credited: {
+    title: ['Gains crédités', 'Earnings credited', 'تم إيداع الأرباح', 'Ganancias abonadas', 'Ganhos creditados'],
+    message: [
+      'Vous avez gagné {amount} pour la mission {code}.',
+      'You earned {amount} for mission {code}.',
+      'ربحت {amount} عن المهمة {code}.',
+      'Has ganado {amount} por la misión {code}.',
+      'Ganhou {amount} pela missão {code}.',
+    ],
+  },
+  gp_arrived: {
+    title: ['GP arrivé à destination', 'GP arrived at destination', 'وصل الناقل إلى الوجهة', 'GP llegó a destino', 'GP chegou ao destino'],
+    message: [
+      'Le GP est arrivé à destination pour la mission {code}. La remise du colis est imminente.',
+      'The GP has arrived at the destination for mission {code}. The parcel hand-over is imminent.',
+      'وصل الناقل إلى الوجهة للمهمة {code}. تسليم الطرد وشيك.',
+      'El GP ha llegado a destino para la misión {code}. La entrega del paquete es inminente.',
+      'O GP chegou ao destino para a missão {code}. A entrega da encomenda é iminente.',
+    ],
+  },
+  payment_confirmed: {
+    title: ['Paiement confirmé', 'Payment confirmed', 'تم تأكيد الدفع', 'Pago confirmado', 'Pagamento confirmado'],
+    message: [
+      'Votre paiement de {amount} a été confirmé.',
+      'Your payment of {amount} has been confirmed.',
+      'تم تأكيد دفعتك البالغة {amount}.',
+      'Tu pago de {amount} ha sido confirmado.',
+      'O seu pagamento de {amount} foi confirmado.',
+    ],
+  },
+  withdrawal_approved: {
+    title: ['Retrait approuvé', 'Withdrawal approved', 'تمت الموافقة على السحب', 'Retiro aprobado', 'Levantamento aprovado'],
+    message: [
+      'Votre retrait de {amount} a été approuvé. Le paiement est en cours.',
+      'Your withdrawal of {amount} has been approved. The payment is in progress.',
+      'تمت الموافقة على سحبك البالغ {amount}. الدفع قيد التنفيذ.',
+      'Tu retiro de {amount} ha sido aprobado. El pago está en curso.',
+      'O seu levantamento de {amount} foi aprovado. O pagamento está em curso.',
+    ],
+  },
+  withdrawal_paid: {
+    title: ['Retrait payé', 'Withdrawal paid', 'تم دفع السحب', 'Retiro pagado', 'Levantamento pago'],
+    message: [
+      'Votre retrait de {amount} a été payé.',
+      'Your withdrawal of {amount} has been paid.',
+      'تم دفع سحبك البالغ {amount}.',
+      'Tu retiro de {amount} ha sido pagado.',
+      'O seu levantamento de {amount} foi pago.',
+    ],
+  },
+  withdrawal_paid_ref: {
+    title: ['Retrait payé', 'Withdrawal paid', 'تم دفع السحب', 'Retiro pagado', 'Levantamento pago'],
+    message: [
+      'Votre retrait de {amount} a été payé (réf. {ref}).',
+      'Your withdrawal of {amount} has been paid (ref. {ref}).',
+      'تم دفع سحبك البالغ {amount} (المرجع {ref}).',
+      'Tu retiro de {amount} ha sido pagado (ref. {ref}).',
+      'O seu levantamento de {amount} foi pago (ref. {ref}).',
+    ],
+  },
+  withdrawal_rejected: {
+    title: ['Retrait rejeté', 'Withdrawal rejected', 'تم رفض السحب', 'Retiro rechazado', 'Levantamento recusado'],
+    message: [
+      'Votre retrait de {amount} a été rejeté. Les fonds ont été recrédités.',
+      'Your withdrawal of {amount} has been rejected. The funds have been credited back.',
+      'تم رفض سحبك البالغ {amount}. أُعيدت الأموال إلى رصيدك.',
+      'Tu retiro de {amount} ha sido rechazado. Los fondos se han reabonado.',
+      'O seu levantamento de {amount} foi recusado. Os fundos foram recreditados.',
+    ],
+  },
+  withdrawal_rejected_reason: {
+    title: ['Retrait rejeté', 'Withdrawal rejected', 'تم رفض السحب', 'Retiro rechazado', 'Levantamento recusado'],
+    message: [
+      'Votre retrait de {amount} a été rejeté: {reason}. Les fonds ont été recrédités.',
+      'Your withdrawal of {amount} has been rejected: {reason}. The funds have been credited back.',
+      'تم رفض سحبك البالغ {amount}: {reason}. أُعيدت الأموال إلى رصيدك.',
+      'Tu retiro de {amount} ha sido rechazado: {reason}. Los fondos se han reabonado.',
+      'O seu levantamento de {amount} foi recusado: {reason}. Os fundos foram recreditados.',
+    ],
+  },
+};

@@ -99,7 +99,37 @@
       if (PUBLIC_PAGES.indexOf(pageName(win)) === -1) win.location.replace(LOGIN_PAGE);
     }
 
+    // La langue de l'application accompagne chaque appel a l'API : le serveur traduit ses messages d'erreur.
+    function withLanguage(input, init) {
+      var base = win.API_BASE_URL;
+      var lang = win.SengpI18n && win.SengpI18n.lang;
+      if (!lang || !base || typeof win.Headers !== 'function' || urlOf(input).indexOf(base) !== 0) return init;
+      var headers = new win.Headers(init && init.headers);
+      if (!headers.has('Accept-Language')) headers.set('Accept-Language', lang);
+      var out = {};
+      for (var k in init) if (Object.prototype.hasOwnProperty.call(init || {}, k)) out[k] = init[k];
+      out.headers = headers;
+      return out;
+    }
+
+    // Choix explicite de langue (selecteur) : enregistre sur le compte pour les notifications et les autres appareils.
+    if (typeof win.addEventListener === 'function') {
+      win.addEventListener('sengp:languagechange', function (e) {
+        var d = e && e.detail;
+        if (!d || !d.explicit || !win.API_BASE_URL) return;
+        var token;
+        try { token = win.localStorage.getItem('authToken'); } catch (err) { token = null; }
+        if (!token) return;
+        win.fetch(win.API_BASE_URL + '/users/me', {
+          method: 'PUT',
+          headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ language: d.lang })
+        }).catch(function () { /* au mieux : la langue reste choisie sur l'appareil */ });
+      });
+    }
+
     win.fetch = function (input, init) {
+      init = withLanguage(input, init);
       return originalFetch(input, init).then(function (res) {
         if (res && res.status === 401) {
           try { onSessionFailure(input, init); } catch (e) { /* ne jamais casser l'appel */ }

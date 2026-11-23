@@ -61,8 +61,8 @@ export class AdminPaymentService {
         await NotificationService.create({
           user_id: p.payer_id,
           notification_type: NotificationType.SYSTEM_ALERT,
-          title: 'Paiement remboursé',
-          message: `Votre paiement ${p.payment_code} de ${Helpers.formatCurrency(Number(p.amount))} a été remboursé${reason ? ` : ${reason}` : ''}.`,
+          template: reason ? 'payment_refunded_reason' : 'payment_refunded',
+          params: { code: p.payment_code, amount: Number(p.amount), reason: reason || '' },
         });
       } catch (e) { logger.warn(`Payment ${id} refunded but notification failed`); }
     }

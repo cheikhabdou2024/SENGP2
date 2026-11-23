@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ResponseUtil } from '../utils/response';
 import logger from '../utils/logger';
 import { AppError } from '../utils/AppError';
+import { tr } from '../i18n';
 
 export class ErrorMiddleware {
   /**
@@ -18,7 +19,7 @@ export class ErrorMiddleware {
 
     // Errors raised on purpose with their own HTTP status
     if (err instanceof AppError) {
-      res.status(err.statusCode).json({ success: false, error: err.message });
+      res.status(err.statusCode).json({ success: false, error: tr(err.message) });
       return;
     }
 

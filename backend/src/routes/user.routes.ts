@@ -1,3 +1,4 @@
+import { isLang, tr } from '../i18n';
 import { Router } from 'express';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
 import pool from '../config/database';
@@ -17,13 +18,13 @@ router.get('/me', async (req: any, res) => {
       `SELECT id, email, phone, user_type, first_name, last_name,
               country, city, status, is_email_verified, is_phone_verified,
               profile_photo_url, identity_document_type, identity_document_url,
-              identity_document_url_back, created_at, last_login_at
+              identity_document_url_back, language, created_at, last_login_at
        FROM users WHERE id = $1 AND deleted_at IS NULL`,
       [userId]
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'User not found' });
+      return res.status(404).json({ success: false, error: tr('User not found') });
     }
 
     const u = result.rows[0];
@@ -34,7 +35,7 @@ router.get('/me', async (req: any, res) => {
     res.json({ success: true, data: u });
   } catch (error: any) {
     console.error('Error fetching user profile:', error);
-    res.status(500).json({ success: false, error: 'Failed to fetch profile' });
+    res.status(500).json({ success: false, error: tr('Failed to fetch profile') });
   }
 });
 
@@ -42,34 +43,37 @@ router.get('/me', async (req: any, res) => {
 router.put('/me', async (req: any, res) => {
   try {
     const userId = req.user?.id;
-    const allowed = ['first_name', 'last_name', 'phone', 'identity_document_type', 'identity_document_url', 'identity_document_url_back'];
+    const allowed = ['first_name', 'last_name', 'phone', 'identity_document_type', 'identity_document_url', 'identity_document_url_back', 'language'];
+    if (req.body.language !== undefined && !isLang(req.body.language)) {
+      return res.status(400).json({ success: false, error: tr('Invalid language') });
+    }
     const sets: string[] = [];
     const vals: any[] = [];
     let i = 1;
     for (const k of allowed) {
       if (req.body[k] !== undefined) { sets.push(`${k} = $${i++}`); vals.push(req.body[k] === '' ? null : req.body[k]); }
     }
-    if (!sets.length) return res.status(400).json({ success: false, error: 'Aucun champ à mettre à jour' });
+    if (!sets.length) return res.status(400).json({ success: false, error: tr('Aucun champ à mettre à jour') });
     sets.push('updated_at = CURRENT_TIMESTAMP');
     vals.push(userId);
     const r = await pool.query(
       `UPDATE users SET ${sets.join(', ')} WHERE id = $${i} AND deleted_at IS NULL
        RETURNING id, email, phone, user_type, first_name, last_name, country, city,
                  status, is_email_verified, profile_photo_url, identity_document_type,
-                 identity_document_url, identity_document_url_back, created_at`,
+                 identity_document_url, identity_document_url_back, language, created_at`,
       vals
     );
-    if (!r.rows.length) return res.status(404).json({ success: false, error: 'User not found' });
+    if (!r.rows.length) return res.status(404).json({ success: false, error: tr('User not found') });
     const u = r.rows[0];
     if (u.identity_document_url) u.identity_document_url = resolveEvidenceUrl(u.identity_document_url);
     if (u.identity_document_url_back) u.identity_document_url_back = resolveEvidenceUrl(u.identity_document_url_back);
     res.json({ success: true, data: u, message: 'Profil mis à jour' });
   } catch (error: any) {
     if (error.code === '23505') {
-      return res.status(409).json({ success: false, error: 'Ce numéro de téléphone est déjà utilisé' });
+      return res.status(409).json({ success: false, error: tr('Ce numéro de téléphone est déjà utilisé') });
     }
     console.error('Error updating profile:', error);
-    res.status(500).json({ success: false, error: 'Mise à jour échouée' });
+    res.status(500).json({ success: false, error: tr('Mise à jour échouée') });
   }
 });
 

@@ -3,6 +3,7 @@ import { Helpers } from '../utils/helpers';
 import logger from '../utils/logger';
 import { NotificationType } from '../types';
 import { NotificationService } from './notification.service';
+import { TemplateKey } from '../i18n';
 import { WalletService } from './wallet.service';
 
 const MIN_WITHDRAWAL = Number(process.env.MIN_WITHDRAWAL_AMOUNT) || 5000;
@@ -150,11 +151,7 @@ export class WithdrawalService {
     );
     if (result.rows.length === 0) throw new Error('Withdrawal not found or not pending');
     const withdrawal = result.rows[0];
-    await this.notify(
-      withdrawal.gp_id,
-      'Retrait approuvé',
-      `Votre retrait de ${Helpers.formatCurrency(Number(withdrawal.amount))} a été approuvé. Le paiement est en cours.`
-    );
+    await this.notify(withdrawal.gp_id, 'withdrawal_approved', { amount: Number(withdrawal.amount) });
     logger.info(`Withdrawal approved: ${withdrawal.withdrawal_code} by admin ${adminId}`);
     return withdrawal;
   }
@@ -183,11 +180,7 @@ export class WithdrawalService {
         [withdrawal.amount, withdrawal.gp_id]
       );
       await client.query('COMMIT');
-      await this.notify(
-        withdrawal.gp_id,
-        'Retrait payé',
-        `Votre retrait de ${Helpers.formatCurrency(Number(withdrawal.amount))} a été payé${reference ? ` (réf. ${reference})` : ''}.`
-      );
+      await this.notify(withdrawal.gp_id, reference ? 'withdrawal_paid_ref' : 'withdrawal_paid', { amount: Number(withdrawal.amount), ref: reference || '' });
       logger.info(`Withdrawal paid: ${withdrawal.withdrawal_code} by admin ${adminId}`);
       return withdrawal;
     } catch (error) {
@@ -230,13 +223,7 @@ export class WithdrawalService {
 
       await client.query('COMMIT');
 
-      await this.notify(
-        withdrawal.gp_id,
-        'Retrait rejeté',
-        `Votre retrait de ${Helpers.formatCurrency(Number(withdrawal.amount))} a été rejeté${
-          reason ? `: ${reason}` : ''
-        }. Les fonds ont été recrédités.`
-      );
+      await this.notify(withdrawal.gp_id, reason ? 'withdrawal_rejected_reason' : 'withdrawal_rejected', { amount: Number(withdrawal.amount), reason: reason || '' });
 
       logger.info(`Withdrawal rejected: ${withdrawal.withdrawal_code} by admin ${adminId}`);
       return withdrawal;
@@ -248,13 +235,13 @@ export class WithdrawalService {
     }
   }
 
-  private static async notify(userId: string, title: string, message: string): Promise<void> {
+  private static async notify(userId: string, template: TemplateKey, params: Record<string, string | number>): Promise<void> {
     try {
       await NotificationService.create({
         user_id: userId,
         notification_type: NotificationType.SYSTEM_ALERT,
-        title,
-        message,
+        template,
+        params,
       });
     } catch (e: any) {
       logger.warn('Failed to create withdrawal notification:', e.message);

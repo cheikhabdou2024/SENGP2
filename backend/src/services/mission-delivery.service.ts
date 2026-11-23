@@ -236,8 +236,8 @@ export class MissionDeliveryService {
       await NotificationService.create({
         user_id: mission.expediteur_id,
         notification_type: NotificationType.MISSION_DELIVERED,
-        title: 'Colis livré',
-        message: `Votre colis ${mission.mission_code} a été remis${mission.recipient_name ? ' à ' + mission.recipient_name : ' au destinataire'} (QR confirmé).`,
+        template: mission.recipient_name ? 'parcel_delivered_named' : 'parcel_delivered',
+        params: { code: mission.mission_code, name: mission.recipient_name || '' },
         action_url: 'suivi.html',
         metadata: { mission_id: missionId, mission_code: mission.mission_code },
       });

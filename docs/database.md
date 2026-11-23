@@ -14,7 +14,7 @@ Pour changer le schéma : ajouter `backend/src/migrations/003_xxx.sql` (idempote
 
 | Table | Contenu |
 |---|---|
-| `users` | Comptes. `user_type` (expediteur, gp, admin), `status`, `admin_role_id`, `token_version` (révocation des sessions). |
+| `users` | Comptes. `user_type` (expediteur, gp, admin), `status`, `admin_role_id`, `token_version` (révocation des sessions), `language` (langue préférée, nullable, utilisée pour les notifications). |
 | `expediteur_profiles` | Profil expéditeur, `total_spent`. |
 | `gp_profiles` | Profil GP : KYC, note, `scan_review_pending` (verrou de fin de voyage). |
 | `trips` | Trajets des GP : villes, dates, poids disponible, `current_packages`, statut. |

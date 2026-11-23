@@ -2,6 +2,7 @@ import pool from '../config/database';
 import { Notification, NotificationType, PaginatedResult } from '../types';
 import { Helpers } from '../utils/helpers';
 import logger from '../utils/logger';
+import { isLang, Lang, money, renderNotification, TemplateKey } from '../i18n';
 
 /**
  * Maps the canonical `notification_type` enum to the short category key the
@@ -41,11 +42,28 @@ export class NotificationService {
   static async create(data: {
     user_id: string;
     notification_type: NotificationType;
-    title: string;
-    message: string;
+    title?: string;
+    message?: string;
+    /** Modele (i18n/messages.ts) : titre et message sont rendus dans la langue du destinataire. */
+    template?: TemplateKey;
+    params?: Record<string, string | number>;
     action_url?: string;
     metadata?: any;
   }): Promise<Notification> {
+    let { title, message, metadata } = data;
+    if (data.template) {
+      const lang = await this.recipientLang(data.user_id);
+      // Montants (cles se terminant par "amount") : formates dans la langue du destinataire.
+      const params: Record<string, string | number> = {};
+      for (const [k, v] of Object.entries(data.params || {})) {
+        params[k] = typeof v === 'number' && /amount$/i.test(k) ? money(v, lang) : v;
+      }
+      ({ title, message } = renderNotification(data.template, lang, params));
+      // Le modele et ses variables sont conserves : la notification pourra etre re-rendue plus tard.
+      metadata = { ...(data.metadata || {}), template: data.template, params: data.params || {} };
+    }
+    if (!title || !message) throw new Error('Notification title and message are required');
+    data = { ...data, title, message, metadata };
     const result = await pool.query(
       `INSERT INTO notifications (user_id, notification_type, title, message, action_url, metadata)
        VALUES ($1, $2, $3, $4, $5, $6)
@@ -53,8 +71,8 @@ export class NotificationService {
       [
         data.user_id,
         data.notification_type,
-        data.title,
-        data.message,
+        title,
+        message,
         data.action_url || null,
         data.metadata ? JSON.stringify(data.metadata) : null,
       ]
@@ -62,6 +80,17 @@ export class NotificationService {
 
     logger.info(`Notification created for user ${data.user_id} (${data.notification_type})`);
     return this.decorate(result.rows[0]);
+  }
+
+  /** Langue enregistree du destinataire (francais par defaut). */
+  private static async recipientLang(userId: string): Promise<Lang> {
+    try {
+      const r = await pool.query('SELECT language FROM users WHERE id = $1', [userId]);
+      const l = r.rows[0]?.language;
+      return isLang(l) ? l : 'fr';
+    } catch {
+      return 'fr';
+    }
   }
 
   /**

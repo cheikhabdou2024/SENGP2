@@ -234,8 +234,7 @@ export class AdminUserService {
       await NotificationService.create({
         user_id: userId,
         notification_type: NotificationType.ACCOUNT_VERIFIED,
-        title: 'Identité vérifiée',
-        message: 'Votre pièce d\'identité a été validée. Votre compte est maintenant vérifié.',
+        template: 'identity_verified',
         action_url: 'profile.html',
       });
     } catch (e) { logger.warn(`KYC approved for ${userId} but notification failed`); }
@@ -256,10 +255,8 @@ export class AdminUserService {
       await NotificationService.create({
         user_id: userId,
         notification_type: NotificationType.SYSTEM_ALERT,
-        title: 'Pièce d\'identité refusée',
-        message: reason
-          ? `Votre pièce d'identité a été refusée : ${reason}. Merci de la soumettre à nouveau.`
-          : 'Votre pièce d\'identité a été refusée. Merci de la soumettre à nouveau.',
+        template: reason ? 'identity_rejected_reason' : 'identity_rejected',
+        params: { reason: reason || '' },
         action_url: 'profile.html',
       });
     } catch (e) { logger.warn(`KYC rejected for ${userId} but notification failed`); }

@@ -452,6 +452,12 @@
         if (new URLSearchParams(window.location.search).get('expired') === '1') {
             SengpI18n.ready.then(() => setTimeout(() => alert(sengpT('errors.session_expired')), 300));
         }
+        // Nouvel appareil : on adopte la langue enregistree sur le compte (sauf choix deja fait sur cet appareil).
+        function adoptAccountLanguage(user) {
+            try {
+                if (user && user.language && !localStorage.getItem('sengpLang') && window.SengpI18n) SengpI18n.setLanguage(user.language);
+            } catch (e) { /* sans importance */ }
+        }
         function enforceAccountType(user) {
             if (EXPECTED_TYPE && user && user.user_type !== EXPECTED_TYPE) {
                 alert(sengpT('login.account_mismatch', { actual: typeLabel(user.user_type), expected: typeLabel(EXPECTED_TYPE) }));
@@ -493,6 +499,7 @@
                 if (!enforceAccountType(data.data.user)) return;
                 localStorage.setItem('authToken', data.data.token);
                 localStorage.setItem('userData', JSON.stringify(data.data.user));
+                adoptAccountLanguage(data.data.user);
                 const ut = data.data.user.user_type;
                 window.location.href = ut === 'gp' ? 'dashgp.html' : 'dashexpediteur.html';
             } else {
@@ -605,6 +612,7 @@
 
                         localStorage.setItem('authToken', token);
                         localStorage.setItem('userData', JSON.stringify(user));
+                        adoptAccountLanguage(user);
 
                         // Vérifier immédiatement après sauvegarde
                         const savedToken = localStorage.getItem('authToken');

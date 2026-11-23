@@ -82,6 +82,8 @@ export async function initDatabase(): Promise<void> {
     await pool.query('CREATE INDEX IF NOT EXISTS idx_push_subs_user ON push_subscriptions(user_id)');
     // Lot 3 (security): bumping token_version revokes every token issued before.
     await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS token_version INTEGER NOT NULL DEFAULT 0');
+    // Phase C (i18n) : langue d'affichage choisie par l'utilisateur (fr, en, ar, es, pt) ; NULL = non choisie.
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS language VARCHAR(5)');
     // Lot 2 (money integrity): a payment credits the GP wallet at most once, and a
     // mission has at most one completed payment.
     await pool.query('ALTER TABLE payments ADD COLUMN IF NOT EXISTS credited_at TIMESTAMP');

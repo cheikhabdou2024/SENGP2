@@ -104,8 +104,8 @@ export class AdminClaimService {
       await NotificationService.create({
         user_id: claim.rows[0].claimant_id,
         notification_type: NotificationType.SYSTEM_ALERT,
-        title: `Réponse à votre réclamation ${claim.rows[0].claim_code}`,
-        message: message.trim().slice(0, 140),
+        template: 'claim_reply',
+        params: { code: claim.rows[0].claim_code, text: message.trim().slice(0, 140) },
         action_url: 'reclamation.html',
       });
     } catch (e) { logger.warn(`Claim ${claimId} reply posted but notification failed`); }
@@ -146,10 +146,8 @@ export class AdminClaimService {
       await NotificationService.create({
         user_id: claim.claimant_id,
         notification_type: NotificationType.CLAIM_RESOLVED,
-        title: `Réclamation ${claim.claim_code} résolue`,
-        message: credited
-          ? `Une compensation de ${Helpers.formatCurrency(amt)} a été créditée sur votre portefeuille.`
-          : `Une compensation de ${Helpers.formatCurrency(amt)} vous a été accordée. Notre équipe vous contactera pour le versement.`,
+        template: credited ? 'claim_resolved_credited' : 'claim_resolved_granted',
+        params: { code: claim.claim_code, amount: Number(amt) },
         action_url: 'reclamation.html',
       });
     } catch (e) { logger.warn(`Compensation set for claim ${claimId} but notification failed`); }

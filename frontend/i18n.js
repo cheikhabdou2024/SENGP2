@@ -232,7 +232,7 @@
       return Promise.all(chain().map(load)).then(function () {
         applyDom();
         mountSwitchers();
-        event('sengp:languagechange', { lang: lang });
+        event('sengp:languagechange', { lang: lang, explicit: !!persist });
         return lang;
       });
     }

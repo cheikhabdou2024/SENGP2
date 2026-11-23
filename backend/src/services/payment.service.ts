@@ -241,8 +241,8 @@ export class PaymentService {
       await NotificationService.create({
         user_id: payment.payer_id,
         notification_type: NotificationType.PAYMENT_RECEIVED,
-        title: 'Paiement confirmé',
-        message: `Votre paiement de ${Helpers.formatCurrency(Number(payment.amount))} a été confirmé.`,
+        template: 'payment_confirmed',
+        params: { amount: Number(payment.amount) },
       });
     } catch (e: any) {
       logger.warn('Failed to create payment notification:', e.message);

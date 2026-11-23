@@ -553,8 +553,8 @@ export class MissionService {
           await NotificationService.create({
             user_id: mission.gp_id,
             notification_type: NotificationType.PAYMENT_RECEIVED,
-            title: 'Gains crédités',
-            message: `Vous avez gagné ${Helpers.formatCurrency(creditedNet)} pour la mission ${mission.mission_code}.`,
+            template: 'earnings_credited',
+            params: { amount: Number(creditedNet), code: mission.mission_code },
           });
         } catch (e: any) {
           logger.warn('Failed to create earnings notification:', e.message);
@@ -586,8 +586,8 @@ export class MissionService {
             await NotificationService.create({
               user_id: expediteurId,
               notification_type: NotificationType.MISSION_TRANSIT,
-              title: 'GP arrivé à destination',
-              message: `Le GP est arrivé à destination pour la mission ${mission.mission_code}. La remise du colis est imminente.`,
+              template: 'gp_arrived',
+              params: { code: mission.mission_code },
               action_url: 'suivi.html',
               metadata: { mission_id: id, mission_code: mission.mission_code },
             });

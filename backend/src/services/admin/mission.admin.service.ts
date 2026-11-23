@@ -158,8 +158,8 @@ export class AdminMissionService {
       await NotificationService.create({
         user_id: gpId,
         notification_type: NotificationType.MISSION_ASSIGNED,
-        title: `Mission assignée : ${route}`,
-        message: `Une nouvelle mission (${m.mission_code}) vous a été assignée. Acceptez ou déclinez depuis vos notifications.`,
+        template: 'mission_assigned',
+        params: { route, code: m.mission_code },
         action_url: 'notifications.html',
         metadata: {
           mission_id: m.id,
@@ -203,8 +203,8 @@ export class AdminMissionService {
         await NotificationService.create({
           user_id: m.gp_id,
           notification_type: NotificationType.MISSION_TRANSIT,
-          title: 'Arrivée confirmée',
-          message: `Arrivée confirmée pour ${m.mission_code}. Vous pouvez maintenant scanner le QR du destinataire pour livrer.`,
+          template: 'arrival_confirmed',
+          params: { code: m.mission_code },
           action_url: 'alivrer.html',
           metadata: { mission_id: m.id, mission_code: m.mission_code },
         });
@@ -253,8 +253,7 @@ export class AdminMissionService {
       await NotificationService.create({
         user_id: gpId,
         notification_type: NotificationType.MISSION_TRANSIT,
-        title: 'Accès rétabli',
-        message: "L'administration a validé la fin de votre voyage. Vous pouvez de nouveau utiliser l'application.",
+        template: 'access_restored',
         action_url: 'dashgp.html',
       });
     } catch (e: any) { logger.warn('Release notification failed: ' + e.message); }
@@ -352,8 +351,8 @@ export class AdminMissionService {
       await NotificationService.create({
         user_id: gpId,
         notification_type: NotificationType.MISSION_ASSIGNED,
-        title: `Mission réassignée : ${route}`,
-        message: `La mission ${m.mission_code} vous a été (ré)assignée. Acceptez ou déclinez depuis vos notifications.`,
+        template: 'mission_reassigned',
+        params: { route, code: m.mission_code },
         action_url: 'notifications.html',
         metadata: { mission_id: m.id, mission_code: m.mission_code, route, price: m.final_price ?? m.offered_price },
       });

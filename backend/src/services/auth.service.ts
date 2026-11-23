@@ -1,3 +1,4 @@
+import { currentLang } from '../i18n';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import pool from '../config/database';
@@ -54,9 +55,9 @@ export class AuthService {
       // Insert user
       const userResult = await client.query(
         `INSERT INTO users (
-          email, phone, password_hash, user_type, first_name, last_name, country, city
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        RETURNING id, email, phone, user_type, first_name, last_name, country, city, status, created_at`,
+          email, phone, password_hash, user_type, first_name, last_name, country, city, language
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        RETURNING id, email, phone, user_type, first_name, last_name, country, city, language, status, created_at`,
         [
           data.email,
           data.phone || null,
@@ -66,6 +67,7 @@ export class AuthService {
           data.last_name,
           data.country,
           data.city,
+          currentLang(),
         ]
       );
 
@@ -134,7 +136,7 @@ export class AuthService {
 
     // Existing user → log in.
     const existing = await pool.query(
-      `SELECT id, email, phone, user_type, first_name, last_name, status, profile_photo_url
+      `SELECT id, email, phone, user_type, first_name, last_name, status, profile_photo_url, language
        FROM users WHERE email = $1 AND deleted_at IS NULL`,
       [email]
     );
@@ -165,15 +167,16 @@ export class AuthService {
 
       const userResult = await client.query(
         `INSERT INTO users (
-           email, user_type, first_name, last_name, is_email_verified, profile_photo_url, status
-         ) VALUES ($1, $2, $3, $4, TRUE, $5, 'verified')
-         RETURNING id, email, phone, user_type, first_name, last_name, country, city, status, created_at`,
+           email, user_type, first_name, last_name, is_email_verified, profile_photo_url, status, language
+         ) VALUES ($1, $2, $3, $4, TRUE, $5, 'verified', $6)
+         RETURNING id, email, phone, user_type, first_name, last_name, country, city, language, status, created_at`,
         [
           email,
           finalType,
           payload.given_name || 'Utilisateur',
           payload.family_name || '',
           payload.picture || null,
+          currentLang(),
         ]
       );
       const user = userResult.rows[0];
@@ -208,7 +211,7 @@ export class AuthService {
   }): Promise<{ user: Partial<User>; token: string }> {
     const result = await pool.query(
       `SELECT id, email, phone, password_hash, user_type, first_name, last_name,
-              status, is_email_verified, is_phone_verified, profile_photo_url
+              status, is_email_verified, is_phone_verified, profile_photo_url, language
        FROM users WHERE email = $1 AND deleted_at IS NULL`,
       [data.email]
     );

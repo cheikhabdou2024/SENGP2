@@ -123,3 +123,53 @@ test('install est idempotent', () => {
   api.install(win);
   assert.equal(win.fetch, wrapped);
 });
+
+// ---- langue envoyee au serveur ----
+function langWindow(lang) {
+  const sent = [];
+  const handlers = {};
+  const win = {
+    API_BASE_URL: BASE,
+    Headers,
+    SengpI18n: { lang },
+    location: { pathname: '/x.html', replace() {} },
+    localStorage: { getItem: k => (k === 'authToken' ? 'tok-1' : null), removeItem() {} },
+    addEventListener: (t, fn) => { handlers[t] = fn; },
+    fetch: async (url, init) => { sent.push({ url, init }); return { status: 200 }; },
+  };
+  return { win, sent, handlers };
+}
+
+test('chaque appel a l\'API porte la langue de l\'application (Accept-Language)', async () => {
+  const { win, sent } = langWindow('ar');
+  api.install(win);
+  await win.fetch(`${BASE}/missions`, { headers: { Authorization: 'Bearer tok-1' } });
+  assert.equal(sent[0].init.headers.get('Accept-Language'), 'ar');
+  assert.equal(sent[0].init.headers.get('Authorization'), 'Bearer tok-1', 'les autres en-tetes sont conserves');
+  await win.fetch(`${BASE}/auth/login`, { method: 'POST' });
+  assert.equal(sent[1].init.headers.get('Accept-Language'), 'ar');
+  assert.equal(sent[1].init.method, 'POST');
+});
+
+test('la langue n\'est pas envoyee aux autres sites, ni imposee si deja presente', async () => {
+  const { win, sent } = langWindow('ar');
+  api.install(win);
+  await win.fetch('https://autre.example/x', { headers: { a: 'b' } });
+  assert.equal(sent[0].init.headers.a, 'b');
+  assert.equal(sent[0].init.headers.get, undefined, 'requete etrangere inchangee');
+  await win.fetch(`${BASE}/x`, { headers: { 'Accept-Language': 'fr' } });
+  assert.equal(sent[1].init.headers.get('Accept-Language'), 'fr');
+});
+
+test('un choix explicite de langue est enregistre sur le compte ; une detection automatique non', async () => {
+  const { win, sent, handlers } = langWindow('es');
+  api.install(win);
+  handlers['sengp:languagechange']({ detail: { lang: 'es', explicit: false } });
+  assert.equal(sent.length, 0);
+  handlers['sengp:languagechange']({ detail: { lang: 'pt', explicit: true } });
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0].url, `${BASE}/users/me`);
+  assert.equal(sent[0].init.method, 'PUT');
+  assert.equal(JSON.parse(sent[0].init.body).language, 'pt');
+  assert.equal(sent[0].init.headers.get('Authorization'), 'Bearer tok-1');
+});
