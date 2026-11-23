@@ -17,12 +17,11 @@
             }, delay === undefined ? 5000 : delay);
         }
 
+        // Libelle d'un bouton de navigation : sa cle est memorisee pour suivre un changement de langue.
+        function setNavLabel(btn, key) { btn.setAttribute('data-i18n', key); btn.textContent = sengpT(key); }
+
         // Text rotation for screen 1
-        const texts = [
-            "nos meilleurs GP",
-            "des voyageurs vérifiés",
-            "nos transporteurs fiables"
-        ];
+        const textKeys = ['onb.s1_rot1', 'onb.s1_rot2', 'onb.s1_rot3'];
         let currentIndex = 0;
         let isAnimating = false;
 
@@ -37,8 +36,10 @@
                 textElement.style.transform = 'translateY(-30px)';
                 
                 setTimeout(() => {
-                    currentIndex = (currentIndex + 1) % texts.length;
-                    textElement.textContent = texts[currentIndex];
+                    currentIndex = (currentIndex + 1) % textKeys.length;
+                    // La cle suit le texte affiche : un changement de langue le garde.
+                    textElement.setAttribute('data-i18n', textKeys[currentIndex]);
+                    textElement.textContent = sengpT(textKeys[currentIndex]);
                     
                     textElement.style.opacity = '1';
                     textElement.style.transform = 'translateY(0)';
@@ -86,19 +87,19 @@
                 
                 // Update Left Button
                 if (screenNumber === 1) {
-                    btnLeft.textContent = 'Passer';
+                    setNavLabel(btnLeft, 'onb.skip');
                     btnLeft.className = 'btn btn-skip';
                 } else {
-                    btnLeft.textContent = 'Retour';
+                    setNavLabel(btnLeft, 'common.back');
                     btnLeft.className = 'btn btn-back';
                 }
                 
                 // Update Right Button
                 if (screenNumber === 3) {
-                    btnRight.textContent = 'Commencer';
+                    setNavLabel(btnRight, 'onb.start');
                     btnRight.className = 'btn btn-start';
                 } else {
-                    btnRight.textContent = 'Suivant';
+                    setNavLabel(btnRight, 'common.next');
                     btnRight.className = 'btn btn-next';
                 }
                 
@@ -237,7 +238,9 @@
                     if (startX === null) return;
                     const dx = e.changedTouches[0].clientX - startX;
                     if (Math.abs(dx) > 50) {
-                        if (dx < 0) { nextScreen(); } else { previousScreen(); }
+                        // En droite-a-gauche (arabe) le geste est inverse : glisser vers la droite avance.
+                        const forward = document.documentElement.getAttribute('dir') === 'rtl' ? dx > 0 : dx < 0;
+                        if (forward) { nextScreen(); } else { previousScreen(); }
                     }
                     startX = null;
                 }, { passive: true });

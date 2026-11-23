@@ -143,15 +143,38 @@
       return fetchJson(baseUrl + lang + '.json').then(function (d) { dictionaries[lang] = d; }, function () { /* hors ligne : on continue */ });
     }
 
+    /**
+     * Phrase avec elements integres (liens...) dont l'ordre varie selon la langue.
+     * Modele : "J'accepte les {terms} et la {privacy}" ; les elements a inserer sont les enfants
+     * portant data-slot="terms" / data-slot="privacy" (leur propre texte vient de leur data-i18n).
+     */
+    function applyRich(el, key) {
+      var doc = win.document;
+      var slots = {};
+      Array.prototype.slice.call(el.children || []).forEach(function (c) {
+        var name = c.getAttribute && c.getAttribute('data-slot');
+        if (name) slots[name] = c;
+      });
+      var parts = t(key).split(/(\{\w+\})/);
+      el.textContent = '';
+      parts.forEach(function (part) {
+        var m = /^\{(\w+)\}$/.exec(part);
+        if (m && slots[m[1]]) el.appendChild(slots[m[1]]);
+        else if (part) el.appendChild(doc.createTextNode(part));
+      });
+    }
+
     /** Applique les traductions aux elements portant data-i18n / data-i18n-attr. Texte seulement. */
     function applyDom(rootEl) {
       var scope = rootEl || (win.document && win.document);
       if (!scope || !scope.querySelectorAll) return;
-      var nodes = scope.querySelectorAll('[data-i18n],[data-i18n-attr]');
+      var nodes = scope.querySelectorAll('[data-i18n],[data-i18n-attr],[data-i18n-rich]');
       for (var i = 0; i < nodes.length; i++) {
         var el = nodes[i];
         var key = el.getAttribute('data-i18n');
         if (key && has(key)) el.textContent = t(key);
+        var richKey = el.getAttribute('data-i18n-rich');
+        if (richKey && has(richKey)) applyRich(el, richKey);
         var attrs = el.getAttribute('data-i18n-attr');
         if (attrs) {
           attrs.split(';').forEach(function (pair) {
@@ -206,6 +229,7 @@
       applyDocument();
       return Promise.all(chain().map(load)).then(function () {
         applyDom();
+        mountSwitchers();
         event('sengp:languagechange', { lang: lang });
         return lang;
       });
@@ -250,6 +274,15 @@
         });
       }
       return select;
+    }
+
+    var switchersMounted = false;
+    /** Place un selecteur dans chaque element [data-i18n-switcher] (une seule fois). */
+    function mountSwitchers() {
+      if (switchersMounted || !win.document || !win.document.querySelectorAll) return;
+      var hosts = win.document.querySelectorAll('[data-i18n-switcher]');
+      if (hosts.length) switchersMounted = true;
+      for (var i = 0; i < hosts.length; i++) mountSwitcher(hosts[i]);
     }
 
     return {

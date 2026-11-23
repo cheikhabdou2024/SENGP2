@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEN GP - Inscription</title>
+    <title data-i18n="signup.page_title">SEN GP - Inscription</title>
     <style>
         * {
             margin: 0;
@@ -78,6 +78,13 @@
             transition: all 0.3s ease;
             font-size: 18px;
         }
+
+        /* Droite a gauche (arabe) */
+        [dir="rtl"] input { padding-right: 16px; padding-left: 45px; }
+        [dir="rtl"] .validation-icon,
+        [dir="rtl"] .password-toggle { right: auto; left: 14px; }
+        [dir="rtl"] .back-btn { transform: scaleX(-1); }
+        [dir="rtl"] .back-btn:hover { transform: scaleX(-1) translateX(-3px); }
 
         .back-btn:hover {
             background: rgba(255, 255, 255, 0.15);
@@ -441,8 +448,10 @@
         body{padding:0!important;}
         </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="i18n.css">
     <script src="ui.js"></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -463,8 +472,8 @@
         <div class="header">
             <button class="back-btn" onclick="goBack()">←</button>
             <div class="header-title">
-                <h1>Créer un compte</h1>
-                <p id="accountTypeLabel">Expéditeur</p>
+                <h1 data-i18n="signup.title">Créer un compte</h1>
+                <p id="accountTypeLabel" data-i18n="roles.expediteur">Expéditeur</p>
             </div>
         </div>
 
@@ -480,24 +489,25 @@
                             <path d="M4.39 11.99c-.2-.58-.32-1.2-.32-1.84 0-.64.11-1.26.31-1.84l-.01-.14-3.18-2.46-.1.05C.41 7.43 0 8.68 0 10c0 1.32.41 2.57 1.1 3.58l3.29-2.59z" fill="#FBBC05"/>
                             <path d="M10 3.88c1.85 0 3.1.8 3.81 1.47l2.8-2.73C14.96.88 12.7 0 10 0 6.08 0 2.61 2.09 1.1 5.17l3.29 2.59c.79-2.39 3-4.13 5.61-4.13z" fill="#EB4335"/>
                         </svg>
-                        <span>S'inscrire avec Google</span>
+                        <span data-i18n="signup.google">S'inscrire avec Google</span>
                     </button>
                 </div>
                 <div class="divider" style="margin: 24px 0;">
                     <div class="divider-line"></div>
-                    <span class="divider-text">Ou avec le formulaire</span>
+                    <span class="divider-text" data-i18n="signup.divider">Ou avec le formulaire</span>
                     <div class="divider-line"></div>
                 </div>
 
                 <!-- Nom complet -->
                 <div class="form-group">
-                    <label for="fullname">Nom complet <span class="required">*</span></label>
+                    <label for="fullname"><span data-i18n="signup.fullname">Nom complet</span> <span class="required">*</span></label>
                     <div class="input-wrapper">
                         <input 
                             type="text" 
                             id="fullname" 
                             name="fullname"
                             placeholder="Ex: Moussa Diallo"
+                            data-i18n-attr="placeholder:signup.fullname_placeholder"
                             onkeyup="validateFullname()"
                             required
                         />
@@ -508,13 +518,14 @@
 
                 <!-- Email -->
                 <div class="form-group">
-                    <label for="email">Email <span class="required">*</span></label>
+                    <label for="email"><span data-i18n="signup.email">Email</span> <span class="required">*</span></label>
                     <div class="input-wrapper">
                         <input 
                             type="email" 
                             id="email" 
                             name="email"
                             placeholder="votre@email.com"
+                            data-i18n-attr="placeholder:signup.email_placeholder"
                             onkeyup="validateEmail()"
                             required
                         />
@@ -526,7 +537,7 @@
 
                 <!-- Mot de passe -->
                 <div class="form-group">
-                    <label for="password">Mot de passe <span class="required">*</span></label>
+                    <label for="password"><span data-i18n="signup.password">Mot de passe</span> <span class="required">*</span></label>
                     <div class="input-wrapper">
                         <input 
                             type="password" 
@@ -542,13 +553,13 @@
                         <div class="strength-bar">
                             <div class="strength-fill" id="strengthFill"></div>
                         </div>
-                        <div class="strength-text" id="strengthText">Minimum 8 caractères, 1 majuscule, 1 chiffre</div>
+                        <div class="strength-text" id="strengthText" data-i18n="signup.password_hint">Minimum 8 caractères, 1 majuscule, 1 chiffre</div>
                     </div>
                 </div>
 
                 <!-- Confirmer mot de passe -->
                 <div class="form-group">
-                    <label for="confirmPassword">Confirmer le mot de passe <span class="required">*</span></label>
+                    <label for="confirmPassword"><span data-i18n="signup.confirm_password">Confirmer le mot de passe</span> <span class="required">*</span></label>
                     <div class="input-wrapper">
                         <input 
                             type="password" 
@@ -567,23 +578,20 @@
                 <!-- Terms & Conditions -->
                 <div class="checkbox-group">
                     <div class="custom-checkbox" id="termsCheckbox" onclick="toggleCheckbox()"></div>
-                    <label class="checkbox-label">
-                        J'accepte les <a href="#">conditions d'utilisation</a> et la <a href="#">politique de confidentialité</a>
-                    </label>
+                    <label class="checkbox-label" data-i18n-rich="signup.terms">J'accepte les <a href="#" data-slot="terms" data-i18n="signup.terms_link">conditions d'utilisation</a> et la <a href="#" data-slot="privacy" data-i18n="signup.privacy_link">politique de confidentialité</a></label>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="signup-btn" id="signupBtn">
-                    Créer mon compte
-                </button>
+                <button type="submit" class="signup-btn" id="signupBtn" data-i18n="signup.submit">Créer mon compte</button>
 
                 <!-- Login Link -->
                 <div class="login-link">
-                    Vous avez déjà un compte ? <a href="#" onclick="goToLogin()">Se connecter</a>
+                    <span data-i18n-rich="signup.has_account">Vous avez déjà un compte ? <a href="#" data-slot="login" onclick="goToLogin()" data-i18n="signup.login">Se connecter</a></span>
                 </div>
             </form>
         </div>
     </div>
+    <div data-i18n-switcher></div>
 
     <script>
         let validations = {
@@ -610,7 +618,7 @@
                 input.classList.add('invalid');
                 icon.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
                 icon.classList.add('show');
-                message.innerHTML = '<span class="icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> Le nom doit contenir au moins 3 caractères';
+                message.innerHTML = '<span class="icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> ' + window.sengpEsc(sengpT('signup.name_short'));
                 message.classList.add('show', 'error');
                 message.classList.remove('success');
                 validations.fullname = false;
@@ -619,7 +627,7 @@
                 input.classList.add('valid');
                 icon.innerHTML = '✓';
                 icon.classList.add('show');
-                message.innerHTML = '<span class="icon">✓</span> Nom valide';
+                message.innerHTML = '<span class="icon">✓</span> ' + window.sengpEsc(sengpT('signup.name_ok'));
                 message.classList.add('show', 'success');
                 message.classList.remove('error');
                 validations.fullname = true;
@@ -645,7 +653,7 @@
                 input.classList.add('invalid');
                 icon.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
                 icon.classList.add('show');
-                message.innerHTML = '<span class="icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> Email invalide';
+                message.innerHTML = '<span class="icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> ' + window.sengpEsc(sengpT('signup.email_invalid'));
                 message.classList.add('show', 'error');
                 message.classList.remove('success');
                 validations.email = false;
@@ -654,7 +662,7 @@
                 input.classList.add('valid');
                 icon.innerHTML = '✓';
                 icon.classList.add('show');
-                message.innerHTML = '<span class="icon">✓</span> Email valide';
+                message.innerHTML = '<span class="icon">✓</span> ' + window.sengpEsc(sengpT('signup.email_ok'));
                 message.classList.add('show', 'success');
                 message.classList.remove('error');
                 validations.email = true;
@@ -680,7 +688,7 @@
                 input.classList.add('invalid');
                 icon.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
                 icon.classList.add('show');
-                message.innerHTML = '<span class="icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> Numéro de téléphone invalide';
+                message.innerHTML = '<span class="icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> ' + window.sengpEsc(sengpT('signup.phone_invalid'));
                 message.classList.add('show', 'error');
                 message.classList.remove('success');
                 validations.phone = false;
@@ -689,7 +697,7 @@
                 input.classList.add('valid');
                 icon.innerHTML = '✓';
                 icon.classList.add('show');
-                message.innerHTML = '<span class="icon">✓</span> Numéro valide';
+                message.innerHTML = '<span class="icon">✓</span> ' + window.sengpEsc(sengpT('signup.phone_ok'));
                 message.classList.add('show', 'success');
                 message.classList.remove('error');
                 validations.phone = true;
@@ -697,6 +705,9 @@
 
             checkFormValidity();
         }
+
+        // Le texte sous la barre de force garde sa cle : il suit un changement de langue.
+        function setStrengthText(el, key) { el.setAttribute('data-i18n', key); el.textContent = sengpT(key); }
 
         function validatePassword() {
             const input = document.getElementById('password');
@@ -716,22 +727,22 @@
 
             if (value.length === 0) {
                 fill.style.width = '0%';
-                text.textContent = 'Minimum 8 caractères, 1 majuscule, 1 chiffre';
+                setStrengthText(text, 'signup.password_hint');
                 text.style.color = 'rgba(255, 255, 255, 0.6)';
                 validations.password = false;
             } else if (strength <= 2) {
                 fill.classList.add('weak');
-                text.textContent = 'Mot de passe faible';
+                setStrengthText(text, 'signup.password_weak');
                 text.style.color = '#FF6B6B';
                 validations.password = false;
             } else if (strength === 3) {
                 fill.classList.add('medium');
-                text.textContent = 'Mot de passe moyen';
+                setStrengthText(text, 'signup.password_medium');
                 text.style.color = '#FFE66D';
                 validations.password = true;
             } else {
                 fill.classList.add('strong');
-                text.textContent = 'Mot de passe fort';
+                setStrengthText(text, 'signup.password_strong');
                 text.style.color = '#4CAF50';
                 validations.password = true;
             }
@@ -757,7 +768,7 @@
                 input.classList.add('invalid');
                 icon.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
                 icon.classList.add('show');
-                message.innerHTML = '<span class="icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> Les mots de passe ne correspondent pas';
+                message.innerHTML = '<span class="icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> ' + window.sengpEsc(sengpT('signup.passwords_mismatch'));
                 message.classList.add('show', 'error');
                 message.classList.remove('success');
                 validations.confirmPassword = false;
@@ -766,7 +777,7 @@
                 input.classList.add('valid');
                 icon.innerHTML = '✓';
                 icon.classList.add('show');
-                message.innerHTML = '<span class="icon">✓</span> Les mots de passe correspondent';
+                message.innerHTML = '<span class="icon">✓</span> ' + window.sengpEsc(sengpT('signup.passwords_match'));
                 message.classList.add('show', 'success');
                 message.classList.remove('error');
                 validations.confirmPassword = true;
@@ -837,7 +848,7 @@
                 const ut = data.data.user.user_type;
                 window.location.href = ut === 'gp' ? 'dashgp.html' : 'dashexpediteur.html';
             } else {
-                alert('Erreur Google: ' + (data.error || 'Inscription échouée'));
+                alert(sengpT('login.google_error', { message: data.error || sengpT('signup.google_default') }));
             }
         }
 
@@ -847,7 +858,7 @@
                 await finishGoogleAuth(idToken);
             } catch (e) {
                 console.error('Google sign-up error', e);
-                alert('Inscription Google échouée. Vérifiez votre connexion et réessayez.');
+                alert(sengpT('signup.google_failed'));
             }
         };
 
@@ -856,7 +867,7 @@
             try {
                 const GoogleAuth = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth;
                 if (!GoogleAuth) {
-                    alert('L\'inscription Google est disponible dans l\'application mobile.');
+                    alert(sengpT('signup.google_mobile_only'));
                     return;
                 }
                 const result = await GoogleAuth.signIn();
@@ -866,7 +877,7 @@
                 await finishGoogleAuth(idToken);
             } catch (e) {
                 console.error('Google sign-up error', e);
-                alert('Inscription Google annulée ou échouée.');
+                alert(sengpT('signup.google_cancelled'));
             }
         }
 
@@ -878,7 +889,7 @@
                     // Afficher un loader
                     const submitButton = document.getElementById('signupBtn');
                     const originalText = submitButton.textContent;
-                    submitButton.textContent = 'Inscription en cours...';
+                    submitButton.textContent = sengpT('signup.in_progress');
                     submitButton.disabled = true;
 
                     // Récupérer les valeurs du formulaire
@@ -918,7 +929,7 @@
                         localStorage.setItem('authToken', result.data.token);
                         localStorage.setItem('userData', JSON.stringify(result.data.user));
 
-                        alert('Inscription réussie !\n\nVous allez être redirigé vers votre tableau de bord.');
+                        alert(sengpT('signup.success'));
 
                         // Rediriger vers le dashboard approprié
                         setTimeout(() => {
@@ -930,17 +941,17 @@
                         }, 1500);
                     } else {
                         // Afficher l'erreur
-                        alert('Erreur d\'inscription:\n\n' + (result.message || 'Une erreur est survenue'));
+                        alert(sengpT('signup.error', { message: result.message || sengpT('errors.generic') }));
                         submitButton.textContent = originalText;
                         submitButton.disabled = false;
                     }
                 } catch (error) {
                     console.error('Erreur:', error);
-                    alert('Erreur d\'inscription:\n\nImpossible de se connecter au serveur. Assurez-vous que le backend est démarré.');
+                    alert(sengpT('signup.error', { message: sengpT('errors.network') }));
 
                     // Réactiver le bouton
                     const submitButton = document.getElementById('signupBtn');
-                    submitButton.textContent = 'Créer mon compte';
+                    submitButton.textContent = sengpT('signup.submit');
                     submitButton.disabled = false;
                 }
             }
@@ -951,11 +962,11 @@
             const urlParams = new URLSearchParams(window.location.search);
             const accountType = urlParams.get('type');
 
-            if (accountType === 'sender') {
-                document.getElementById('accountTypeLabel').textContent = 'Expéditeur';
-            } else if (accountType === 'carrier') {
-                document.getElementById('accountTypeLabel').textContent = 'Gros Porteur (GP)';
-            }
+            // La cle du libelle suit le type de compte choisi ; le texte est applique par i18n.js.
+            const typeLabel = document.getElementById('accountTypeLabel');
+            if (accountType === 'sender') typeLabel.setAttribute('data-i18n', 'roles.expediteur');
+            else if (accountType === 'carrier') typeLabel.setAttribute('data-i18n', 'roles.gp');
+            SengpI18n.ready.then(() => SengpI18n.applyDom(typeLabel.parentNode));
         }
 
         // Animation on load

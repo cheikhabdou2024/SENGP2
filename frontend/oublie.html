@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEN GP - Mot de passe oublié</title>
+    <title data-i18n="forgot.page_title">SEN GP - Mot de passe oublié</title>
     <style>
         * {
             margin: 0;
@@ -439,13 +439,21 @@
                 height: 100vh;
             }
         }
+            /* Droite a gauche (arabe) */
+        [dir="rtl"] input { padding-right: 16px; padding-left: 45px; }
+        [dir="rtl"] .validation-icon { right: auto; left: 14px; }
+        [dir="rtl"] .back-btn { transform: scaleX(-1); }
+        [dir="rtl"] .back-btn:hover { transform: scaleX(-1) translateX(-3px); }
+
             /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
         </style>
     <link rel="stylesheet" href="theme.css">
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="ui.js"></script>
+    <link rel="stylesheet" href="i18n.css">
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
@@ -464,7 +472,7 @@
         <div class="header">
             <button class="back-btn" onclick="goBack()">←</button>
             <div class="header-title">
-                <h1>Mot de passe oublié</h1>
+                <h1 data-i18n="forgot.title">Mot de passe oublié</h1>
             </div>
         </div>
 
@@ -481,21 +489,22 @@
                 <!-- Illustration -->
                 <div class="illustration">
                     <div class="icon-container"><svg class="ic" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-                    <h2>Réinitialiser</h2>
-                    <p>Entrez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe</p>
+                    <h2 data-i18n="forgot.heading">Réinitialiser</h2>
+                    <p data-i18n="forgot.intro">Entrez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe</p>
                 </div>
 
                 <!-- Form -->
                 <div class="form-container">
                     <form id="forgotPasswordForm">
                         <div class="form-group">
-                            <label for="email">Adresse email</label>
+                            <label for="email" data-i18n="forgot.email_label">Adresse email</label>
                             <div class="input-wrapper">
                                 <input 
                                     type="email" 
                                     id="email" 
                                     name="email"
                                     placeholder="votre@email.com"
+                                    data-i18n-attr="placeholder:signup.email_placeholder"
                                     onkeyup="validateEmail()"
                                     required
                                 />
@@ -504,15 +513,11 @@
                             <div class="validation-message" id="emailMessage"></div>
                         </div>
 
-                        <button type="submit" class="submit-btn" id="submitBtn" disabled>
-                            Envoyer le lien
-                        </button>
+                        <button type="submit" class="submit-btn" id="submitBtn" disabled data-i18n="forgot.submit">Envoyer le lien</button>
 
                         <div class="info-box">
                             <div class="info-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></div>
-                            <div class="info-text">
-                                Vous recevrez un email contenant un lien pour réinitialiser votre mot de passe. Vérifiez également vos spams.
-                            </div>
+                            <div class="info-text" data-i18n="forgot.info">Vous recevrez un email contenant un lien pour réinitialiser votre mot de passe. Vérifiez également vos spams.</div>
                         </div>
                     </form>
                 </div>
@@ -521,35 +526,29 @@
             <!-- Success State -->
             <div id="successState" class="success-state">
                 <div class="success-icon">✓</div>
-                <h2>Email envoyé !</h2>
-                <p>Nous avons envoyé un lien de réinitialisation à votre adresse email</p>
+                <h2 data-i18n="forgot.sent_title">Email envoyé !</h2>
+                <p data-i18n="forgot.sent_text">Nous avons envoyé un lien de réinitialisation à votre adresse email</p>
 
                 <div class="email-sent">
-                    <div class="email-sent-label">Email envoyé à :</div>
+                    <div class="email-sent-label" data-i18n="forgot.sent_to">Email envoyé à :</div>
                     <div class="email-sent-value" id="sentEmail"></div>
                 </div>
 
-                <button class="submit-btn" onclick="openEmailApp()">
-                    Ouvrir l'application email
-                </button>
+                <button class="submit-btn" onclick="openEmailApp()" data-i18n="forgot.open_mail">Ouvrir l'application email</button>
 
-                <div class="resend-timer">
-                    Vous n'avez pas reçu l'email ? 
-                    <a href="#" class="resend-link disabled" id="resendLink" onclick="resendEmail()">
-                        Renvoyer (<span id="countdown">60</span>s)
-                    </a>
-                </div>
+                <div class="resend-timer" data-i18n-rich="forgot.not_received">Vous n'avez pas reçu l'email ? <a href="#" data-slot="resend" class="resend-link disabled" id="resendLink" onclick="resendEmail()">Renvoyer (60 s)</a></div>
             </div>
 
             <!-- Back to Login -->
             <div class="back-to-login">
                 <a href="#" onclick="goToLogin()">
-                    <span>←</span>
-                    <span>Retour à la connexion</span>
+                    <span class="i18n-flip">←</span>
+                    <span data-i18n="forgot.back_to_login">Retour à la connexion</span>
                 </a>
             </div>
         </div>
     </div>
+    <div data-i18n-switcher></div>
 
     <script>
         let isEmailValid = false;
@@ -575,7 +574,7 @@
                 input.classList.add('invalid');
                 icon.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
                 icon.classList.add('show');
-                message.innerHTML = '<span class="icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> Email invalide';
+                message.innerHTML = '<span class="icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> ' + window.sengpEsc(sengpT('signup.email_invalid'));
                 message.classList.add('show', 'error');
                 message.classList.remove('success');
                 isEmailValid = false;
@@ -585,7 +584,7 @@
                 input.classList.add('valid');
                 icon.innerHTML = '✓';
                 icon.classList.add('show');
-                message.innerHTML = '<span class="icon">✓</span> Email valide';
+                message.innerHTML = '<span class="icon">✓</span> ' + window.sengpEsc(sengpT('signup.email_ok'));
                 message.classList.add('show', 'success');
                 message.classList.remove('error');
                 isEmailValid = true;
@@ -594,41 +593,44 @@
         }
 
         function goBack() {
-            alert('Retour vers l\'écran de connexion');
+            window.location.href = 'connexion.html';
         }
 
         function goToLogin() {
             event.preventDefault();
-            alert('Navigation vers l\'écran de connexion');
+            window.location.href = 'connexion.html';
         }
 
         function openEmailApp() {
-            alert('Ouverture de l\'application email');
+            window.location.href = 'mailto:';
         }
 
+        // Libelle du lien « Renvoyer » : avec le compte a rebours, puis sans. Suit un changement de langue.
+        function updateResendLabel() {
+            document.getElementById('resendLink').textContent = timeLeft > 0 ? sengpT('forgot.resend_wait', { seconds: timeLeft }) : sengpT('forgot.resend');
+        }
+        window.addEventListener('sengp:languagechange', updateResendLabel);
+
         function startCountdown() {
-            const countdownEl = document.getElementById('countdown');
             const resendLink = document.getElementById('resendLink');
-            
+            updateResendLabel();
             countdownTimer = setInterval(() => {
                 timeLeft--;
-                countdownEl.textContent = timeLeft;
-                
                 if (timeLeft <= 0) {
                     clearInterval(countdownTimer);
                     resendLink.classList.remove('disabled');
-                    resendLink.innerHTML = 'Renvoyer';
                 }
+                updateResendLabel();
             }, 1000);
         }
 
         function resendEmail() {
             event.preventDefault();
             if (timeLeft <= 0) {
-                alert('Email renvoyé !');
+                alert(sengpT('forgot.resent'));
                 timeLeft = 60;
                 document.getElementById('resendLink').classList.add('disabled');
-                document.getElementById('resendLink').innerHTML = 'Renvoyer (<span id="countdown">60</span>s)';
+                updateResendLabel();
                 startCountdown();
             }
         }

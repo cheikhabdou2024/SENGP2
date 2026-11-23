@@ -18,6 +18,12 @@
 
     var CLIENT_ID = '1022151111172-re1mqoru6lo5fvgbnkrjqfk7vtoj1rco.apps.googleusercontent.com';
 
+    // Langue du bouton Google : celle choisie dans l'application (i18n.js), francais par defaut.
+    function googleLocale() {
+        var l = (window.SengpI18n && window.SengpI18n.lang) || 'fr';
+        return l === 'pt' ? 'pt-PT' : l;
+    }
+
     function initGoogleButton() {
         if (!(window.google && google.accounts && google.accounts.id)) return;
 
@@ -47,7 +53,7 @@
             shape: 'pill',
             text: 'continue_with',
             logo_alignment: 'left',
-            locale: 'fr',
+            locale: googleLocale(),
             width: width
         });
     }

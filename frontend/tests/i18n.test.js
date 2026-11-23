@@ -21,7 +21,7 @@ function fakeWindow({ languages = ['fr'], timeZone, saved = null } = {}) {
   const win = {
     navigator: { languages },
     localStorage: { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = v; } },
-    document: { readyState: 'complete', documentElement: html, querySelectorAll: () => nodes },
+    document: { readyState: 'complete', documentElement: html, querySelectorAll: sel => (sel.includes('data-i18n-switcher') ? [] : nodes) },
     dispatchEvent: e => events.push(e.type),
     CustomEvent: class { constructor(type, init) { this.type = type; this.detail = init && init.detail; } },
   };
@@ -238,4 +238,53 @@ test('locales : les statuts de mission couvrent toute l\'enumeration de la base'
   for (const lang of i18n.SUPPORTED) {
     for (const s of statuses) assert.ok(`mission.status.${s}` in dict[lang], `${lang} : statut ${s}`);
   }
+});
+
+// ---- phrases avec elements integres + selecteur automatique ----
+class FNode {
+  constructor(tag, attrs = {}) { this.tag = tag; this.attrs = { ...attrs }; this.kids = []; this._text = ''; }
+  get children() { return this.kids.filter(k => k instanceof FNode); }
+  get textContent() { return this.kids.length ? this.kids.map(k => (k instanceof FNode ? k.textContent : k.text)).join('') : this._text; }
+  set textContent(v) { this.kids = []; this._text = v; }
+  getAttribute(k) { return k in this.attrs ? this.attrs[k] : null; }
+  setAttribute(k, v) { this.attrs[k] = v; }
+  appendChild(n) { this._text = ''; this.kids.push(n); return n; }
+  addEventListener() {}
+}
+
+test('data-i18n-rich : l\'ordre des mots change, les liens restent les memes elements', async () => {
+  const f = fakeWindow({ languages: ['en'] });
+  f.win.document.createTextNode = text => ({ text });
+  f.win.document.createElement = tag => new FNode(tag);
+  const terms = new FNode('a', { 'data-slot': 'terms', 'data-i18n': 'legal.terms' });
+  terms.textContent = 'conditions';
+  const privacy = new FNode('a', { 'data-slot': 'privacy', 'data-i18n': 'legal.privacy' });
+  privacy.textContent = 'confidentialité';
+  const label = new FNode('label', { 'data-i18n-rich': 'signup.terms' });
+  label.appendChild({ text: "J'accepte les " }); label.appendChild(terms); label.appendChild({ text: ' et la ' }); label.appendChild(privacy);
+  f.nodes.push(label, terms, privacy);
+
+  const inst = i18n.createI18n(f.win, { fetchJson: () => Promise.resolve({
+    'signup.terms': 'I agree to the {terms} and the {privacy}', 'legal.terms': 'Terms of use', 'legal.privacy': 'Privacy policy',
+  }) });
+  await inst.init();
+  assert.equal(label.textContent, 'I agree to the Terms of use and the Privacy policy');
+  assert.deepEqual(label.children, [terms, privacy], 'memes elements, memes ecouteurs');
+
+  await inst.setLanguage('en'); // second passage : les enfants sont retrouves
+  assert.equal(label.textContent, 'I agree to the Terms of use and the Privacy policy');
+});
+
+test('selecteur de langue : monte une seule fois dans [data-i18n-switcher], change la langue', async () => {
+  const f = fakeWindow({ languages: ['fr'] });
+  const host = new FNode('div', { 'data-i18n-switcher': '' });
+  f.win.document.createElement = tag => new FNode(tag);
+  f.win.document.querySelectorAll = sel => (sel === '[data-i18n-switcher]' ? [host] : []);
+  const inst = i18n.createI18n(f.win, { fetchJson: url => Promise.resolve(dict[/(\w+)\.json$/.exec(url)[1]]) });
+  await inst.init();
+  await inst.setLanguage('es');
+  assert.equal(host.children.length, 1, 'un seul selecteur malgre deux chargements');
+  const select = host.children[0];
+  assert.deepEqual(select.children.map(o => o.value), ['fr', 'en', 'ar', 'es', 'pt']);
+  assert.deepEqual(select.children.map(o => o.textContent), ['Français', 'English', 'العربية', 'Español', 'Português']);
 });

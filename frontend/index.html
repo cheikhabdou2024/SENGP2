@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>SEN GP - Onboarding Complet</title>
+    <title data-i18n="onb.page_title">SEN GP - Onboarding Complet</title>
     <style>
         * {
             margin: 0;
@@ -1033,6 +1033,13 @@
             background: linear-gradient(180deg, rgba(7, 20, 47, 0), rgba(7, 20, 47, 0.94) 38%);
             flex-shrink: 0;
         }
+        /* Droite a gauche (arabe) */
+        .pf-title b { font: inherit; }
+        [dir="rtl"] .pf-card__head { padding-right: 0; padding-left: 34px; }
+        [dir="rtl"] .pf-check { right: auto; left: 12px; }
+        [dir="rtl"] .pf-icon__badge { right: auto; left: -4px; }
+        [dir="rtl"] .benefits-list { text-align: right; }
+
         .pf-continue {
             width: 100%;
             min-height: 54px;
@@ -1574,7 +1581,9 @@
     </style>
     <link rel="stylesheet" href="theme.css">
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="ui.js"></script>
+    <link rel="stylesheet" href="i18n.css">
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
@@ -1625,11 +1634,11 @@
 
                     <div class="text-content">
                         <h1>
-                            Envoyez vos colis avec<br>
+                            <span data-i18n="onb.s1_a">Envoyez vos colis avec</span><br>
                             <span class="text-wrapper">
-                                <span class="changing-text" id="changingText">nos meilleurs GP</span>
+                                <span class="changing-text" id="changingText" data-i18n="onb.s1_rot1">nos meilleurs GP</span>
                             </span><br>
-                            rapide et en toute sécurité
+                            <span data-i18n="onb.s1_b">rapide et en toute sécurité</span>
                         </h1>
          
                     </div>
@@ -1650,8 +1659,8 @@
 
                     <div class="text-content">
                         <h1>
-                            Gagnez de l'argent en<br>
-                            transportant des colis sûrs et vérifiés
+                            <span data-i18n="onb.s2_a">Gagnez de l'argent en</span><br>
+                            <span data-i18n="onb.s2_b">transportant des colis sûrs et vérifiés</span>
                         </h1>
          
                     </div>
@@ -1671,15 +1680,13 @@
                     </div>
 
                     <div class="text-content">
-                        <h1>
-                            Suivez votre colis en temps réel
-                        </h1>
+                        <h1 data-i18n="onb.s3_title">Suivez votre colis en temps réel</h1>
                         
                         <div class="live-tracking-card">
                             <div class="live-header">
                                 <span class="live-dot pulse-green"></span>
-                                <span class="live-text">Localisation GPS en direct</span>
-                                <span class="live-time">Mise à jour: instant</span>
+                                <span class="live-text" data-i18n="onb.s3_gps">Localisation GPS en direct</span>
+                                <span class="live-time" data-i18n="onb.s3_update">Mise à jour: instant</span>
                             </div>
                             
                             <div class="live-map-area">
@@ -1703,8 +1710,8 @@
                                     </div>
                                 </div>
                                 <div class="location-nodes">
-                                    <div class="node origin">Départ</div>
-                                    <div class="node dest">Destination</div>
+                                    <div class="node origin" data-i18n="onb.s3_origin">Départ</div>
+                                    <div class="node dest" data-i18n="onb.s3_dest">Destination</div>
                                 </div>
                             </div>
                         </div>
@@ -1730,11 +1737,11 @@
                             <source type="image/webp" srcset="im/sengp-logo.webp">
                             <img class="pf-logo" src="im/sengp-logo.png" alt="SENGP" width="768" height="475" decoding="async">
                         </picture>
-                        <p class="pf-tagline">Vos colis, notre engagement</p>
+                        <p class="pf-tagline" data-i18n="onb.tagline">Vos colis, notre engagement</p>
                     </header>
 
                     <div class="pf-heading pf-reveal" style="--i:1">
-                        <h2 class="pf-title" id="pfTitle">Choisissez votre <span>profil</span></h2>
+                        <h2 class="pf-title" id="pfTitle"><b data-i18n="onb.choose_a">Choisissez votre</b> <span data-i18n="onb.choose_b">profil</span></h2>
                     </div>
 
                     <fieldset class="pf-cards" aria-labelledby="pfTitle">
@@ -1747,9 +1754,9 @@
                                     <span class="pf-icon__badge"><svg class="pf-i"><use href="#i-send"/></svg></span>
                                 </span>
                                 <span class="pf-card__head">
-                                    <span class="pf-card__title">Expéditeur</span>
-                                    <span class="pf-badge">Client</span>
-                                    <span class="pf-card__desc">Envoyez vos colis à l'étranger</span>
+                                    <span class="pf-card__title" data-i18n="roles.expediteur">Expéditeur</span>
+                                    <span class="pf-badge" data-i18n="onb.badge_client">Client</span>
+                                    <span class="pf-card__desc" data-i18n="onb.sender_desc">Envoyez vos colis à l'étranger</span>
                                 </span>
                             </span>
                         </label>
@@ -1765,16 +1772,16 @@
                                     </picture>
                                 </span>
                                 <span class="pf-card__head">
-                                    <span class="pf-card__title">Gros Porteur</span>
+                                    <span class="pf-card__title" data-i18n="onb.carrier_title">Gros Porteur</span>
                                     <span class="pf-badge">GP</span>
-                                    <span class="pf-card__desc">Gagnez de l'argent en voyageant</span>
+                                    <span class="pf-card__desc" data-i18n="onb.carrier_desc">Gagnez de l'argent en voyageant</span>
                                 </span>
                             </span>
                         </label>
                     </fieldset>
                     <div class="pf-cta pf-reveal" style="--i:4">
                         <button type="button" class="pf-continue" id="continueBtn" onclick="continueToSignup()" disabled>
-                            Continuer <svg class="pf-i" aria-hidden="true"><use href="#i-arrow"/></svg>
+                            <span data-i18n="common.continue">Continuer</span> <svg class="pf-i i18n-flip" aria-hidden="true"><use href="#i-arrow"/></svg>
                         </button>
                     </div>
                 </div>
@@ -1786,6 +1793,7 @@
 
         </div>
 
+        <div data-i18n-switcher></div>
         <!-- Global Fixed Navigation -->
         <div class="global-bottom-nav" id="globalNav" style="display: none;">
             <div class="pagination" id="globalPagination">
@@ -1794,8 +1802,8 @@
                 <div class="dot"></div>
             </div>
             <div class="nav-buttons">
-                <button class="btn btn-skip" id="btnGlobalLeft" onclick="handleGlobalLeft()">Passer</button>
-                <button class="btn btn-next" id="btnGlobalRight" onclick="handleGlobalRight()">Suivant</button>
+                <button class="btn btn-skip" id="btnGlobalLeft" onclick="handleGlobalLeft()" data-i18n="onb.skip">Passer</button>
+                <button class="btn btn-next" id="btnGlobalRight" onclick="handleGlobalRight()" data-i18n="common.next">Suivant</button>
             </div>
         </div>
     </div>

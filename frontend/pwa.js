@@ -1,6 +1,15 @@
 // SEN GP - PWA : enregistrement du service worker + invite d'installation.
 // Dans l'app native Capacitor, tout ceci est désactivé.
 (function () {
+    // Texte traduit si i18n.js est charge et possede la cle ; sinon le francais d'origine.
+    function i18nText(key, fallback) {
+        return (window.SengpI18n && window.sengpT && window.SengpI18n.has(key)) ? window.sengpT(key) : fallback;
+    }
+    // Idem, echappe pour etre insere dans du HTML (la banniere est construite en innerHTML).
+    function i18nHtml(key, fallback) {
+        return String(i18nText(key, fallback)).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
     var isNative = !!(
         window.Capacitor &&
         typeof window.Capacitor.isNativePlatform === 'function' &&
@@ -28,7 +37,7 @@
     }
     async function sengpSubscribePush(interactive) {
         try {
-            if (!('serviceWorker' in navigator) || !('PushManager' in window)) { if (interactive) alert('Notifications non supportées sur cet appareil.'); return false; }
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) { if (interactive) alert(i18nText('pwa.push_unsupported', 'Notifications non supportées sur cet appareil.')); return false; }
             var token = localStorage.getItem('authToken');
             if (!token) { if (interactive) alert('Connectez-vous d\'abord.'); return false; }
             var perm = Notification.permission;
@@ -46,9 +55,9 @@
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                 body: JSON.stringify(sub)
             });
-            if (interactive) alert('Notifications activées');
+            if (interactive) alert(i18nText('pwa.push_enabled', 'Notifications activées'));
             return true;
-        } catch (e) { console.warn('Push subscribe failed:', e); if (interactive) alert('Échec de l\'activation des notifications.'); return false; }
+        } catch (e) { console.warn('Push subscribe failed:', e); if (interactive) alert(i18nText('pwa.push_failed', 'Échec de l\'activation des notifications.')); return false; }
     }
     window.sengpEnablePush = function () { return sengpSubscribePush(true); };
     // Auto-abonnement silencieux si déjà autorisé + connecté.
@@ -132,9 +141,9 @@
         showBannerWhenReady(
             ICON_IMG +
             '<div style="flex:1;min-width:0">' +
-            '<strong style="font-size:15px">Installez SEN GP</strong><br>' +
-            'Dans Safari : appuyez sur <span style="font-weight:700">' + SHARE_ICON + ' Partager</span> ' +
-            'puis <span style="font-weight:700">' + PLUS_ICON + ' Sur l’écran d’accueil</span>' +
+            '<strong style="font-size:15px">' + i18nHtml('pwa.ios_title', 'Installez SEN GP') + '</strong><br>' +
+            i18nHtml('pwa.ios_before', 'Dans Safari : appuyez sur') + ' <span style="font-weight:700">' + SHARE_ICON + ' ' + i18nHtml('pwa.ios_share', 'Partager') + '</span> ' +
+            i18nHtml('pwa.ios_then', 'puis') + ' <span style="font-weight:700">' + PLUS_ICON + ' ' + i18nHtml('pwa.ios_home', 'Sur l’écran d’accueil') + '</span>' +
             '</div>' + CLOSE_BTN,
             function () {}
         );
@@ -149,13 +158,13 @@
         showBannerWhenReady(
             ICON_IMG +
             '<div style="flex:1;min-width:0">' +
-            '<strong style="font-size:15px">SEN GP sur votre téléphone</strong><br>' +
-            'Installez l’application gratuitement' +
+            '<strong style="font-size:15px">' + i18nHtml('pwa.banner_title', 'SEN GP sur votre téléphone') + '</strong><br>' +
+            i18nHtml('pwa.banner_text', 'Installez l’application gratuitement') +
             '</div>' +
             '<button class="sengp-install-go" style="' +
             'background:#fff;color:#1e40af;border:0;border-radius:12px;' +
             'padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;' +
-            'flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25)">Installer</button>' +
+            'flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.25)">' + i18nHtml('pwa.install', 'Installer') + '</button>' +
             CLOSE_BTN,
             function (banner) {
                 banner.querySelector('.sengp-install-go').addEventListener('click', function () {

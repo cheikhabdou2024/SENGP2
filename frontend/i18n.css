@@ -1,0 +1,43 @@
+/* SEN GP — styles communs a l'internationalisation : selecteur de langue et petits reglages droite-a-gauche. */
+
+/* Emplacement du selecteur : coin superieur "de fin" (droite en LTR, gauche en RTL). */
+[data-i18n-switcher] {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 14px);
+    inset-inline-end: 14px;
+    z-index: 60;
+}
+
+.sengp-lang-switcher {
+    -webkit-appearance: none;
+    appearance: none;
+    min-height: 40px;
+    padding: 8px 30px 8px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 999px;
+    background-color: rgba(8, 20, 47, 0.6);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%23F8FAFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m1 1.5 5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 11px center;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: #F8FAFF;
+    font: 600 13px/1.2 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    cursor: pointer;
+}
+.sengp-lang-switcher:focus-visible { outline: 2px solid #FFC247; outline-offset: 2px; }
+.sengp-lang-switcher option { color: #111827; background: #fff; }
+
+[dir="rtl"] .sengp-lang-switcher {
+    padding: 8px 14px 8px 30px;
+    background-position: left 11px center;
+}
+
+/* Les identifiants (email, telephone, mot de passe) restent ecrits de gauche a droite en arabe. */
+[dir="rtl"] input[type="email"],
+[dir="rtl"] input[type="tel"],
+[dir="rtl"] input[type="password"],
+[dir="rtl"] input[data-ltr] { direction: ltr; text-align: start; }
+
+/* Les fleches de navigation sont retournees en droite-a-gauche. */
+[dir="rtl"] .i18n-flip { transform: scaleX(-1); }
