@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>SEN GP - Notifications</title>
+    <title data-i18n="notif.page_title">SEN GP - Notifications</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -139,6 +139,14 @@
         .nt-nav__item[aria-current="page"] { background: #E8F1FF; color: #1E6FEA; font-weight: 700; }
         .nt-nav__icon { position: relative; display: flex; }
         .nt-nav__icon .nt-i { width: 26px; height: 26px; }
+        /* Droite a gauche (arabe) */
+        [dir="rtl"] .nt-markall { right: auto; left: 18px; }
+        [dir="rtl"] .nt-meta { margin-left: 0; margin-right: auto; }
+        [dir="rtl"] .nt-del { margin-right: 0; margin-left: -4px; }
+        [dir="rtl"] .nt-place--r { text-align: left; }
+        [dir="rtl"] .nt-dotbadge { right: auto; left: -3px; }
+        [dir="rtl"] .nt-back svg, [dir="rtl"] .nt-side > svg, [dir="rtl"] .nt-line img { transform: scaleX(-1); }
+
         .nt-dotbadge { position: absolute; top: -2px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: #EF4444; border: 2px solid #fff; }
         .nt-dotbadge.hidden { display: none; }
         .lbl-short { display: none; }
@@ -177,6 +185,8 @@
         body{padding:0!important;}
     </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
+    <link rel="stylesheet" href="i18n.css">
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
@@ -206,38 +216,38 @@
         </picture>
         <div class="nt-hero__in">
           <div class="nt-hero__row">
-            <button type="button" class="nt-back" onclick="goBack()" aria-label="Retour">
+            <button type="button" class="nt-back" onclick="goBack()" aria-label="Retour" data-i18n-attr="aria-label:common.back">
               <svg class="nt-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
             </button>
             <div>
-              <h1>Notifications</h1>
-              <p id="heroSub">Restez informé de vos envois</p>
+              <h1 data-i18n="nav.notifications">Notifications</h1>
+              <p id="heroSub" data-i18n="notif.sub_exp">Restez informé de vos envois</p>
             </div>
           </div>
           <button type="button" class="nt-markall" id="markAllBtn" onclick="markAllAsRead()" hidden>
-            <svg class="nt-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Tout marquer lu
+            <svg class="nt-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="notif.mark_all">Tout marquer lu</span>
           </button>
         </div>
       </header>
 
       <div class="nt-body">
-        <div class="nt-tabs nt-reveal" style="--i:0" role="tablist" aria-label="Filtrer les notifications">
+        <div class="nt-tabs nt-reveal" style="--i:0" role="tablist" aria-label="Filtrer les notifications" data-i18n-attr="aria-label:notif.filter_aria">
           <button type="button" class="nt-tab active" id="tab-all" role="tab" aria-selected="true" onclick="switchTab('all')">
             <svg class="nt-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-            <span>Toutes (<span id="cnt-all">0</span>)</span>
+            <span><span data-i18n="notif.tab_all">Toutes</span> (<span id="cnt-all">0</span>)</span>
           </button>
           <button type="button" class="nt-tab" id="tab-unread" role="tab" aria-selected="false" onclick="switchTab('unread')">
             <svg class="nt-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-            <span>Non lues (<span id="cnt-unread">0</span>)</span>
+            <span><span data-i18n="notif.tab_unread">Non lues</span> (<span id="cnt-unread">0</span>)</span>
           </button>
         </div>
 
-        <div id="notifList"><div class="nt-empty">Chargement…</div></div>
+        <div id="notifList"><div class="nt-empty" data-i18n="common.loading">Chargement…</div></div>
       </div>
     </div>
 
     <!-- Bottom navigation (expéditeur by default; replaced for GP in JS) -->
-    <nav class="nt-nav" id="bottomNav" aria-label="Navigation principale"></nav>
+    <nav class="nt-nav" id="bottomNav" aria-label="Navigation principale" data-i18n-attr="aria-label:nav.main_aria"></nav>
   </div>
 </div>
 <script>
@@ -282,22 +292,22 @@
         // ---- bottom navigation (expéditeur: 5 tabs like the rest of the redesigned app)
         const NAV = {
             expediteur: [
-                ['home', 'Accueil', null, ICON.home], ['orders', 'Envois', null, ICON.box],
-                ['tracking', 'Suivi', null, ICON.pin], ['notifications', 'Notifications', 'Notifs', ICON.bell], ['profile', 'Profil', null, ICON.user]
+                ['home', 'nav.home', null, ICON.home], ['orders', 'nav.orders', null, ICON.box],
+                ['tracking', 'nav.tracking', null, ICON.pin], ['notifications', 'nav.notifications', 'nav.notifs_short', ICON.bell], ['profile', 'nav.profile', null, ICON.user]
             ],
             gp: [
-                ['home', 'Accueil', null, ICON.home], ['trips', 'Trajets', null, ICON.plane],
-                ['notifications', 'Notifs', null, ICON.bell], ['profile', 'Profil', null, ICON.user]
+                ['home', 'nav.home', null, ICON.home], ['trips', 'nav.trips', null, ICON.plane],
+                ['notifications', 'nav.notifs_short', null, ICON.bell], ['profile', 'nav.profile', null, ICON.user]
             ]
         };
         function buildNav() {
             document.getElementById('bottomNav').innerHTML = (NAV[userType === 'gp' ? 'gp' : 'expediteur']).map(([key, label, short, icon]) => {
                 const cur = key === 'notifications';
-                const text = short ? `<span class="lbl-long">${label}</span><span class="lbl-short">${short}</span>` : `<span>${label}</span>`;
-                const dot = key === 'notifications' ? '<span class="nt-dotbadge hidden" id="notifNavBadge" aria-label="Notifications non lues"></span>' : '';
+                const text = short ? `<span class="lbl-long">${esc(sengpT(label))}</span><span class="lbl-short">${esc(sengpT(short))}</span>` : `<span>${esc(sengpT(label))}</span>`;
+                const dot = key === 'notifications' ? '<span class="nt-dotbadge hidden" id="notifNavBadge" aria-label="' + esc(sengpT('nav.unread_aria')) + '"></span>' : '';
                 return `<button type="button" class="nt-nav__item"${cur ? ' aria-current="page"' : ''} onclick="navigateTo('${key}')"><span class="nt-nav__icon">${icon}${dot}</span>${text}</button>`;
             }).join('');
-            if (userType === 'gp') document.getElementById('heroSub').textContent = 'Restez informé de vos missions';
+            if (userType === 'gp') { const sub = document.getElementById('heroSub'); sub.setAttribute('data-i18n', 'notif.sub_gp'); sub.textContent = sengpT('notif.sub_gp'); }
         }
 
         let allNotifs = [];
@@ -339,7 +349,7 @@
                 updateCounts();
                 render();
             } catch (e) {
-                document.getElementById('notifList').innerHTML = '<div class="nt-empty">' + ICON.alert + '<div>Erreur de chargement.</div></div>';
+                document.getElementById('notifList').innerHTML = '<div class="nt-empty">' + ICON.alert + '<div>' + esc(sengpT('notif.load_error')) + '</div></div>';
             }
         }
 
@@ -367,7 +377,7 @@
             const box = document.getElementById('notifList');
             if (!list.length) {
                 box.innerHTML = '<div class="nt-empty">' + ICON.bell + '<div>' +
-                    (currentTab === 'unread' ? 'Aucune notification non lue.' : 'Aucune notification pour le moment.') + '</div></div>';
+                    esc(sengpT(currentTab === 'unread' ? 'notif.empty_unread' : 'notif.empty_all')) + '</div></div>';
                 return;
             }
             box.innerHTML = list.map((n, i) => card(n, i)).join('');
@@ -391,17 +401,17 @@
             return '<article class="nt-card' + (!n.is_read ? ' unread' : '') + anim + '" style="--i:' + (i + 1) + '" data-id="' + id + '" role="button" tabindex="0">'
                 + '<span class="nt-ic nt-ic--' + color + '" aria-hidden="true">' + ICON[icon] + '</span>'
                 + '<div class="nt-main">'
-                + '<div class="nt-top"><h3 class="nt-title">' + esc(n.title) + '</h3><span class="nt-meta"><span>' + esc(formatTime(n.created_at)) + '</span>' + (!n.is_read ? '<i class="nt-dot" aria-label="Non lue"></i>' : '') + '</span></div>'
+                + '<div class="nt-top"><h3 class="nt-title">' + esc(n.title) + '</h3><span class="nt-meta"><span>' + esc(formatTime(n.created_at)) + '</span>' + (!n.is_read ? '<i class="nt-dot" aria-label="' + esc(sengpT('notif.unread_one')) + '"></i>' : '') + '</span></div>'
                 + '<p class="nt-msg">' + esc(n.message) + '</p>'
                 + '</div>'
-                + '<div class="nt-side">' + ICON.chev + '<button type="button" class="nt-del" data-del="' + id + '" aria-label="Supprimer la notification">' + ICON.trash + '</button></div>'
+                + '<div class="nt-side">' + ICON.chev + '<button type="button" class="nt-del" data-del="' + id + '" aria-label="' + esc(sengpT('notif.delete_aria')) + '">' + ICON.trash + '</button></div>'
                 + routeStrip(n.metadata)
                 + '</article>';
         }
 
         function formatFCFA(v) {
             const num = Number(v);
-            return isFinite(num) ? num.toLocaleString('fr-FR') + ' FCFA' : String(v);
+            return isFinite(num) ? SengpI18n.fmt.currency(num) : String(v);
         }
 
         // Rich card for a mission the admin assigned to this GP, with Accept/Decline.
@@ -411,10 +421,10 @@
             const code = md.mission_code || '';
             const route = md.route || (md.departure_city && md.arrival_city ? md.departure_city + ' → ' + md.arrival_city : n.title);
             const date = md.departure_date
-                ? new Date(md.departure_date).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' })
+                ? SengpI18n.fmt.date(md.departure_date, { day:'2-digit', month:'short', year:'numeric' })
                 : '—';
             const time = (md.departure_has_time && md.departure_date)
-                ? new Date(md.departure_date).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' })
+                ? new Date(md.departure_date).toLocaleTimeString(SengpI18n.fmt.localeTag(), { hour:'2-digit', minute:'2-digit' })
                 : '—';
             const weight = (md.package_weight != null) ? md.package_weight + ' kg' : '—';
             const price = (md.price != null) ? formatFCFA(md.price) : '—';
@@ -423,31 +433,31 @@
 
             let action;
             if (state === 'accepted') {
-                action = '<div class="ma-state ok">Mission acceptée — l\'équipe SEN GP vous contactera pour confirmer et organiser la remise du colis.</div>';
+                action = '<div class="ma-state ok">' + esc(sengpT('notif.ma_state_ok')) + '</div>';
             } else if (state === 'declined') {
-                action = '<div class="ma-state no">Mission déclinée — elle sera ré-assignée à un autre GP de la même catégorie.</div>';
+                action = '<div class="ma-state no">' + esc(sengpT('notif.ma_state_no')) + '</div>';
             } else if (!missionId) {
-                action = '<div class="ma-state no">Détails de mission indisponibles.</div>';
+                action = '<div class="ma-state no">' + esc(sengpT('notif.ma_unavailable')) + '</div>';
             } else {
                 action = '<div class="ma-actions">'
-                    + '<button type="button" class="ma-btn ma-accept" data-resp="accept" data-nid="' + nid + '" data-mid="' + mid + '">' + ICON.checkOnly + 'Accepter</button>'
-                    + '<button type="button" class="ma-btn ma-decline" data-resp="decline" data-nid="' + nid + '" data-mid="' + mid + '">' + ICON.x + 'Décliner</button>'
+                    + '<button type="button" class="ma-btn ma-accept" data-resp="accept" data-nid="' + nid + '" data-mid="' + mid + '">' + ICON.checkOnly + esc(sengpT('notif.ma_accept')) + '</button>'
+                    + '<button type="button" class="ma-btn ma-decline" data-resp="decline" data-nid="' + nid + '" data-mid="' + mid + '">' + ICON.x + esc(sengpT('notif.ma_decline')) + '</button>'
                     + '</div>';
             }
 
             return '<article class="nt-card ma' + (!n.is_read ? ' unread' : '') + '" id="notif-card-' + nid + '">'
                 + '<div class="ma-head">'
                 + '<div class="ma-badge">' + ICON.target + '</div>'
-                + '<div style="flex:1;min-width:0;"><div class="ma-title">Mission assignée' + (code ? ' — ' + esc(code) : '') + '</div>'
-                + '<div class="ma-sub">' + esc(formatTime(n.created_at)) + ' · <b>PAR L\'ADMIN</b></div></div>'
-                + '<button type="button" class="nt-del" data-del="' + nid + '" aria-label="Supprimer la notification">' + ICON.trash + '</button>'
+                + '<div style="flex:1;min-width:0;"><div class="ma-title">' + esc(sengpT('notif.ma_title')) + (code ? ' — ' + esc(code) : '') + '</div>'
+                + '<div class="ma-sub">' + esc(formatTime(n.created_at)) + ' · <b>' + esc(sengpT('notif.ma_by_admin')) + '</b></div></div>'
+                + '<button type="button" class="nt-del" data-del="' + nid + '" aria-label="' + esc(sengpT('notif.delete_aria')) + '">' + ICON.trash + '</button>'
                 + '</div>'
                 + '<div class="ma-route">' + esc(route) + '</div>'
                 + '<div class="ma-grid">'
-                + '<div class="ma-cell"><div class="ma-label">' + ICON.cal + ' Date</div><div class="ma-value">' + esc(date) + '</div></div>'
-                + '<div class="ma-cell"><div class="ma-label">' + ICON.clock + ' Heure</div><div class="ma-value">' + esc(time) + '</div></div>'
-                + '<div class="ma-cell"><div class="ma-label">' + ICON.box + ' Poids</div><div class="ma-value">' + esc(weight) + '</div></div>'
-                + '<div class="ma-cell"><div class="ma-label">' + ICON.coins + ' Rémunération</div><div class="ma-value">' + esc(price) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">' + ICON.cal + ' ' + esc(sengpT('notif.ma_date')) + '</div><div class="ma-value">' + esc(date) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">' + ICON.clock + ' ' + esc(sengpT('notif.ma_time')) + '</div><div class="ma-value">' + esc(time) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">' + ICON.box + ' ' + esc(sengpT('ship.pkg_weight')) + '</div><div class="ma-value">' + esc(weight) + '</div></div>'
+                + '<div class="ma-cell"><div class="ma-label">' + ICON.coins + ' ' + esc(sengpT('notif.ma_pay')) + '</div><div class="ma-value">' + esc(price) + '</div></div>'
                 + '</div>'
                 + action
                 + '</article>';
@@ -457,8 +467,8 @@
             const token = getAuthToken();
             if (action === 'decline') {
                 const ok = await window.sengpConfirm(
-                    'Décliner cette mission ? Elle sera ré-assignée à un autre GP de votre catégorie.',
-                    { okLabel: 'Décliner', cancelLabel: 'Annuler' }
+                    sengpT('notif.ma_decline_confirm'),
+                    { okLabel: sengpT('notif.ma_decline'), cancelLabel: sengpT('common.cancel') }
                 );
                 if (!ok) return;
             }
@@ -471,10 +481,10 @@
                 });
                 if (!res.ok) {
                     const err = await res.json().catch(() => ({}));
-                    throw new Error(err.message || 'Action impossible');
+                    throw new Error(err.message || sengpT('notif.ma_failed'));
                 }
             } catch (e) {
-                window.sengpAlert(e.message || 'Action impossible. Réessayez.');
+                window.sengpAlert(e.message || sengpT('notif.ma_failed'));
                 return;
             }
             missionStates[notifId] = action === 'accept' ? 'accepted' : 'declined';
@@ -488,8 +498,8 @@
             updateCounts();
             render();
             window.sengpAlert(action === 'accept'
-                ? 'Mission acceptée ! L\'équipe SEN GP vous contactera pour confirmer et organiser la remise du colis.'
-                : 'Mission déclinée. Elle sera ré-assignée à un autre GP de la même catégorie.');
+                ? sengpT('notif.ma_alert_ok')
+                : sengpT('notif.ma_alert_no'));
         }
 
         function formatTime(dateString) {
@@ -497,11 +507,11 @@
             if (isNaN(date.getTime())) return '';
             const diff = Date.now() - date.getTime();
             const m = Math.floor(diff / 60000), h = Math.floor(diff / 3600000), d = Math.floor(diff / 86400000);
-            if (m < 1) return "À l'instant";
-            if (m < 60) return 'Il y a ' + m + ' min';
-            if (h < 24) return 'Il y a ' + h + ' h';
-            if (d < 7) return 'Il y a ' + d + (d > 1 ? ' jours' : ' jour');
-            return date.toLocaleDateString('fr-FR');
+            if (m < 1) return sengpT('notif.ago_now');
+            if (m < 60) return sengpT('notif.ago_min', { n: m });
+            if (h < 24) return sengpT('notif.ago_h', { n: h });
+            if (d < 7) return sengpT('notif.ago_days', { count: d });
+            return SengpI18n.fmt.date(date, { day: 'numeric', month: 'numeric', year: 'numeric' });
         }
 
         // The old shipment detail page is replaced by "Mes envois"
@@ -539,7 +549,7 @@
                 allNotifs = allNotifs.filter(x => String(x.notification_id) !== String(id));
                 updateCounts();
                 render();
-            } catch (e) { alert('Suppression impossible.'); }
+            } catch (e) { alert(sengpT('notif.delete_failed')); }
         }
 
         async function markAllAsRead() {
@@ -549,7 +559,7 @@
                     method: 'PUT', headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (r.ok) { allNotifs.forEach(n => n.is_read = true); updateCounts(); render(); }
-                else alert('Erreur lors de la mise à jour');
+                else alert(sengpT('notif.update_failed'));
             } catch (e) { console.error(e); }
         }
 
@@ -575,7 +585,9 @@
         }
 
         window.onPullRefresh = async () => { await loadUserNotifications(); return true; };
-        window.addEventListener('load', () => { buildNav(); loadUserNotifications(); });
+        window.addEventListener('load', () => { SengpI18n.ready.then(() => { buildNav(); loadUserNotifications(); }); });
+        // Changement de langue : navigation et liste sont redessinees.
+        window.addEventListener('sengp:languagechange', () => { buildNav(); if (allNotifs.length) { updateCounts(); render(); } });
         setInterval(() => { if (!document.hidden) loadUserNotifications(); }, 60000);
     </script>
     <script src="ptr.js"></script>

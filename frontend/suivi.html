@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>SEN GP - Suivi</title>
+<title data-i18n="track.page_title">SEN GP - Suivi</title>
 <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -119,6 +119,14 @@
         .sv-card.open .sv-panel { grid-template-rows: 1fr; visibility: visible; transition: grid-template-rows 0.32s ease, visibility 0s; }
         .sv-panel__in { min-height: 0; overflow: hidden; padding: 0 16px; }
         .sv-card.open .sv-panel__in { padding-bottom: 18px; }
+        /* Droite a gauche (arabe) */
+        [dir="rtl"] .sv-stat + .sv-stat { padding-left: 0; padding-right: 14px; border-left: 0; border-right: 1px solid #E3EAF3; }
+        [dir="rtl"] .sv-place--r { text-align: left; }
+        [dir="rtl"] .sv-chev { margin-left: 0; margin-right: auto; }
+        [dir="rtl"] .sv-st::before { left: auto; right: 19px; }
+        [dir="rtl"] .sv-dotbadge { right: auto; left: -3px; }
+        [dir="rtl"] .sv-hero__row button svg, [dir="rtl"] .sv-line img { transform: scaleX(-1); }
+
         .sv-chev { width: 24px; height: 24px; margin-left: auto; color: #6B7A93; transition: transform 0.3s ease; }
         .sv-card.open .sv-chev { transform: rotate(180deg); }
 
@@ -249,7 +257,9 @@
         body{padding:0!important;}
 </style>
 <script src="api.js"></script>
+<script src="i18n.js"></script>
 <script src="config.js"></script>
+<link rel="stylesheet" href="i18n.css">
 <link rel="stylesheet" href="theme.css">
     <script src="ui.js"></script>
     <!-- PWA -->
@@ -280,8 +290,8 @@
             <svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
           </button>
           <div>
-            <h1>Suivi en temps réel</h1>
-            <p>Localisez vos colis en cours d'acheminement</p>
+            <h1 data-i18n="detail.live_tracking">Suivi en temps réel</h1>
+            <p data-i18n="track.subtitle">Localisez vos colis en cours d'acheminement</p>
           </div>
         </div>
       </header>
@@ -290,54 +300,54 @@
         <form class="sv-search sv-reveal" style="--i:0" onsubmit="trackByCode(event)" role="search">
           <label class="sv-search__box">
             <svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
-            <input id="trackInput" type="search" placeholder="Suivre par n° de colis…" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Numéro de colis">
+            <input id="trackInput" type="search" placeholder="Suivre par n° de colis…" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Numéro de colis" data-i18n-attr="placeholder:track.search_placeholder; aria-label:track.code_aria">
           </label>
-          <button type="submit" class="sv-go">Suivre</button>
+          <button type="submit" class="sv-go" data-i18n="track.go">Suivre</button>
         </form>
 
-        <div class="sv-tabs sv-reveal" style="--i:1" role="tablist" aria-label="Filtrer les colis">
+        <div class="sv-tabs sv-reveal" style="--i:1" role="tablist" aria-label="Filtrer les colis" data-i18n-attr="aria-label:track.filter_aria">
           <button type="button" class="sv-tab active" id="t-encours" role="tab" aria-selected="true" onclick="setTab('encours')">
             <svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
-            <span>En cours (<span id="cnt-encours">0</span>)</span>
+            <span><span data-i18n="dash.in_progress">En cours</span> (<span id="cnt-encours">0</span>)</span>
           </button>
           <button type="button" class="sv-tab" id="t-avenir" role="tab" aria-selected="false" onclick="setTab('avenir')">
             <svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            <span>À venir (<span id="cnt-avenir">0</span>)</span>
+            <span><span data-i18n="track.tab_upcoming">À venir</span> (<span id="cnt-avenir">0</span>)</span>
           </button>
           <button type="button" class="sv-tab" id="t-livres" role="tab" aria-selected="false" onclick="setTab('livres')">
             <svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-            <span>Livrés (<span id="cnt-livres">0</span>)</span>
+            <span><span data-i18n="dash.delivered">Livrés</span> (<span id="cnt-livres">0</span>)</span>
           </button>
         </div>
 
-        <div id="list"><div class="sv-loading">Chargement…</div></div>
+        <div id="list"><div class="sv-loading" data-i18n="common.loading">Chargement…</div></div>
       </div>
     </div>
 
     <!-- Bottom navigation -->
-    <nav class="sv-nav" aria-label="Navigation principale">
+    <nav class="sv-nav" aria-label="Navigation principale" data-i18n-attr="aria-label:nav.main_aria">
       <button type="button" class="sv-nav__item" onclick="navigateTo('home')">
         <span class="sv-nav__icon"><svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span>
-        <span>Accueil</span>
+        <span data-i18n="nav.home">Accueil</span>
       </button>
       <button type="button" class="sv-nav__item" onclick="navigateTo('orders')">
         <span class="sv-nav__icon"><svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
-        <span>Envois</span>
+        <span data-i18n="nav.orders">Envois</span>
       </button>
       <button type="button" class="sv-nav__item" aria-current="page" onclick="navigateTo('tracking')">
         <span class="sv-nav__icon"><svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
-        <span>Suivi</span>
+        <span data-i18n="nav.tracking">Suivi</span>
       </button>
       <button type="button" class="sv-nav__item" onclick="navigateTo('notifications')">
         <span class="sv-nav__icon">
           <svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-          <span class="sv-dotbadge hidden" id="notifDot" aria-label="Notifications non lues"></span>
+          <span class="sv-dotbadge hidden" id="notifDot" aria-label="Notifications non lues" data-i18n-attr="aria-label:nav.unread_aria"></span>
         </span>
-        <span class="lbl-long">Notifications</span><span class="lbl-short">Notifs</span>
+        <span class="lbl-long" data-i18n="nav.notifications">Notifications</span><span class="lbl-short" data-i18n="nav.notifs_short">Notifs</span>
       </button>
       <button type="button" class="sv-nav__item" onclick="navigateTo('profile')">
         <span class="sv-nav__icon"><svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
-        <span>Profil</span>
+        <span data-i18n="nav.profile">Profil</span>
       </button>
     </nav>
 
@@ -346,8 +356,8 @@
       <div class="sv-sheet" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
         <div class="sv-sheet__grab"><i></i></div>
         <div class="sv-sheet__head">
-          <div><h3 id="shareTitle">Partager le suivi</h3><p>Envoyez le lien de suivi à votre destinataire</p></div>
-          <button type="button" class="sv-close" id="shareClose" onclick="closeShare()" aria-label="Fermer"><svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+          <div><h3 id="shareTitle" data-i18n="ship.tile_share">Partager le suivi</h3><p data-i18n="ship.sheet_share_sub">Envoyez le lien de suivi à votre destinataire</p></div>
+          <button type="button" class="sv-close" id="shareClose" onclick="closeShare()" aria-label="Fermer" data-i18n-attr="aria-label:common.close"><svg class="sv-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
         </div>
         <div class="sv-sheet__body" id="shareBody"></div>
       </div>
@@ -374,18 +384,20 @@
   };
 
   const flag = c => (window.SengpGeo ? SengpGeo.flag(c) : '');
+  // Nom du pays dans la langue courante (la valeur enregistree reste le nom francais).
+  const ctry = c => (window.SengpGeo ? SengpGeo.displayCountry(c || '') : (c || ''));
   const esc = window.sengpEsc;
   const st = m => String(m.status || '').toLowerCase();
   const validDate = d => { const x = d ? new Date(d) : null; return x && !isNaN(x.getTime()) ? x : null; };
-  const fmtDate = d => { const x = validDate(d); return x ? x.toLocaleDateString('fr-FR') : '—'; };
-  const fmtDateTime = d => { const x = validDate(d); return x ? x.toLocaleDateString('fr-FR') + ' · ' + x.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : ''; };
-  const fcfa = n => (Number(n) || 0).toLocaleString('fr-FR') + ' FCFA';
+  const fmtDate = d => { const x = validDate(d); return x ? SengpI18n.fmt.date(x, { day: 'numeric', month: 'numeric', year: 'numeric' }) : '—'; };
+  const fmtDateTime = d => { const x = validDate(d); return x ? fmtDate(x) + ' · ' + x.toLocaleTimeString(SengpI18n.fmt.localeTag(), { hour: '2-digit', minute: '2-digit' }) : ''; };
+  const fcfa = n => SengpI18n.fmt.currency(n);
   function timeAgo(d) {
     const x = validDate(d); if (!x) return '';
     const m = Math.floor((Date.now() - x.getTime()) / 60000);
-    if (m < 1) return "à l'instant"; if (m < 60) return 'il y a ' + m + ' min';
-    const h = Math.floor(m / 60); if (h < 24) return 'il y a ' + h + ' h';
-    return 'il y a ' + Math.floor(h / 24) + ' j';
+    if (m < 1) return sengpT('track.ago_now'); if (m < 60) return sengpT('track.ago_min', { n: m });
+    const h = Math.floor(m / 60); if (h < 24) return sengpT('track.ago_h', { n: h });
+    return sengpT('track.ago_d', { n: Math.floor(h / 24) });
   }
 
   const IC = {
@@ -415,12 +427,8 @@
     wa: '<svg viewBox="0 0 24 24" width="28" height="28" fill="#fff" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.54-3.87c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 0 0 1.523 5.26l-.999 3.648 3.965-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>'
   };
 
-  const STATUS = {
-    pending: ['En attente', 'yellow'], matched: ['Pris en charge', 'blue'], accepted: ['Accepté', 'blue'],
-    picked_up: ['Récupéré', 'blue'], in_transit: ['En transit', 'green'], in_customs: ['En douane', 'orange'],
-    out_for_delivery: ['En livraison', 'green'], delivered: ['Livré', 'green']
-  };
-  const pill = m => { const s = STATUS[st(m)] || [m.status || '', 'blue']; return `<span class="sv-pill sv-pill--${s[1]}">${esc(s[0])}</span>`; };
+  const STATUS_CLS = { pending: 'yellow', matched: 'blue', accepted: 'blue', picked_up: 'blue', in_transit: 'green', in_customs: 'orange', out_for_delivery: 'green', delivered: 'green' };
+  const pill = m => { const k = st(m); const cls = STATUS_CLS[k] || 'blue'; const label = STATUS_CLS[k] ? sengpT(k === 'matched' ? 'ship.status.matched_taken' : 'ship.status.' + k) : (m.status || ''); return `<span class="sv-pill sv-pill--${cls}">${esc(label)}</span>`; };
 
   const originBase = () => API.replace(/\/api\/v1\/?$/, '');
   const publicUrl = m => originBase() + '/t/' + encodeURIComponent(m.tracking_number || m.mission_code || '');
@@ -446,7 +454,7 @@
       selectTabButton();
       render();
     } catch (e) {
-      document.getElementById('list').innerHTML = `<div class="sv-empty">${IC.alert}<div>Erreur : ${esc(e.message)}</div></div>`;
+      document.getElementById('list').innerHTML = `<div class="sv-empty">${IC.alert}<div>${esc(sengpT('envois.error', { message: e.message }))}</div></div>`;
     }
     loadUnread();
   }
@@ -473,11 +481,11 @@
   // ---------------- timeline ----------------
   // Steps follow the real order: a GP takes the parcel in charge before it is picked up.
   const STEPS = [
-    { key: 'gp', title: 'Pris en charge par le GP', icon: IC.truck, statuses: ['matched', 'accepted'] },
-    { key: 'pickup', title: 'Colis récupéré', icon: IC.box, statuses: ['picked_up'] },
-    { key: 'transit', title: 'En transit', icon: IC.plane, statuses: ['in_transit'] },
-    { key: 'arrived', title: 'Arrivé à destination', icon: IC.pin, statuses: ['in_customs'] },
-    { key: 'delivered', title: 'Livré', icon: IC.flagEnd, statuses: ['out_for_delivery', 'delivered'] }
+    { key: 'gp', tk: 'track.step_gp', icon: IC.truck, statuses: ['matched', 'accepted'] },
+    { key: 'pickup', tk: 'track.step_pickup', icon: IC.box, statuses: ['picked_up'] },
+    { key: 'transit', tk: 'ship.step_transit', icon: IC.plane, statuses: ['in_transit'] },
+    { key: 'arrived', tk: 'track.step_arrived', icon: IC.pin, statuses: ['in_customs'] },
+    { key: 'delivered', tk: 'ship.status.delivered', icon: IC.flagEnd, statuses: ['out_for_delivery', 'delivered'] }
   ];
   // [steps done, current step (1-based, 0 = none)] per status
   const PROGRESS = { pending: [0, 1], matched: [1, 2], accepted: [1, 2], picked_up: [2, 0], in_transit: [2, 3], in_customs: [3, 4], out_for_delivery: [4, 5], delivered: [5, 0] };
@@ -494,14 +502,14 @@
   }
 
   function stepTexts(m, step, isNow, ev) {
-    const from = [m.departure_city, m.departure_country].filter(Boolean).join(', ');
-    const to = [m.arrival_city, m.arrival_country].filter(Boolean).join(', ');
+    const from = [m.departure_city, m.departure_country && ctry(m.departure_country)].filter(Boolean).join(', ');
+    const to = [m.arrival_city, m.arrival_country && ctry(m.arrival_country)].filter(Boolean).join(', ');
     let place = ev.place, sub = '';
-    if (step.key === 'gp') { place = place || from; sub = m.gp_name ? 'GP : ' + m.gp_name : (st(m) === 'pending' ? "En attente d'un GP" : 'Centre de traitement'); }
-    else if (step.key === 'pickup') { place = place || from; sub = "Chez l'expéditeur"; }
-    else if (step.key === 'transit') { place = place || ('En route vers ' + (m.arrival_city || '—')); sub = isNow ? 'Vol en cours' : 'Départ à venir'; }
-    else if (step.key === 'arrived') { place = place || to; sub = st(m) === 'in_customs' ? 'En cours de dédouanement' : 'Centre de traitement'; }
-    else { place = place || (m.arrival_city || '—'); sub = st(m) === 'delivered' ? 'Remis au destinataire' : (isNow ? 'Livraison en cours' : 'Après vérification'); }
+    if (step.key === 'gp') { place = place || from; sub = m.gp_name ? sengpT('track.sub_gp_named', { name: m.gp_name }) : sengpT(st(m) === 'pending' ? 'track.sub_waiting_gp' : 'track.sub_processing'); }
+    else if (step.key === 'pickup') { place = place || from; sub = sengpT('track.sub_at_sender'); }
+    else if (step.key === 'transit') { place = place || sengpT('track.place_enroute', { city: m.arrival_city || '—' }); sub = sengpT(isNow ? 'track.sub_flight' : 'track.sub_departure_soon'); }
+    else if (step.key === 'arrived') { place = place || to; sub = sengpT(st(m) === 'in_customs' ? 'track.sub_customs' : 'track.sub_processing'); }
+    else { place = place || (m.arrival_city || '—'); sub = sengpT(st(m) === 'delivered' ? 'track.sub_handed' : (isNow ? 'track.sub_delivering' : 'track.sub_after_check')); }
     return { place, sub };
   }
 
@@ -514,9 +522,9 @@
       const t = stepTexts(m, step, isNow, ev);
       const cls = isDone ? 'is-done' : (isNow ? 'is-now' : 'is-todo');
       const dotIcon = isDone ? IC.check : (isNow ? (st(m) === 'pending' ? IC.hourglass : step.icon) : '');
-      const dateTxt = ev.date ? fmtDateTime(ev.date) : (isNow ? 'En cours' : 'En attente');
+      const dateTxt = ev.date ? fmtDateTime(ev.date) : sengpT(isNow ? 'dash.in_progress' : 'ship.status.pending');
       return `<li class="sv-st ${cls}"><span class="sv-dot">${dotIcon}</span><span class="sv-ic">${step.icon}</span>`
-        + `<span class="sv-st__t"><b>${esc(step.title)}</b><span class="sv-st__d">${esc(dateTxt)}</span><span class="sv-st__p">${IC.pin}<span>${esc(t.place)} — ${esc(t.sub)}</span></span></span></li>`;
+        + `<span class="sv-st__t"><b>${esc(sengpT(step.tk))}</b><span class="sv-st__d">${esc(dateTxt)}</span><span class="sv-st__p">${IC.pin}<span>${esc(t.place)} — ${esc(t.sub)}</span></span></span></li>`;
     }).join('') + '</ol>';
   }
 
@@ -532,33 +540,33 @@
       <button type="button" class="sv-head" data-act="toggle" aria-expanded="${open}" aria-controls="panel-${id}">
         <picture><source type="image/webp" srcset="im/sengp-box-3d.webp"><img class="sv-box" src="im/sengp-box-3d.png" alt="" width="378" height="255" decoding="async"></picture>
         <span class="sv-main">
-          <span class="sv-top"><span class="sv-code">#${esc(codeOf(m))}<span class="sv-copy" role="button" tabindex="0" data-act="copy" aria-label="Copier le numéro de suivi">${IC.copy}</span></span>${pill(m)}</span>
-          <span class="sv-desc">${IC.doc}<span>${esc(m.package_description || 'Colis')}</span>${IC.chev}</span>
+          <span class="sv-top"><span class="sv-code">#${esc(codeOf(m))}<span class="sv-copy" role="button" tabindex="0" data-act="copy" aria-label="${esc(sengpT('track.copy_aria'))}">${IC.copy}</span></span>${pill(m)}</span>
+          <span class="sv-desc">${IC.doc}<span>${esc(m.package_description || sengpT('detail.parcel'))}</span>${IC.chev}</span>
         </span>
       </button>
       <div class="sv-stats">
-        <div class="sv-stat"><span class="sv-ic">${IC.weight}</span><span><span class="sv-v">${esc(parseFloat(m.package_weight) || 0)} kg</span><span class="sv-k">Poids</span></span></div>
-        <div class="sv-stat"><span class="sv-ic">${IC.coins}</span><span><span class="sv-v">${esc(fcfa(m.offered_price || m.price))}</span><span class="sv-k">Prix</span></span></div>
+        <div class="sv-stat"><span class="sv-ic">${IC.weight}</span><span><span class="sv-v">${esc(parseFloat(m.package_weight) || 0)} kg</span><span class="sv-k">${esc(sengpT('ship.pkg_weight'))}</span></span></div>
+        <div class="sv-stat"><span class="sv-ic">${IC.coins}</span><span><span class="sv-v">${esc(fcfa(m.offered_price || m.price))}</span><span class="sv-k">${esc(sengpT('track.price'))}</span></span></div>
       </div>
       <div class="sv-route">
-        <div class="sv-place"><span class="sv-flag">${flag(m.departure_country)}</span><div><b>${esc(m.departure_city || '—')}</b><small>${esc(m.departure_country || '')}</small></div></div>
+        <div class="sv-place"><span class="sv-flag">${flag(m.departure_country)}</span><div><b>${esc(m.departure_city || '—')}</b><small>${esc(ctry(m.departure_country))}</small></div></div>
         <div class="sv-line" aria-hidden="true"><i class="dot g"></i><span class="dash"></span><img src="im/sengp-plane.png" alt="" width="192" height="142"><span class="dash"></span><i class="dot r"></i></div>
-        <div class="sv-place sv-place--r"><span class="sv-flag">${flag(m.arrival_country)}</span><div><b>${esc(m.arrival_city || '—')}</b><small>${esc(m.arrival_country || '')}</small></div></div>
+        <div class="sv-place sv-place--r"><span class="sv-flag">${flag(m.arrival_country)}</span><div><b>${esc(m.arrival_city || '—')}</b><small>${esc(ctry(m.arrival_country))}</small></div></div>
       </div>
       <div class="sv-panel" id="panel-${id}"><div class="sv-panel__in">
         <div id="tl-${id}">${timelineHtml(m, trackingCache[m.id])}</div>
         <div id="live-${id}"></div>
-        ${late ? `<div class="sv-alert sv-alert--warn">${IC.alert}<span>La date de départ souhaitée est dépassée : votre envoi attend toujours un départ.</span></div>` : ''}
+        ${late ? `<div class="sv-alert sv-alert--warn">${IC.alert}<span>${esc(sengpT('track.late'))}</span></div>` : ''}
         <div class="sv-sum">
-          <div class="sv-stat"><span class="sv-ic">${IC.cal}</span><span><span class="sv-k">Date d'envoi</span><span class="sv-v">${esc(fmtDate(m.created_at))}</span></span></div>
-          <div class="sv-stat"><span class="sv-ic">${IC.plane}</span><span><span class="sv-k">Départ souhaité</span><span class="sv-v">${esc(fmtDate(eta))}</span></span></div>
-          <div class="sv-stat"><span class="sv-ic">${IC.user}</span><span><span class="sv-k">Destinataire</span><span class="sv-v">${esc(m.recipient_name || '—')}</span></span></div>
+          <div class="sv-stat"><span class="sv-ic">${IC.cal}</span><span><span class="sv-k">${esc(sengpT('track.send_date'))}</span><span class="sv-v">${esc(fmtDate(m.created_at))}</span></span></div>
+          <div class="sv-stat"><span class="sv-ic">${IC.plane}</span><span><span class="sv-k">${esc(sengpT('ship.desired_departure'))}</span><span class="sv-v">${esc(fmtDate(eta))}</span></span></div>
+          <div class="sv-stat"><span class="sv-ic">${IC.user}</span><span><span class="sv-k">${esc(sengpT('ship.recipient'))}</span><span class="sv-v">${esc(m.recipient_name || '—')}</span></span></div>
         </div>
         <div class="sv-acts">
-          <button type="button" class="sv-btn" data-act="share">${IC.share}Partager</button>
-          ${phone ? `<a class="sv-btn sv-btn--call" href="tel:${esc(phone)}">${IC.phone}Appeler le GP</a>` : ''}
+          <button type="button" class="sv-btn" data-act="share">${IC.share}${esc(sengpT('track.share'))}</button>
+          ${phone ? `<a class="sv-btn sv-btn--call" href="tel:${esc(phone)}">${IC.phone}${esc(sengpT('ship.call_gp_aria'))}</a>` : ''}
         </div>
-        <a class="sv-detail" href="envois.html?open=${encodeURIComponent(m.id)}"><span class="sv-ic">${IC.doc}</span><span>Voir les détails du suivi</span>${IC.go}</a>
+        <a class="sv-detail" href="envois.html?open=${encodeURIComponent(m.id)}"><span class="sv-ic">${IC.doc}</span><span>${esc(sengpT('track.see_details'))}</span>${IC.go}</a>
       </div></div>
     </article>`;
   }
@@ -567,8 +575,8 @@
     const list = visible();
     const box = document.getElementById('list');
     if (!list.length) {
-      const label = tab === 'encours' ? 'en cours' : (tab === 'avenir' ? 'à venir' : 'livré');
-      box.innerHTML = `<div class="sv-empty">${IC.box}<div>Aucun colis ${label}.</div>${tab === 'encours' ? '<a href="creenvoi.html">Créer un envoi</a>' : ''}</div>`;
+      const emptyKey = tab === 'encours' ? 'track.empty_encours' : (tab === 'avenir' ? 'track.empty_avenir' : 'track.empty_livres');
+      box.innerHTML = `<div class="sv-empty">${IC.box}<div>${esc(sengpT(emptyKey))}</div>${tab === 'encours' ? '<a href="creenvoi.html">' + esc(sengpT('dash.create')) + '</a>' : ''}</div>`;
       return;
     }
     if (openId == null || !list.some(m => String(m.id) === String(openId))) openId = list[0].id;
@@ -594,7 +602,7 @@
       const live = document.getElementById('live-' + m.id);
       if (live && gps && !['delivered'].includes(st(m))) {
         const la = Number(gps.latitude), lo = Number(gps.longitude), d = 0.05;
-        live.innerHTML = `<div class="sv-live"><iframe loading="lazy" title="Position du GP" src="https://www.openstreetmap.org/export/embed.html?bbox=${lo - d}%2C${la - d}%2C${lo + d}%2C${la + d}&layer=mapnik&marker=${la}%2C${lo}"></iframe><p>${IC.pin}Dernière position du GP · ${esc(timeAgo(gps.created_at))}</p></div>`;
+        live.innerHTML = `<div class="sv-live"><iframe loading="lazy" title="${esc(sengpT('track.gp_position_title'))}" src="https://www.openstreetmap.org/export/embed.html?bbox=${lo - d}%2C${la - d}%2C${lo + d}%2C${la + d}&layer=mapnik&marker=${la}%2C${lo}"></iframe><p>${IC.pin}${esc(sengpT('track.last_position', { ago: timeAgo(gps.created_at) }))}</p></div>`;
       }
     } catch (e) { /* timeline stays on mission data */ }
   }
@@ -658,10 +666,10 @@
     const url = publicUrl(m);
     const nets = [
       ['wa', 'WhatsApp', '#25D366', IC.wa], ['tg', 'Telegram', '#229ED9', IC.send], ['fb', 'Facebook', '#1877F2', 'f'], ['x', 'X', '#111111', '𝕏'],
-      ['sms', 'SMS', '#34C759', IC.sms], ['mail', 'Email', '#EA4335', IC.mail], ['copy', 'Copier', '#6B7A93', IC.link], ['more', 'Plus', '#0B1D3A', IC.more]
+      ['sms', 'SMS', '#34C759', IC.sms], ['mail', sengpT('ship.net_mail'), '#EA4335', IC.mail], ['copy', sengpT('ship.copy'), '#6B7A93', IC.link], ['more', sengpT('ship.more'), '#0B1D3A', IC.more]
     ];
     document.getElementById('shareBody').innerHTML =
-      `<div class="sv-linkbox"><span>${esc(url)}</span><button type="button" data-net="copy">Copier</button></div>`
+      `<div class="sv-linkbox"><span>${esc(url)}</span><button type="button" data-net="copy">${esc(sengpT('ship.copy'))}</button></div>`
       + `<div class="sv-nets">${nets.map(n => `<button type="button" class="sv-net" data-net="${n[0]}"><span class="sv-net__ic" style="background:${n[2]}">${n[3]}</span>${n[1]}</button>`).join('')}</div>`
       + '<div class="sv-toast" id="shareToast" role="status" aria-live="polite"></div>';
     document.getElementById('shareOverlay').classList.add('show');
@@ -680,8 +688,8 @@
     const P = window.Capacitor && window.Capacitor.Plugins;
     const url = publicUrl(m);
     try {
-      if (P && P.Share && P.Share.share) { await P.Share.share({ title: 'Suivi de votre colis SEN GP', text: 'Suivez votre colis SEN GP en temps réel : ' + url, url, dialogTitle: 'Partager le suivi' }); return true; }
-      if (navigator.share) { await navigator.share({ title: 'Suivi de votre colis SEN GP', text: 'Suivez votre colis SEN GP en temps réel', url }); return true; }
+      if (P && P.Share && P.Share.share) { await P.Share.share({ title: sengpT('ship.share_subject'), text: sengpT('ship.share_text', { url }), url, dialogTitle: sengpT('ship.tile_share') }); return true; }
+      if (navigator.share) { await navigator.share({ title: sengpT('ship.share_subject'), text: sengpT('ship.share_text_short'), url }); return true; }
     } catch (e) { return true; }
     return false;
   }
@@ -689,19 +697,20 @@
   document.getElementById('shareBody').addEventListener('click', async e => {
     const b = e.target.closest('[data-net]');
     if (!b || !shareMission) return;
-    const m = shareMission, url = publicUrl(m), text = 'Suivez votre colis SEN GP en temps réel : ' + url, net = b.dataset.net;
+    const m = shareMission, url = publicUrl(m), text = sengpT('ship.share_text', { url }), net = b.dataset.net;
     const open = u => window.open(u, '_blank');
     if (net === 'wa') open('https://wa.me/?text=' + encodeURIComponent(text));
-    else if (net === 'tg') open('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent('Suivez votre colis SEN GP en temps réel'));
+    else if (net === 'tg') open('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(sengpT('ship.share_text_short')));
     else if (net === 'fb') open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url));
-    else if (net === 'x') open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Suivez votre colis SEN GP en temps réel') + '&url=' + encodeURIComponent(url));
+    else if (net === 'x') open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(sengpT('ship.share_text_short')) + '&url=' + encodeURIComponent(url));
     else if (net === 'sms') location.href = 'sms:?&body=' + encodeURIComponent(text);
-    else if (net === 'mail') location.href = 'mailto:?subject=' + encodeURIComponent('Suivi de votre colis SEN GP') + '&body=' + encodeURIComponent(text);
-    else if (net === 'copy') toast((await copyText(url)) ? 'Lien copié ✓' : 'Copie impossible — copiez le lien ci-dessus');
-    else if (net === 'more') { if (!(await shareNative(m))) toast((await copyText(url)) ? 'Lien copié ✓' : 'Partage indisponible'); }
+    else if (net === 'mail') location.href = 'mailto:?subject=' + encodeURIComponent(sengpT('ship.share_subject')) + '&body=' + encodeURIComponent(text);
+    else if (net === 'copy') toast(sengpT((await copyText(url)) ? 'ship.link_copied' : 'ship.copy_failed'));
+    else if (net === 'more') { if (!(await shareNative(m))) toast(sengpT((await copyText(url)) ? 'ship.link_copied' : 'ship.share_unavailable')); }
   });
 
-  load();
+  SengpI18n.ready.then(load);
+  window.addEventListener('sengp:languagechange', () => { if (all.length) { updateCounts(); render(); } });
   // Live refresh (position + statuses) while the page is visible
   setInterval(() => { if (!document.hidden) { Object.keys(trackingCache).forEach(k => delete trackingCache[k]); load(); } }, 45000);
 </script>

@@ -24,8 +24,10 @@ function buildId() {
   }
 }
 
-fs.rmSync(out, { recursive: true, force: true });
+// On vide le contenu plutot que le dossier : sous Windows, un serveur de test dont le dossier courant est www/
+// l'empeche d'etre supprime (EBUSY).
 fs.mkdirSync(out, { recursive: true });
+for (const entry of fs.readdirSync(out)) fs.rmSync(path.join(out, entry), { recursive: true, force: true });
 
 const files = fs.readdirSync(root).filter(f => /\.(html|js|css)$/.test(f) || f === 'manifest.json');
 for (const f of files) fs.copyFileSync(path.join(root, f), path.join(out, f));

@@ -10,7 +10,24 @@
   }
   function esc(s) { return window.sengpEsc(s); }
   function norm(s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(); }
-  function fcfa(n) { return n == null ? 'Tarif à définir' : String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA/kg'; }
+  // Texte traduit si i18n.js est charge et possede la cle ; sinon le francais d'origine (pages pas encore traduites).
+  function T(key, params, fallback) {
+    return (window.SengpI18n && window.sengpT && window.SengpI18n.has(key)) ? window.sengpT(key, params) : fallback;
+  }
+  function plural(key, n, fbOne, fbMany) { return T(key, { count: n }, n + ' ' + (n > 1 ? fbMany : fbOne)); }
+  function num(n) { return window.SengpI18n ? window.SengpI18n.fmt.number(n) : String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+  function fcfa(n) { return n == null ? T('geo.price_tbd', null, 'Tarif à définir') : T('geo.price_per_kg', { amount: num(n) }, num(n) + ' FCFA/kg'); }
+
+  // Nom d'un pays dans la langue de l'utilisateur (Intl). Les donnees enregistrees restent en francais.
+  function countryLabel(iso, frName) {
+    var l = window.SengpI18n && window.SengpI18n.lang;
+    if (!l || l === 'fr') return frName;
+    try { return new Intl.DisplayNames([l], { type: 'region' }).of(iso) || frName; } catch (e) { return frName; }
+  }
+  function cn(p) { return countryLabel(p[0], p[1]); }
+  function cont(c) { return T('geo.continent.' + c.id, null, c.name); }
+  // La recherche accepte le nom francais ET le nom affiche dans la langue courante.
+  function hit(p, q) { return norm(p[1]).indexOf(q) > -1 || norm(cn(p)).indexOf(q) > -1; }
 
   // Index pays (nom normalisé → entrée) pour retrouver le drapeau / tarif d'un pays déjà enregistré.
   var byName = {};
@@ -43,6 +60,7 @@
     + '.sg-price{font-size:13px;font-weight:800;color:#1F9D55;white-space:nowrap}.sg-price.na{color:#9AA7BC;font-weight:600}'
     + '.sg-chev{color:#9AA7BC;font-size:18px}'
     + '.sg-empty{padding:28px 16px;text-align:center;color:#6B7A93;font-size:14px}'
+    + '[dir="rtl"] .sg-row{text-align:right}[dir="rtl"] .sg-back,[dir="rtl"] .sg-chev{transform:scaleX(-1)}[dir="rtl"] .sg-head{padding:16px 20px 6px 16px}'
     + '@media (prefers-reduced-motion:reduce){.sg-ov,.sg-sheet{transition:none}}';
 
   var ov, st;
@@ -67,6 +85,7 @@
       else if (a === 'region') pick(ci, pi, ri);
     });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && ov.classList.contains('show')) close(); });
+    window.addEventListener('sengp:languagechange', function () { if (ov.classList.contains('show')) render(); });
   }
   function reset() { ov.querySelector('.sg-search').value = ''; render(); ov.querySelector('#sgList').scrollTop = 0; }
   function back() { if (st.country != null) st.country = null; else st.cont = null; reset(); }
@@ -89,44 +108,49 @@
   function render() {
     var q = norm(ov.querySelector('.sg-search').value), out = '', head = ov.querySelector('#sgTitle'), bk = ov.querySelector('.sg-back'), inp = ov.querySelector('.sg-search');
     bk.hidden = st.cont == null;
+    bk.setAttribute('aria-label', T('common.back', null, 'Retour'));
+    ov.querySelector('.sg-x').setAttribute('aria-label', T('common.close', null, 'Fermer'));
+    inp.setAttribute('aria-label', T('common.search', null, 'Rechercher'));
     if (st.cont == null) {
-      head.innerHTML = esc(st.title || 'Destination') + '<small>Choisissez un continent</small>';
-      inp.placeholder = 'Rechercher un pays ou une région…';
+      head.innerHTML = esc(st.title || T('geo.default_title', null, 'Destination')) + '<small>' + esc(T('geo.choose_continent', null, 'Choisissez un continent')) + '</small>';
+      inp.placeholder = T('geo.search_any', null, 'Rechercher un pays ou une région…');
       if (!q) {
-        DATA.forEach(function (c, ci) { out += row('cont', ci, 0, 0, GLOBE, c.name, c.countries.length + ' pays', priceTag(c.price)); });
+        DATA.forEach(function (c, ci) { out += row('cont', ci, 0, 0, GLOBE, cont(c), plural('geo.countries_count', c.countries.length, 'pays', 'pays'), priceTag(c.price)); });
       } else {
         var n = 0;
         DATA.forEach(function (c, ci) {
           c.countries.forEach(function (p, pi) {
             if (n > 60) return;
-            if (norm(p[1]).indexOf(q) > -1) { out += row('country', ci, pi, 0, flagOf(p[0]), p[1], c.name + ' · ' + p[2].length + ' région' + (p[2].length > 1 ? 's' : ''), priceTag(c.price)); n++; }
+            if (hit(p, q)) { out += row('country', ci, pi, 0, flagOf(p[0]), cn(p), cont(c) + ' · ' + plural('geo.regions_count', p[2].length, 'région', 'régions'), priceTag(c.price)); n++; }
             else {
               var ri = p[2].findIndex(function (r) { return norm(r).indexOf(q) > -1; });
-              if (ri > -1) { out += row('region', ci, pi, ri, flagOf(p[0]), p[2][ri], p[1] + ' · ' + c.name, priceTag(c.price)); n++; }
+              if (ri > -1) { out += row('region', ci, pi, ri, flagOf(p[0]), p[2][ri], cn(p) + ' · ' + cont(c), priceTag(c.price)); n++; }
             }
           });
         });
       }
     } else if (st.country == null) {
       var c = DATA[st.cont];
-      head.innerHTML = esc(c.name) + '<small>' + fcfa(c.price) + ' · choisissez un pays</small>';
-      inp.placeholder = 'Rechercher un pays…';
+      head.innerHTML = esc(cont(c)) + '<small>' + esc(fcfa(c.price)) + ' · ' + esc(T('geo.choose_country', null, 'choisissez un pays')) + '</small>';
+      inp.placeholder = T('geo.search_country', null, 'Rechercher un pays…');
       c.countries.forEach(function (p, pi) {
-        if (!q || norm(p[1]).indexOf(q) > -1) out += row('country', st.cont, pi, 0, flagOf(p[0]), p[1], p[2].length + ' région' + (p[2].length > 1 ? 's' : ''));
+        if (!q || hit(p, q)) out += row('country', st.cont, pi, 0, flagOf(p[0]), cn(p), plural('geo.regions_count', p[2].length, 'région', 'régions'));
       });
     } else {
       var cc = DATA[st.cont], p2 = cc.countries[st.country];
-      head.innerHTML = flagOf(p2[0]) + ' ' + esc(p2[1]) + '<small>Choisissez la région / l’État</small>';
-      inp.placeholder = 'Rechercher une région…';
+      head.innerHTML = flagOf(p2[0]) + ' ' + esc(cn(p2)) + '<small>' + esc(T('geo.choose_region', null, 'Choisissez la région / l’État')) + '</small>';
+      inp.placeholder = T('geo.search_region', null, 'Rechercher une région…');
       p2[2].forEach(function (r, ri) {
         if (!q || norm(r).indexOf(q) > -1) out += row('region', st.cont, st.country, ri, '', r, '', '<span class="sg-chev"></span>');
       });
     }
-    ov.querySelector('#sgList').innerHTML = out || '<div class="sg-empty">Aucun résultat</div>';
+    ov.querySelector('#sgList').innerHTML = out || '<div class="sg-empty">' + esc(T('geo.no_result', null, 'Aucun résultat')) + '</div>';
   }
 
   window.SengpGeo = {
-    data: DATA, find: find, flag: flag, priceFor: priceFor, flagOf: flagOf, fcfa: fcfa,
+    data: DATA, find: find, flag: flag, priceFor: priceFor, flagOf: flagOf, fcfa: fcfa, countryLabel: countryLabel,
+    /** Nom francais enregistre -> nom dans la langue courante (a afficher). */
+    displayCountry: function (frName) { var f = find(frName); return f ? cn(f.c) : frName; },
     open: function (opts) {
       ensure();
       st = { title: (opts && opts.title) || 'Destination', onPick: opts && opts.onPick, cont: null, country: null };

@@ -93,3 +93,41 @@ test('les scripts integres des pages traduites ont une syntaxe valide', () => {
     });
   }
 });
+
+// ---- selecteur de pays (geo.js) ----
+function loadGeo(win) {
+  const vm = require('node:vm');
+  const ctx = { window: win, document: {}, Intl, String, Array, Object };
+  vm.runInNewContext(read('geo-data.js'), ctx);
+  win.sengpEsc = x => String(x);
+  vm.runInNewContext(read('geo.js'), ctx);
+  return win.SengpGeo;
+}
+
+test('geo : chaque continent a un nom traduit dans les cinq langues', () => {
+  const win = {};
+  const geo = loadGeo(win);
+  assert.ok(geo.data.length >= 6);
+  for (const c of geo.data) {
+    for (const l of LANGS) assert.ok(`geo.continent.${c.id}` in dict[l], `${l} : continent ${c.id}`);
+    assert.equal(dict.fr[`geo.continent.${c.id}`], c.name, `fr : ${c.id} different de geo-data.js`);
+  }
+});
+
+test('geo : noms de pays traduits par Intl, donnees enregistrees inchangees', () => {
+  const geo = loadGeo({ SengpI18n: { lang: 'en', has: () => false } });
+  assert.equal(geo.displayCountry('Sénégal'), 'Senegal');
+  assert.equal(geo.countryLabel('SN', 'Sénégal'), 'Senegal');
+  assert.equal(geo.find('Sénégal').c[1], 'Sénégal', 'la valeur enregistree reste le nom francais');
+  const ar = loadGeo({ SengpI18n: { lang: 'ar', has: () => false } });
+  assert.equal(ar.displayCountry('Sénégal'), 'السنغال');
+  const fr = loadGeo({ SengpI18n: { lang: 'fr', has: () => false } });
+  assert.equal(fr.displayCountry('Sénégal'), 'Sénégal');
+  assert.equal(loadGeo({}).displayCountry('Inconnu'), 'Inconnu');
+});
+
+test('geo : sans traduction chargee, les textes francais d\'origine restent', () => {
+  const geo = loadGeo({});
+  assert.equal(geo.fcfa(null), 'Tarif à définir');
+  assert.match(geo.fcfa(3500), /^3.500 FCFA\/kg$/);
+});

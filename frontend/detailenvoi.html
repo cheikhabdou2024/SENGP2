@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEN GP - Détails de l'envoi</title>
+    <title data-i18n="detail.page_title">SEN GP - Détails de l'envoi</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -49,6 +49,11 @@
         .btn-cancel { background:rgba(255,107,107,.18); color:#ff8f8f; border:1px solid rgba(255,107,107,.3); }
         iframe.map { width:100%; height:200px; border:0; border-radius:12px; margin-top:8px; }
         /* timeline */
+        /* Droite a gauche (arabe) */
+        [dir="rtl"] .timeline { padding-left: 0; padding-right: 24px; }
+        [dir="rtl"] .timeline::before { left: auto; right: 7px; }
+        [dir="rtl"] .tl-item::before { left: auto; right: -22px; }
+        [dir="rtl"] .back-btn svg, [dir="rtl"] .route .arrow { transform: scaleX(-1); }
         .timeline { position:relative; padding-left:24px; }
         .timeline::before { content:''; position:absolute; left:7px; top:4px; bottom:4px; width:2px; background:rgba(255,255,255,.12); }
         .tl-item { position:relative; padding-bottom:18px; }
@@ -73,8 +78,10 @@
         .ic-wa{background:#25D366}.ic-mail{background:#EA4335}.ic-copy{background:rgba(255,255,255,.15)}
     </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="i18n.css">
     <script src="ui.js"></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -91,11 +98,11 @@
 <body class="ds">
     <div class="mobile-frame">
         <div class="header">
-            <button class="back-btn" onclick="goBack()" aria-label="Retour"><svg class="ico" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
-            <h1>Détails de l'envoi</h1>
+            <button class="back-btn" onclick="goBack()" aria-label="Retour" data-i18n-attr="aria-label:common.back"><svg class="ico" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
+            <h1 data-i18n="detail.title">Détails de l'envoi</h1>
         </div>
         <div class="content" id="content">
-            <div class="loading">Chargement…</div>
+            <div class="loading" data-i18n="common.loading">Chargement…</div>
         </div>
     </div>
 
@@ -103,11 +110,11 @@
     <div class="sheet-ov" id="shareSheet" onclick="if(event.target===this)closeShareSheet()">
         <div class="sheet">
             <div class="sheet-grip"></div>
-            <h3>Partager le suivi</h3>
+            <h3 data-i18n="ship.tile_share">Partager le suivi</h3>
             <div class="url" id="shareText"></div>
-            <button class="share-opt" id="waBtn"><span class="ic ic-wa"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.54-3.87c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 0 0 1.523 5.26l-.999 3.648 3.965-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg></span> WhatsApp</button>
-            <button class="share-opt" id="mailBtn"><span class="ic ic-mail"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span> Email / Gmail</button>
-            <button class="share-opt" id="copyBtn"><span class="ic ic-copy"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span> Copier le lien</button>
+            <button class="share-opt" id="waBtn"><span class="ic ic-wa"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.54-3.87c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.82 9.82 0 0 0 1.523 5.26l-.999 3.648 3.965-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg></span> <span data-i18n="detail.share_wa">WhatsApp</span></button>
+            <button class="share-opt" id="mailBtn"><span class="ic ic-mail"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span> <span data-i18n="detail.share_mail">Email / Gmail</span></button>
+            <button class="share-opt" id="copyBtn"><span class="ic ic-copy"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span> <span data-i18n="detail.share_copy">Copier le lien</span></button>
         </div>
     </div>
 
@@ -119,48 +126,48 @@
         let mission = null;
 
         const flag = c => (window.SengpGeo ? SengpGeo.flag(c) : '');
+        // Nom du pays dans la langue courante (la valeur enregistree reste le nom francais).
+        const ctry = c => (window.SengpGeo ? SengpGeo.displayCountry(c || '') : (c || ''));
         const esc = window.sengpEsc;
-        const fcfa = n => (Number(n)||0).toLocaleString('fr-FR')+' FCFA';
-        const dt = d => d ? new Date(d).toLocaleString('fr-FR',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+        const fcfa = n => SengpI18n.fmt.currency(n);
+        const dt = d => d ? SengpI18n.fmt.dateTime(d) : '—';
+        const dShort = d => SengpI18n.fmt.date(d, { day:'numeric', month:'numeric', year:'numeric' });
 
-        const STATUS = {
-            pending:['En attente','b-yellow'], matched:['Correspondance','b-yellow'], accepted:['Accepté','b-blue'],
-            picked_up:['Récupéré','b-blue'], in_transit:['En transit','b-blue'], in_customs:['En douane','b-blue'],
-            out_for_delivery:['En livraison','b-blue'], delivered:['Livré','b-green'], cancelled:['Annulé','b-red'], disputed:['Litige','b-red']
-        };
-        function statusBadge(s){ const m=STATUS[String(s||'').toLowerCase()]||[s,'b-yellow']; return `<span class="badge ${m[1]}">${esc(m[0])}</span>`; }
+        const STATUS_CLS = { pending:'b-yellow', matched:'b-yellow', accepted:'b-blue', picked_up:'b-blue', in_transit:'b-blue', in_customs:'b-blue', out_for_delivery:'b-blue', delivered:'b-green', cancelled:'b-red', disputed:'b-red' };
+        const statusLabel = s => { const k = String(s||'').toLowerCase(); return STATUS_CLS[k] ? sengpT(k === 'matched' ? 'ship.status.matched_short' : 'ship.status.' + k) : s; };
+        function statusBadge(s){ const cls = STATUS_CLS[String(s||'').toLowerCase()] || 'b-yellow'; return `<span class="badge ${cls}">${esc(statusLabel(s))}</span>`; }
 
         function goBack(){ if (history.length>1) history.back(); else location.href='dashexpediteur.html'; }
 
         async function load(){
             if (!token){ location.href='connexion.html'; return; }
-            if (!missionId){ document.getElementById('content').innerHTML='<div class="empty">Envoi introuvable.</div>'; return; }
+            if (!missionId){ document.getElementById('content').innerHTML='<div class="empty">' + esc(sengpT('detail.not_found')) + '</div>'; return; }
             try {
                 const [mRes, tRes] = await Promise.all([
                     fetch(`${API}/missions/${missionId}`, { headers:{ 'Authorization':'Bearer '+token } }),
                     fetch(`${API}/missions/${missionId}/tracking`, { headers:{ 'Authorization':'Bearer '+token } })
                 ]);
-                if (!mRes.ok) throw new Error('Chargement impossible');
+                if (!mRes.ok) throw new Error(sengpT('detail.load_failed'));
                 mission = (await mRes.json()).data;
                 const tracking = tRes.ok ? ((await tRes.json()).data || []) : [];
                 render(mission, tracking);
             } catch(e){
-                document.getElementById('content').innerHTML = `<div class="empty">Erreur: ${esc(e.message)}</div>`;
+                document.getElementById('content').innerHTML = `<div class="empty">${esc(sengpT('envois.error', { message: e.message }))}</div>`;
             }
         }
 
         function render(m, tracking){
             const dims = [m.package_length,m.package_width,m.package_height].every(x=>x!=null)
-                ? `${m.package_length}×${m.package_width}×${m.package_height} cm` : 'N/C';
+                ? `${m.package_length}×${m.package_width}×${m.package_height} cm` : sengpT('detail.na');
             // Carte: si une position GPS existe, l'afficher; sinon lien itinéraire.
             const gps = tracking.find(t => t.latitude && t.longitude);
             let mapBlock;
             if (gps){
                 const la=Number(gps.latitude), lo=Number(gps.longitude), d=0.05;
                 mapBlock = `<iframe class="map" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=${lo-d}%2C${la-d}%2C${lo+d}%2C${la+d}&layer=mapnik&marker=${la}%2C${lo}"></iframe>`
-                    + `<div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.4-5.4 9-8 11-2.6-2-8-6.6-8-11a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>Dernière position du GP · ${dt(gps.created_at)}</div>`;
+                    + `<div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.4-5.4 9-8 11-2.6-2-8-6.6-8-11a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(sengpT('detail.last_position', { date: dt(gps.created_at) }))}</div>`;
             } else {
-                mapBlock = '<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px;">Position GPS non disponible. Voir l\'itinéraire prévu :</div>';
+                mapBlock = '<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px;">' + esc(sengpT('detail.no_gps')) + '</div>';
             }
             const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent((m.departure_city||'')+', '+(m.departure_country||''))}&destination=${encodeURIComponent((m.arrival_city||'')+', '+(m.arrival_country||''))}`;
 
@@ -171,12 +178,12 @@
             const events = tracking.filter(t => String(t.status||'').toLowerCase() !== 'location');
             const tl = events.length ? events.map((t,idx)=>`
                 <div class="tl-item ${idx>0?'muted':''}">
-                    <div class="tl-status">${esc((STATUS[String(t.status||'').toLowerCase()]||[t.status])[0])}</div>
+                    <div class="tl-status">${esc(statusLabel(t.status))}</div>
                     ${t.description?`<div class="tl-desc">${esc(t.description)}</div>`:''}
                     ${t.location?`<div class="tl-desc" style="display:flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.4-5.4 9-8 11-2.6-2-8-6.6-8-11a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(t.location)}</div>`:''}
                     <div class="tl-date">${dt(t.created_at)}</div>
                 </div>`).join('')
-                : `<div class="tl-item"><div class="tl-status">${esc((STATUS[String(m.status||'').toLowerCase()]||[m.status])[0])}</div><div class="tl-date">${dt(m.created_at)}</div></div>`;
+                : `<div class="tl-item"><div class="tl-status">${esc(statusLabel(m.status))}</div><div class="tl-date">${dt(m.created_at)}</div></div>`;
 
             document.getElementById('content').innerHTML = `
                 <div class="card">
@@ -186,57 +193,57 @@
                         <div style="text-align:right;">${statusBadge(m.status)}</div>
                     </div>
                     <div class="route">
-                        <div class="loc"><div class="flag">${flag(m.departure_country)}</div><div class="city">${esc(m.departure_city||'—')}</div><div class="country">${esc(m.departure_country||'')}</div></div>
+                        <div class="loc"><div class="flag">${flag(m.departure_country)}</div><div class="city">${esc(m.departure_city||'—')}</div><div class="country">${esc(ctry(m.departure_country))}</div></div>
                         <div class="arrow">→</div>
-                        <div class="loc"><div class="flag">${flag(m.arrival_country)}</div><div class="city">${esc(m.arrival_city||'—')}</div><div class="country">${esc(m.arrival_country||'')}</div></div>
+                        <div class="loc"><div class="flag">${flag(m.arrival_country)}</div><div class="city">${esc(m.arrival_city||'—')}</div><div class="country">${esc(ctry(m.arrival_country))}</div></div>
                     </div>
                     <div class="kv" style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;">
-                        <div><div class="k">Destinataire</div><div class="v">${m.recipient_name?esc(m.recipient_name):'Non renseigné'}${m.recipient_phone?' · '+esc(m.recipient_phone):''}</div></div>
-                        <button onclick="editRecipient()" aria-label="Modifier le destinataire" style="background:rgba(255,255,255,.1);border:none;color:#4ECDC4;border-radius:8px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+                        <div><div class="k">${esc(sengpT('ship.recipient'))}</div><div class="v">${m.recipient_name?esc(m.recipient_name):esc(sengpT('detail.not_set'))}${m.recipient_phone?' · '+esc(m.recipient_phone):''}</div></div>
+                        <button onclick="editRecipient()" aria-label="${esc(sengpT('detail.edit_recipient_aria'))}" style="background:rgba(255,255,255,.1);border:none;color:#4ECDC4;border-radius:8px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
                     </div>
                 </div>
 
                 <div class="card">
-                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.76v15"/><path d="M9 3.24v15"/></svg>Suivi en temps réel</div>
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.76v15"/><path d="M9 3.24v15"/></svg>${esc(sengpT('detail.live_tracking'))}</div>
                     ${mapBlock}
-                    <a class="map-btn" href="${mapsUrl}" target="_blank" rel="noopener">Voir l'itinéraire sur la carte</a>
-                    <button class="btn" style="background:rgba(78,205,196,.18);color:#4ECDC4;border:1px solid rgba(78,205,196,.3);" onclick="openShareSheet()"><svg class="ico" viewBox="0 0 24 24" style="display:inline-block;vertical-align:-4px;margin-right:6px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Partager le suivi avec le destinataire</button>
+                    <a class="map-btn" href="${mapsUrl}" target="_blank" rel="noopener">${esc(sengpT('detail.see_route'))}</a>
+                    <button class="btn" style="background:rgba(78,205,196,.18);color:#4ECDC4;border:1px solid rgba(78,205,196,.3);" onclick="openShareSheet()"><svg class="ico" viewBox="0 0 24 24" style="display:inline-block;vertical-align:-4px;margin-right:6px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>${esc(sengpT('detail.share_recipient'))}</button>
                 </div>
 
                 ${isActive ? `<div class="card">
-                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>Preuve de livraison (QR)</div>
-                    <div id="qrBox"><div style="text-align:center;color:rgba(255,255,255,.5);padding:16px;">Chargement du QR…</div></div>
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>${esc(sengpT('detail.qr_proof'))}</div>
+                    <div id="qrBox"><div style="text-align:center;color:rgba(255,255,255,.5);padding:16px;">${esc(sengpT('detail.qr_loading'))}</div></div>
                 </div>` : ''}
 
                 <div class="card">
-                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>Historique du suivi</div>
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>${esc(sengpT('detail.history'))}</div>
                     <div class="timeline">${tl}</div>
                 </div>
 
                 <div class="card">
-                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>Colis</div>
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>${esc(sengpT('detail.parcel'))}</div>
                     <div class="grid">
-                        <div class="kv"><div class="k">Poids</div><div class="v">${parseFloat(m.package_weight)||0} kg</div></div>
-                        <div class="kv"><div class="k">Dimensions</div><div class="v">${esc(dims)}</div></div>
-                        <div class="kv"><div class="k">Valeur déclarée</div><div class="v">${m.package_value?fcfa(m.package_value):'—'}</div></div>
-                        <div class="kv"><div class="k">Assuré</div><div class="v">${m.is_insured?'Oui':'Non'}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('ship.pkg_weight'))}</div><div class="v">${parseFloat(m.package_weight)||0} kg</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('ship.pkg_dims'))}</div><div class="v">${esc(dims)}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('ship.pkg_value'))}</div><div class="v">${m.package_value?fcfa(m.package_value):'—'}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('detail.insured'))}</div><div class="v">${esc(sengpT(m.is_insured?'common.yes':'common.no'))}</div></div>
                     </div>
-                    ${m.package_description?`<div class="kv" style="margin-top:10px;"><div class="k">Description</div><div class="v">${esc(m.package_description)}</div></div>`:''}
+                    ${m.package_description?`<div class="kv" style="margin-top:10px;"><div class="k">${esc(sengpT('ship.pkg_desc'))}</div><div class="v">${esc(m.package_description)}</div></div>`:''}
                 </div>
 
                 <div class="card">
-                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>Détails</div>
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>${esc(sengpT('detail.details'))}</div>
                     <div class="grid">
-                        <div class="kv"><div class="k">Enlèvement</div><div class="v">${esc(m.pickup_address||'—')}</div></div>
-                        <div class="kv"><div class="k">Livraison</div><div class="v">${esc(m.delivery_address||'—')}</div></div>
-                        <div class="kv"><div class="k">Départ souhaité</div><div class="v">${m.desired_departure_date?new Date(m.desired_departure_date).toLocaleDateString('fr-FR'):'—'}</div></div>
-                        <div class="kv"><div class="k">Suivi n°</div><div class="v">${esc(m.tracking_number||'—')}</div></div>
-                        <div class="kv"><div class="k">GP</div><div class="v">${m.gp_first_name?esc(m.gp_first_name+' '+(m.gp_last_name||'')):'En recherche…'}</div></div>
-                        <div class="kv"><div class="k">Créé le</div><div class="v">${new Date(m.created_at).toLocaleDateString('fr-FR')}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('ship.pickup'))}</div><div class="v">${esc(m.pickup_address||'—')}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('ship.delivery'))}</div><div class="v">${esc(m.delivery_address||'—')}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('ship.desired_departure'))}</div><div class="v">${m.desired_departure_date?dShort(m.desired_departure_date):'—'}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('detail.tracking_short'))}</div><div class="v">${esc(m.tracking_number||'—')}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('ship.gp'))}</div><div class="v">${m.gp_first_name?esc(m.gp_first_name+' '+(m.gp_last_name||'')):esc(sengpT('ship.searching'))}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('detail.created_label'))}</div><div class="v">${dShort(m.created_at)}</div></div>
                     </div>
                 </div>
 
-                ${canCancel?`<button class="btn btn-cancel" onclick="cancelShipment()">Annuler l'envoi</button>`:''}
+                ${canCancel?`<button class="btn btn-cancel" onclick="cancelShipment()">${esc(sengpT('detail.cancel'))}</button>`:''}
             `;
 
             // The package QR is generated automatically (once) and stays visible.
@@ -262,24 +269,24 @@
                 const qrUrl = (j.data && j.data.qr_code_url) || j.qr_code_url;
                 if (!res.ok || !qrUrl) throw new Error(j.error || j.message || 'QR indisponible');
                 const m = mission || {};
-                const recip = m.recipient_name ? esc(m.recipient_name) : 'Destinataire';
+                const recip = m.recipient_name ? esc(m.recipient_name) : esc(sengpT('ship.recipient'));
                 const code = esc(m.tracking_number || m.mission_code || '');
                 box.innerHTML = `
                     <div style="background:#fff;color:#1a1a2e;border-radius:12px;padding:16px;text-align:center;">
                         <div style="font-weight:800;font-size:15px;letter-spacing:1px;">SEN GP</div>
-                        <div style="font-size:14px;margin-top:6px;">Pour : <b>${recip}</b></div>
+                        <div style="font-size:14px;margin-top:6px;">${esc(sengpT('ship.qr_for'))} <b>${recip}</b></div>
                         <div style="font-size:12px;color:#555;margin-top:2px;">${esc(m.departure_city||'')} → ${esc(m.arrival_city||'')}</div>
-                        <img id="qrImg" src="${qrUrl}" alt="QR du colis" style="width:210px;height:210px;display:block;margin:10px auto;">
+                        <img id="qrImg" src="${qrUrl}" alt="${esc(sengpT('detail.qr_alt'))}" style="width:210px;height:210px;display:block;margin:10px auto;">
                         <div style="font-weight:800;letter-spacing:1.5px;font-size:15px;">${code}</div>
                     </div>
                     <button class="btn" style="width:100%;margin-top:12px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;" onclick="shareQrWhatsApp()">
                         <svg class="ico" viewBox="0 0 24 24" style="display:inline-block;vertical-align:-4px;margin-right:6px;"><path d="M4 4h16v16H4z" fill="none"/><path d="M12 2a10 10 0 0 0-8.94 14.46L2 22l5.7-1.49A10 10 0 1 0 12 2z"/></svg>
-                        Envoyer le QR au destinataire (WhatsApp)
+                        ${esc(sengpT('detail.send_qr_wa'))}
                     </button>
-                    <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:8px;text-align:center;">Collez ce QR sur le colis : le livreur (GP) le scannera, puis celui du destinataire.</div>`;
+                    <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:8px;text-align:center;">${esc(sengpT('detail.qr_hint'))}</div>`;
             } catch (e) {
-                box.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.6);padding:12px;">QR indisponible pour le moment.' +
-                    ' <button class="btn" style="margin-top:8px;background:rgba(255,215,0,.15);color:#FFD700;border:1px solid rgba(255,215,0,.3);" onclick="loadPackageQR()">Réessayer</button></div>';
+                box.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.6);padding:12px;">' + esc(sengpT('ship.qr_unavailable')) +
+                    ' <button class="btn" style="margin-top:8px;background:rgba(255,215,0,.15);color:#FFD700;border:1px solid rgba(255,215,0,.3);" onclick="loadPackageQR()">' + esc(sengpT('common.retry')) + '</button></div>';
             }
         }
 
@@ -289,12 +296,7 @@
         async function shareQrWhatsApp(){
             const m = mission || {};
             const trackingNum = m.tracking_number || m.mission_code || '';
-            const caption =
-                `SEN GP — Votre colis est en route !\n\n` +
-                `Numéro de suivi : ${trackingNum}\n\n` +
-                `QR code du colis : à imprimer ou coller sur le colis. ` +
-                `Le livreur (GP) SEN GP le scannera, puis celui du destinataire, pour confirmer la remise.\n\n` +
-                `SEN GP — La livraison collaborative`;
+            const caption = sengpT('ship.qr_caption', { tracking: trackingNum });
             const img = document.getElementById('qrImg');
             const dataUrl = img && img.src;
             const hasData = dataUrl && dataUrl.indexOf('data:') === 0;
@@ -312,7 +314,7 @@
                         uri = w && w.uri;
                     } catch (e) { /* getUri below */ }
                     if (!uri){ const g = await P.Filesystem.getUri({ path: fileName, directory: 'CACHE' }); uri = g && g.uri; }
-                    await P.Share.share({ title: 'QR de livraison SEN GP', text: caption, files: [uri] });
+                    await P.Share.share({ title: sengpT('ship.qr_share_title'), text: caption, files: [uri] });
                     return;
                 } catch (e) {
                     const msg = String((e && (e.message || e.errorMessage)) || '').toLowerCase();
@@ -327,20 +329,20 @@
                 try { const blob = await (await fetch(dataUrl)).blob(); file = new File([blob], `sengp-qr-${trackingNum}.png`, { type:'image/png' }); } catch(e){}
             }
             if (file && navigator.canShare && navigator.canShare({ files:[file] })){
-                try { await navigator.share({ files:[file], text: caption, title:'QR de livraison SEN GP' }); return; }
+                try { await navigator.share({ files:[file], text: caption, title: sengpT('ship.qr_share_title') }); return; }
                 catch(e){ if (e && e.name === 'AbortError') return; }
             }
 
             // 3) Last resort: save the image + open WhatsApp with the caption.
             if (dataUrl){ try { const a=document.createElement('a'); a.href=dataUrl; a.download=`sengp-qr-${trackingNum}.png`; document.body.appendChild(a); a.click(); a.remove(); } catch(e){} }
-            window.open('https://wa.me/?text=' + encodeURIComponent(caption + `\n\n(QR code enregistré dans vos images — joignez-le à ce message.)`), '_blank');
+            window.open('https://wa.me/?text=' + encodeURIComponent(caption + '\n\n' + sengpT('ship.qr_saved')), '_blank');
         }
 
         async function editRecipient(){
             const m = mission || {};
-            const name = prompt('Nom du destinataire :', m.recipient_name || '');
+            const name = prompt(sengpT('detail.prompt_name'), m.recipient_name || '');
             if (name === null) return;
-            const phone = prompt('Téléphone du destinataire :', m.recipient_phone || '');
+            const phone = prompt(sengpT('detail.prompt_phone'), m.recipient_phone || '');
             try {
                 const res = await fetch(`${API}/missions/${missionId}/recipient`, {
                     method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' },
@@ -348,19 +350,19 @@
                 });
                 const j = await res.json();
                 if (res.ok && j.success){ await load(); }
-                else alert('Erreur: ' + (j.error || j.message || ''));
-            } catch(e){ alert('Erreur de connexion.'); }
+                else alert(sengpT('envois.error', { message: j.error || j.message || '' }));
+            } catch(e){ alert(sengpT('errors.network')); }
         }
 
         // ---- Partage : bottom sheet WhatsApp / Email / Copier ----
         function openShareSheet(){
             const url = publicTrackUrl();
-            const text = `Suivez votre colis SEN GP en temps réel : ${url}`;
+            const text = sengpT('ship.share_text', { url });
             document.getElementById('shareText').textContent = url;
             document.getElementById('waBtn').onclick = () => { window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank'); closeShareSheet(); };
-            document.getElementById('mailBtn').onclick = () => { window.location.href = 'mailto:?subject=' + encodeURIComponent('Suivi de votre colis SEN GP') + '&body=' + encodeURIComponent(text); closeShareSheet(); };
+            document.getElementById('mailBtn').onclick = () => { window.location.href = 'mailto:?subject=' + encodeURIComponent(sengpT('ship.share_subject')) + '&body=' + encodeURIComponent(text); closeShareSheet(); };
             document.getElementById('copyBtn').onclick = async () => {
-                try { await navigator.clipboard.writeText(url); alert('Lien copié !'); } catch(e){ alert(url); }
+                try { await navigator.clipboard.writeText(url); alert(sengpT('detail.link_copied')); } catch(e){ alert(url); }
                 closeShareSheet();
             };
             const ov = document.getElementById('shareSheet');
@@ -369,22 +371,23 @@
         function closeShareSheet(){ document.getElementById('shareSheet').classList.remove('open'); }
 
         async function cancelShipment(){
-            if (!confirm('Annuler cet envoi ? Cette action est irréversible.')) return;
+            if (!confirm(sengpT('detail.cancel_confirm'))) return;
             try {
                 const res = await fetch(`${API}/missions/${missionId}/status`, {
                     method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' },
                     body: JSON.stringify({ status:'cancelled' })
                 });
                 const j = await res.json();
-                if (res.ok && j.success){ alert('Envoi annulé.'); load(); }
-                else alert('Erreur: '+(j.error||j.message||'Annulation échouée'));
-            } catch(e){ alert('Erreur de connexion.'); }
+                if (res.ok && j.success){ alert(sengpT('detail.cancelled_ok')); load(); }
+                else alert(sengpT('envois.error', { message: j.error || j.message || sengpT('detail.cancel_failed') }));
+            } catch(e){ alert(sengpT('errors.network')); }
         }
 
         // Pull-to-refresh recharge les données en place (sans recharger la page).
         window.onPullRefresh = async () => { await load(); return true; };
 
-        load();
+        SengpI18n.ready.then(load);
+        window.addEventListener('sengp:languagechange', () => { if (mission) load(); });
 
         // Rafraîchissement auto de la position toutes les 30 s tant que l'envoi est actif.
         const ACTIVE = ['pending','matched','accepted','picked_up','in_transit','in_customs','out_for_delivery'];

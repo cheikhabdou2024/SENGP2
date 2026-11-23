@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>SEN GP - Dashboard Expéditeur</title>
+    <title data-i18n="dash.page_title">SEN GP - Dashboard Expéditeur</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -190,6 +190,15 @@
         .hm-country__name { font-size: 16px; font-weight: 700; color: #0B1D3A; }
         .hm-country__city { font-size: 14px; color: #6B7A93; }
 
+        /* Droite a gauche (arabe) */
+        [dir="rtl"] .hm-avatar__dot { right: auto; left: 0; }
+        [dir="rtl"] .hm-side { text-align: right; }
+        [dir="rtl"] .hm-side .hm-i { margin-left: 0; margin-right: auto; transform: scaleX(-1); }
+        [dir="rtl"] .hm-stat__body { padding-right: 0; padding-left: 14px; }
+        [dir="rtl"] .hm-stat__go { right: auto; left: 12px; transform: scaleX(-1); }
+        [dir="rtl"] .hm-badge { right: auto; left: -9px; }
+        [dir="rtl"] .hm-create > .hm-i:last-child, [dir="rtl"] .view-all .hm-i, [dir="rtl"] .hm-ship > .hm-i, [dir="rtl"] .hm-ship__route .hm-i { transform: scaleX(-1); }
+
         .hm-side:focus-visible, .hm-swap:focus-visible, .hm-stat:focus-visible, .hm-create:focus-visible, .hm-ship:focus-visible,
         .hm-avatar:focus-visible, .view-all:focus-visible, .hm-nav__item:focus-visible, .hm-close:focus-visible, .hm-country:focus-visible { outline: 2px solid #E8890C; outline-offset: 2px; }
 
@@ -230,8 +239,10 @@
         body{padding:0!important;}
     </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="i18n.css">
     <script src="ui.js"></script>
     <script src="geo-data.js" defer></script>
     <script src="geo.js" defer></script>
@@ -267,9 +278,9 @@
                                 <source type="image/webp" srcset="im/sengp-logo.webp">
                                 <img class="hm-logo" src="im/sengp-logo.png" alt="SENGP" width="768" height="475" decoding="async">
                             </picture>
-                            <p class="hm-tagline">Vos colis, notre engagement</p>
+                            <p class="hm-tagline" data-i18n="onb.tagline">Vos colis, notre engagement</p>
                         </div>
-                        <button type="button" class="hm-avatar" id="profileAvatar" onclick="openProfile()" aria-label="Mon profil">
+                        <button type="button" class="hm-avatar" id="profileAvatar" onclick="openProfile()" aria-label="Mon profil" data-i18n-attr="aria-label:dash.profile_aria">
                             <span id="profileInitials">EX</span>
                             <i class="hm-avatar__dot" aria-hidden="true"></i>
                         </button>
@@ -278,42 +289,42 @@
                     <!-- Greeting -->
                     <div class="hm-greeting hm-reveal" style="--i:1">
                         <h1 id="greetingTitle">Bonjour</h1>
-                        <p>Prêt à envoyer un colis ?</p>
+                        <p data-i18n="dash.ready">Prêt à envoyer un colis ?</p>
                     </div>
 
                     <!-- Route selector -->
-                    <section class="hm-card hm-route hm-reveal" style="--i:2" aria-label="Itinéraire">
+                    <section class="hm-card hm-route hm-reveal" style="--i:2" aria-label="Itinéraire" data-i18n-attr="aria-label:dash.route_aria">
                         <button type="button" class="hm-side" id="departureSelector" onclick="openCountryModal('departure')">
                             <span class="hm-flag" id="departureFlag">🇸🇳</span>
                             <span class="hm-side__txt">
-                                <span class="hm-label">Départ</span>
-                                <span class="hm-place" id="departureName">Dakar, Sénégal</span>
+                                <span class="hm-label" data-i18n="dash.departure">Départ</span>
+                                <span class="hm-place" id="departureName" data-i18n="dash.default_departure">Dakar, Sénégal</span>
                             </span>
                             <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
 
-                        <button type="button" class="hm-swap" onclick="swapRoute()" aria-label="Inverser départ et arrivée">
+                        <button type="button" class="hm-swap" onclick="swapRoute()" aria-label="Inverser départ et arrivée" data-i18n-attr="aria-label:dash.swap_aria">
                             <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>
                         </button>
 
                         <button type="button" class="hm-side" id="arrivalSelector" onclick="openCountryModal('arrival')">
                             <span class="hm-flag" id="arrivalFlag"></span>
                             <span class="hm-side__txt">
-                                <span class="hm-label">Arrivée</span>
-                                <span class="hm-place hm-place--ph" id="arrivalName">Choisir destination</span>
+                                <span class="hm-label" data-i18n="dash.arrival">Arrivée</span>
+                                <span class="hm-place hm-place--ph" id="arrivalName" data-i18n="dash.choose_destination">Choisir destination</span>
                             </span>
                             <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                         </button>
                     </section>
 
                     <!-- Stats -->
-                    <section class="hm-stats hm-reveal" style="--i:3" aria-label="Mes envois">
+                    <section class="hm-stats hm-reveal" style="--i:3" aria-label="Mes envois" data-i18n-attr="aria-label:dash.stats_aria">
                         <button type="button" class="hm-stat hm-stat--active" onclick="location.href='envois.html?status=active'">
                             <svg class="hm-i hm-stat__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
                             <span class="hm-stat__body">
-                                <span class="hm-stat__label">En cours</span>
+                                <span class="hm-stat__label" data-i18n="dash.in_progress">En cours</span>
                                 <span class="hm-stat__value" id="statActiveValue">0</span>
-                                <span class="hm-stat__note" id="statActiveNote">Chargement…</span>
+                                <span class="hm-stat__note" id="statActiveNote" data-i18n="common.loading">Chargement…</span>
                             </span>
                             <svg class="hm-i hm-stat__go" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                         </button>
@@ -321,9 +332,9 @@
                         <button type="button" class="hm-stat hm-stat--done" onclick="location.href='envois.html?status=delivered'">
                             <svg class="hm-i hm-stat__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
                             <span class="hm-stat__body">
-                                <span class="hm-stat__label">Livrés</span>
+                                <span class="hm-stat__label" data-i18n="dash.delivered">Livrés</span>
                                 <span class="hm-stat__value" id="statDeliveredValue">0</span>
-                                <span class="hm-stat__note" id="statDeliveredNote">Chargement…</span>
+                                <span class="hm-stat__note" id="statDeliveredNote" data-i18n="common.loading">Chargement…</span>
                             </span>
                             <svg class="hm-i hm-stat__go" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                         </button>
@@ -332,15 +343,15 @@
                     <!-- Create shipment -->
                     <button type="button" class="hm-create hm-reveal" style="--i:4" onclick="createShipment()">
                         <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
-                        <span class="hm-create__label">Créer un envoi</span>
+                        <span class="hm-create__label" data-i18n="dash.create">Créer un envoi</span>
                         <svg class="hm-i hm-create__go" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                     </button>
 
                     <!-- Last shipment -->
                     <section class="hm-reveal" style="--i:5" aria-labelledby="lastShipmentTitle">
                         <div class="hm-sec-head">
-                            <h2 id="lastShipmentTitle">Mon dernier envoi</h2>
-                            <a href="envois.html" class="view-all" onclick="viewAllShipments(event)">Voir tout <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a>
+                            <h2 id="lastShipmentTitle" data-i18n="dash.last">Mon dernier envoi</h2>
+                            <a href="envois.html" class="view-all" onclick="viewAllShipments(event)"><span data-i18n="dash.view_all">Voir tout</span> <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a>
                         </div>
                         <!-- Rendered by displayMissions() -->
                         <div id="shipmentsList"></div>
@@ -349,29 +360,29 @@
             </div>
 
             <!-- Bottom navigation -->
-            <nav class="hm-nav" aria-label="Navigation principale">
+            <nav class="hm-nav" aria-label="Navigation principale" data-i18n-attr="aria-label:nav.main_aria">
                 <button type="button" class="hm-nav__item" aria-current="page" onclick="navigateTo('home')">
                     <span class="hm-nav__icon"><svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span>
-                    <span>Accueil</span>
+                    <span data-i18n="nav.home">Accueil</span>
                 </button>
                 <button type="button" class="hm-nav__item" onclick="navigateTo('orders')">
                     <span class="hm-nav__icon"><svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
-                    <span>Envois</span>
+                    <span data-i18n="nav.orders">Envois</span>
                 </button>
                 <button type="button" class="hm-nav__item" onclick="navigateTo('tracking')">
                     <span class="hm-nav__icon"><svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
-                    <span>Suivi</span>
+                    <span data-i18n="nav.tracking">Suivi</span>
                 </button>
                 <button type="button" class="hm-nav__item" onclick="navigateTo('notifications')">
                     <span class="hm-nav__icon">
                         <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
                         <span class="hm-badge hidden" id="expNotifBadge"></span>
                     </span>
-                    <span class="lbl-long">Notifications</span><span class="lbl-short">Notifs</span>
+                    <span class="lbl-long" data-i18n="nav.notifications">Notifications</span><span class="lbl-short" data-i18n="nav.notifs_short">Notifs</span>
                 </button>
                 <button type="button" class="hm-nav__item" onclick="navigateTo('profile')">
                     <span class="hm-nav__icon"><svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
-                    <span>Profil</span>
+                    <span data-i18n="nav.profile">Profil</span>
                 </button>
             </nav>
 
@@ -380,6 +391,7 @@
     <script>
         // Configuration de l'API
         const API_BASE_URL = window.API_BASE_URL;
+        let lastStats = null, lastMissions = null;
 
         // Escape text coming from the API before it is placed in HTML
         function esc(s) { return window.sengpEsc(s); }
@@ -402,15 +414,15 @@
 
             if (!token || !userData) {
                 // Rediriger vers la page de connexion si pas authentifié
-                alert('Session expirée. Veuillez vous reconnecter.');
+                alert(sengpT('errors.session_expired'));
                 window.location.href = 'connexion.html';
                 return;
             }
 
             // Mettre à jour le nom de l'utilisateur
-            const firstName = userData.first_name || userData.firstName || 'Utilisateur';
+            const firstName = userData.first_name || userData.firstName || sengpT('dash.user_default');
             const title = document.getElementById('greetingTitle');
-            title.textContent = 'Bonjour, ';
+            title.textContent = sengpT('dash.hello') + ' ';
             const nameEl = document.createElement('span');
             nameEl.className = 'hm-name';
             nameEl.textContent = firstName;
@@ -479,12 +491,14 @@
                 const result = await response.json();
                 const missions = result.data || [];
 
+                lastMissions = missions;
                 displayMissions(missions);
-                updateStatsDisplay(calculateStats(missions));
+                lastStats = calculateStats(missions);
+                updateStatsDisplay(lastStats);
             } catch (error) {
                 console.error('Erreur:', error);
-                document.getElementById('statActiveNote').textContent = 'Indisponible';
-                document.getElementById('statDeliveredNote').textContent = 'Indisponible';
+                setNote('statActiveNote', 'dash.unavailable');
+                setNote('statDeliveredNote', 'dash.unavailable');
             }
         }
 
@@ -505,15 +519,20 @@
             return stats;
         }
 
+        // Texte d'une note : sa cle est memorisee pour suivre un changement de langue.
+        function setNote(id, key) {
+            const el = document.getElementById(id);
+            el.setAttribute('data-i18n', key);
+            el.textContent = sengpT(key);
+        }
+
         // Mettre à jour l'affichage des statistiques
         function updateStatsDisplay(stats) {
             document.getElementById('statActiveValue').textContent = stats.enCours;
-            document.getElementById('statActiveNote').textContent =
-                stats.enCours === 0 ? 'Aucune mission' : (stats.enCours === 1 ? 'Mission active' : 'Missions actives');
+            setNote('statActiveNote', stats.enCours === 0 ? 'dash.note_none_active' : (stats.enCours === 1 ? 'dash.note_one_active' : 'dash.note_many_active'));
 
             document.getElementById('statDeliveredValue').textContent = stats.livres;
-            document.getElementById('statDeliveredNote').textContent =
-                stats.livres === 0 ? 'Aucune livraison' : (stats.livres === 1 ? 'Mission terminée' : 'Missions terminées');
+            setNote('statDeliveredNote', stats.livres === 0 ? 'dash.note_none_done' : (stats.livres === 1 ? 'dash.note_one_done' : 'dash.note_many_done'));
         }
 
         // Afficher le dernier envoi
@@ -525,8 +544,8 @@
                 list.innerHTML = `
                     <div class="hm-card hm-empty">
                         <svg class="hm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
-                        <div class="hm-empty__title">Aucun envoi</div>
-                        <div class="hm-empty__desc">Vous n'avez pas encore créé d'envoi. Commencez dès maintenant !</div>
+                        <div class="hm-empty__title">${esc(sengpT('dash.empty_title'))}</div>
+                        <div class="hm-empty__desc">${esc(sengpT('dash.empty_desc'))}</div>
                     </div>`;
                 return;
             }
@@ -545,7 +564,7 @@
             const statusText = getStatusText(mission.status);
             const departureFlag = getCountryFlag(mission.departure_country);
             const arrivalFlag = getCountryFlag(mission.arrival_country);
-            const gpHtml = mission.gp_id ? '<span>· GP assigné</span>' : '';
+            const gpHtml = mission.gp_id ? '<span>' + esc(sengpT('ship.gp_assigned')) + '</span>' : '';
 
             card.innerHTML = `
                 <span class="hm-ship__thumb" aria-hidden="true">
@@ -594,19 +613,9 @@
 
         // Obtenir le texte du statut en français
         function getStatusText(status) {
-            const statusMap = {
-                'pending': 'En attente',
-                'matched': 'Correspondance trouvée',
-                'accepted': 'Accepté',
-                'picked_up': 'Récupéré',
-                'in_transit': 'En transit',
-                'in_customs': 'En douane',
-                'out_for_delivery': 'En livraison',
-                'delivered': 'Livré',
-                'cancelled': 'Annulé',
-                'disputed': 'Litige'
-            };
-            return statusMap[String(status || '').toLowerCase()] || status || '';
+            const key = String(status || '').toLowerCase();
+            const known = ['pending', 'matched', 'accepted', 'picked_up', 'in_transit', 'in_customs', 'out_for_delivery', 'delivered', 'cancelled', 'disputed'];
+            return known.includes(key) ? sengpT('ship.status.' + key) : (status || '');
         }
 
         // Obtenir le drapeau du pays (tous les pays de geo-data.js)
@@ -619,18 +628,19 @@
         function formatDate(dateString) {
             const date = new Date(dateString);
             if (isNaN(date.getTime())) return '';
-            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+            return SengpI18n.fmt.date(date);
         }
 
         // Sélecteur continent > pays > région (geo.js)
         function openCountryModal(type) {
             SengpGeo.open({
-                title: type === 'departure' ? 'Lieu de départ' : "Lieu d'arrivée",
+                title: sengpT(type === 'departure' ? 'dash.pick_departure' : 'dash.pick_arrival'),
                 onPick: sel => {
                     const prefix = type === 'departure' ? 'departure' : 'arrival';
                     document.getElementById(prefix + 'Flag').textContent = sel.flag;
                     const nameEl = document.getElementById(prefix + 'Name');
-                    nameEl.textContent = `${sel.region}, ${sel.country}`;
+                    nameEl.removeAttribute('data-i18n'); // texte choisi par l'utilisateur : plus de traduction automatique
+                    nameEl.textContent = `${sel.region}, ${SengpGeo.countryLabel(sel.iso, sel.country)}`;
                     nameEl.classList.remove('hm-place--ph');
                 }
             });
@@ -648,6 +658,8 @@
             const arrFlag = document.getElementById('arrivalFlag');
             [depFlag.textContent, arrFlag.textContent] = [arrFlag.textContent, depFlag.textContent];
             [depName.textContent, arrivalName.textContent] = [arrivalName.textContent, depName.textContent];
+            depName.removeAttribute('data-i18n');
+            arrivalName.removeAttribute('data-i18n');
         }
 
 
@@ -692,7 +704,15 @@
                 const p = JSON.parse(localStorage.getItem('sg_pending_share') || 'null');
                 if (p && p.id) { location.href = 'envois.html?open=' + encodeURIComponent(p.id); return; }
             } catch (e) {}
-            loadDashboardData();
+            SengpI18n.ready.then(loadDashboardData);
+        });
+
+        // Changement de langue : salutation, notes et carte du dernier envoi suivent.
+        window.addEventListener('sengp:languagechange', () => {
+            const t = document.getElementById('greetingTitle');
+            if (t && t.firstChild && t.firstChild.nodeType === 3) t.firstChild.nodeValue = sengpT('dash.hello') + ' ';
+            if (lastStats) updateStatsDisplay(lastStats);
+            if (lastMissions) displayMissions(lastMissions);
         });
     </script>
     <script src="ptr.js"></script>

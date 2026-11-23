@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>SEN GP - Mes envois</title>
+    <title data-i18n="envois.page_title">SEN GP - Mes envois</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -148,6 +148,16 @@
         .empty .ev-i { width: 44px; height: 44px; color: #E8890C; margin-bottom: 8px; }
 
         /* ---- bottom nav ---- */
+        /* Droite a gauche (arabe) */
+        [dir="rtl"] .ev-tab + .ev-tab::before { left: auto; right: -1px; }
+        [dir="rtl"] .ev-info { padding-right: 0; padding-left: 22px; }
+        [dir="rtl"] .ev-chev { right: auto; left: 12px; }
+        [dir="rtl"] .ev-step::before { right: auto; left: 50%; }
+        [dir="rtl"] .ev-tile { padding-left: 30px; padding-right: 12px; }
+        [dir="rtl"] .ev-tile__go { right: auto; left: 8px; transform: scaleX(-1); }
+        [dir="rtl"] .ev-dotbadge { right: auto; left: -3px; }
+        [dir="rtl"] .ev-back svg { transform: scaleX(-1); }
+
         .ev-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; height: calc(76px + env(safe-area-inset-bottom, 0px)); padding: 6px 8px env(safe-area-inset-bottom, 0px); display: flex; gap: 4px; background: rgba(255, 255, 255, 0.97); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid #E3EAF3; box-shadow: 0 -8px 24px rgba(11, 29, 58, 0.06); }
         .ev-nav__item { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; border-radius: 20px; background: none; color: #6B7A93; font-size: 13px; font-weight: 600; cursor: pointer; }
         .ev-nav__item[aria-current="page"] { background: #E8F1FF; color: #1E6FEA; font-weight: 700; }
@@ -261,8 +271,10 @@
         body{padding:0!important;}
     </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="i18n.css">
     <script src="ui.js"></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -288,60 +300,60 @@
                         <img src="im/sengp-home-background.jpg" alt="" width="941" height="1672" decoding="async">
                     </picture>
                     <div class="ev-hero__row">
-                        <button type="button" class="ev-back" onclick="goBack()" aria-label="Retour">
+                        <button type="button" class="ev-back" onclick="goBack()" aria-label="Retour" data-i18n-attr="aria-label:common.back">
                             <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
                         </button>
                         <div>
-                            <h1>Mes envois</h1>
-                            <p>Suivez tous vos colis en temps réel</p>
+                            <h1 data-i18n="envois.title">Mes envois</h1>
+                            <p data-i18n="envois.subtitle">Suivez tous vos colis en temps réel</p>
                         </div>
                     </div>
                 </header>
 
                 <div class="ev-body">
-                    <div class="ev-tabs ev-reveal" style="--i:0" role="tablist" aria-label="Filtrer les envois">
+                    <div class="ev-tabs ev-reveal" style="--i:0" role="tablist" aria-label="Filtrer les envois" data-i18n-attr="aria-label:envois.filter_aria">
                         <button type="button" class="ev-tab active" id="t-all" data-tab="all" role="tab" aria-selected="true" onclick="setTab('all')">
                             <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
-                            <span class="ev-tab__txt"><span class="ev-tab__label">Tous</span><span class="ev-tab__count" id="cnt-all">–</span></span>
+                            <span class="ev-tab__txt"><span class="ev-tab__label" data-i18n="envois.tab_all">Tous</span><span class="ev-tab__count" id="cnt-all">–</span></span>
                         </button>
                         <button type="button" class="ev-tab" id="t-active" data-tab="active" role="tab" aria-selected="false" onclick="setTab('active')">
                             <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                            <span class="ev-tab__txt"><span class="ev-tab__label">En cours</span><span class="ev-tab__count" id="cnt-active">–</span></span>
+                            <span class="ev-tab__txt"><span class="ev-tab__label" data-i18n="dash.in_progress">En cours</span><span class="ev-tab__count" id="cnt-active">–</span></span>
                         </button>
                         <button type="button" class="ev-tab" id="t-delivered" data-tab="delivered" role="tab" aria-selected="false" onclick="setTab('delivered')">
                             <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                            <span class="ev-tab__txt"><span class="ev-tab__label">Livrés</span><span class="ev-tab__count" id="cnt-delivered">–</span></span>
+                            <span class="ev-tab__txt"><span class="ev-tab__label" data-i18n="dash.delivered">Livrés</span><span class="ev-tab__count" id="cnt-delivered">–</span></span>
                         </button>
                     </div>
 
-                    <div id="list"><div class="loading">Chargement…</div></div>
+                    <div id="list"><div class="loading" data-i18n="common.loading">Chargement…</div></div>
                 </div>
             </div>
 
             <!-- Bottom navigation -->
-            <nav class="ev-nav" aria-label="Navigation principale">
+            <nav class="ev-nav" aria-label="Navigation principale" data-i18n-attr="aria-label:nav.main_aria">
                 <button type="button" class="ev-nav__item" onclick="navigateTo('home')">
                     <span class="ev-nav__icon"><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span>
-                    <span>Accueil</span>
+                    <span data-i18n="nav.home">Accueil</span>
                 </button>
                 <button type="button" class="ev-nav__item" aria-current="page" onclick="navigateTo('orders')">
                     <span class="ev-nav__icon"><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
-                    <span>Envois</span>
+                    <span data-i18n="nav.orders">Envois</span>
                 </button>
                 <button type="button" class="ev-nav__item" onclick="navigateTo('tracking')">
                     <span class="ev-nav__icon"><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
-                    <span>Suivi</span>
+                    <span data-i18n="nav.tracking">Suivi</span>
                 </button>
                 <button type="button" class="ev-nav__item" onclick="navigateTo('notifications')">
                     <span class="ev-nav__icon">
                         <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-                        <span class="ev-dotbadge hidden" id="notifDot" aria-label="Notifications non lues"></span>
+                        <span class="ev-dotbadge hidden" id="notifDot" aria-label="Notifications non lues" data-i18n-attr="aria-label:nav.unread_aria"></span>
                     </span>
-                    <span class="lbl-long">Notifications</span><span class="lbl-short">Notifs</span>
+                    <span class="lbl-long" data-i18n="nav.notifications">Notifications</span><span class="lbl-short" data-i18n="nav.notifs_short">Notifs</span>
                 </button>
                 <button type="button" class="ev-nav__item" onclick="navigateTo('profile')">
                     <span class="ev-nav__icon"><svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
-                    <span>Profil</span>
+                    <span data-i18n="nav.profile">Profil</span>
                 </button>
             </nav>
 
@@ -354,7 +366,7 @@
                             <h3 id="sheetTitle"></h3>
                             <p id="sheetSub"></p>
                         </div>
-                        <button type="button" class="ev-close" id="sheetClose" onclick="closeSheet()" aria-label="Fermer">
+                        <button type="button" class="ev-close" id="sheetClose" onclick="closeSheet()" aria-label="Fermer" data-i18n-attr="aria-label:common.close">
                             <svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                         </button>
                     </div>
@@ -379,12 +391,12 @@
 
         const flag = c => (window.SengpGeo ? SengpGeo.flag(c) : '');
         const esc = window.sengpEsc;
-        const fcfa = n => (Number(n)||0).toLocaleString('fr-FR')+' FCFA';
+        const fcfa = n => SengpI18n.fmt.currency(n);
         const validDate = d => { const x = d ? new Date(d) : null; return x && !isNaN(x.getTime()) ? x : null; };
-        const fmtFull = d => { const x = validDate(d); return x ? x.toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' }) : '—'; };
-        const fmtTime = d => { const x = validDate(d); return x ? x.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }) : ''; };
+        const fmtFull = d => { const x = validDate(d); return x ? SengpI18n.fmt.date(x) : '—'; };
+        const fmtTime = d => { const x = validDate(d); return x ? x.toLocaleTimeString(SengpI18n.fmt.localeTag(), { hour:'2-digit', minute:'2-digit' }) : ''; };
 
-        const STATUS = { pending:['En attente','b-yellow'],matched:['Correspondance','b-yellow'],accepted:['Accepté','b-blue'],picked_up:['Récupéré','b-blue'],in_transit:['En transit','b-blue'],in_customs:['En douane','b-blue'],out_for_delivery:['En livraison','b-blue'],delivered:['Livré','b-green'],cancelled:['Annulé','b-red'],disputed:['Litige','b-red'] };
+        const STATUS_CLS = { pending:'b-yellow', matched:'b-yellow', accepted:'b-blue', picked_up:'b-blue', in_transit:'b-blue', in_customs:'b-blue', out_for_delivery:'b-blue', delivered:'b-green', cancelled:'b-red', disputed:'b-red' };
         const st = m => String(m.status||'').toLowerCase();
         const IC = {
             clock: '<svg class="ev-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
@@ -422,7 +434,7 @@
 
         function badge(s){
             const key = String(s||'').toLowerCase();
-            const m = STATUS[key] || [s, 'b-yellow'];
+            const m = STATUS_CLS[key] ? [sengpT(key === 'matched' ? 'ship.status.matched_short' : 'ship.status.' + key), STATUS_CLS[key]] : [s, 'b-yellow'];
             let icon = IC.plane;
             if (key === 'pending' || key === 'matched') icon = IC.clock;
             else if (key === 'delivered') icon = IC.check;
@@ -458,7 +470,7 @@
                 updateCounts();
                 render();
                 resolveAutoShare();
-            } catch(e){ document.getElementById('list').innerHTML = `<div class="empty">Erreur : ${esc(e.message)}</div>`; }
+            } catch(e){ document.getElementById('list').innerHTML = `<div class="empty">${esc(sengpT('envois.error', { message: e.message }))}</div>`; }
             loadUnreadNotifCount();
         }
         window.onPullRefresh = load;
@@ -476,11 +488,8 @@
                 if (t) qrLink = API.replace(/\/api\/v1\/?$/, '') + '/q/' + encodeURIComponent(t);
             } catch(e){}
             const to = [m.arrival_city, m.arrival_country].filter(Boolean).join(', ');
-            return `Bonjour${m.recipient_name ? ' ' + m.recipient_name : ''}, un colis SEN GP vous est envoyé (${m.mission_code || m.tracking_number || ''})${to ? ' à destination de ' + to : ''}.
-
-` +
-                `Suivi en direct : ${trackUrl(m)}
-` + (qrLink ? `Votre QR de livraison (à montrer au livreur) : ${qrLink}` : '');
+            return sengpT('envois.wa_msg', { name: m.recipient_name ? ' ' + m.recipient_name : '', code: m.mission_code || m.tracking_number || '', dest: to ? ' ' + sengpT('envois.wa_dest', { to }) : '' }) + '\n\n' +
+                sengpT('envois.wa_tracking', { url: trackUrl(m) }) + '\n' + (qrLink ? sengpT('envois.wa_qr', { url: qrLink }) : '');
         }
         // Paiement en ligne : on attend la confirmation du paiement avant de prévenir le destinataire.
         async function resolveAutoShare(){
@@ -512,8 +521,8 @@
             if (w) { try { localStorage.setItem(key, '1'); } catch(e){}; return; }
             const bar = document.createElement('div');
             bar.style.cssText = 'position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:900;background:#0B1D3A;color:#fff;border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:flex;align-items:center;gap:12px';
-            bar.innerHTML = '<div style="flex:1;font-size:14px;line-height:1.4"><b>Envoi créé ✓</b><br>Prévenez ' + esc(m.recipient_name || 'le destinataire') + ' : suivi + QR de livraison.</div>'
-                + '<button type="button" style="border:0;border-radius:12px;padding:12px 14px;font:800 14px inherit;background:#25D366;color:#06231f;cursor:pointer">Envoyer sur WhatsApp</button>';
+            bar.innerHTML = '<div style="flex:1;font-size:14px;line-height:1.4"><b>' + esc(sengpT('envois.share_created')) + '</b><br>' + esc(sengpT('envois.share_notify', { name: m.recipient_name || sengpT('ship.recipient_the') })) + '</div>'
+                + '<button type="button" style="border:0;border-radius:12px;padding:12px 14px;font:800 14px inherit;background:#25D366;color:#06231f;cursor:pointer">' + esc(sengpT('envois.share_wa')) + '</button>';
             bar.querySelector('button').onclick = () => { try { localStorage.setItem(key, '1'); } catch(e){}; window.open(url, '_blank'); bar.remove(); };
             document.body.appendChild(bar);
         }
@@ -560,7 +569,7 @@
                 reached === 3 ? m.updated_at : null,
                 done ? doneAt : (reached === 4 ? m.updated_at : null)
             ];
-            const labels = [warm ? 'En préparation' : 'Colis pris en charge', 'En transit', 'Arrivée pays', 'Livraison'];
+            const labels = [sengpT(warm ? 'ship.step_prep' : 'ship.step_pickedup'), sengpT('ship.step_transit'), sengpT('ship.step_arrival'), sengpT('ship.step_delivery')];
             const icons = [IC.checkOnly, IC.plane, IC.pin, IC.box];
             const steps = labels.map((label, i) => {
                 const n = i + 1;
@@ -576,8 +585,8 @@
             const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent((m.departure_city||'')+', '+(m.departure_country||''))}&destination=${encodeURIComponent((m.arrival_city||'')+', '+(m.arrival_country||''))}`;
             return `<div class="ev-track">
                 <div class="ev-track__head">
-                    <span class="ev-track__title">${IC.truck}Suivi de votre colis</span>
-                    <a class="ev-map" href="${mapsUrl}" target="_blank" rel="noopener">${IC.pin}Voir sur la carte</a>
+                    <span class="ev-track__title">${IC.truck}${esc(sengpT('ship.track_title'))}</span>
+                    <a class="ev-map" href="${mapsUrl}" target="_blank" rel="noopener">${IC.pin}${esc(sengpT('ship.see_map'))}</a>
                 </div>
                 <ol class="ev-steps">${steps}</ol>
             </div>`;
@@ -585,10 +594,10 @@
 
         function tilesHtml(){
             return `<div class="ev-tiles">
-                <button type="button" class="ev-tile ev-tile--share" data-act="share">${IC.share}<span><span class="ev-tile__t">Partager le suivi</span><span class="ev-tile__s">WhatsApp, Telegram, etc.</span></span>${IC.go}</button>
-                <button type="button" class="ev-tile ev-tile--qr" data-act="qr">${IC.qr}<span><span class="ev-tile__t">QR code</span><span class="ev-tile__s">À coller sur le colis</span></span>${IC.go}</button>
-                <button type="button" class="ev-tile ev-tile--pkg" data-act="pkg">${IC.pkg}<span><span class="ev-tile__t">Détails du colis</span><span class="ev-tile__s">Poids, dimensions, assurance</span></span>${IC.go}</button>
-                <button type="button" class="ev-tile ev-tile--more" data-act="more">${IC.doc}<span><span class="ev-tile__t">Plus de détails</span><span class="ev-tile__s">Référence, dates, destinataire</span></span>${IC.go}</button>
+                <button type="button" class="ev-tile ev-tile--share" data-act="share">${IC.share}<span><span class="ev-tile__t">${esc(sengpT('ship.tile_share'))}</span><span class="ev-tile__s">${esc(sengpT('ship.tile_share_s'))}</span></span>${IC.go}</button>
+                <button type="button" class="ev-tile ev-tile--qr" data-act="qr">${IC.qr}<span><span class="ev-tile__t">${esc(sengpT('ship.tile_qr'))}</span><span class="ev-tile__s">${esc(sengpT('ship.tile_qr_s'))}</span></span>${IC.go}</button>
+                <button type="button" class="ev-tile ev-tile--pkg" data-act="pkg">${IC.pkg}<span><span class="ev-tile__t">${esc(sengpT('ship.tile_pkg'))}</span><span class="ev-tile__s">${esc(sengpT('ship.tile_pkg_s'))}</span></span>${IC.go}</button>
+                <button type="button" class="ev-tile ev-tile--more" data-act="more">${IC.doc}<span><span class="ev-tile__t">${esc(sengpT('ship.tile_more'))}</span><span class="ev-tile__s">${esc(sengpT('ship.tile_more_s'))}</span></span>${IC.go}</button>
             </div>`;
         }
 
@@ -604,11 +613,11 @@
                         <span class="ev-top"><span class="code">${esc(m.mission_code||m.tracking_number||'')}</span>${badge(m.status)}</span>
                         <span class="price">${fcfa(m.offered_price||m.price)}</span>
                         <span class="route"><span class="flag">${flag(m.departure_country)}</span><span>${esc(m.departure_city||'—')}</span><span class="plane"><i></i>${IC.plane}<i></i></span><span class="flag">${flag(m.arrival_country)}</span><span>${esc(m.arrival_city||'—')}</span></span>
-                        <span class="meta">${IC.cal}<span>Créé le ${esc(created)}</span></span>
+                        <span class="meta">${IC.cal}<span>${esc(sengpT('ship.created_on', { date: created }))}</span></span>
                     </span>
                     ${IC.chev}
                 </button>
-                <div class="ev-panel" id="panel-${id}" role="region" aria-label="Actions de l'envoi ${esc(m.mission_code||'')}"><div class="ev-panel__inner">${trackerHtml(m)}${tilesHtml()}</div></div>
+                <div class="ev-panel" id="panel-${id}" role="region" aria-label="${esc(sengpT('ship.panel_aria', { code: m.mission_code || '' }))}"><div class="ev-panel__inner">${trackerHtml(m)}${tilesHtml()}</div></div>
             </article>`;
         }
 
@@ -616,7 +625,7 @@
             const list = visible();
             const box = document.getElementById('list');
             if (!list.length){
-                box.innerHTML = `<div class="empty">${IC.box}<div>Aucun envoi dans cette catégorie.</div></div>`;
+                box.innerHTML = `<div class="empty">${IC.box}<div>${esc(sengpT('ship.empty_category'))}</div></div>`;
                 return;
             }
             if (openId == null || !list.some(m => String(m.id) === String(openId))) openId = list[0].id;   // first card open, like the mockup
@@ -663,7 +672,7 @@
         const qrCache = {};
 
         const trackUrl = m => API.replace(/\/api\/v1\/?$/, '') + '/t/' + encodeURIComponent(m.tracking_number || m.mission_code || '');
-        const shareText = m => `Suivez votre colis SEN GP en temps réel : ${trackUrl(m)}`;
+        const shareText = m => sengpT('ship.share_text', { url: trackUrl(m) });
 
         function openSheet(type, m, trigger){
             if (!m) return;
@@ -673,10 +682,10 @@
             const sub = document.getElementById('sheetSub');
             const body = document.getElementById('sheetBody');
             body.scrollTop = 0;
-            if (type === 'share') { title.textContent = 'Partager le suivi'; sub.textContent = 'Envoyez le lien de suivi à votre destinataire'; body.innerHTML = shareHtml(m); }
-            else if (type === 'qr') { title.textContent = 'QR code du colis'; sub.textContent = 'À imprimer ou coller sur le colis'; body.innerHTML = '<div class="ev-qrcard"><div class="ev-qrskel"></div></div>'; loadQr(m); }
-            else if (type === 'pkg') { title.textContent = 'Détails du colis'; sub.textContent = m.mission_code || ''; body.innerHTML = pkgHtml(m); }
-            else { title.textContent = 'Plus de détails'; sub.textContent = 'Enlèvement, livraison et suivi'; body.innerHTML = moreHtml(m); }
+            if (type === 'share') { title.textContent = sengpT('ship.tile_share'); sub.textContent = sengpT('ship.sheet_share_sub'); body.innerHTML = shareHtml(m); }
+            else if (type === 'qr') { title.textContent = sengpT('ship.sheet_qr'); sub.textContent = sengpT('ship.sheet_qr_sub'); body.innerHTML = '<div class="ev-qrcard"><div class="ev-qrskel"></div></div>'; loadQr(m); }
+            else if (type === 'pkg') { title.textContent = sengpT('ship.tile_pkg'); sub.textContent = m.mission_code || ''; body.innerHTML = pkgHtml(m); }
+            else { title.textContent = sengpT('ship.tile_more'); sub.textContent = sengpT('ship.sheet_more_sub'); body.innerHTML = moreHtml(m); }
             document.getElementById('sheetOverlay').classList.add('show');
             document.getElementById('scroller').classList.add('is-locked');
             setTimeout(() => document.getElementById('sheetClose').focus({ preventScroll: true }), 50);
@@ -714,11 +723,11 @@
                 ['fb', 'Facebook', '#1877F2', 'f'],
                 ['x', 'X', '#111111', '𝕏'],
                 ['sms', 'SMS', '#34C759', IC.sms],
-                ['mail', 'Email', '#EA4335', IC.mail],
-                ['copy', 'Copier', '#6B7A93', IC.link],
-                ['more', 'Plus', '#0B1D3A', IC.more]
+                ['mail', sengpT('ship.net_mail'), '#EA4335', IC.mail],
+                ['copy', sengpT('ship.copy'), '#6B7A93', IC.link],
+                ['more', sengpT('ship.more'), '#0B1D3A', IC.more]
             ];
-            return `<div class="ev-linkbox"><span id="shareUrl">${esc(trackUrl(m))}</span><button type="button" data-net="copy">Copier</button></div>
+            return `<div class="ev-linkbox"><span id="shareUrl">${esc(trackUrl(m))}</span><button type="button" data-net="copy">${esc(sengpT('ship.copy'))}</button></div>
                 <div class="ev-nets">${nets.map(n => `<button type="button" class="ev-net" data-net="${n[0]}"><span class="ev-net__ic" style="background:${n[2]}">${n[3]}</span>${n[1]}</button>`).join('')}</div>
                 <div class="ev-toast" id="sheetToast" role="status" aria-live="polite"></div>`;
         }
@@ -732,9 +741,9 @@
 
         async function shareNative(m){
             const P = window.Capacitor && window.Capacitor.Plugins;
-            const data = { title: 'Suivi de votre colis SEN GP', text: shareText(m), url: trackUrl(m) };
+            const data = { title: sengpT('ship.share_subject'), text: shareText(m), url: trackUrl(m) };
             try {
-                if (P && P.Share && P.Share.share) { await P.Share.share({ title: data.title, text: data.text, url: data.url, dialogTitle: 'Partager le suivi' }); return true; }
+                if (P && P.Share && P.Share.share) { await P.Share.share({ title: data.title, text: data.text, url: data.url, dialogTitle: sengpT('ship.tile_share') }); return true; }
                 if (navigator.share) { await navigator.share(data); return true; }
             } catch (e) { return true; }     // dismissed by the user
             return false;
@@ -746,13 +755,13 @@
             const m = sheetMission, url = trackUrl(m), text = shareText(m), net = b.dataset.net;
             const open = u => window.open(u, '_blank');
             if (net === 'wa') open('https://wa.me/?text=' + encodeURIComponent(text));
-            else if (net === 'tg') open('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent('Suivez votre colis SEN GP en temps réel'));
+            else if (net === 'tg') open('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(sengpT('ship.share_text_short')));
             else if (net === 'fb') open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url));
-            else if (net === 'x') open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Suivez votre colis SEN GP en temps réel') + '&url=' + encodeURIComponent(url));
+            else if (net === 'x') open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(sengpT('ship.share_text_short')) + '&url=' + encodeURIComponent(url));
             else if (net === 'sms') location.href = 'sms:?&body=' + encodeURIComponent(text);
-            else if (net === 'mail') location.href = 'mailto:?subject=' + encodeURIComponent('Suivi de votre colis SEN GP') + '&body=' + encodeURIComponent(text);
-            else if (net === 'copy') { toast((await copyText(url)) ? 'Lien copié ✓' : 'Copie impossible — copiez le lien ci-dessus'); }
-            else if (net === 'more') { if (!(await shareNative(m))) toast((await copyText(url)) ? 'Lien copié ✓' : 'Partage indisponible'); }
+            else if (net === 'mail') location.href = 'mailto:?subject=' + encodeURIComponent(sengpT('ship.share_subject')) + '&body=' + encodeURIComponent(text);
+            else if (net === 'copy') { toast(sengpT((await copyText(url)) ? 'ship.link_copied' : 'ship.copy_failed')); }
+            else if (net === 'more') { if (!(await shareNative(m))) toast(sengpT((await copyText(url)) ? 'ship.link_copied' : 'ship.share_unavailable')); }
         });
 
         // ---- 2) QR code
@@ -768,18 +777,18 @@
                     if (!res.ok || !qrUrl) throw new Error(j.error || j.message || 'QR indisponible');
                     qrCache[m.id] = qrUrl;
                 }
-                const recip = m.recipient_name ? esc(m.recipient_name) : 'Destinataire';
+                const recip = m.recipient_name ? esc(m.recipient_name) : esc(sengpT('ship.recipient'));
                 draw(`<div class="ev-qrcard">
                         <div class="ev-qrcard__brand">SEN GP</div>
-                        <div class="ev-qrcard__for">Pour : <b>${recip}</b></div>
+                        <div class="ev-qrcard__for">${esc(sengpT('ship.qr_for'))} <b>${recip}</b></div>
                         <div class="ev-qrcard__route">${esc(m.departure_city||'')} → ${esc(m.arrival_city||'')}</div>
-                        <img id="qrImg" src="${esc(qrUrl)}" alt="QR code du colis ${esc(m.tracking_number||m.mission_code||'')}">
+                        <img id="qrImg" src="${esc(qrUrl)}" alt="${esc(sengpT('ship.qr_alt', { code: m.tracking_number || m.mission_code || '' }))}">
                         <div class="ev-qrcard__num">${esc(m.tracking_number || m.mission_code || '')}</div>
                     </div>
-                    <button type="button" class="ev-wa" onclick="shareQrWhatsApp()">${IC.wa}Partager via WhatsApp</button>
-                    <p class="ev-hint">Collez ce QR sur le colis : le livreur (GP) le scannera, puis celui du destinataire, pour confirmer la remise.</p>`);
+                    <button type="button" class="ev-wa" onclick="shareQrWhatsApp()">${IC.wa}${esc(sengpT('ship.qr_share_wa'))}</button>
+                    <p class="ev-hint">${esc(sengpT('ship.qr_hint'))}</p>`);
             } catch (e) {
-                draw(`<div class="ev-msg">QR indisponible pour le moment.<br><button type="button" class="ev-retry" onclick="retryQr()">Réessayer</button></div>`);
+                draw(`<div class="ev-msg">${esc(sengpT('ship.qr_unavailable'))}<br><button type="button" class="ev-retry" onclick="retryQr()">${esc(sengpT('common.retry'))}</button></div>`);
             }
         }
         function retryQr(){ if (sheetMission) { document.getElementById('sheetBody').innerHTML = '<div class="ev-qrcard"><div class="ev-qrskel"></div></div>'; loadQr(sheetMission); } }
@@ -788,12 +797,7 @@
         async function shareQrWhatsApp(){
             const m = sheetMission || {};
             const trackingNum = m.tracking_number || m.mission_code || '';
-            const caption =
-                `SEN GP — Votre colis est en route !\n\n` +
-                `Numéro de suivi : ${trackingNum}\n\n` +
-                `QR code du colis : à imprimer ou coller sur le colis. ` +
-                `Le livreur (GP) SEN GP le scannera, puis celui du destinataire, pour confirmer la remise.\n\n` +
-                `SEN GP — La livraison collaborative`;
+            const caption = sengpT('ship.qr_caption', { tracking: trackingNum });
             const img = document.getElementById('qrImg');
             const dataUrl = img && img.src;
             const hasData = dataUrl && dataUrl.indexOf('data:') === 0;
@@ -809,7 +813,7 @@
                         uri = w && w.uri;
                     } catch (e) { /* getUri below */ }
                     if (!uri){ const g = await P.Filesystem.getUri({ path: fileName, directory: 'CACHE' }); uri = g && g.uri; }
-                    await P.Share.share({ title: 'QR de livraison SEN GP', text: caption, files: [uri] });
+                    await P.Share.share({ title: sengpT('ship.qr_share_title'), text: caption, files: [uri] });
                     return;
                 } catch (e) {
                     const msg = String((e && (e.message || e.errorMessage)) || '').toLowerCase();
@@ -822,12 +826,12 @@
                 try { const blob = await (await fetch(dataUrl)).blob(); file = new File([blob], `sengp-qr-${trackingNum}.png`, { type:'image/png' }); } catch(e){}
             }
             if (file && navigator.canShare && navigator.canShare({ files:[file] })){
-                try { await navigator.share({ files:[file], text: caption, title:'QR de livraison SEN GP' }); return; }
+                try { await navigator.share({ files:[file], text: caption, title: sengpT('ship.qr_share_title') }); return; }
                 catch(e){ if (e && e.name === 'AbortError') return; }
             }
 
             if (dataUrl){ try { const a=document.createElement('a'); a.href=dataUrl; a.download=`sengp-qr-${trackingNum}.png`; document.body.appendChild(a); a.click(); a.remove(); } catch(e){} }
-            window.open('https://wa.me/?text=' + encodeURIComponent(caption + `\n\n(QR code enregistré dans vos images — joignez-le à ce message.)`), '_blank');
+            window.open('https://wa.me/?text=' + encodeURIComponent(caption + '\n\n' + sengpT('ship.qr_saved')), '_blank');
         }
 
         // ---- 3) package details
@@ -835,36 +839,39 @@
             return `<div class="ev-row"><span class="ev-row__ic ${cls || ''}">${icon}</span><span class="ev-row__txt"><span class="ev-row__k">${k}</span><span class="ev-row__v">${v}</span></span>${extra || ''}</div>`;
         }
         function pkgHtml(m){
-            const dims = [m.package_length, m.package_width, m.package_height].every(x => x != null) ? `${m.package_length} × ${m.package_width} × ${m.package_height} cm` : 'Non communiquées';
+            const dims = [m.package_length, m.package_width, m.package_height].every(x => x != null) ? `${m.package_length} × ${m.package_width} × ${m.package_height} cm` : sengpT('ship.dims_unknown');
             const weight = parseFloat(m.package_weight || m.weight);
-            const insured = m.is_insured ? `Oui${m.insurance_cost ? ` <small>· ${esc(fcfa(m.insurance_cost))}</small>` : ''}` : 'Non';
+            const insured = m.is_insured ? `${esc(sengpT('common.yes'))}${m.insurance_cost ? ` <small>· ${esc(fcfa(m.insurance_cost))}</small>` : ''}` : esc(sengpT('common.no'));
             return `<div class="ev-rows">
-                ${row(IC.weight, '', 'Poids', weight ? esc(weight) + ' kg' : '—')}
-                ${row(IC.ruler, 'ev-row__ic--o', 'Dimensions', esc(dims))}
-                ${row(IC.tag, 'ev-row__ic--g', 'Valeur déclarée', m.package_value ? esc(fcfa(m.package_value)) : '—')}
-                ${row(IC.shield, 'ev-row__ic--v', 'Assurance', insured)}
-                ${m.package_description ? row(IC.text, '', 'Description', esc(m.package_description)) : ''}
+                ${row(IC.weight, '', esc(sengpT('ship.pkg_weight')), weight ? esc(weight) + ' kg' : '—')}
+                ${row(IC.ruler, 'ev-row__ic--o', esc(sengpT('ship.pkg_dims')), esc(dims))}
+                ${row(IC.tag, 'ev-row__ic--g', esc(sengpT('ship.pkg_value')), m.package_value ? esc(fcfa(m.package_value)) : '—')}
+                ${row(IC.shield, 'ev-row__ic--v', esc(sengpT('ship.pkg_insurance')), insured)}
+                ${m.package_description ? row(IC.text, '', esc(sengpT('ship.pkg_desc')), esc(m.package_description)) : ''}
             </div>`;
         }
 
         // ---- 4) more details
         function moreHtml(m){
-            const gp = m.gp_name && String(m.gp_name).trim() ? esc(m.gp_name) : 'En recherche…';
-            const call = m.gp_phone ? `<a class="ev-row__act" href="tel:${esc(String(m.gp_phone).replace(/[^+\d]/g, ''))}" aria-label="Appeler le GP">${IC.phone}</a>` : '';
+            const gp = m.gp_name && String(m.gp_name).trim() ? esc(m.gp_name) : esc(sengpT('ship.searching'));
+            const call = m.gp_phone ? `<a class="ev-row__act" href="tel:${esc(String(m.gp_phone).replace(/[^+\d]/g, ''))}" aria-label="${esc(sengpT('ship.call_gp_aria'))}">${IC.phone}</a>` : '';
             const desired = m.desired_departure_date ? fmtFull(m.desired_departure_date) : '—';
-            const created = `${fmtFull(m.created_at)}${fmtTime(m.created_at) ? ' à ' + fmtTime(m.created_at) : ''}`;
+            const created = fmtTime(m.created_at) ? sengpT('ship.date_at', { date: fmtFull(m.created_at), time: fmtTime(m.created_at) }) : fmtFull(m.created_at);
             return `<div class="ev-rows">
-                ${row(IC.home, '', 'Enlèvement', esc(m.pickup_address || '—'))}
-                ${row(IC.pin, 'ev-row__ic--o', 'Livraison', esc(m.delivery_address || '—'))}
-                ${row(IC.plane, 'ev-row__ic--g', 'Départ souhaité', esc(desired))}
-                ${row(IC.hash, 'ev-row__ic--v', 'Numéro de suivi', esc(m.tracking_number || m.mission_code || '—'))}
-                ${row(IC.user, '', 'GP', gp, call)}
-                ${row(IC.cal, 'ev-row__ic--o', 'Date de création', esc(created))}
+                ${row(IC.home, '', esc(sengpT('ship.pickup')), esc(m.pickup_address || '—'))}
+                ${row(IC.pin, 'ev-row__ic--o', esc(sengpT('ship.delivery')), esc(m.delivery_address || '—'))}
+                ${row(IC.plane, 'ev-row__ic--g', esc(sengpT('ship.desired_departure')), esc(desired))}
+                ${row(IC.hash, 'ev-row__ic--v', esc(sengpT('ship.tracking_no')), esc(m.tracking_number || m.mission_code || '—'))}
+                ${row(IC.user, '', esc(sengpT('ship.gp')), gp, call)}
+                ${row(IC.cal, 'ev-row__ic--o', esc(sengpT('ship.created_at')), esc(created))}
             </div>
-            <a class="ev-full" href="detailenvoi.html?id=${encodeURIComponent(m.id)}">${IC.doc.replace(' ev-tile__ico', '')}Ouvrir la fiche complète</a>`;
+            <a class="ev-full" href="detailenvoi.html?id=${encodeURIComponent(m.id)}">${IC.doc.replace(' ev-tile__ico', '')}${esc(sengpT('ship.open_full'))}</a>`;
         }
 
-        load();
+        SengpI18n.ready.then(load);
+
+        // Changement de langue : la liste est redessinee dans la nouvelle langue.
+        window.addEventListener('sengp:languagechange', () => { if (all.length) { updateCounts(); render(); } });
     </script>
     <script src="ptr.js"></script>
 </body>

@@ -197,6 +197,8 @@
 
     function tag() { return LOCALE_TAGS[state.lang] || LOCALE_TAGS[SOURCE]; }
     var fmt = {
+      /** Etiquette de langue pour Intl (ex. 'fr-FR'). */
+      localeTag: function () { return tag(); },
       number: function (n, opts) { return new Intl.NumberFormat(tag(), opts).format(Number(n) || 0); },
       currency: function (n) { return fmt.number(n) + ' FCFA'; },
       date: function (d, opts) {
