@@ -1,0 +1,45 @@
+{
+  "common.ok": "OK",
+  "common.cancel": "Annuler",
+  "common.confirm": "Confirmer",
+  "common.back": "Retour",
+  "common.next": "Suivant",
+  "common.save": "Enregistrer",
+  "common.close": "Fermer",
+  "common.loading": "Chargement…",
+  "common.retry": "Réessayer",
+  "common.yes": "Oui",
+  "common.no": "Non",
+  "common.search": "Rechercher",
+  "common.language": "Langue",
+
+  "errors.generic": "Une erreur est survenue. Veuillez réessayer.",
+  "errors.network": "Connexion impossible. Vérifiez votre connexion internet.",
+  "errors.session_expired": "Votre session a expiré. Merci de vous reconnecter.",
+  "errors.not_found": "Élément introuvable.",
+  "errors.forbidden": "Vous n'avez pas l'autorisation d'effectuer cette action.",
+  "errors.rate_limited": "Trop de tentatives. Réessayez dans quelques minutes.",
+  "errors.expediteur_only": "Cet écran est réservé aux comptes Expéditeur. Vous êtes connecté avec un compte « {type} ». Pour créer un envoi, connectez-vous avec un compte Expéditeur.",
+
+  "roles.expediteur": "Expéditeur",
+  "roles.gp": "Gros Porteur (GP)",
+  "roles.admin": "Administrateur",
+
+  "mission.status.pending": "En attente",
+  "mission.status.matched": "Affectée",
+  "mission.status.accepted": "Acceptée",
+  "mission.status.picked_up": "Colis récupéré",
+  "mission.status.in_transit": "En transit",
+  "mission.status.in_customs": "En douane",
+  "mission.status.out_for_delivery": "En cours de livraison",
+  "mission.status.delivered": "Livrée",
+  "mission.status.cancelled": "Annulée",
+  "mission.status.disputed": "Litige",
+
+  "mission.count.one": "{count} envoi",
+  "mission.count.other": "{count} envois",
+
+  "payment.method.wave": "Wave",
+  "payment.method.orange_money": "Orange Money",
+  "payment.method.cod": "Paiement à la livraison"
+}

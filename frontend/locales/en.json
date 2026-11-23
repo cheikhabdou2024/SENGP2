@@ -1,0 +1,45 @@
+{
+  "common.ok": "OK",
+  "common.cancel": "Cancel",
+  "common.confirm": "Confirm",
+  "common.back": "Back",
+  "common.next": "Next",
+  "common.save": "Save",
+  "common.close": "Close",
+  "common.loading": "Loading…",
+  "common.retry": "Try again",
+  "common.yes": "Yes",
+  "common.no": "No",
+  "common.search": "Search",
+  "common.language": "Language",
+
+  "errors.generic": "Something went wrong. Please try again.",
+  "errors.network": "Unable to connect. Check your internet connection.",
+  "errors.session_expired": "Your session has expired. Please sign in again.",
+  "errors.not_found": "Item not found.",
+  "errors.forbidden": "You are not allowed to perform this action.",
+  "errors.rate_limited": "Too many attempts. Please try again in a few minutes.",
+  "errors.expediteur_only": "This screen is reserved for Sender accounts. You are signed in with a “{type}” account. To create a shipment, sign in with a Sender account.",
+
+  "roles.expediteur": "Sender",
+  "roles.gp": "Carrier (GP)",
+  "roles.admin": "Administrator",
+
+  "mission.status.pending": "Pending",
+  "mission.status.matched": "Assigned",
+  "mission.status.accepted": "Accepted",
+  "mission.status.picked_up": "Picked up",
+  "mission.status.in_transit": "In transit",
+  "mission.status.in_customs": "In customs",
+  "mission.status.out_for_delivery": "Out for delivery",
+  "mission.status.delivered": "Delivered",
+  "mission.status.cancelled": "Cancelled",
+  "mission.status.disputed": "Disputed",
+
+  "mission.count.one": "{count} shipment",
+  "mission.count.other": "{count} shipments",
+
+  "payment.method.wave": "Wave",
+  "payment.method.orange_money": "Orange Money",
+  "payment.method.cod": "Cash on delivery"
+}

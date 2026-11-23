@@ -1,0 +1,45 @@
+{
+  "common.ok": "OK",
+  "common.cancel": "Cancelar",
+  "common.confirm": "Confirmar",
+  "common.back": "Voltar",
+  "common.next": "Seguinte",
+  "common.save": "Guardar",
+  "common.close": "Fechar",
+  "common.loading": "A carregar…",
+  "common.retry": "Tentar novamente",
+  "common.yes": "Sim",
+  "common.no": "Não",
+  "common.search": "Pesquisar",
+  "common.language": "Idioma",
+
+  "errors.generic": "Ocorreu um erro. Tente novamente.",
+  "errors.network": "Não foi possível ligar. Verifique a sua ligação à internet.",
+  "errors.session_expired": "A sua sessão expirou. Inicie sessão novamente.",
+  "errors.not_found": "Elemento não encontrado.",
+  "errors.forbidden": "Não tem permissão para realizar esta ação.",
+  "errors.rate_limited": "Demasiadas tentativas. Tente novamente dentro de alguns minutos.",
+  "errors.expediteur_only": "Este ecrã está reservado às contas de Remetente. Iniciou sessão com uma conta «{type}». Para criar um envio, inicie sessão com uma conta de Remetente.",
+
+  "roles.expediteur": "Remetente",
+  "roles.gp": "Transportador (GP)",
+  "roles.admin": "Administrador",
+
+  "mission.status.pending": "Pendente",
+  "mission.status.matched": "Atribuída",
+  "mission.status.accepted": "Aceite",
+  "mission.status.picked_up": "Encomenda recolhida",
+  "mission.status.in_transit": "Em trânsito",
+  "mission.status.in_customs": "Na alfândega",
+  "mission.status.out_for_delivery": "Em entrega",
+  "mission.status.delivered": "Entregue",
+  "mission.status.cancelled": "Cancelada",
+  "mission.status.disputed": "Em disputa",
+
+  "mission.count.one": "{count} envio",
+  "mission.count.other": "{count} envios",
+
+  "payment.method.wave": "Wave",
+  "payment.method.orange_money": "Orange Money",
+  "payment.method.cod": "Pagamento na entrega"
+}

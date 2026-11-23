@@ -1,0 +1,45 @@
+{
+  "common.ok": "Aceptar",
+  "common.cancel": "Cancelar",
+  "common.confirm": "Confirmar",
+  "common.back": "Volver",
+  "common.next": "Siguiente",
+  "common.save": "Guardar",
+  "common.close": "Cerrar",
+  "common.loading": "Cargando…",
+  "common.retry": "Reintentar",
+  "common.yes": "Sí",
+  "common.no": "No",
+  "common.search": "Buscar",
+  "common.language": "Idioma",
+
+  "errors.generic": "Ha ocurrido un error. Inténtalo de nuevo.",
+  "errors.network": "No se pudo conectar. Comprueba tu conexión a internet.",
+  "errors.session_expired": "Tu sesión ha caducado. Vuelve a iniciar sesión.",
+  "errors.not_found": "Elemento no encontrado.",
+  "errors.forbidden": "No tienes permiso para realizar esta acción.",
+  "errors.rate_limited": "Demasiados intentos. Inténtalo de nuevo en unos minutos.",
+  "errors.expediteur_only": "Esta pantalla está reservada a las cuentas de Remitente. Has iniciado sesión con una cuenta «{type}». Para crear un envío, inicia sesión con una cuenta de Remitente.",
+
+  "roles.expediteur": "Remitente",
+  "roles.gp": "Transportista (GP)",
+  "roles.admin": "Administrador",
+
+  "mission.status.pending": "Pendiente",
+  "mission.status.matched": "Asignada",
+  "mission.status.accepted": "Aceptada",
+  "mission.status.picked_up": "Paquete recogido",
+  "mission.status.in_transit": "En tránsito",
+  "mission.status.in_customs": "En aduana",
+  "mission.status.out_for_delivery": "En reparto",
+  "mission.status.delivered": "Entregada",
+  "mission.status.cancelled": "Cancelada",
+  "mission.status.disputed": "En disputa",
+
+  "mission.count.one": "{count} envío",
+  "mission.count.other": "{count} envíos",
+
+  "payment.method.wave": "Wave",
+  "payment.method.orange_money": "Orange Money",
+  "payment.method.cod": "Pago contra entrega"
+}

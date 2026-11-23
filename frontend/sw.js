@@ -12,6 +12,7 @@ const PRECACHE = [
     'manifest.json',
     'config.js',
     'api.js',
+    'i18n.js',
     'theme.css',
     'responsive.css',
     'ui.js',

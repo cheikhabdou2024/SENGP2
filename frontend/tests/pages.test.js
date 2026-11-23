@@ -75,6 +75,7 @@ test('le service worker est versionne au build', () => {
   assert.match(sw, /const CACHE_NAME = 'sengp-__BUILD_ID__';/);
   assert.ok(!/sengp-v\d+/.test(sw), 'ancien nom de cache fixe');
   assert.match(sw, /'api\.js'/);
+  assert.match(sw, /'i18n\.js'/);
 });
 
 test('creenvoi : un compte GP ou admin est renvoye avec un message clair, un expediteur reste', async () => {
@@ -107,4 +108,11 @@ test('creenvoi : un compte GP ou admin est renvoye avec un message clair, un exp
   assert.equal(anon.alert, null);
 
   assert.match(src, /missionRes\.status === 403/);
+});
+
+test('le build copie les langues et i18n.js', () => {
+  const build = read('scripts/build.js');
+  assert.match(build, /'locales'/);
+  assert.ok(fs.existsSync(path.join(root, 'i18n.js')));
+  for (const l of ['fr', 'en', 'ar', 'es', 'pt']) assert.ok(fs.existsSync(path.join(root, 'locales', l + '.json')), l);
 });

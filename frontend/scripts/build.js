@@ -29,7 +29,7 @@ fs.mkdirSync(out, { recursive: true });
 
 const files = fs.readdirSync(root).filter(f => /\.(html|js|css)$/.test(f) || f === 'manifest.json');
 for (const f of files) fs.copyFileSync(path.join(root, f), path.join(out, f));
-for (const dir of ['im', 'icons']) fs.cpSync(path.join(root, dir), path.join(out, dir), { recursive: true });
+for (const dir of ['im', 'icons', 'locales']) fs.cpSync(path.join(root, dir), path.join(out, dir), { recursive: true });
 
 const id = buildId();
 const swPath = path.join(out, 'sw.js');

@@ -47,6 +47,7 @@ Ces trois commandes sont exécutées à chaque push par GitHub Actions (`.github
 - [Base de données](docs/database.md)
 - [Variables d'environnement](docs/environment.md)
 - [Tests](docs/testing.md)
+- [Internationalisation (5 langues)](docs/i18n.md)
 - [Exploitation (déploiement, retour arrière, incidents)](docs/runbook.md)
 - [Dette technique](docs/tech-debt.md)
 - [Mise en production des paiements](docs/go-live-payments.md)
