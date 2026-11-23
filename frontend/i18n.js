@@ -290,6 +290,8 @@
     return {
       t: t, has: has, fmt: fmt, applyDom: applyDom, init: init, setLanguage: setLanguage, mountSwitcher: mountSwitcher,
       detect: detect,
+      supported: SUPPORTED,
+      nativeNames: NATIVE_NAMES,
       get lang() { return state.lang; },
       get dir() { return direction(state.lang); },
       get missing() { return missing.slice(); },

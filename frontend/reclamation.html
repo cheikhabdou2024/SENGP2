@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEN GP - Réclamations</title>
+    <title data-i18n="claim.page_title">SEN GP - Réclamations</title>
     <style>
         * {
             margin: 0;
@@ -340,6 +340,10 @@
         }
 
         /* Bottom Navigation */
+        /* Droite a gauche (arabe) */
+        [dir="rtl"] .form-select, [dir="rtl"] .form-input, [dir="rtl"] .claim-card { text-align: right; }
+        [dir="rtl"] .back-btn { transform: scaleX(-1); }
+
         .bottom-nav { position:absolute; bottom:0; left:0; right:0; background:rgba(18,16,36,.92);
             backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-top:1px solid rgba(255,255,255,.07);
             display:flex; justify-content:space-around; align-items:stretch;
@@ -504,8 +508,10 @@
         body{padding:0!important;}
         </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="i18n.css">
     <script src="ui.js"></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -523,10 +529,10 @@
 
         <!-- Header -->
         <div class="header">
-            <button class="back-btn" onclick="goBack()">←</button>
+            <button class="back-btn i18n-flip" onclick="goBack()" aria-label="Retour" data-i18n-attr="aria-label:common.back">←</button>
             <div class="header-title">
-                <h1>Réclamations</h1>
-                <p>Gérez vos réclamations</p>
+                <h1 data-i18n="prof.claims">Réclamations</h1>
+                <p data-i18n="claim.subtitle">Gérez vos réclamations</p>
             </div>
         </div>
 
@@ -534,18 +540,18 @@
         <div class="content">
             <!-- Tabs -->
             <div class="tabs">
-                <button class="tab active" id="tab-active" onclick="switchTab('active')">En cours (0)</button>
-                <button class="tab" id="tab-resolved" onclick="switchTab('resolved')">Résolues (0)</button>
+                <button class="tab active" id="tab-active" onclick="switchTab('active')"><span data-i18n="dash.in_progress">En cours</span> (<span id="cnt-active">0</span>)</button>
+                <button class="tab" id="tab-resolved" onclick="switchTab('resolved')"><span data-i18n="claim.tab_resolved">Résolues</span> (<span id="cnt-resolved">0</span>)</button>
             </div>
 
             <!-- New Claim Button -->
             <button class="new-claim-btn" onclick="openNewClaimModal()">
                 <div class="btn-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
                 <div class="btn-text">
-                    <div class="btn-title">Nouvelle réclamation</div>
-                    <div class="btn-subtitle">Signalez un problème</div>
+                    <div class="btn-title" data-i18n="claim.new">Nouvelle réclamation</div>
+                    <div class="btn-subtitle" data-i18n="claim.new_s">Signalez un problème</div>
                 </div>
-                <div style="font-size: 20px; color: #1a1a2e;">→</div>
+                <div class="i18n-flip" style="font-size: 20px; color: #1a1a2e;">→</div>
             </button>
 
             <!-- Active Claims -->
@@ -563,27 +569,27 @@
         <div class="bottom-nav">
             <div class="nav-item" onclick="navigateTo('home')">
                 <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
-                <div class="nav-label">Accueil</div>
+                <div class="nav-label" data-i18n="nav.home">Accueil</div>
             </div>
 
             <div class="nav-item active" onclick="navigateTo('reclamation')">
                 <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10.3 4 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
-                <div class="nav-label">Réclamation</div>
+                <div class="nav-label" data-i18n="claim.nav">Réclamation</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('tracking')">
                 <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-                <div class="nav-label">Suivi</div>
+                <div class="nav-label" data-i18n="nav.tracking">Suivi</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('notifications')">
                 <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
-                <div class="nav-label">Notifications</div>
+                <div class="nav-label" data-i18n="nav.notifications">Notifications</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('profile')">
                 <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
-                <div class="nav-label">Profil</div>
+                <div class="nav-label" data-i18n="nav.profile">Profil</div>
             </div>
         </div>
 
@@ -591,47 +597,47 @@
         <div class="modal-overlay" id="newClaimModal">
             <div class="modal">
                 <div class="modal-header">
-                    <h3 class="modal-title">Nouvelle réclamation</h3>
-                    <p class="modal-subtitle">Décrivez votre problème en détail</p>
+                    <h3 class="modal-title" data-i18n="claim.new">Nouvelle réclamation</h3>
+                    <p class="modal-subtitle" data-i18n="claim.modal_sub">Décrivez votre problème en détail</p>
                 </div>
                 <div class="modal-body">
                     <form id="claimForm">
                         <div class="form-group">
-                            <label class="form-label">Colis concerné</label>
+                            <label class="form-label" data-i18n="claim.package">Colis concerné</label>
                             <select class="form-select" id="packageNumber" required>
-                                <option value="">Chargement de vos envois…</option>
+                                <option value="" data-i18n="claim.loading_shipments">Chargement de vos envois…</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Type de réclamation</label>
+                            <label class="form-label" data-i18n="claim.type_label">Type de réclamation</label>
                             <select class="form-select" id="claimType" required>
-                                <option value="">Sélectionnez un type</option>
-                                <option value="damaged">Colis endommagé</option>
-                                <option value="lost">Colis perdu</option>
-                                <option value="delay">Retard de livraison</option>
-                                <option value="tracking">Problème de suivi</option>
-                                <option value="other">Autre</option>
+                                <option value="" data-i18n="claim.choose_type">Sélectionnez un type</option>
+                                <option value="damaged" data-i18n="claim.type_damaged">Colis endommagé</option>
+                                <option value="lost" data-i18n="claim.type_lost">Colis perdu</option>
+                                <option value="delay" data-i18n="claim.type_delay">Retard de livraison</option>
+                                <option value="tracking" data-i18n="claim.type_tracking">Problème de suivi</option>
+                                <option value="other" data-i18n="claim.type_other">Autre</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Votre message</label>
+                            <label class="form-label" data-i18n="claim.message">Votre message</label>
                             <div class="chat-compose">
-                                <input type="text" class="form-input" id="claimDescription" placeholder="Écrivez votre message…" style="flex:1;">
-                                <button type="button" id="voiceBtn" class="voice-btn" onclick="toggleVoice()" title="Message vocal"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></button>
+                                <input type="text" class="form-input" id="claimDescription" placeholder="Écrivez votre message…" data-i18n-attr="placeholder:claim.message_placeholder" style="flex:1;">
+                                <button type="button" id="voiceBtn" class="voice-btn" onclick="toggleVoice()" title="Message vocal" data-i18n-attr="title:claim.voice_title"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></button>
                             </div>
                             <div id="voicePreview" style="display:none;margin-top:10px;">
                                 <audio id="voiceAudio" controls style="width:100%;"></audio>
-                                <button type="button" onclick="discardVoice()" style="margin-top:6px;background:rgba(255,107,107,.2);color:#ff8f8f;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;">Supprimer le vocal</button>
+                                <button type="button" onclick="discardVoice()" style="margin-top:6px;background:rgba(255,107,107,.2);color:#ff8f8f;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;" data-i18n="claim.voice_delete">Supprimer le vocal</button>
                             </div>
-                            <div id="voiceStatus" style="font-size:12px;color:rgba(255,255,255,.55);margin-top:8px;">Appuyez sur le micro pour enregistrer un message vocal (parlez dans votre langue).</div>
+                            <div id="voiceStatus" style="font-size:12px;color:rgba(255,255,255,.55);margin-top:8px;" data-i18n="claim.voice_hint">Appuyez sur le micro pour enregistrer un message vocal (parlez dans votre langue).</div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-cancel" onclick="closeNewClaimModal()">Annuler</button>
-                    <button class="btn btn-submit" onclick="submitClaim()">Soumettre</button>
+                    <button class="btn btn-cancel" onclick="closeNewClaimModal()" data-i18n="common.cancel">Annuler</button>
+                    <button class="btn btn-submit" onclick="submitClaim()" data-i18n="claim.submit">Soumettre</button>
                 </div>
             </div>
         </div>
@@ -679,14 +685,14 @@
                     headers: { 'Authorization': `Bearer ${getAuthToken()}` }
                 });
                 const data = res.ok ? ((await res.json()).data || []) : [];
-                if (!data.length) { sel.innerHTML = '<option value="">Aucun envoi</option>'; return; }
-                sel.innerHTML = '<option value="">Sélectionnez le colis</option>' + data.map(function(m){
-                    const type = (m.package_description || 'Colis').toString();
+                if (!data.length) { sel.innerHTML = '<option value="">' + window.sengpEsc(sengpT('claim.no_shipments')) + '</option>'; return; }
+                sel.innerHTML = '<option value="">' + window.sengpEsc(sengpT('claim.choose_package')) + '</option>' + data.map(function(m){
+                    const type = (m.package_description || sengpT('detail.parcel')).toString();
                     const route = (m.departure_city || '') + ' → ' + (m.arrival_city || '');
                     return '<option value="' + window.sengpEsc(m.id) + '">' + window.sengpEsc(type) + ' · ' + window.sengpEsc(route) + '</option>';
                 }).join('');
             } catch (e) {
-                sel.innerHTML = '<option value="">Erreur de chargement</option>';
+                sel.innerHTML = '<option value="">' + window.sengpEsc(sengpT('claim.load_error')) + '</option>';
             }
         }
 
@@ -710,22 +716,22 @@
                         voiceDataUrl = reader.result;
                         document.getElementById('voiceAudio').src = voiceDataUrl;
                         document.getElementById('voicePreview').style.display = 'block';
-                        document.getElementById('voiceStatus').textContent = 'Message vocal enregistré.';
+                        document.getElementById('voiceStatus').textContent = sengpT('claim.voice_saved');
                     };
                     reader.readAsDataURL(blob);
                 };
                 mediaRecorder.start();
-                btn.classList.add('recording'); btn.textContent = 'Arrêter';
-                document.getElementById('voiceStatus').textContent = 'Enregistrement… appuyez de nouveau pour arrêter.';
+                btn.classList.add('recording'); btn.textContent = sengpT('claim.voice_stop');
+                document.getElementById('voiceStatus').textContent = sengpT('claim.voice_recording');
                 setTimeout(function(){ if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop(); }, 60000);
             } catch (e) {
-                alert('Micro indisponible ou permission refusée. Vous pouvez écrire votre message.');
+                alert(sengpT('claim.mic_denied'));
             }
         }
         function discardVoice() {
             voiceDataUrl = null; voiceBlob = null;
             const p = document.getElementById('voicePreview'); if (p) p.style.display = 'none';
-            const s = document.getElementById('voiceStatus'); if (s) s.textContent = 'Appuyez sur le micro pour enregistrer un message vocal (parlez dans votre langue).';
+            const s = document.getElementById('voiceStatus'); if (s) s.textContent = sengpT('claim.voice_hint');
         }
 
         function getAuthToken() {
@@ -748,6 +754,7 @@
 
                 if (response.ok) {
                     const result = await response.json();
+                    window.__claims = result.data;
                     displayClaims(result.data);
                 } else {
                     console.error('Failed to load claims');
@@ -766,13 +773,13 @@
             // Update tab counts (real)
             const ta = document.getElementById('tab-active');
             const tr = document.getElementById('tab-resolved');
-            if (ta) ta.textContent = `En cours (${activeClaims.length})`;
-            if (tr) tr.textContent = `Résolues (${resolvedClaims.length})`;
+            document.getElementById('cnt-active').textContent = activeClaims.length;
+            document.getElementById('cnt-resolved').textContent = resolvedClaims.length;
 
             // Display active claims
             const activeContainer = document.getElementById('activeClaims');
             if (activeClaims.length === 0) {
-                activeContainer.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5);padding:40px;">Aucune réclamation active</p>';
+                activeContainer.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5);padding:40px;">' + window.sengpEsc(sengpT('claim.none_active')) + '</p>';
             } else {
                 activeContainer.innerHTML = activeClaims.map(claim => createClaimCard(claim)).join('');
             }
@@ -780,10 +787,17 @@
             // Display resolved claims
             const resolvedContainer = document.getElementById('resolvedClaims');
             if (resolvedClaims.length === 0) {
-                resolvedContainer.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5);padding:40px;">Aucune réclamation résolue</p>';
+                resolvedContainer.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5);padding:40px;">' + window.sengpEsc(sengpT('claim.none_resolved')) + '</p>';
             } else {
                 resolvedContainer.innerHTML = resolvedClaims.map(claim => createClaimCard(claim)).join('');
             }
+        }
+
+        // Libelle du type de reclamation (valeurs du formulaire et de la base).
+        function claimTypeLabel(t) {
+            const map = { damaged: 'type_damaged', damaged_package: 'type_damaged', lost: 'type_lost', lost_package: 'type_lost',
+                          delay: 'type_delay', delayed_delivery: 'type_delay', tracking: 'type_tracking', tracking_issue: 'type_tracking', other: 'type_other' };
+            return map[t] ? sengpT('claim.' + map[t]) : t;
         }
 
         function createClaimCard(claim) {
@@ -794,9 +808,9 @@
             };
 
             const statusLabels = {
-                pending: 'En attente',
-                in_progress: 'En cours',
-                resolved: 'Résolu'
+                pending: sengpT('ship.status.pending'),
+                in_progress: sengpT('dash.in_progress'),
+                resolved: sengpT('claim.status_resolved')
             };
 
             return `
@@ -807,9 +821,9 @@
                             ${statusLabels[claim.status]}
                         </span>
                     </div>
-                    <div class="claim-type">${window.sengpEsc(claim.claim_type)}</div>
-                    <div class="claim-description">${window.sengpEsc(claim.description || 'Aucune description')}</div>
-                    <div class="claim-date">Créée le ${new Date(claim.created_at).toLocaleDateString('fr-FR')}</div>
+                    <div class="claim-type">${window.sengpEsc(claimTypeLabel(claim.claim_type))}</div>
+                    <div class="claim-description">${window.sengpEsc(claim.description || sengpT('claim.no_description'))}</div>
+                    <div class="claim-date">${window.sengpEsc(sengpT('claim.created_on', { date: SengpI18n.fmt.date(claim.created_at, { day: 'numeric', month: 'numeric', year: 'numeric' }) }))}</div>
                 </div>
             `;
         }
@@ -821,11 +835,11 @@
             const text = document.getElementById('claimDescription').value.trim();
 
             if (!missionId || !claimType) {
-                alert('Veuillez choisir le colis et le type de réclamation.');
+                alert(sengpT('claim.need_fields'));
                 return;
             }
             if (!text && !voiceDataUrl) {
-                alert('Écrivez un message ou enregistrez un vocal.');
+                alert(sengpT('claim.need_message'));
                 return;
             }
 
@@ -863,27 +877,30 @@
                 });
 
                 if (response.ok) {
-                    alert('Réclamation soumise avec succès!\n\nVous recevrez une notification dès qu\'elle sera traitée.');
+                    alert(sengpT('claim.submitted'));
                     closeNewClaimModal();
                     loadUserClaims();
                 } else {
                     const error = await response.json();
-                    alert('Erreur: ' + (error.error || error.message || 'Impossible de soumettre la réclamation'));
+                    alert(sengpT('envois.error', { message: error.error || error.message || sengpT('claim.submit_failed') }));
                 }
             } catch (error) {
                 console.error('Error submitting claim:', error);
-                alert('Erreur de connexion au serveur');
+                alert(sengpT('errors.network'));
             }
         }
 
         function viewClaimDetails(claimId) {
-            alert(`Voir les détails de la réclamation\n\nID: ${claimId}\n\nInformations complètes, historique, messages, etc.`);
+            alert(sengpT('claim.details_stub', { id: claimId }));
         }
 
         // Load claims on page load
         window.addEventListener('load', () => {
-            loadUserClaims();
+            SengpI18n.ready.then(() => { loadUserClaims(); });
         });
+
+        // Changement de langue : cartes et textes dynamiques se redessinent.
+        window.addEventListener('sengp:languagechange', () => { if (window.__claims) displayClaims(window.__claims); });
 
         function navigateTo(section) {
             const pages = {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEN GP - Confirmation d'envoi</title>
+    <title data-i18n="pay.page_title">SEN GP - Confirmation d'envoi</title>
     <style>
         * {
             margin: 0;
@@ -335,7 +335,9 @@
         </style>
     <link rel="stylesheet" href="theme.css">
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="ui.js"></script>
+    <link rel="stylesheet" href="i18n.css">
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
@@ -357,77 +359,77 @@
                 <div class="success-circle"><svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
             </div>
 
-            <h1 class="success-title">Envoi confirmé !</h1>
-            <p class="success-subtitle">Votre colis est prêt à être expédié</p>
+            <h1 class="success-title" data-i18n="pay.title">Envoi confirmé !</h1>
+            <p class="success-subtitle" data-i18n="pay.subtitle">Votre colis est prêt à être expédié</p>
 
             <!-- Tracking Number -->
             <div class="tracking-section">
-                <div class="tracking-label">Numéro de suivi</div>
+                <div class="tracking-label" data-i18n="ship.tracking_no">Numéro de suivi</div>
                 <div class="tracking-number" id="trackingNumber">SG-20251021-X7Y8</div>
                 <button class="copy-btn" id="copyBtn" onclick="copyTrackingNumber()">
                     <span id="copyIcon"><svg class="ic" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></span>
-                    <span id="copyText">Copier le numéro</span>
+                    <span id="copyText" data-i18n="pay.copy">Copier le numéro</span>
                 </button>
             </div>
 
             <!-- QR Code -->
             <div class="qr-section">
-                <h3 class="qr-title">Code QR de votre colis</h3>
+                <h3 class="qr-title" data-i18n="pay.qr_title">Code QR de votre colis</h3>
                 <div class="qr-code-container">
                     <div class="qr-code"></div>
                 </div>
                 <p class="qr-instruction">
-                    <strong>Présentez ce code au GP</strong><br>
-                    Il sera scanné lors de la prise en charge et de la livraison
+                    <strong data-i18n="pay.qr_present">Présentez ce code au GP</strong><br>
+                    <span data-i18n="pay.qr_scan">Il sera scanné lors de la prise en charge et de la livraison</span>
                 </p>
             </div>
 
             <!-- Action Buttons -->
             <div class="action-buttons">
                 <button class="btn btn-primary" onclick="downloadQR()">
-                    <svg class="ic" viewBox="0 0 24 24" style="vertical-align:-3px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Télécharger le QR Code
+                    <svg class="ic" viewBox="0 0 24 24" style="vertical-align:-3px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> <span data-i18n="pay.download">Télécharger le QR Code</span>
                 </button>
                 <button class="btn btn-secondary" onclick="shareTracking()">
-                    <svg class="ic" viewBox="0 0 24 24" style="vertical-align:-3px;"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></svg> Partager le suivi
+                    <svg class="ic" viewBox="0 0 24 24" style="vertical-align:-3px;"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></svg> <span data-i18n="ship.tile_share">Partager le suivi</span>
                 </button>
             </div>
 
             <!-- Shipment Details -->
             <div class="shipment-details">
-                <div class="details-title">Détails de l'envoi</div>
+                <div class="details-title" data-i18n="detail.title">Détails de l'envoi</div>
                 
                 <div class="detail-row">
-                    <span class="detail-label">Route</span>
+                    <span class="detail-label" data-i18n="pay.route">Route</span>
                     <span class="detail-value route-value">
                         <span>🇸🇳 Dakar</span>
-                        <span>→</span>
+                        <span class="i18n-flip">→</span>
                         <span>🇫🇷 Paris</span>
                     </span>
                 </div>
 
                 <div class="detail-row">
-                    <span class="detail-label">GP sélectionné</span>
+                    <span class="detail-label" data-i18n="pay.gp_selected">GP sélectionné</span>
                     <span class="detail-value">Fatou Sall</span>
                 </div>
 
                 <div class="detail-row">
-                    <span class="detail-label">Date de départ</span>
+                    <span class="detail-label" data-i18n="pay.dep_date">Date de départ</span>
                     <span class="detail-value">28 Oct 2025</span>
                 </div>
 
                 <div class="detail-row">
-                    <span class="detail-label">Statut</span>
-                    <span class="detail-value" style="color: #FFE66D;">En attente GP</span>
+                    <span class="detail-label" data-i18n="pay.status">Statut</span>
+                    <span class="detail-value" style="color: #FFE66D;" data-i18n="pay.status_waiting_gp">En attente GP</span>
                 </div>
 
                 <div class="detail-row">
-                    <span class="detail-label">Paiement</span>
-                    <span class="detail-value" style="color: #4CAF50;">✓ Confirmé</span>
+                    <span class="detail-label" data-i18n="pay.payment">Paiement</span>
+                    <span class="detail-value" style="color: #4CAF50;" data-i18n="pay.confirmed">✓ Confirmé</span>
                 </div>
             </div>
 
             <button class="btn btn-primary" onclick="goToDashboard()" style="margin-top: 10px;">
-                <svg class="ic" viewBox="0 0 24 24" style="vertical-align:-3px;"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg> Retour au tableau de bord
+                <svg class="ic" viewBox="0 0 24 24" style="vertical-align:-3px;"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg> <span data-i18n="pay.back_dashboard">Retour au tableau de bord</span>
             </button>
         </div>
     </div>
@@ -444,38 +446,40 @@
                 // Update button state
                 copyBtn.classList.add('copied');
                 copyIcon.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
-                copyText.textContent = 'Copié !';
+                copyText.textContent = sengpT('pay.copied');
+                copyText.setAttribute('data-i18n', 'pay.copied');
 
                 // Reset after 2 seconds
                 setTimeout(() => {
                     copyBtn.classList.remove('copied');
                     copyIcon.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
-                    copyText.textContent = 'Copier le numéro';
+                    copyText.textContent = sengpT('pay.copy');
+                    copyText.setAttribute('data-i18n', 'pay.copy');
                 }, 2000);
             });
         }
 
         function downloadQR() {
-            alert('Téléchargement du QR Code\n\nLe QR code sera enregistré dans vos téléchargements.\n\nDans la version complète, cela téléchargerait une image PNG haute résolution.');
+            alert(sengpT('pay.download_alert'));
         }
 
         function shareTracking() {
             const trackingNumber = document.getElementById('trackingNumber').textContent;
-            const message = `Suivi de colis SEN GP\n\nNuméro: ${trackingNumber}\n\nSuivez votre colis: https://sengp.com/track/${trackingNumber}`;
+            const message = sengpT('pay.share_message', { tracking: trackingNumber, url: 'https://sengp.com/track/' + trackingNumber });
             
             if (navigator.share) {
                 navigator.share({
-                    title: 'SEN GP - Suivi de colis',
+                    title: sengpT('pay.share_title'),
                     text: message
                 }).catch(() => {
                     // Fallback: copy to clipboard
                     navigator.clipboard.writeText(message);
-                    alert('Lien de suivi copié !\n\nVous pouvez le partager avec vos contacts.');
+                    alert(sengpT('pay.link_copied'));
                 });
             } else {
                 // Fallback for browsers that don't support Web Share API
                 navigator.clipboard.writeText(message);
-                alert('Lien de suivi copié !\n\nVous pouvez le partager avec vos contacts.');
+                alert(sengpT('pay.link_copied'));
             }
         }
 
