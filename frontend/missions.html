@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEN GP - Recherche de Missions</title>
+    <title data-i18n="ms.page_title">SEN GP - Recherche de Missions</title>
     <style>
         * {
             margin: 0;
@@ -512,6 +512,15 @@
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
 
+        /* Droite a gauche (arabe) */
+        [dir="rtl"] .back-btn { transform: scaleX(-1); }
+        [dir="rtl"] .back-btn:hover { transform: scaleX(-1) translateX(-3px); }
+        [dir="rtl"] .route-arrow { display: inline-block; transform: scaleX(-1); }
+        [dir="rtl"] .search-input { padding: 12px 45px 12px 16px; }
+        [dir="rtl"] .search-icon { left: auto; right: 16px; }
+        [dir="rtl"] .mission-card:hover { transform: translateX(-5px); }
+        [dir="rtl"] .mission-badges { align-items: flex-start; }
+        [dir="rtl"] .nav-badge { left: auto; right: calc(50% + 5px); }
         /* Loading / empty states */
         .missions-state {
             text-align: center;
@@ -522,8 +531,10 @@
         .missions-state .state-text { font-size: 14px; line-height: 1.5; }
         </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="i18n.css">
     <script src="ui.js"></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -544,10 +555,10 @@
         <!-- Header -->
         <div class="header">
             <div class="header-top">
-                <button class="back-btn" onclick="goBack()">←</button>
+                <button class="back-btn" onclick="goBack()" aria-label="Retour" data-i18n-attr="aria-label:common.back">←</button>
                 <div class="header-title">
-                    <h1>Missions disponibles</h1>
-                    <p id="missionsCount">Chargement…</p>
+                    <h1 data-i18n="ms.missions_disponibles">Missions disponibles</h1>
+                    <p id="missionsCount" data-i18n="common.loading">Chargement…</p>
                 </div>
             </div>
 
@@ -555,7 +566,7 @@
             <div class="search-section">
                 <div class="search-bar">
                     <span class="search-icon"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
-                    <input type="text" class="search-input" placeholder="Rechercher une destination...">
+                    <input type="text" class="search-input" placeholder="Rechercher une destination..." data-i18n-attr="placeholder:ms.rechercher_une_destination">
                 </div>
                 <button class="filter-btn" onclick="openFilters()"><svg class="ic" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></button>
             </div>
@@ -566,27 +577,27 @@
             <!-- Info: missions matching the GP's trip; assignment is by the admin -->
             <div style="background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.3);border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;">
                 <span style="font-size:18px;line-height:1.3;"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
-                <span style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.5;">Voici les missions correspondant à votre trajet (destination &amp; dates). L'affectation est faite par l'<strong style="color:#4ECDC4">administration</strong> : surveillez vos <strong style="color:#FFD700">Notifications</strong> pour les missions qui vous sont assignées.</span>
+                <span style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.5;" data-i18n-rich="ms.info_rich">Voici les missions correspondant à votre trajet (destination &amp; dates). L'affectation est faite par l'<strong style="color:#4ECDC4" data-slot="admin" data-i18n="ms.administration">administration</strong> : surveillez vos <strong style="color:#FFD700" data-slot="notifs" data-i18n="nav.notifications">Notifications</strong> pour les missions qui vous sont assignées.</span>
             </div>
             <!-- Filter Tags -->
             <div class="filter-tags">
-                <div class="filter-tag active" onclick="filterMissions('all', this)">Toutes</div>
-                <div class="filter-tag" onclick="filterMissions('high-pay', this)"><svg class="ic" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Bien payées</div>
-                <div class="filter-tag" onclick="filterMissions('urgent', this)"><svg class="ic" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Urgentes</div>
-                <div class="filter-tag" onclick="filterMissions('verified', this)"><svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Vérifiées</div>
-                <div class="filter-tag" onclick="filterMissions('light', this)"><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg> Légères</div>
+                <div class="filter-tag active" onclick="filterMissions('all', this)" data-i18n="notif.tab_all">Toutes</div>
+                <div class="filter-tag" onclick="filterMissions('high-pay', this)"><svg class="ic" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span data-i18n="ms.bien_payees">Bien payées</span></div>
+                <div class="filter-tag" onclick="filterMissions('urgent', this)"><svg class="ic" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span data-i18n="ms.urgentes">Urgentes</span></div>
+                <div class="filter-tag" onclick="filterMissions('verified', this)"><svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="ms.verifiees">Vérifiées</span></div>
+                <div class="filter-tag" onclick="filterMissions('light', this)"><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg><span data-i18n="ms.legeres">Légères</span></div>
             </div>
 
             <!-- Section Header -->
             <div class="section-header">
-                <h2 class="section-title">Missions disponibles</h2>
-                <button class="sort-btn" onclick="sortMissions()">Trier</button>
+                <h2 class="section-title" data-i18n="ms.missions_disponibles">Missions disponibles</h2>
+                <button class="sort-btn" onclick="sortMissions()" data-i18n="ms.trier">Trier</button>
             </div>
 
             <!-- Missions (rendered from real backend data) -->
             <div id="missionsLoading" class="missions-state">
                 <div class="state-icon"><span data-icon="clock" data-size="34"></span></div>
-                <div class="state-text">Chargement des missions…</div>
+                <div class="state-text" data-i18n="ms.chargement_des_missions">Chargement des missions…</div>
             </div>
             <div id="missionsEmpty" class="missions-state" style="display: none;">
                 <div class="state-icon"><svg class="ic" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div>
@@ -597,25 +608,25 @@
 
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
-            <div class="nav-item" onclick="navigateTo('home')" tabindex="0" role="button" aria-label="Accueil">
+            <div class="nav-item" onclick="navigateTo('home')" tabindex="0" role="button" aria-label="Accueil" data-i18n-attr="aria-label:nav.home">
                 <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
-                <div class="nav-label">Accueil</div>
+                <div class="nav-label" data-i18n="nav.home">Accueil</div>
             </div>
 
-            <div class="nav-item active" onclick="navigateTo('missions')" tabindex="0" role="button" aria-label="Missions">
+            <div class="nav-item active" onclick="navigateTo('missions')" tabindex="0" role="button" aria-label="Missions" data-i18n-attr="aria-label:ms.missions">
                 <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
-                <div class="nav-label">Missions</div>
+                <div class="nav-label" data-i18n="ms.missions">Missions</div>
                 <div class="nav-badge" id="navMissionsBadge" style="display:none;">0</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('trips')" tabindex="0" role="button" aria-label="Trajets">
+            <div class="nav-item" onclick="navigateTo('trips')" tabindex="0" role="button" aria-label="Trajets" data-i18n-attr="aria-label:nav.trips">
                 <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
-                <div class="nav-label">Trajets</div>
+                <div class="nav-label" data-i18n="nav.trips">Trajets</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil">
+            <div class="nav-item" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil" data-i18n-attr="aria-label:nav.profile">
                 <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
-                <div class="nav-label">Profil</div>
+                <div class="nav-label" data-i18n="nav.profile">Profil</div>
             </div>
         </div>
     </div>
@@ -655,25 +666,24 @@
 
         function formatPrice(p) {
             const n = parseFloat(p) || 0;
-            return n.toLocaleString('fr-FR') + ' FCFA';
+            return SengpI18n.fmt.currency(n);
         }
-
         function formatDate(d) {
             if (!d) return '—';
             try {
-                return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+                return SengpI18n.fmt.date(d, { day: 'numeric', month: 'short' }) || '—';
             } catch (e) { return '—'; }
         }
-
         function timeAgo(d) {
             if (!d) return '';
             const diff = Date.now() - new Date(d).getTime();
             const h = Math.floor(diff / 3600000);
-            if (h < 1) return 'À l\'instant';
-            if (h < 24) return `Publié il y a ${h}h`;
+            if (h < 1) return sengpT('notif.ago_now');
+            if (h < 24) return sengpT('ms.ago_hours', { n: h });
             const days = Math.floor(h / 24);
-            return `Publié il y a ${days} jour${days > 1 ? 's' : ''}`;
+            return sengpT('ms.ago_days', { count: days });
         }
+        const ctry = c => (window.SengpGeo ? SengpGeo.displayCountry(c || '') : (c || ''));
 
         function isNewMission(d) {
             if (!d) return false;
@@ -690,11 +700,16 @@
             window.location.href = 'dashgp.html';
         }
 
-        function setEmptyText(html) {
+        // Texte de l'etat vide : liste de cles, redessinee au changement de langue.
+        let emptyKeys = ['ms.empty_none', 'ms.empty_later'];
+        let loadFailed = false;
+        let rendered = false;
+        function renderEmpty() {
             const empty = document.getElementById('missionsEmpty');
             const t = empty && empty.querySelector('.state-text');
-            if (t) t.innerHTML = html;
+            if (t) t.innerHTML = emptyKeys.map(k => esc(sengpT(k))).join('<br>');
         }
+        function setEmptyKeys(keys) { emptyKeys = keys; renderEmpty(); }
 
         const _norm = s => String(s == null ? '' : s).trim().toLowerCase();
         function _samePlace(a, b) { return !!a && !!b && _norm(a) === _norm(b); }
@@ -718,7 +733,7 @@
 
         async function loadMissions() {
             if (!authToken) {
-                alert('Vous devez vous connecter pour accéder à cette page');
+                alert(sengpT('ms.login_required'));
                 window.location.href = 'connexion.html';
                 return;
             }
@@ -740,7 +755,7 @@
                 // Sans trajet, aucune mission n'est visible — il faut d'abord en créer un.
                 if (!myTrips.length) {
                     allMissions = [];
-                    setEmptyText('Créez d\'abord un trajet pour voir les missions correspondant à votre destination et à vos dates.');
+                    setEmptyKeys(['ms.empty_no_trip']);
                     renderMissions();
                     return;
                 }
@@ -749,19 +764,21 @@
                 const res = await fetch(`${API_BASE_URL}/missions?status=pending&limit=100`, {
                     headers: { 'Authorization': `Bearer ${authToken}` }
                 });
-                if (!res.ok) throw new Error('Échec du chargement');
+                if (!res.ok) throw new Error(sengpT('detail.load_failed'));
                 const json = await res.json();
                 allMissions = (json.data || []).filter(missionMatchesTrips);
-                setEmptyText('Aucune mission ne correspond à votre trajet pour le moment.<br>Revenez plus tard ou ajoutez un trajet.');
+                setEmptyKeys(['ms.empty_nomatch', 'ms.empty_later_trip']);
                 renderMissions();
             } catch (error) {
                 console.error('Erreur chargement missions:', error);
                 document.getElementById('missionsLoading').style.display = 'none';
                 const empty = document.getElementById('missionsEmpty');
-                empty.querySelector('.state-text').innerHTML =
-                    'Impossible de charger les missions.<br>Vérifiez votre connexion.';
+                loadFailed = true;
+                setEmptyKeys(['ms.load_failed', 'ms.check_connection']);
                 empty.style.display = 'block';
-                document.getElementById('missionsCount').textContent = 'Erreur de chargement';
+                const cnt = document.getElementById('missionsCount');
+                cnt.setAttribute('data-i18n', 'claim.load_error');
+                cnt.textContent = sengpT('claim.load_error');
             }
         }
 
@@ -799,8 +816,10 @@
 
             // Compteurs (entête + badge nav) basés sur le total réel chargé.
             const total = allMissions.length;
-            document.getElementById('missionsCount').textContent =
-                `${total} mission${total > 1 ? 's' : ''} disponible${total > 1 ? 's' : ''}`;
+            rendered = true;
+            const cntEl = document.getElementById('missionsCount');
+            cntEl.removeAttribute('data-i18n');
+            cntEl.textContent = sengpT('ms.count', { count: total });
             const navBadge = document.getElementById('navMissionsBadge');
             if (total > 0) { navBadge.textContent = total; navBadge.style.display = 'flex'; }
             else { navBadge.style.display = 'none'; }
@@ -815,12 +834,12 @@
             container.innerHTML = list.map((m, idx) => {
                 const featured = idx === 0 ? ' featured' : '';
                 const badges = [];
-                if (isNewMission(m.created_at)) badges.push('<span class="badge badge-new"><svg class="ic" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Nouveau</span>');
-                if (isUrgent(m)) badges.push('<span class="badge badge-urgent"><svg class="ic" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Urgent</span>');
-                if (m.is_insured) badges.push('<span class="badge badge-verified"><svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Assuré</span>');
+                if (isNewMission(m.created_at)) badges.push('<span class="badge badge-new"><svg class="ic" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> ' + esc(sengpT('ms.badge_new')) + '</span>');
+                if (isUrgent(m)) badges.push('<span class="badge badge-urgent"><svg class="ic" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> ' + esc(sengpT('ms.badge_urgent')) + '</span>');
+                if (m.is_insured) badges.push('<span class="badge badge-verified"><svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ' + esc(sengpT('detail.insured')) + '</span>');
 
-                const priceType = m.is_price_negotiable ? 'Prix négociable' : 'Prix fixe';
-                const dims = (m.dimensions && m.dimensions !== 'xx') ? m.dimensions : 'N/C';
+                const priceType = sengpT(m.is_price_negotiable ? 'ms.price_negotiable' : 'ms.price_fixed');
+                const dims = (m.dimensions && m.dimensions !== 'xx') ? m.dimensions : sengpT('detail.na');
                 const weight = (parseFloat(m.weight) || 0);
 
                 return `
@@ -828,32 +847,32 @@
                     <div class="mission-header">
                         <div class="mission-price-section">
                             <div class="mission-price">${formatPrice(m.price)}</div>
-                            <div class="price-type">${priceType}</div>
+                            <div class="price-type">${esc(priceType)}</div>
                         </div>
                         <div class="mission-badges">${badges.join('')}</div>
                     </div>
                     <div class="mission-route">
                         <div class="route-location">
                             <span class="flag">${flagFor(m.departure_country)}</span>
-                            <span>${esc(m.departure_city || m.departure_country || '—')}</span>
+                            <span>${esc(m.departure_city || ctry(m.departure_country) || '—')}</span>
                         </div>
                         <span class="route-arrow">→</span>
                         <div class="route-location">
                             <span class="flag">${flagFor(m.arrival_country)}</span>
-                            <span>${esc(m.arrival_city || m.arrival_country || '—')}</span>
+                            <span>${esc(m.arrival_city || ctry(m.arrival_country) || '—')}</span>
                         </div>
                     </div>
                     <div class="mission-details">
                         <div class="detail-item"><span><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span><span>${weight} kg</span></div>
                         <div class="detail-item"><span><svg class="ic" viewBox="0 0 24 24"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg></span><span>${esc(dims)} cm</span></div>
-                        <div class="detail-item"><span><svg class="ic" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg></span><span>Départ: ${formatDate(m.departure_date)}</span></div>
-                        <div class="detail-item"><span><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span>Arrivée: ${formatDate(m.desired_arrival_date)}</span></div>
+                        <div class="detail-item"><span><svg class="ic" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg></span><span>${esc(sengpT('ms.departure_on', { date: formatDate(m.departure_date) }))}</span></div>
+                        <div class="detail-item"><span><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span>${esc(sengpT('ms.arrival_on', { date: formatDate(m.desired_arrival_date) }))}</span></div>
                     </div>
                     <div class="mission-footer">
-                        <span class="mission-date">Publiée ${timeAgo(m.created_at)}</span>
+                        <span class="mission-date">${esc(sengpT('ms.published', { ago: timeAgo(m.created_at) }))}</span>
                     </div>
                     <div class="action-buttons">
-                        <button class="btn btn-details" onclick="viewDetails('${m.id}')" style="flex:1;">Voir les détails</button>
+                        <button class="btn btn-details" onclick="viewDetails('${m.id}')" style="flex:1;">${esc(sengpT('ms.view_details'))}</button>
                     </div>
                 </div>`;
             }).join('');
@@ -880,17 +899,19 @@
         function viewDetails(missionId) {
             const m = allMissions.find(x => String(x.id) === String(missionId));
             if (!m) return;
-            const desc = m.package_description ? `\nColis: ${m.package_description}` : '';
+            const desc = m.package_description ? sengpT('ms.vd_pkg', { desc: m.package_description }) : '';
             // Aucune information sur l'expéditeur n'est exposée au GP : l'affectation
             // passe par l'admin, et le contact se fait via l'équipe SEN GP.
-            alert(
-                `Mission ${m.mission_code || ''}\n\n` +
-                `${m.departure_city || m.departure_country} → ${m.arrival_city || m.arrival_country}\n` +
-                `Prix: ${formatPrice(m.price)} (${m.is_price_negotiable ? 'négociable' : 'fixe'})\n` +
-                `Poids: ${parseFloat(m.weight) || 0} kg${desc}\n` +
-                `Départ: ${formatDate(m.departure_date)} — Arrivée: ${formatDate(m.desired_arrival_date)}\n\n` +
-                `Cette mission peut vous être assignée par l'administration. Vous serez notifié(e) dans l'onglet Notifications.`
-            );
+            alert(sengpT('ms.vd_body', {
+                code: m.mission_code || '',
+                route: `${m.departure_city || ctry(m.departure_country)} → ${m.arrival_city || ctry(m.arrival_country)}`,
+                price: formatPrice(m.price),
+                kind: sengpT(m.is_price_negotiable ? 'ms.kind_neg' : 'ms.kind_fixed'),
+                weight: parseFloat(m.weight) || 0,
+                desc: desc,
+                dep: formatDate(m.departure_date),
+                arr: formatDate(m.desired_arrival_date)
+            }));
         }
 
         function navigateTo(section) {
@@ -913,7 +934,12 @@
                     renderMissions();
                 });
             }
-            loadMissions();
+            SengpI18n.ready.then(loadMissions);
+        });
+        // Changement de langue : redessiner les contenus dynamiques.
+        window.addEventListener('sengp:languagechange', () => {
+            renderEmpty();
+            if (rendered && !loadFailed) renderMissions();
         });
     </script>
 </body>

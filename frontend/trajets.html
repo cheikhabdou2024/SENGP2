@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>SEN GP - Mes Trajets</title>
+    <title data-i18n="tj.page_title">SEN GP - Mes Trajets</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -237,10 +237,31 @@
             .tj-fact b { font-size: 14px; }
             .tj-cta { padding: 0 24px; font-size: 17px; }
         }
+
+        /* ---- droite a gauche (arabe) ---- */
+        [dir="rtl"] .tj-hero::after { background: linear-gradient(270deg, rgba(7, 20, 47, 0.55) 0%, rgba(7, 20, 47, 0.08) 62%, rgba(7, 20, 47, 0) 100%), linear-gradient(180deg, rgba(244, 248, 253, 0) 74%, #F4F8FD 100%); }
+        [dir="rtl"] .tj-back .tj-i, [dir="rtl"] .tj-more .tj-i, [dir="rtl"] .tj-view .tj-i, [dir="rtl"] .tj-tip > .tj-i:last-child { transform: scaleX(-1); }
+        [dir="rtl"] .tj-add { margin-left: 0; margin-right: auto; padding: 10px 12px 10px 16px; text-align: right; }
+        [dir="rtl"] .tj-card::before { left: auto; right: 0; }
+        [dir="rtl"] .tj-city:last-child { text-align: left; }
+        [dir="rtl"] .tj-city:last-child span { justify-content: flex-start; }
+        [dir="rtl"] .tj-path .tj-i, [dir="rtl"] .tj-t__route > .tj-i.plane { transform: scaleX(-1) rotate(45deg); }
+        [dir="rtl"] .tj-more { padding: 6px 8px 6px 4px; }
+        [dir="rtl"] .tj-badge { left: auto; right: 8px; }
+        [dir="rtl"] .tj-dots { margin-left: 0; margin-right: auto; }
+        [dir="rtl"] .tj-tip { text-align: right; }
+        [dir="rtl"] .tj-tip > .tj-i:first-child { padding-right: 0; padding-left: 12px; border-right: 0; border-left: 1px solid #F3DDB8; }
+        [dir="rtl"] .tj-tip > .tj-i:last-child { margin-left: 0; margin-right: auto; }
+        [dir="rtl"] .tj-nav .bell-badge { right: auto; left: -9px; }
+        [dir="rtl"] .tj-art svg { left: auto; right: 14%; }
+        @media (max-width: 400px) { [dir="rtl"] .tj-add { padding: 9px 9px 9px 12px; } }
+        @media (max-width: 359px) { [dir="rtl"] .tj-add { padding: 10px; } }
     </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="i18n.css">
     <script src="ui.js"></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -265,41 +286,41 @@
                 <img class="tj-bg" src="im/sengp-create-background.jpg" alt="" decoding="async">
             </picture>
             <div class="tj-hero__in">
-                <button type="button" class="tj-back" onclick="goBack()" aria-label="Retour">
+                <button type="button" class="tj-back" onclick="goBack()" aria-label="Retour" data-i18n-attr="aria-label:common.back">
                     <svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
                 </button>
                 <div class="tj-brand">
                     <img src="im/sengp-logo.png" alt="SEN GP" width="112" height="69">
-                    <span>VOS COLIS, NOTRE ENGAGEMENT</span>
+                    <span data-i18n="tj.vos_colis_notre_engagement">VOS COLIS, NOTRE ENGAGEMENT</span>
                 </div>
-                <button type="button" class="tj-add" onclick="addTrip()" aria-label="Créer un trajet">
+                <button type="button" class="tj-add" onclick="addTrip()" aria-label="Créer un trajet" data-i18n-attr="aria-label:tj.creer_un_trajet">
                     <svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-                    <span>Créer<br>un trajet</span>
+                    <span><span data-i18n="tj.add_1">Créer</span><br><span data-i18n="tj.add_2">un trajet</span></span>
                 </button>
             </div>
             <div class="tj-title">
-                <h1>Mes <em>Trajets</em></h1>
-                <p>Gérez tous vos voyages</p>
+                <h1 data-i18n-rich="tj.title">Mes <em data-slot="trips" data-i18n="nav.trips">Trajets</em></h1>
+                <p data-i18n="tj.gerez_tous_vos_voyages">Gérez tous vos voyages</p>
             </div>
         </header>
 
         <div class="tj-body">
-            <div class="tj-tabs" role="tablist" aria-label="Catégories de trajets">
+            <div class="tj-tabs" role="tablist" aria-label="Catégories de trajets" data-i18n-attr="aria-label:tj.categories_de_trajets">
                 <button type="button" class="tj-tab" id="tab-active" role="tab" aria-selected="true" onclick="switchTab('active')">
                     <svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
-                    <span>En cours<small id="cnt-active">(0)</small></span>
+                    <span><span data-i18n="dash.in_progress">En cours</span><small id="cnt-active">(0)</small></span>
                 </button>
                 <button type="button" class="tj-tab" id="tab-upcoming" role="tab" aria-selected="false" onclick="switchTab('upcoming')">
                     <svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                    <span>À venir<small id="cnt-upcoming">(0)</small></span>
+                    <span><span data-i18n="tj.tab_upcoming">À venir</span><small id="cnt-upcoming">(0)</small></span>
                 </button>
                 <button type="button" class="tj-tab" id="tab-completed" role="tab" aria-selected="false" onclick="switchTab('completed')">
                     <svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                    <span>Terminés<small id="cnt-completed">(0)</small></span>
+                    <span><span data-i18n="tj.tab_completed">Terminés</span><small id="cnt-completed">(0)</small></span>
                 </button>
             </div>
 
-            <div class="tj-loading" id="tripsLoading"><i></i>Chargement de vos trajets…</div>
+            <div class="tj-loading" id="tripsLoading"><i></i><span data-i18n="tj.loading">Chargement de vos trajets…</span></div>
             <div class="tj-list" id="tripsList"></div>
 
             <section class="tj-empty" id="tripsEmpty" style="display: none;">
@@ -308,12 +329,12 @@
                     <svg viewBox="0 0 100 70"><path d="M8 62C0 40 14 24 34 26" fill="none" stroke="#2F6BFF" stroke-width="2" stroke-dasharray="3 4" stroke-linecap="round"/><path d="M96 4 44 22l17 7 6 17z" fill="#2F8BFF"/><path d="M96 4 61 29l6 17" fill="#1E6FE0"/></svg>
                     <img src="im/sengp-suitcase.webp" alt="" width="420" height="386">
                 </div>
-                <h2 id="emptyTitle">Aucun trajet dans cette catégorie</h2>
-                <p id="emptyText">Créez un trajet pour commencer à recevoir des missions.</p>
-                <button type="button" class="tj-cta" id="emptyCta" onclick="addTrip()"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span id="emptyCtaLabel">Créer un trajet</span></button>
+                <h2 id="emptyTitle" data-i18n="tj.aucun_trajet_dans_cette">Aucun trajet dans cette catégorie</h2>
+                <p id="emptyText" data-i18n="tj.creez_un_trajet_pour">Créez un trajet pour commencer à recevoir des missions.</p>
+                <button type="button" class="tj-cta" id="emptyCta" onclick="addTrip()"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span id="emptyCtaLabel" data-i18n="tj.creer_un_trajet">Créer un trajet</span></button>
                 <button type="button" class="tj-tip" id="emptyTip" onclick="addTrip()">
                     <svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-                    <span><b>Conseil</b><p>Créez un trajet dès maintenant pour voir les missions disponibles sur votre itinéraire.</p></span>
+                    <span><b data-i18n="tj.conseil">Conseil</b><p data-i18n="tj.creez_un_trajet_des">Créez un trajet dès maintenant pour voir les missions disponibles sur votre itinéraire.</p></span>
                     <svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
             </section>
@@ -321,18 +342,18 @@
     </div>
 
     <!-- Bottom navigation -->
-    <nav class="tj-nav" aria-label="Navigation principale">
+    <nav class="tj-nav" aria-label="Navigation principale" data-i18n-attr="aria-label:nav.main_aria">
         <button type="button" class="tj-nav__item" onclick="navigateTo('home')">
-            <span class="tj-nav__icon"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span>Accueil</span>
+            <span class="tj-nav__icon"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span data-i18n="nav.home">Accueil</span>
         </button>
         <button type="button" class="tj-nav__item" aria-current="page" onclick="navigateTo('trips')">
-            <span class="tj-nav__icon"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span><span>Trajets</span>
+            <span class="tj-nav__icon"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span><span data-i18n="nav.trips">Trajets</span>
         </button>
         <button type="button" class="tj-nav__item" onclick="navigateTo('notifications')">
-            <span class="tj-nav__icon"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="bell-badge hidden" id="notifNavBadge">0</span></span><span class="lbl-long">Notifications</span><span class="lbl-short">Notifs</span>
+            <span class="tj-nav__icon"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="bell-badge hidden" id="notifNavBadge">0</span></span><span class="lbl-long" data-i18n="nav.notifications">Notifications</span><span class="lbl-short" data-i18n="nav.notifs_short">Notifs</span>
         </button>
         <button type="button" class="tj-nav__item" onclick="navigateTo('profile')">
-            <span class="tj-nav__icon"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span>Profil</span>
+            <span class="tj-nav__icon"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span data-i18n="nav.profile">Profil</span>
         </button>
     </nav>
 
@@ -341,8 +362,8 @@
         <div class="tj-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
             <div class="tj-sheet__grab"><i></i></div>
             <div class="tj-sheet__head">
-                <div><h3 id="sheetTitle">Détails du trajet</h3><p id="sheetSub"></p></div>
-                <button type="button" class="tj-close" onclick="closeSheet()" aria-label="Fermer"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+                <div><h3 id="sheetTitle" data-i18n="tj.details_du_trajet">Détails du trajet</h3><p id="sheetSub"></p></div>
+                <button type="button" class="tj-close" onclick="closeSheet()" aria-label="Fermer" data-i18n-attr="aria-label:common.close"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
             </div>
             <div class="tj-sheet__body" id="sheetBody"></div>
         </div>
@@ -363,10 +384,15 @@
             completed: ['completed', 'cancelled']
         };
         const EMPTY_TEXT = {
-            active: 'Vous n\'avez pas encore de trajet en cours.',
-            upcoming: 'Vous n\'avez pas encore de trajet à venir.',
-            completed: 'Vous n\'avez pas encore de trajet terminé.'
+            active: 'tj.empty_active',
+            upcoming: 'tj.empty_upcoming',
+            completed: 'tj.empty_completed'
         };
+        function setI18n(el, key, params) { el.setAttribute('data-i18n', key); el.textContent = sengpT(key, params); }
+        function setText(el, text) { el.removeAttribute('data-i18n'); el.textContent = text; }
+        // Nom de pays affiche dans la langue courante (la valeur enregistree reste le nom francais)
+        const ctry = c => c ? ((window.SengpGeo && SengpGeo.displayCountry) ? SengpGeo.displayCountry(c) : c) : '';
+        let loaded = false;
 
         // Drapeaux en SVG (les emoji drapeaux ne s'affichent pas sous Windows)
         const FLAGS = {
@@ -392,17 +418,17 @@
             try {
                 const dt = new Date(d);
                 if (isNaN(dt)) return '—';
-                return dt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ', ' +
-                       dt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                return SengpI18n.fmt.date(dt, { day: 'numeric', month: 'short' }) + ', ' +
+                       dt.toLocaleTimeString(SengpI18n.fmt.localeTag(), { hour: '2-digit', minute: '2-digit' });
             } catch (e) { return '—'; }
         }
         function statusMeta(s) {
             switch (s) {
-                case 'active': return { label: 'En cours', acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' };
-                case 'published': return { label: 'Ouvert', acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' };
-                case 'draft': return { label: 'Brouillon', acc: '#94A3B8', bg: '#EDF1F6', fg: '#64748B' };
-                case 'completed': return { label: 'Terminé', acc: '#17A34A', bg: '#D9F5E6', fg: '#13803F' };
-                case 'cancelled': return { label: 'Annulé', acc: '#94A3B8', bg: '#EDF1F6', fg: '#64748B' };
+                case 'active': return { label: sengpT('tj.status.active'), acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' };
+                case 'published': return { label: sengpT('tj.status.published'), acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' };
+                case 'draft': return { label: sengpT('tj.status.draft'), acc: '#94A3B8', bg: '#EDF1F6', fg: '#64748B' };
+                case 'completed': return { label: sengpT('tj.status.completed'), acc: '#17A34A', bg: '#D9F5E6', fg: '#13803F' };
+                case 'cancelled': return { label: sengpT('tj.status.cancelled'), acc: '#94A3B8', bg: '#EDF1F6', fg: '#64748B' };
                 default: return { label: s || '—', acc: '#94A3B8', bg: '#EDF1F6', fg: '#64748B' };
             }
         }
@@ -412,11 +438,12 @@
 
         async function loadTrips() {
             if (!authToken) {
-                alert('Vous devez vous connecter pour accéder à cette page');
+                alert(sengpT('tj.login_required'));
                 window.location.href = 'connexion.html';
                 return;
             }
             loadFailed = false;
+            loaded = false;
             $('tripsLoading').style.display = '';
             $('tripsEmpty').style.display = 'none';
             try {
@@ -435,6 +462,7 @@
                 loadFailed = true;
                 $('tripsLoading').style.display = 'none';
             }
+            loaded = true;
             renderTabs();
             renderTrips();
         }
@@ -452,38 +480,38 @@
             ['active', 'upcoming', 'completed'].forEach(b => $('tab-' + b).setAttribute('aria-selected', String(b === currentBucket)));
         }
 
-        const WAIT_NOTE = '<p class="tj-wait">En attente d’une mission : l’administration vous affectera des colis vers cette destination. Vous serez notifié et pourrez accepter ou refuser chaque mission.</p>';
+        const waitNote = () => '<p class="tj-wait">' + esc(sengpT('tj.wait_note')) + '</p>';
         function tripCard(t, i, inSheet) {
             const st = statusMeta(t.status);
-            const cap = `${t.current_packages || 0}/${t.max_packages || 0} colis`;
+            const cap = sengpT('tj.packages_ratio', { current: t.current_packages || 0, max: t.max_packages || 0 });
             const isOpen = t.status === 'published' || t.status === 'draft';
             const buttons = inSheet ? '' : `
                 <div class="tj-actions">
-                    <button type="button" class="tj-btn tj-btn--ghost" onclick="viewTripDetails('${esc(t.id)}')">Détails</button>
-                    ${isOpen ? '' : `<button type="button" class="tj-btn tj-btn--main" onclick="navigateTo('missions')">Voir missions</button>`}
+                    <button type="button" class="tj-btn tj-btn--ghost" onclick="viewTripDetails('${esc(t.id)}')">${esc(sengpT('detail.details'))}</button>
+                    ${isOpen ? '' : `<button type="button" class="tj-btn tj-btn--main" onclick="navigateTo('missions')">${esc(sengpT('tj.view_missions'))}</button>`}
                 </div>`;
             return `
             <article class="tj-card" style="--i:${Math.min(i || 0, 8)};--tj-acc:${st.acc};--tj-chipbg:${st.bg};--tj-chipfg:${st.fg}">
-                <div class="tj-card__top"><span class="tj-chip">${st.label}</span><span class="tj-code">${esc(t.trip_code || '')}</span></div>
+                <div class="tj-card__top"><span class="tj-chip">${esc(st.label)}</span><span class="tj-code">${esc(t.trip_code || '')}</span></div>
                 <div class="tj-route">
-                    <div class="tj-city"><b>${esc(t.departure_city || '—')}</b><span>${flagFor(t.departure_country)}${esc(t.departure_country || '')}</span></div>
+                    <div class="tj-city"><b>${esc(t.departure_city || '—')}</b><span>${flagFor(t.departure_country)}${esc(ctry(t.departure_country))}</span></div>
                     <div class="tj-path"><svg class="tj-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
-                    <div class="tj-city"><b>${esc(t.arrival_city || '—')}</b><span>${flagFor(t.arrival_country)}${esc(t.arrival_country || '')}</span></div>
+                    <div class="tj-city"><b>${esc(t.arrival_city || '—')}</b><span>${flagFor(t.arrival_country)}${esc(ctry(t.arrival_country))}</span></div>
                 </div>
                 <div class="tj-facts">
-                    <div class="tj-fact"><small>Départ</small><b>${formatDateTime(t.departure_date)}</b></div>
-                    <div class="tj-fact"><small>Arrivée</small><b>${formatDateTime(t.arrival_date)}</b></div>
-                    <div class="tj-fact"><small>Capacité</small><b>${parseFloat(t.available_weight) || 0} kg</b></div>
-                    <div class="tj-fact"><small>Colis acceptés</small><b>${cap}</b></div>
-                </div>${buttons}${isOpen && !inSheet ? WAIT_NOTE : ''}
+                    <div class="tj-fact"><small>${esc(sengpT('dash.departure'))}</small><b>${esc(formatDateTime(t.departure_date))}</b></div>
+                    <div class="tj-fact"><small>${esc(sengpT('dash.arrival'))}</small><b>${esc(formatDateTime(t.arrival_date))}</b></div>
+                    <div class="tj-fact"><small>${esc(sengpT('tj.capacity'))}</small><b>${parseFloat(t.available_weight) || 0} ${esc(sengpT('cr.kg'))}</b></div>
+                    <div class="tj-fact"><small>${esc(sengpT('tj.accepted_packages'))}</small><b>${esc(cap)}</b></div>
+                </div>${buttons}${isOpen && !inSheet ? waitNote() : ''}
             </article>`;
         }
 
         // ---------- liste par sections ----------
         const SECTIONS = [
-            { key: 'active', title: 'Trajets en cours', none: 'Aucun trajet en cours.' },
-            { key: 'upcoming', title: 'Trajets à venir', none: 'Aucun trajet à venir.' },
-            { key: 'completed', title: 'Trajets terminés', none: 'Aucun trajet terminé.' }
+            { key: 'active', title: 'tj.sec_active', none: 'tj.none_active' },
+            { key: 'upcoming', title: 'tj.sec_upcoming', none: 'tj.none_upcoming' },
+            { key: 'completed', title: 'tj.sec_completed', none: 'tj.none_completed' }
         ];
         const expanded = { active: false, upcoming: false, completed: false };
         const PREVIEW = 2;
@@ -512,24 +540,24 @@
 
         // Billet ✓ → Détails ✓ → état du trajet
         function progressHTML(status) {
-            const step = (cls, icon, label) => '<span class="tj-ps ' + cls + '"><i>' + icon + '</i><span class="lb">' + label + '</span></span>';
+            const step = (cls, icon, label) => '<span class="tj-ps ' + cls + '"><i>' + icon + '</i><span class="lb">' + esc(label) + '</span></span>';
             const line = done => '<span class="tj-pl' + (done ? ' done' : '') + '"></span>';
             const detailsDone = status !== 'draft';
             let third;
-            if (status === 'active') third = step('now', SVG.pl, 'Actif');
-            else if (status === 'completed') third = step('done', SVG.check, 'Terminé');
-            else if (status === 'cancelled') third = step('bad', SVG.x, 'Annulé');
-            else third = step('', SVG.pl, 'En attente');
-            return step('done', SVG.check, 'Billet') + line(true) +
-                   step(detailsDone ? 'done' : '', detailsDone ? SVG.check : '', 'Détails') + line(detailsDone) + third;
+            if (status === 'active') third = step('now', SVG.pl, sengpT('tj.step_active'));
+            else if (status === 'completed') third = step('done', SVG.check, sengpT('tj.status.completed'));
+            else if (status === 'cancelled') third = step('bad', SVG.x, sengpT('tj.status.cancelled'));
+            else third = step('', SVG.pl, sengpT('mission.status.pending'));
+            return step('done', SVG.check, sengpT('ct.billet')) + line(true) +
+                   step(detailsDone ? 'done' : '', detailsDone ? SVG.check : '', sengpT('detail.details')) + line(detailsDone) + third;
         }
 
         function dateParts(d) {
             const dt = d ? new Date(d) : null;
             if (!dt || isNaN(dt)) return { day: '—', time: '' };
             return {
-                day: dt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }),
-                time: dt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                day: SengpI18n.fmt.date(dt, { day: 'numeric', month: 'short', year: 'numeric' }),
+                time: dt.toLocaleTimeString(SengpI18n.fmt.localeTag(), { hour: '2-digit', minute: '2-digit' })
             };
         }
 
@@ -538,21 +566,21 @@
             const bs = BADGE_SOLID[t.status] || ['#EDF1F6', '#475569'];
             const dp = dateParts(t.departure_date);
             const id = esc(t.id);
-            const place = (city, country) => '<div class="tj-place">' + flagFor(country) + '<span><b>' + esc(city || '—') + '</b><small>' + esc(country || '') + '</small></span></div>';
+            const place = (city, country) => '<div class="tj-place">' + flagFor(country) + '<span><b>' + esc(city || '—') + '</b><small>' + esc(ctry(country)) + '</small></span></div>';
             return '<article class="tj-t" style="--i:' + Math.min(i, 8) + ';--tj-chipbg-solid:' + bs[0] + ';--tj-chipfg-solid:' + bs[1] + '">' +
                 '<div class="tj-t__main">' +
-                    '<div class="tj-thumb" style="background-image:url(' + thumbFor(t) + ')"><span class="tj-badge">' + st.label + '</span></div>' +
+                    '<div class="tj-thumb" style="background-image:url(' + thumbFor(t) + ')"><span class="tj-badge">' + esc(st.label) + '</span></div>' +
                     '<div class="tj-t__info">' +
                         '<div class="tj-t__route">' + place(t.departure_city, t.departure_country) + SVG.plane + place(t.arrival_city, t.arrival_country) +
-                            '<button type="button" class="tj-dots" onclick="openTripMenu(\'' + id + '\')" aria-label="Plus d\'actions">' + SVG.dots + '</button></div>' +
+                            '<button type="button" class="tj-dots" onclick="openTripMenu(\'' + id + '\')" aria-label="' + esc(sengpT('tj.more_actions')) + '">' + SVG.dots + '</button></div>' +
                         '<div class="tj-t__meta">' +
-                            '<div class="tj-mi">' + SVG.cal + '<span><b>' + dp.day + '</b><small>' + dp.time + '</small></span></div>' +
-                            '<div class="tj-mi">' + SVG.bag + '<span><b>' + (parseFloat(t.available_weight) || 0) + ' kg</b><small>disponible</small></span></div>' +
+                            '<div class="tj-mi">' + SVG.cal + '<span><b>' + esc(dp.day) + '</b><small>' + esc(dp.time) + '</small></span></div>' +
+                            '<div class="tj-mi">' + SVG.bag + '<span><b>' + (parseFloat(t.available_weight) || 0) + ' ' + esc(sengpT('cr.kg')) + '</b><small>' + esc(sengpT('tj.available')) + '</small></span></div>' +
                         '</div>' +
                     '</div>' +
                 '</div>' +
                 '<div class="tj-t__foot"><div class="tj-prog">' + progressHTML(t.status) + '</div>' +
-                    '<button type="button" class="tj-view" onclick="viewTripDetails(\'' + id + '\')">Voir détails' + SVG.chev + '</button></div>' +
+                    '<button type="button" class="tj-view" onclick="viewTripDetails(\'' + id + '\')">' + esc(sengpT('tj.view_details')) + SVG.chev + '</button></div>' +
             '</article>';
         }
 
@@ -562,15 +590,15 @@
             if (loadFailed || allTrips.length === 0) {
                 container.innerHTML = '';
                 if (loadFailed) {
-                    $('emptyTitle').textContent = 'Impossible de charger vos trajets';
-                    $('emptyText').textContent = 'Vérifiez votre connexion puis réessayez.';
-                    $('emptyCtaLabel').textContent = 'Réessayer';
+                    setI18n($('emptyTitle'), 'tj.load_failed_title');
+                    setI18n($('emptyText'), 'tj.load_failed_text');
+                    setI18n($('emptyCtaLabel'), 'common.retry');
                     $('emptyCta').onclick = loadTrips;
                     $('emptyTip').style.display = 'none';
                 } else {
-                    $('emptyTitle').textContent = 'Aucun trajet dans cette catégorie';
-                    $('emptyText').textContent = EMPTY_TEXT[currentBucket] + ' Créez un trajet pour commencer à recevoir des missions.';
-                    $('emptyCtaLabel').textContent = 'Créer un trajet';
+                    setI18n($('emptyTitle'), 'tj.aucun_trajet_dans_cette');
+                    setText($('emptyText'), sengpT(EMPTY_TEXT[currentBucket]) + ' ' + sengpT('tj.creez_un_trajet_pour'));
+                    setI18n($('emptyCtaLabel'), 'tj.creer_un_trajet');
                     $('emptyCta').onclick = addTrip;
                     $('emptyTip').style.display = '';
                 }
@@ -582,9 +610,9 @@
                 const list = bucketTrips(sec.key);
                 const shown = expanded[sec.key] ? list : list.slice(0, PREVIEW);
                 const more = list.length > PREVIEW
-                    ? '<button type="button" class="tj-more" onclick="toggleSection(\'' + sec.key + '\')">' + (expanded[sec.key] ? 'Réduire' : 'Voir tout') + SVG.chev + '</button>' : '';
-                return '<section class="tj-sec" id="sec-' + sec.key + '"><div class="tj-sec__h"><h2>' + sec.title + '</h2>' + more + '</div>' +
-                    '<div class="tj-sec__list">' + (shown.length ? shown.map(tripRow).join('') : '<div class="tj-none">' + sec.none + '</div>') + '</div></section>';
+                    ? '<button type="button" class="tj-more" onclick="toggleSection(\'' + sec.key + '\')">' + esc(sengpT(expanded[sec.key] ? 'tj.collapse' : 'dash.view_all')) + SVG.chev + '</button>' : '';
+                return '<section class="tj-sec" id="sec-' + sec.key + '"><div class="tj-sec__h"><h2>' + esc(sengpT(sec.title)) + '</h2>' + more + '</div>' +
+                    '<div class="tj-sec__list">' + (shown.length ? shown.map(tripRow).join('') : '<div class="tj-none">' + esc(sengpT(sec.none)) + '</div>') + '</div></section>';
             }).join('');
         }
 
@@ -627,11 +655,11 @@
             const t = allTrips.find(x => String(x.id) === String(tripId));
             if (!t) return;
             const open = t.status === 'published' || t.status === 'draft';
-            $('sheetTitle').textContent = (t.departure_city || '—') + ' → ' + (t.arrival_city || '—');
+            setText($('sheetTitle'), (t.departure_city || '—') + ' → ' + (t.arrival_city || '—'));
             $('sheetSub').textContent = t.trip_code || '';
             $('sheetBody').innerHTML = '<div class="tj-menu">' +
-                '<button type="button" class="tj-btn tj-btn--ghost" onclick="viewTripDetails(\'' + esc(t.id) + '\')">Voir les détails</button>' +
-                (open ? WAIT_NOTE : '<button type="button" class="tj-btn tj-btn--main" onclick="closeSheet();navigateTo(\'missions\')">Voir les missions</button>') + '</div>';
+                '<button type="button" class="tj-btn tj-btn--ghost" onclick="viewTripDetails(\'' + esc(t.id) + '\')">' + esc(sengpT('tj.view_details_full')) + '</button>' +
+                (open ? waitNote() : '<button type="button" class="tj-btn tj-btn--main" onclick="closeSheet();navigateTo(\'missions\')">' + esc(sengpT('tj.view_missions_full')) + '</button>') + '</div>';
             $('sheetOverlay').classList.add('show');
             $('scroller').classList.add('is-locked');
         }
@@ -639,12 +667,12 @@
         function viewTripDetails(tripId) {
             const t = allTrips.find(x => String(x.id) === String(tripId));
             if (!t) return;
-            $('sheetTitle').textContent = 'Détails du trajet';
+            setI18n($('sheetTitle'), 'tj.details_du_trajet');
             $('sheetSub').textContent = t.trip_code || '';
             $('sheetBody').innerHTML = tripCard(t, 0, true) +
                 ((t.status === 'published' || t.status === 'draft')
-                    ? WAIT_NOTE
-                    : `<div class="tj-actions" style="grid-template-columns:1fr;margin-top:12px"><button type="button" class="tj-btn tj-btn--main" onclick="closeSheet();navigateTo('missions')">Voir missions</button></div>`);
+                    ? waitNote()
+                    : `<div class="tj-actions" style="grid-template-columns:1fr;margin-top:12px"><button type="button" class="tj-btn tj-btn--main" onclick="closeSheet();navigateTo('missions')">${esc(sengpT('tj.view_missions'))}</button></div>`);
             $('sheetOverlay').classList.add('show');
             $('scroller').classList.add('is-locked');
         }
@@ -680,7 +708,12 @@
             if (pages[section] && section !== 'trips') window.location.href = pages[section];
         }
 
-        document.addEventListener('DOMContentLoaded', () => { loadTrips(); loadUnreadNotifCount(); });
+        document.addEventListener('DOMContentLoaded', () => { SengpI18n.ready.then(() => { loadTrips(); loadUnreadNotifCount(); }); });
+        // Changement de langue : on redessine la liste, les compteurs et on ferme la feuille ouverte
+        window.addEventListener('sengp:languagechange', () => {
+            closeSheet();
+            if (loaded) { updateTabCounts(); renderTabs(); renderTrips(); }
+        });
     </script>
     <script src="ptr.js"></script>
 </body>

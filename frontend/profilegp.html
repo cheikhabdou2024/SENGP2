@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>SEN GP - Profil Gros Porteur</title>
+    <title data-i18n="pg.page_title">SEN GP - Profil Gros Porteur</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -107,6 +107,13 @@
         .pr-logout:active { transform: scale(0.985); }
 
         /* ---- bottom nav ---- */
+        /* Droite a gauche (arabe) */
+        [dir="rtl"] .pr-card::after { right: auto; left: -40px; }
+        [dir="rtl"] .pr-cam { right: auto; left: -2px; }
+        [dir="rtl"] .pr-dotbadge { right: auto; left: -3px; }
+        [dir="rtl"] .pr-opt small, [dir="rtl"] .pr-opt.is-on::after { margin-left: 0; margin-right: auto; }
+        [dir="rtl"] .pr-back svg, [dir="rtl"] .pr-item > svg:last-child { transform: scaleX(-1); }
+
         .pr-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; height: calc(76px + env(safe-area-inset-bottom, 0px)); padding: 6px 4px env(safe-area-inset-bottom, 0px); display: flex; gap: 2px; background: rgba(255, 255, 255, 0.97); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid #E3EAF3; box-shadow: 0 -8px 24px rgba(11, 29, 58, 0.06); }
         .pr-nav__item { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; border-radius: 18px; background: none; color: var(--pr-muted); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; }
         .pr-nav__item[aria-current="page"] { background: #FFF1DE; color: #E8780C; font-weight: 700; }
@@ -206,8 +213,10 @@
         body{padding:0!important;}
     </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="i18n.css">
     <script src="ui.js"></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -233,69 +242,69 @@
           <img src="im/sengp-gp-background.jpg" alt="" width="960" height="784" decoding="async">
         </picture>
         <div class="pr-hero__row">
-          <button type="button" class="pr-back" onclick="goBack()" aria-label="Retour">
+          <button type="button" class="pr-back" onclick="goBack()" aria-label="Retour" data-i18n-attr="aria-label:common.back">
             <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
           </button>
           <div>
-            <h1>Mon Profil</h1>
-            <p>Gérez vos informations</p>
+            <h1 data-i18n="prof.title">Mon Profil</h1>
+            <p data-i18n="prof.subtitle">Gérez vos informations</p>
           </div>
         </div>
       </header>
 
       <div class="pr-body">
         <!-- Identity -->
-        <section class="pr-card pr-reveal" style="--i:0" aria-label="Mon compte">
-          <button type="button" class="pr-avatar" id="avatar" onclick="editAvatar()" aria-label="Changer la photo de profil">
+        <section class="pr-card pr-reveal" style="--i:0" aria-label="Mon compte" data-i18n-attr="aria-label:prof.account_aria">
+          <button type="button" class="pr-avatar" id="avatar" onclick="editAvatar()" aria-label="Changer la photo de profil" data-i18n-attr="aria-label:prof.avatar_aria">
             <span class="pr-avatar__txt" id="avatarTxt">?</span>
             <span class="pr-cam" aria-hidden="true"><svg class="pr-i" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></span>
           </button>
           <div class="pr-id">
-            <h2 class="pr-name" id="userName">Utilisateur</h2>
+            <h2 class="pr-name" id="userName" data-i18n="dash.user_default">Utilisateur</h2>
             <p class="pr-email" id="userEmail"></p>
             <p class="pr-phone" id="userPhone"></p>
-            <span class="pr-badge" id="verifBadge"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><span id="verifTxt">GP vérifié</span></span>
+            <span class="pr-badge" id="verifBadge"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><span id="verifTxt" data-i18n="pg.verified">GP vérifié</span></span>
           </div>
         </section>
 
         <!-- Stats (real data: /trips/my-trips + /users/me/stats) -->
-        <section class="pr-stats pr-reveal" style="--i:1" aria-label="Mon activité">
+        <section class="pr-stats pr-reveal" style="--i:1" aria-label="Mon activité" data-i18n-attr="aria-label:pg.stats_aria">
           <div class="pr-stat pr-stat--o">
             <span class="pr-stat__ic"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span>
-            <div><b id="statTotal">–</b><span>Trajets</span></div>
+            <div><b id="statTotal">–</b><span data-i18n="nav.trips">Trajets</span></div>
           </div>
           <div class="pr-stat pr-stat--b">
             <span class="pr-stat__ic"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
-            <div><b id="statActive">–</b><span>En cours</span></div>
+            <div><b id="statActive">–</b><span data-i18n="dash.in_progress">En cours</span></div>
           </div>
           <div class="pr-stat pr-stat--g">
             <span class="pr-stat__ic"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>
-            <div><b id="statDone">–</b><span>Livrées</span></div>
+            <div><b id="statDone">–</b><span data-i18n="pg.done">Livrées</span></div>
           </div>
         </section>
 
         <!-- Account -->
         <section class="pr-sec pr-reveal" style="--i:2">
-          <h2>Compte</h2>
+          <h2 data-i18n="prof.sec_account">Compte</h2>
           <div class="pr-list">
             <button type="button" class="pr-item" onclick="openSheet('edit')">
               <span class="pr-item__ic pr-ic--blue"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
-              <span class="pr-item__t"><b>Modifier le profil</b><small>Nom, email, téléphone</small></span>
+              <span class="pr-item__t"><b data-i18n="prof.edit">Modifier le profil</b><small data-i18n="prof.edit_s">Nom, email, téléphone</small></span>
               <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </button>
             <button type="button" class="pr-item" onclick="openSheet('password')">
               <span class="pr-item__ic pr-ic--orange"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-              <span class="pr-item__t"><b>Mot de passe</b><small>Sécurité du compte</small></span>
+              <span class="pr-item__t"><b data-i18n="signup.password">Mot de passe</b><small data-i18n="prof.password_s">Sécurité du compte</small></span>
               <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </button>
             <a class="pr-item" href="gains.html">
               <span class="pr-item__ic pr-ic--green"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
-              <span class="pr-item__t"><b>Mes gains</b><small>Historique et revenus</small></span>
+              <span class="pr-item__t"><b data-i18n="pg.earnings">Mes gains</b><small data-i18n="pg.earnings_s">Historique et revenus</small></span>
               <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </a>
             <button type="button" class="pr-item" onclick="openSheet('lang')">
               <span class="pr-item__ic pr-ic--indigo"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
-              <span class="pr-item__t"><b>Langue</b><small>Français</small></span>
+              <span class="pr-item__t"><b data-i18n="common.language">Langue</b><small id="langSub">Français</small></span>
               <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
@@ -303,53 +312,53 @@
 
         <!-- Support -->
         <section class="pr-sec pr-reveal" style="--i:3">
-          <h2>Support</h2>
+          <h2 data-i18n="prof.sec_support">Support</h2>
           <div class="pr-list">
             <button type="button" class="pr-item" onclick="openSheet('help')">
               <span class="pr-item__ic pr-ic--orange"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
-              <span class="pr-item__t"><b>Centre d'aide</b><small>FAQ et guides</small></span>
+              <span class="pr-item__t"><b data-i18n="prof.help">Centre d'aide</b><small data-i18n="prof.help_s">FAQ et guides</small></span>
               <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </button>
             <a class="pr-item" href="reclamationgp.html">
               <span class="pr-item__ic pr-ic--green"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/></svg></span>
-              <span class="pr-item__t"><b>Réclamations</b><small>Litiges et signalements</small></span>
+              <span class="pr-item__t"><b data-i18n="prof.claims">Réclamations</b><small data-i18n="prof.claims_s">Litiges et signalements</small></span>
               <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </a>
             <button type="button" class="pr-item" onclick="openSheet('contact')">
               <span class="pr-item__ic pr-ic--sky"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 15a2 2 0 0 1-2 2h-1a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h3z"/><path d="M3 15a2 2 0 0 0 2 2h1a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1H3z"/><path d="M21 17v1a3 3 0 0 1-3 3h-4"/></svg></span>
-              <span class="pr-item__t"><b>Contacter le support</b><small>Nous sommes là pour vous</small></span>
+              <span class="pr-item__t"><b data-i18n="prof.contact">Contacter le support</b><small data-i18n="prof.contact_s">Nous sommes là pour vous</small></span>
               <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </button>
             <button type="button" class="pr-item" onclick="openSheet('about')">
               <span class="pr-item__ic pr-ic--indigo"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
-              <span class="pr-item__t"><b>À propos</b><small>Version 1.0.0</small></span>
+              <span class="pr-item__t"><b data-i18n="prof.about">À propos</b><small data-i18n="prof.about_s">Version 1.0.0</small></span>
               <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
         </section>
 
         <button type="button" class="pr-logout pr-reveal" style="--i:4" onclick="openSheet('logout')">
-          <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>Déconnexion
+          <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><span data-i18n="prof.logout">Déconnexion</span>
         </button>
       </div>
     </div>
 
     <!-- Bottom navigation -->
-    <nav class="pr-nav" aria-label="Navigation principale">
+    <nav class="pr-nav" aria-label="Navigation principale" data-i18n-attr="aria-label:nav.main_aria">
       <button type="button" class="pr-nav__item" onclick="navigateTo('home')">
-        <span class="pr-nav__icon"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span>Accueil</span>
+        <span class="pr-nav__icon"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span data-i18n="nav.home">Accueil</span>
       </button>
       <button type="button" class="pr-nav__item" onclick="navigateTo('trips')">
-        <span class="pr-nav__icon"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span><span>Trajets</span>
+        <span class="pr-nav__icon"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span><span data-i18n="nav.trips">Trajets</span>
       </button>
       <button type="button" class="pr-nav__item" onclick="navigateTo('notifications')">
         <span class="pr-nav__icon">
           <svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-          <span class="pr-dotbadge hidden" id="notifDot" aria-label="Notifications non lues"></span>
-        </span><span class="lbl-long">Notifications</span><span class="lbl-short">Notifs</span>
+          <span class="pr-dotbadge hidden" id="notifDot" aria-label="Notifications non lues" data-i18n-attr="aria-label:nav.unread_aria"></span>
+        </span><span class="lbl-long" data-i18n="nav.notifications">Notifications</span><span class="lbl-short" data-i18n="nav.notifs_short">Notifs</span>
       </button>
       <button type="button" class="pr-nav__item" aria-current="page" onclick="navigateTo('profile')">
-        <span class="pr-nav__icon"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span>Profil</span>
+        <span class="pr-nav__icon"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span data-i18n="nav.profile">Profil</span>
       </button>
     </nav>
 
@@ -359,7 +368,7 @@
         <div class="pr-sheet__grab"><i></i></div>
         <div class="pr-sheet__head">
           <div><h3 id="sheetTitle"></h3><p id="sheetSub"></p></div>
-          <button type="button" class="pr-close" id="sheetClose" onclick="closeSheet()" aria-label="Fermer"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+          <button type="button" class="pr-close" id="sheetClose" onclick="closeSheet()" aria-label="Fermer" data-i18n-attr="aria-label:common.close"><svg class="pr-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
         </div>
         <div class="pr-sheet__body" id="sheetBody"></div>
       </div>
@@ -394,7 +403,7 @@
         let currentUser = null;
 
         function fillDisplay(u) {
-            const name = ((u.first_name || '') + ' ' + (u.last_name || '')).trim() || 'Utilisateur';
+            const name = ((u.first_name || '') + ' ' + (u.last_name || '')).trim() || sengpT('dash.user_default');
             $('userName').textContent = name;
             $('userEmail').textContent = u.email || '';
             $('userPhone').textContent = u.phone || '';
@@ -407,7 +416,8 @@
             } else { av.style.backgroundImage = ''; av.classList.remove('has-photo'); }
             const ok = !!u.is_email_verified;
             $('verifBadge').classList.toggle('is-warn', !ok);
-            $('verifTxt').textContent = ok ? 'GP vérifié' : 'Email non vérifié';
+            $('verifTxt').setAttribute('data-i18n', ok ? 'pg.verified' : 'prof.unverified');
+            $('verifTxt').textContent = sengpT(ok ? 'pg.verified' : 'prof.unverified');
         }
 
         async function loadUserProfile() {
@@ -447,27 +457,27 @@
             } catch (e) {}
         }
 
-        function editAvatar() { toast('Changement de photo bientôt disponible'); }
+        function editAvatar() { toast(sengpT('prof.photo_soon')); }
 
         /* ---------- bottom sheet ---------- */
         let sheetKind = null;
         const SHEETS = {
             edit: () => ({
-                title: 'Modifier le profil', sub: 'Vos informations personnelles',
+                title: sengpT('prof.edit'), sub: sengpT('prof.edit_sub'),
                 html: `
-                <div class="pr-field"><label for="epFirst">Prénom</label><input class="pr-input" id="epFirst" autocomplete="given-name"></div>
-                <div class="pr-field"><label for="epLast">Nom</label><input class="pr-input" id="epLast" autocomplete="family-name"></div>
-                <div class="pr-field"><label for="epPhone">Téléphone</label><input class="pr-input" id="epPhone" type="tel" autocomplete="tel"></div>
-                <div class="pr-field"><label>Pièce d'identité — recto</label>
+                <div class="pr-field"><label for="epFirst">${esc(sengpT('prof.first_name'))}</label><input class="pr-input" id="epFirst" autocomplete="given-name"></div>
+                <div class="pr-field"><label for="epLast">${esc(sengpT('prof.last_name'))}</label><input class="pr-input" id="epLast" autocomplete="family-name"></div>
+                <div class="pr-field"><label for="epPhone">${esc(sengpT('prof.phone'))}</label><input class="pr-input" id="epPhone" type="tel" autocomplete="tel"></div>
+                <div class="pr-field"><label>${esc(sengpT('prof.id_front'))}</label>
                     <div class="pr-idprev" id="epRectoPrev"></div>
                     <input type="file" id="epRecto" accept="image/*" hidden onchange="previewId('recto')">
-                    <button type="button" class="pr-idbtn" onclick="$('epRecto').click()">${IC.upload}Choisir une image</button></div>
-                <div class="pr-field"><label>Pièce d'identité — verso</label>
+                    <button type="button" class="pr-idbtn" onclick="$('epRecto').click()">${IC.upload}${esc(sengpT('prof.choose_image'))}</button></div>
+                <div class="pr-field"><label>${esc(sengpT('prof.id_back'))}</label>
                     <div class="pr-idprev" id="epVersoPrev"></div>
                     <input type="file" id="epVerso" accept="image/*" hidden onchange="previewId('verso')">
-                    <button type="button" class="pr-idbtn" onclick="$('epVerso').click()">${IC.upload}Choisir une image</button></div>
-                <div class="pr-actions"><button type="button" class="pr-btn pr-btn--ghost" onclick="closeSheet()">Annuler</button>
-                <button type="button" class="pr-btn pr-btn--main" id="epSave" onclick="saveProfile()">Enregistrer</button></div>`,
+                    <button type="button" class="pr-idbtn" onclick="$('epVerso').click()">${IC.upload}${esc(sengpT('prof.choose_image'))}</button></div>
+                <div class="pr-actions"><button type="button" class="pr-btn pr-btn--ghost" onclick="closeSheet()">${esc(sengpT('common.cancel'))}</button>
+                <button type="button" class="pr-btn pr-btn--main" id="epSave" onclick="saveProfile()">${esc(sengpT('common.save'))}</button></div>`,
                 init() {
                     const u = currentUser || {};
                     $('epFirst').value = u.first_name || '';
@@ -479,46 +489,45 @@
                 }
             }),
             password: () => ({
-                title: 'Mot de passe', sub: 'Au moins 8 caractères',
+                title: sengpT('signup.password'), sub: sengpT('prof.pw_sub'),
                 html: `
-                <div class="pr-field"><label for="pwOld">Mot de passe actuel</label><input class="pr-input" id="pwOld" type="password" autocomplete="current-password"></div>
-                <div class="pr-field"><label for="pwNew">Nouveau mot de passe</label><input class="pr-input" id="pwNew" type="password" autocomplete="new-password"></div>
-                <div class="pr-field"><label for="pwConf">Confirmer le mot de passe</label><input class="pr-input" id="pwConf" type="password" autocomplete="new-password"></div>
-                <div class="pr-actions"><button type="button" class="pr-btn pr-btn--ghost" onclick="closeSheet()">Annuler</button>
-                <button type="button" class="pr-btn pr-btn--main" id="pwSave" onclick="savePassword()">Changer</button></div>`
+                <div class="pr-field"><label for="pwOld">${esc(sengpT('prof.pw_current'))}</label><input class="pr-input" id="pwOld" type="password" autocomplete="current-password"></div>
+                <div class="pr-field"><label for="pwNew">${esc(sengpT('prof.pw_new'))}</label><input class="pr-input" id="pwNew" type="password" autocomplete="new-password"></div>
+                <div class="pr-field"><label for="pwConf">${esc(sengpT('signup.confirm_password'))}</label><input class="pr-input" id="pwConf" type="password" autocomplete="new-password"></div>
+                <div class="pr-actions"><button type="button" class="pr-btn pr-btn--ghost" onclick="closeSheet()">${esc(sengpT('common.cancel'))}</button>
+                <button type="button" class="pr-btn pr-btn--main" id="pwSave" onclick="savePassword()">${esc(sengpT('prof.pw_change'))}</button></div>`
             }),
             lang: () => ({
-                title: 'Langue', sub: "Langue d'affichage de l'application",
-                html: `<div class="pr-opts">
-                <div class="pr-opt is-on">Français</div>
-                <div class="pr-opt is-off">English<small>Bientôt</small></div>
-                <div class="pr-opt is-off">Wolof<small>Bientôt</small></div></div>`
+                title: sengpT('common.language'), sub: sengpT('prof.lang_sub'),
+                html: '<div class="pr-opts">'
+                    + SengpI18n.supported.map(l => '<div class="pr-opt' + (l === SengpI18n.lang ? ' is-on' : '') + '" role="button" tabindex="0" data-lang="' + l + '">' + esc(SengpI18n.nativeNames[l]) + '</div>').join('')
+                    + '<div class="pr-opt is-off">Wolof<small>' + esc(sengpT('prof.soon')) + '</small></div></div>'
             }),
             help: () => ({
-                title: "Centre d'aide", sub: 'Les réponses à vos questions',
+                title: sengpT('prof.help'), sub: sengpT('prof.help_sub'),
                 html: `<div class="pr-rows">
-                <div class="pr-row"><div><b>Comment recevoir des missions ?</b><small>Créez un trajet avec votre billet d'avion : l'équipe SEN GP vous assigne ensuite des colis sur votre itinéraire.</small></div></div>
-                <div class="pr-row"><div><b>Comment accepter une mission ?</b><small>Depuis l'accueil, ouvrez « Mes missions » puis appuyez sur Accepter ou Décliner.</small></div></div>
-                <div class="pr-row"><div><b>Comment suis-je payé ?</b><small>Retrouvez vos revenus et votre historique dans « Mes gains » (menu Compte).</small></div></div></div>`
+                <div class="pr-row"><div><b>${esc(sengpT('pg.faq1_q'))}</b><small>${esc(sengpT('pg.faq1_a'))}</small></div></div>
+                <div class="pr-row"><div><b>${esc(sengpT('pg.faq2_q'))}</b><small>${esc(sengpT('pg.faq2_a'))}</small></div></div>
+                <div class="pr-row"><div><b>${esc(sengpT('pg.faq3_q'))}</b><small>${esc(sengpT('pg.faq3_a'))}</small></div></div></div>`
             }),
             contact: () => ({
-                title: 'Contacter le support', sub: 'Nous sommes là pour vous',
+                title: sengpT('prof.contact'), sub: sengpT('prof.contact_s'),
                 html: `<div class="pr-rows">
-                <a class="pr-row" href="mailto:support@sengp.com"><span class="pr-item__ic pr-ic--blue">${IC.mail}</span><div><b>Email</b><small>support@sengp.com</small></div></a>
-                <a class="pr-row" href="tel:+221331234567"><span class="pr-item__ic pr-ic--green">${IC.phone}</span><div><b>Téléphone</b><small>+221 33 123 45 67</small></div></a></div>`
+                <a class="pr-row" href="mailto:support@sengp.com"><span class="pr-item__ic pr-ic--blue">${IC.mail}</span><div><b>${esc(sengpT('ship.net_mail'))}</b><small>support@sengp.com</small></div></a>
+                <a class="pr-row" href="tel:+221331234567"><span class="pr-item__ic pr-ic--green">${IC.phone}</span><div><b>${esc(sengpT('prof.phone'))}</b><small>+221 33 123 45 67</small></div></a></div>`
             }),
             about: () => ({
-                title: 'À propos', sub: '',
+                title: sengpT('prof.about'), sub: '',
                 html: `<div class="pr-about"><img src="im/sengp-logo-square.png" alt="SEN GP" width="92" height="92">
-                <h4>SEN GP</h4><div class="v">Version 1.0.0</div>
-                <p>SEN GP met en relation les expéditeurs de colis et les voyageurs internationaux pour des envois sûrs, rapides et abordables.</p>
-                <div class="c">© 2025 SEN GP. Tous droits réservés.</div></div>`
+                <h4>SEN GP</h4><div class="v">${esc(sengpT('prof.about_s'))}</div>
+                <p>${esc(sengpT('prof.about_text'))}</p>
+                <div class="c">${esc(sengpT('prof.copyright'))}</div></div>`
             }),
             logout: () => ({
-                title: 'Déconnexion', sub: '',
-                html: `<div class="pr-logout-msg"><p>Voulez-vous vraiment vous déconnecter de SEN GP ?</p></div>
-                <div class="pr-actions"><button type="button" class="pr-btn pr-btn--ghost" onclick="closeSheet()">Annuler</button>
-                <button type="button" class="pr-btn pr-btn--danger" onclick="logout()">Se déconnecter</button></div>`
+                title: sengpT('prof.logout'), sub: '',
+                html: `<div class="pr-logout-msg"><p>${esc(sengpT('prof.logout_q'))}</p></div>
+                <div class="pr-actions"><button type="button" class="pr-btn pr-btn--ghost" onclick="closeSheet()">${esc(sengpT('common.cancel'))}</button>
+                <button type="button" class="pr-btn pr-btn--danger" onclick="logout()">${esc(sengpT('prof.logout_btn'))}</button></div>`
             })
         };
 
@@ -553,13 +562,13 @@
             fd.append('file', file, file.name || 'cni.jpg');
             const r = await fetch(API_BASE_URL + '/uploads', { method: 'POST', headers: { 'Authorization': 'Bearer ' + getAuthToken() }, body: fd });
             const j = await r.json();
-            if (!r.ok || !j.success) throw new Error(j.error || 'Upload échoué');
+            if (!r.ok || !j.success) throw new Error(j.error || sengpT('prof.upload_failed'));
             return j.data.key;
         }
 
         async function saveProfile() {
             const btn = $('epSave');
-            btn.disabled = true; btn.textContent = 'Enregistrement…';
+            btn.disabled = true; btn.textContent = sengpT('prof.saving');
             try {
                 const body = {
                     first_name: $('epFirst').value.trim(),
@@ -580,25 +589,25 @@
                     localStorage.setItem('userData', JSON.stringify(Object.assign(getUserData() || {}, currentUser)));
                     fillDisplay(currentUser);
                     closeSheet();
-                    toast('Profil mis à jour');
+                    toast(sengpT('prof.updated'));
                 } else {
-                    alert('Erreur: ' + (j.error || j.message || 'Mise à jour échouée'));
-                    btn.disabled = false; btn.textContent = 'Enregistrer';
+                    alert(sengpT('envois.error', { message: j.error || j.message || sengpT('prof.update_failed') }));
+                    btn.disabled = false; btn.textContent = sengpT('common.save');
                 }
             } catch (e) {
-                alert('Erreur: ' + e.message);
-                btn.disabled = false; btn.textContent = 'Enregistrer';
+                alert(sengpT('envois.error', { message: e.message }));
+                btn.disabled = false; btn.textContent = sengpT('common.save');
             }
         }
 
         /* ---------- mot de passe ---------- */
         async function savePassword() {
             const oldP = $('pwOld').value, newP = $('pwNew').value, conf = $('pwConf').value;
-            if (!oldP || !newP) { alert('Remplissez tous les champs.'); return; }
-            if (newP.length < 8) { alert('Le nouveau mot de passe doit faire au moins 8 caractères.'); return; }
-            if (newP !== conf) { alert('Les mots de passe ne correspondent pas.'); return; }
+            if (!oldP || !newP) { alert(sengpT('prof.pw_fill')); return; }
+            if (newP.length < 8) { alert(sengpT('prof.pw_short')); return; }
+            if (newP !== conf) { alert(sengpT('prof.pw_mismatch')); return; }
             const btn = $('pwSave');
-            btn.disabled = true; btn.textContent = 'Changement…';
+            btn.disabled = true; btn.textContent = sengpT('prof.pw_changing');
             try {
                 const r = await fetch(API_BASE_URL + '/auth/change-password', {
                     method: 'POST',
@@ -606,12 +615,12 @@
                     body: JSON.stringify({ oldPassword: oldP, newPassword: newP })
                 });
                 const j = await r.json();
-                if (r.ok && j.success) { closeSheet(); toast('Mot de passe modifié'); return; }
-                alert('Erreur: ' + (j.error || j.message || 'Échec'));
+                if (r.ok && j.success) { closeSheet(); toast(sengpT('prof.pw_changed')); return; }
+                alert(sengpT('envois.error', { message: j.error || j.message || sengpT('prof.pw_failed') }));
             } catch (e) {
-                alert('Erreur de connexion.');
+                alert(sengpT('errors.network'));
             }
-            btn.disabled = false; btn.textContent = 'Changer';
+            btn.disabled = false; btn.textContent = sengpT('prof.pw_change');
         }
 
         /* ---------- déconnexion ---------- */
@@ -631,7 +640,23 @@
             if (pages[section] && section !== 'profile') window.location.href = pages[section];
         }
 
-        window.addEventListener('load', () => { loadUserProfile(); loadNotifDot(); });
+        // Libelle de la langue courante + selection dans la feuille « Langue »
+        function showLangName() { $('langSub').textContent = SengpI18n.nativeNames[SengpI18n.lang]; }
+        $('sheetBody').addEventListener('click', e => {
+            const o = e.target.closest('[data-lang]');
+            if (o) SengpI18n.setLanguage(o.dataset.lang);
+        });
+        $('sheetBody').addEventListener('keydown', e => {
+            const o = e.target.closest('[data-lang]');
+            if (o && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); SengpI18n.setLanguage(o.dataset.lang); }
+        });
+        // Changement de langue : libelles, feuille ouverte et carte d'identite se redessinent.
+        window.addEventListener('sengp:languagechange', () => {
+            showLangName();
+            if (currentUser) fillDisplay(currentUser);
+            if (sheetKind === 'lang') openSheet('lang');
+        });
+        window.addEventListener('load', () => { SengpI18n.ready.then(() => { showLangName(); loadUserProfile(); loadNotifDot(); }); });
     </script>
     <script src="ptr.js"></script>
 </body>

@@ -14,6 +14,18 @@
   var needGps = false, gpsOk = true, lastPush = 0, lastMissions = [];
   var gpsEl = null, lockEl = null, busy = false;
 
+  // Texte traduit si le moteur i18n est chargé, sinon repli sur le français de la page.
+  function tr(key, fr, params) {
+    if (typeof window.sengpT === 'function') {
+      var v = window.sengpT(key, params);
+      if (v && v !== key) return v;
+    }
+    var s = fr;
+    if (params) Object.keys(params).forEach(function (k) { s = s.split('{' + k + '}').join(params[k]); });
+    return s;
+  }
+  var esc = window.sengpEsc || function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
+
   function css() {
     if (document.getElementById('gpg-css')) return;
     var s = document.createElement('style'); s.id = 'gpg-css';
@@ -56,12 +68,12 @@
   }
   function showGpsOverlay(msg) {
     if (!gpsEl) {
-      gpsEl = overlay('gpgGps', '<div class="gpg-ic"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div><h2>Le GPS doit rester allumé</h2>'
-        + '<p>Pendant le transport du colis, votre position est suivie en continu. Réactivez la localisation de votre téléphone pour continuer : tant qu\'elle est coupée, l\'application est bloquée.</p>'
-        + '<button type="button" class="gpg-btn" id="gpgRetry">Activer le GPS</button><div class="gpg-st" id="gpgSt"></div>');
+      gpsEl = overlay('gpgGps', '<div class="gpg-ic"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div><h2>' + esc(tr('gg.gps_title', 'Le GPS doit rester allumé')) + '</h2>'
+        + '<p>' + esc(tr('gg.gps_text', 'Pendant le transport du colis, votre position est suivie en continu. Réactivez la localisation de votre téléphone pour continuer : tant qu\'elle est coupée, l\'application est bloquée.')) + '</p>'
+        + '<button type="button" class="gpg-btn" id="gpgRetry">' + esc(tr('gg.gps_enable', 'Activer le GPS')) + '</button><div class="gpg-st" id="gpgSt"></div>');
       gpsEl.querySelector('#gpgRetry').onclick = function () {
-        var st = gpsEl.querySelector('#gpgSt'); st.textContent = 'Vérification…';
-        askPermission().then(function () { return checkGps(); }).then(function () { if (!gpsOk) st.textContent = 'Le GPS est toujours désactivé. Activez la localisation dans les réglages du téléphone.'; });
+        var st = gpsEl.querySelector('#gpgSt'); st.textContent = tr('gg.checking', 'Vérification…');
+        askPermission().then(function () { return checkGps(); }).then(function () { if (!gpsOk) st.textContent = tr('gg.gps_still_off', 'Le GPS est toujours désactivé. Activez la localisation dans les réglages du téléphone.'); });
       };
     }
     if (msg) gpsEl.querySelector('#gpgSt').textContent = msg;
@@ -101,9 +113,9 @@
   // ---------- verrou admin ----------
   function showLock() {
     if (lockEl) return;
-    lockEl = overlay('gpgLock', '<div class="gpg-ic"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h2>Validation en cours</h2>'
-      + '<p>Vous avez terminé votre scan. L\'administration doit le valider avant que vous puissiez de nouveau utiliser l\'application (créer un trajet, voir vos missions…). Cet écran se débloquera automatiquement.</p>'
-      + '<button type="button" class="gpg-btn ghost" id="gpgOut">Se déconnecter</button>');
+    lockEl = overlay('gpgLock', '<div class="gpg-ic"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h2>' + esc(tr('gg.lock_title', 'Validation en cours')) + '</h2>'
+      + '<p>' + esc(tr('gg.lock_text', 'Vous avez terminé votre scan. L\'administration doit le valider avant que vous puissiez de nouveau utiliser l\'application (créer un trajet, voir vos missions…). Cet écran se débloquera automatiquement.')) + '</p>'
+      + '<button type="button" class="gpg-btn ghost" id="gpgOut">' + esc(tr('prof.logout_btn', 'Se déconnecter')) + '</button>');
     lockEl.querySelector('#gpgOut').onclick = function () {
       localStorage.removeItem('authToken'); localStorage.removeItem('userData'); location.href = 'connexion.html';
     };
@@ -126,5 +138,15 @@
     document.addEventListener('visibilitychange', function () { if (!document.hidden) tick(); });
     window.addEventListener('focus', tick);
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+  function boot() {
+    // Attend les traductions (si le moteur est présent) avant d'afficher un écran bloquant.
+    var ready = window.SengpI18n && window.SengpI18n.ready;
+    if (ready && ready.then) ready.then(start, start); else start();
+  }
+  // Changement de langue : les écrans bloquants déjà affichés sont reconstruits.
+  window.addEventListener('sengp:languagechange', function () {
+    if (gpsEl) { hideGpsOverlay(); showGpsOverlay(); }
+    if (lockEl) { lockEl.remove(); lockEl = null; showLock(); }
+  });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

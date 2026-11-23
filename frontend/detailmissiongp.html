@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEN GP - Détails de la mission</title>
+    <title data-i18n="dm.page_title">SEN GP - Détails de la mission</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -86,10 +86,20 @@
         .tl-date { font-size:11px; color:rgba(255,255,255,.45); margin-top:2px; }
         .loading,.empty { text-align:center; padding:40px; color:rgba(255,255,255,.5); }
         .hint { font-size:11px; color:rgba(255,255,255,.5); margin-top:8px; }
+        /* Droite a gauche (arabe) */
+        [dir="rtl"] .back-btn svg, [dir="rtl"] .route .arrow { transform: scaleX(-1); }
+        [dir="rtl"] .step { padding-left: 0; padding-right: 30px; }
+        [dir="rtl"] .step::before { left: auto; right: 8px; }
+        [dir="rtl"] .step .dot { left: auto; right: 0; }
+        [dir="rtl"] .timeline { padding-left: 0; padding-right: 24px; }
+        [dir="rtl"] .timeline::before { left: auto; right: 7px; }
+        [dir="rtl"] .tl-item::before { left: auto; right: -22px; }
     </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="i18n.css">
     <script src="ui.js"></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -107,11 +117,11 @@
 <body class="ds">
     <div class="mobile-frame">
         <div class="header">
-            <button class="back-btn" onclick="goBack()" aria-label="Retour"><svg class="ico" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
-            <h1>Détails de la mission</h1>
+            <button class="back-btn" onclick="goBack()" aria-label="Retour" data-i18n-attr="aria-label:common.back"><svg class="ico" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
+            <h1 data-i18n="dm.details_de_la_mission">Détails de la mission</h1>
         </div>
         <div class="content" id="content">
-            <div class="loading">Chargement…</div>
+            <div class="loading" data-i18n="common.loading">Chargement…</div>
         </div>
     </div>
 
@@ -124,24 +134,25 @@
 
         const flag = c => (window.SengpGeo ? SengpGeo.flag(c) : '');
         const esc = window.sengpEsc;
-        const fcfa = n => (Number(n)||0).toLocaleString('fr-FR')+' FCFA';
-        const dt = d => d ? new Date(d).toLocaleString('fr-FR',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
-
+        const ctry = c => (window.SengpGeo ? SengpGeo.displayCountry(c || '') : (c || ''));
+        const fcfa = n => SengpI18n.fmt.currency(n);
+        const dt = d => d ? SengpI18n.fmt.dateTime(d) : '—';
         const STATUS = {
-            pending:['En attente','b-yellow'], matched:['Correspondance','b-yellow'], accepted:['Acceptée','b-blue'],
-            picked_up:['Récupéré','b-blue'], in_transit:['En transit','b-blue'], in_customs:['En douane','b-blue'],
-            out_for_delivery:['En livraison','b-blue'], delivered:['Livré','b-green'], cancelled:['Annulé','b-red'], disputed:['Litige','b-red']
+            pending:['ship.status.pending','b-yellow'], matched:['ship.status.matched_short','b-yellow'], accepted:['mission.status.accepted','b-blue'],
+            picked_up:['ship.status.picked_up','b-blue'], in_transit:['ship.status.in_transit','b-blue'], in_customs:['ship.status.in_customs','b-blue'],
+            out_for_delivery:['ship.status.out_for_delivery','b-blue'], delivered:['ship.status.delivered','b-green'], cancelled:['ship.status.cancelled','b-red'], disputed:['ship.status.disputed','b-red']
         };
-        function statusBadge(s){ const m=STATUS[String(s||'').toLowerCase()]||[s,'b-yellow']; return `<span class="badge ${m[1]}">${esc(m[0])}</span>`; }
+        const statusText = (k, raw) => STATUS[k] ? sengpT(STATUS[k][0]) : raw;
+        function statusBadge(s){ const k=String(s||'').toLowerCase(); return `<span class="badge ${STATUS[k]?STATUS[k][1]:'b-yellow'}">${esc(statusText(k, s))}</span>`; }
 
         // Workflow GP : étape suivante selon le statut courant.
         function nextActionFor(status){
             const map = {
-                accepted:        { to:'picked_up',        label:'Marquer comme récupéré' },
-                picked_up:       { to:'in_transit',       label:'Démarrer le transit' },
-                in_transit:      { to:'out_for_delivery', label:'Mettre en livraison' },
-                in_customs:      { to:'out_for_delivery', label:'Mettre en livraison' },
-                out_for_delivery:{ to:'delivered',        label:'Confirmer la livraison', confirm:'Confirmer la livraison de ce colis au destinataire ? Cette action est définitive.' }
+                accepted:        { to:'picked_up',        label:'dm.mark_picked' },
+                picked_up:       { to:'in_transit',       label:'dm.start_transit' },
+                in_transit:      { to:'out_for_delivery', label:'dm.set_out' },
+                in_customs:      { to:'out_for_delivery', label:'dm.set_out' },
+                out_for_delivery:{ to:'delivered',        label:'dm.confirm_delivery', confirm:'dm.confirm_delivery_q' }
             };
             return map[String(status||'').toLowerCase()] || null;
         }
@@ -150,45 +161,45 @@
 
         async function load(){
             if (!token){ location.href='connexion.html'; return; }
-            if (!missionId){ document.getElementById('content').innerHTML='<div class="empty">Mission introuvable.</div>'; return; }
+            if (!missionId){ document.getElementById('content').innerHTML='<div class="empty">'+esc(sengpT('dm.not_found'))+'</div>'; return; }
             try {
                 const [mRes, tRes] = await Promise.all([
                     fetch(`${API}/missions/${missionId}`, { headers:{ 'Authorization':'Bearer '+token } }),
                     fetch(`${API}/missions/${missionId}/tracking`, { headers:{ 'Authorization':'Bearer '+token } })
                 ]);
-                if (!mRes.ok) throw new Error('Chargement impossible');
+                if (!mRes.ok) throw new Error(sengpT('detail.load_failed'));
                 mission = (await mRes.json()).data;
                 const tracking = tRes.ok ? ((await tRes.json()).data || []) : [];
                 render(mission, tracking);
             } catch(e){
-                document.getElementById('content').innerHTML = `<div class="empty">Erreur: ${esc(e.message)}</div>`;
+                document.getElementById('content').innerHTML = `<div class="empty">${esc(sengpT('envois.error', { message: e.message }))}</div>`;
             }
         }
 
         function stepper(status){
             const order = ['accepted','picked_up','in_transit','out_for_delivery','delivered'];
-            const labels = { accepted:'Mission acceptée', picked_up:'Colis récupéré', in_transit:'En transit', out_for_delivery:'En cours de livraison', delivered:'Livré' };
+            const labels = { accepted:'dm.step_accepted', picked_up:'mission.status.picked_up', in_transit:'mission.status.in_transit', out_for_delivery:'mission.status.out_for_delivery', delivered:'ship.status.delivered' };
             let cur = String(status||'').toLowerCase();
             if (cur === 'in_customs') cur = 'in_transit';
             let ci = order.indexOf(cur); if (ci < 0) ci = -1;
             const check = '<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>';
             return order.map((s,i)=>{
                 const cls = i < ci ? 'done' : (i === ci ? 'current' : '');
-                return `<div class="step ${cls}"><div class="dot">${i<ci?check:''}</div><div class="lbl">${labels[s]}</div></div>`;
+                return `<div class="step ${cls}"><div class="dot">${i<ci?check:''}</div><div class="lbl">${esc(sengpT(labels[s]))}</div></div>`;
             }).join('');
         }
 
         function render(m, tracking){
             const dims = [m.package_length,m.package_width,m.package_height].every(x=>x!=null)
-                ? `${m.package_length}×${m.package_width}×${m.package_height} cm` : 'N/C';
+                ? `${m.package_length}×${m.package_width}×${m.package_height} cm` : sengpT('detail.na');
             const gps = tracking.find(t => t.latitude && t.longitude);
             let mapBlock;
             if (gps){
                 const la=Number(gps.latitude), lo=Number(gps.longitude), d=0.05;
                 mapBlock = `<iframe class="map" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=${lo-d}%2C${la-d}%2C${lo+d}%2C${la+d}&layer=mapnik&marker=${la}%2C${lo}"></iframe>`
-                    + `<div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;">Dernière position envoyée · ${dt(gps.created_at)}</div>`;
+                    + `<div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;">${esc(sengpT('dm.last_position_sent', { date: dt(gps.created_at) }))}</div>`;
             } else {
-                mapBlock = '<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px;">Aucune position partagée pour le moment.</div>';
+                mapBlock = '<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px;">' + esc(sengpT('dm.no_position')) + '</div>';
             }
             const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent((m.departure_city||'')+', '+(m.departure_country||''))}&destination=${encodeURIComponent((m.arrival_city||'')+', '+(m.arrival_country||''))}`;
 
@@ -202,84 +213,84 @@
             const recipName   = m.recipient_name || '';
             const recipPhone  = m.recipient_phone || '';
             const callBtn = (phone) => phone
-                ? `<a class="call-btn" href="tel:${esc(phone)}" aria-label="Appeler"><svg class="ico" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></a>`
-                : `<span class="call-btn disabled" title="Numéro non disponible"><svg class="ico" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>`;
+                ? `<a class="call-btn" href="tel:${esc(phone)}" aria-label="${esc(sengpT('dm.call_aria'))}"><svg class="ico" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></a>`
+                : `<span class="call-btn disabled" title="${esc(sengpT('dm.no_number'))}"><svg class="ico" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>`;
 
             document.getElementById('content').innerHTML = `
                 <div class="card">
                     <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-                        <div><div class="price-lbl">Rémunération</div><div class="price">${fcfa(m.offered_price)}</div>
+                        <div><div class="price-lbl">${esc(sengpT('notif.ma_pay'))}</div><div class="price">${fcfa(m.offered_price)}</div>
                         <div style="font-size:12px;color:rgba(255,255,255,.5);">${esc(m.mission_code||m.tracking_number||'')}</div></div>
-                        <div style="text-align:right;">${statusBadge(m.status)}</div>
+                        <div style="text-align:end;">${statusBadge(m.status)}</div>
                     </div>
                     <div class="route">
-                        <div class="loc"><div class="flag">${flag(m.departure_country)}</div><div class="city">${esc(m.departure_city||'—')}</div><div class="country">${esc(m.departure_country||'')}</div></div>
+                        <div class="loc"><div class="flag">${flag(m.departure_country)}</div><div class="city">${esc(m.departure_city||'—')}</div><div class="country">${esc(ctry(m.departure_country||''))}</div></div>
                         <div class="arrow">→</div>
-                        <div class="loc"><div class="flag">${flag(m.arrival_country)}</div><div class="city">${esc(m.arrival_city||'—')}</div><div class="country">${esc(m.arrival_country||'')}</div></div>
+                        <div class="loc"><div class="flag">${flag(m.arrival_country)}</div><div class="city">${esc(m.arrival_city||'—')}</div><div class="country">${esc(ctry(m.arrival_country||''))}</div></div>
                     </div>
                 </div>
 
                 ${isPending ? `<div class="card" style="border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.06);">
-                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>En attente</div>
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>${esc(sengpT('ship.status.pending'))}</div>
                     <div style="font-size:13px;color:rgba(255,255,255,.8);">${s==='matched'
-                        ? `Cette mission vous est assignée par l'administration. Acceptez-la pour démarrer le suivi, ou déclinez-la : elle sera ré-assignée à un autre GP.</div>
-                    <button class="btn btn-gold" onclick="respondMission('accept')">Accepter la mission</button>
-                    <button class="btn btn-ghost" onclick="respondMission('decline')">Décliner</button>`
-                        : `Cette mission est en attente d'assignation par l'administration.</div>`}
+                        ? `${esc(sengpT('dm.matched_text'))}</div>
+                    <button class="btn btn-gold" onclick="respondMission('accept')">${esc(sengpT('dm.accept_mission'))}</button>
+                    <button class="btn btn-ghost" onclick="respondMission('decline')">${esc(sengpT('notif.ma_decline'))}</button>`
+                        : `${esc(sengpT('dm.pending_text'))}</div>`}
                 </div>` : ''}
 
                 ${(isActive && !isPending) ? `<div class="card">
-                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Progression de la livraison</div>
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>${esc(sengpT('dm.progress'))}</div>
                     <div class="stepper">${stepper(m.status)}</div>
-                    ${action ? `<button class="btn btn-gold" onclick="advance('${action.to}', ${action.confirm?`'${esc(action.confirm).replace(/'/g,"\\'")}'`:'null'})">${esc(action.label)}</button>` : ''}
-                    ${s==='in_transit' ? `<button class="btn btn-ghost" onclick="advance('in_customs', null)">Passer en douane</button>` : ''}
-                    <button class="btn btn-soft-teal" onclick="updatePositionNow()"><svg class="ico" viewBox="0 0 24 24" style="display:inline-block;vertical-align:-4px;margin-right:6px;"><path d="M20 10c0 4.4-5.4 9-8 11-2.6-2-8-6.6-8-11a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>Envoyer ma position maintenant</button>
+                    ${action ? `<button class="btn btn-gold" onclick="advance('${action.to}', ${action.confirm?`'${action.confirm}'`:'null'})">${esc(sengpT(action.label))}</button>` : ''}
+                    ${s==='in_transit' ? `<button class="btn btn-ghost" onclick="advance('in_customs', null)">${esc(sengpT('dm.to_customs'))}</button>` : ''}
+                    <button class="btn btn-soft-teal" onclick="updatePositionNow()"><svg class="ico" viewBox="0 0 24 24" style="display:inline-block;vertical-align:-4px;margin-inline-end:6px;"><path d="M20 10c0 4.4-5.4 9-8 11-2.6-2-8-6.6-8-11a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(sengpT('dm.send_position'))}</button>
                 </div>` : ''}
 
                 <div class="card">
-                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Destinataire</div>
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>${esc(sengpT('ship.recipient'))}</div>
                     <div class="person">
-                        <div class="who"><div class="role">Réception du colis</div><div class="name">${recipName?esc(recipName):'Non renseigné'}${recipPhone?` · ${esc(recipPhone)}`:''}</div></div>
+                        <div class="who"><div class="role">${esc(sengpT('dm.reception'))}</div><div class="name">${recipName?esc(recipName):esc(sengpT('detail.not_set'))}${recipPhone?` · ${esc(recipPhone)}`:''}</div></div>
                         ${callBtn(recipPhone)}
                     </div>
-                    <div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:8px;">Les coordonnées de l'expéditeur ne sont pas communiquées. Pour toute question, contactez l'équipe SEN GP.</div>
+                    <div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:8px;">${esc(sengpT('dm.sender_hidden'))}</div>
                 </div>
 
                 <div class="card">
-                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24" style="color:#4ECDC4;"><path d="M20 10c0 4.4-5.4 9-8 11-2.6-2-8-6.6-8-11a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>Itinéraire & position</div>
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24" style="color:#4ECDC4;"><path d="M20 10c0 4.4-5.4 9-8 11-2.6-2-8-6.6-8-11a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(sengpT('dm.route_position'))}</div>
                     ${mapBlock}
-                    <a class="btn btn-teal" href="${mapsUrl}" target="_blank" rel="noopener">Ouvrir l'itinéraire (GPS)</a>
+                    <a class="btn btn-teal" href="${mapsUrl}" target="_blank" rel="noopener">${esc(sengpT('dm.open_route'))}</a>
                 </div>
 
                 ${(isActive && !isPending) ? `<div class="card">
-                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>Étiquette QR du colis</div>
-                    <div id="qrBox"><button class="btn btn-soft-gold" onclick="loadDeliveryQR()">Afficher l'étiquette QR</button></div>
-                    <div class="hint">Collez l'étiquette sur le colis. Le destinataire scanne ce QR à la réception pour confirmer la livraison.</div>
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>${esc(sengpT('dm.qr_label'))}</div>
+                    <div id="qrBox"><button class="btn btn-soft-gold" onclick="loadDeliveryQR()">${esc(sengpT('dm.show_qr'))}</button></div>
+                    <div class="hint">${esc(sengpT('dm.qr_hint'))}</div>
                 </div>` : ''}
 
                 <div class="card">
-                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>Colis</div>
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>${esc(sengpT('detail.parcel'))}</div>
                     <div class="grid">
-                        <div class="kv"><div class="k">Poids</div><div class="v">${parseFloat(m.package_weight)||0} kg</div></div>
-                        <div class="kv"><div class="k">Dimensions</div><div class="v">${esc(dims)}</div></div>
-                        <div class="kv"><div class="k">Valeur déclarée</div><div class="v">${m.package_value?fcfa(m.package_value):'—'}</div></div>
-                        <div class="kv"><div class="k">Assuré</div><div class="v">${m.is_insured?'Oui':'Non'}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('ship.pkg_weight'))}</div><div class="v">${parseFloat(m.package_weight)||0} kg</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('ship.pkg_dims'))}</div><div class="v">${esc(dims)}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('ship.pkg_value'))}</div><div class="v">${m.package_value?fcfa(m.package_value):'—'}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('detail.insured'))}</div><div class="v">${esc(sengpT(m.is_insured?'common.yes':'common.no'))}</div></div>
                     </div>
-                    ${m.package_description?`<div class="kv" style="margin-top:10px;"><div class="k">Description</div><div class="v">${esc(m.package_description)}</div></div>`:''}
+                    ${m.package_description?`<div class="kv" style="margin-top:10px;"><div class="k">${esc(sengpT('ship.pkg_desc'))}</div><div class="v">${esc(m.package_description)}</div></div>`:''}
                 </div>
 
                 <div class="card">
-                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>Adresses & dates</div>
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>${esc(sengpT('dm.addresses_dates'))}</div>
                     <div class="grid">
-                        <div class="kv"><div class="k">Enlèvement</div><div class="v">${esc(m.pickup_address||'—')}</div></div>
-                        <div class="kv"><div class="k">Livraison</div><div class="v">${esc(m.delivery_address||'—')}</div></div>
-                        <div class="kv"><div class="k">Départ souhaité</div><div class="v">${m.desired_departure_date?new Date(m.desired_departure_date).toLocaleDateString('fr-FR'):'—'}</div></div>
-                        <div class="kv"><div class="k">Suivi n°</div><div class="v">${esc(m.tracking_number||'—')}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('ship.pickup'))}</div><div class="v">${esc(m.pickup_address||'—')}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('ship.delivery'))}</div><div class="v">${esc(m.delivery_address||'—')}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('ship.desired_departure'))}</div><div class="v">${m.desired_departure_date?SengpI18n.fmt.date(m.desired_departure_date, { day:'numeric', month:'numeric', year:'numeric' }):'—'}</div></div>
+                        <div class="kv"><div class="k">${esc(sengpT('detail.tracking_short'))}</div><div class="v">${esc(m.tracking_number||'—')}</div></div>
                     </div>
                 </div>
 
                 <div class="card">
-                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>Historique du suivi</div>
+                    <div class="section-title"><svg class="ico" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>${esc(sengpT('detail.history'))}</div>
                     <div class="timeline">${timelineHTML(m, tracking)}</div>
                 </div>
             `;
@@ -287,10 +298,10 @@
 
         function timelineHTML(m, tracking){
             const events = tracking.filter(t => String(t.status||'').toLowerCase() !== 'location');
-            if (!events.length) return `<div class="tl-item"><div class="tl-status">${esc((STATUS[String(m.status||'').toLowerCase()]||[m.status])[0])}</div><div class="tl-date">${dt(m.created_at)}</div></div>`;
+            if (!events.length) return `<div class="tl-item"><div class="tl-status">${esc(statusText(String(m.status||'').toLowerCase(), m.status))}</div><div class="tl-date">${dt(m.created_at)}</div></div>`;
             return events.map((t,idx)=>`
                 <div class="tl-item ${idx>0?'muted':''}">
-                    <div class="tl-status">${esc((STATUS[String(t.status||'').toLowerCase()]||[t.status])[0])}</div>
+                    <div class="tl-status">${esc(statusText(String(t.status||'').toLowerCase(), t.status))}</div>
                     ${t.description?`<div class="tl-desc">${esc(t.description)}</div>`:''}
                     ${t.location?`<div class="tl-desc">${esc(t.location)}</div>`:''}
                     <div class="tl-date">${dt(t.created_at)}</div>
@@ -301,7 +312,7 @@
         // Le GP confirme ou décline une mission que l'admin lui a assignée ('matched').
         async function respondMission(action){
             if (action === 'decline'){
-                const ok = await sengpConfirm('Décliner cette mission ? Elle sera ré-assignée à un autre GP de votre catégorie.', { okLabel:'Décliner', cancelLabel:'Annuler' });
+                const ok = await sengpConfirm(sengpT('notif.ma_decline_confirm'), { okLabel:sengpT('notif.ma_decline'), cancelLabel:sengpT('common.cancel') });
                 if (!ok) return;
             }
             try {
@@ -310,16 +321,16 @@
                 });
                 if (!res.ok){
                     const err = await res.json().catch(() => ({}));
-                    throw new Error(err.message || 'Action impossible');
+                    throw new Error(err.message || sengpT('dm.action_failed'));
                 }
-            } catch(e){ sengpAlert(e.message || 'Action impossible. Réessayez.'); return; }
-            if (action === 'accept'){ await sengpAlert('Mission acceptée ! L’équipe SEN GP vous contactera pour organiser la remise du colis.'); load(); }
-            else { await sengpAlert('Mission déclinée. Elle sera ré-assignée à un autre GP.'); window.location.href = 'dashgp.html'; }
+            } catch(e){ sengpAlert(e.message || sengpT('notif.ma_failed')); return; }
+            if (action === 'accept'){ await sengpAlert(sengpT('notif.ma_alert_ok')); load(); }
+            else { await sengpAlert(sengpT('dm.declined_ok')); window.location.href = 'dashgp.html'; }
         }
 
         async function advance(newStatus, confirmMsg){
             if (confirmMsg && confirmMsg !== 'null'){
-                const ok = await sengpConfirm(confirmMsg, { okLabel:'Confirmer', cancelLabel:'Annuler' });
+                const ok = await sengpConfirm(sengpT(confirmMsg), { okLabel:sengpT('common.confirm'), cancelLabel:sengpT('common.cancel') });
                 if (!ok) return;
             }
             try {
@@ -328,9 +339,9 @@
                     body: JSON.stringify({ status:newStatus })
                 });
                 const j = await res.json();
-                if (res.ok && j.success){ await sengpAlert('Statut mis à jour ✓'); load(); }
-                else sengpAlert('Erreur : ' + (j.error || j.message || 'mise à jour échouée'));
-            } catch(e){ sengpAlert('Erreur de connexion.'); }
+                if (res.ok && j.success){ await sengpAlert(sengpT('dm.status_updated')); load(); }
+                else sengpAlert(sengpT('envois.error', { message: j.error || j.message || sengpT('dm.update_failed') }));
+            } catch(e){ sengpAlert(sengpT('errors.network')); }
         }
 
         async function getGpPos(){
@@ -342,7 +353,7 @@
             }
             return new Promise((res,rej)=> navigator.geolocation
                 ? navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lng:p.coords.longitude}), e=>rej(new Error(e.message||'GPS')), {enableHighAccuracy:true,timeout:20000})
-                : rej(new Error('Géolocalisation indisponible')));
+                : rej(new Error(sengpT('dm.geo_unavailable'))));
         }
 
         async function updatePositionNow(){
@@ -352,14 +363,14 @@
                     method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' },
                     body: JSON.stringify({ lat:pos.lat, lng:pos.lng })
                 });
-                if (res.ok){ await sengpAlert('Position envoyée ✓'); load(); }
-                else sengpAlert('Envoi de la position impossible.');
-            } catch(e){ sengpAlert('GPS indisponible : ' + (e && e.message ? e.message : '')); }
+                if (res.ok){ await sengpAlert(sengpT('dm.position_sent')); load(); }
+                else sengpAlert(sengpT('dm.position_failed'));
+            } catch(e){ sengpAlert(sengpT('dm.gps_unavailable', { message: e && e.message ? e.message : '' })); }
         }
 
         async function loadDeliveryQR(){
             const box = document.getElementById('qrBox');
-            box.innerHTML = 'Génération…';
+            box.innerHTML = esc(sengpT('dm.generating'));
             try {
                 const res = await fetch(`${API}/missions/${missionId}/delivery-qr`, {
                     method:'POST', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/json' }
@@ -367,28 +378,28 @@
                 const j = await res.json();
                 if (res.ok && j.success) {
                     const m = mission || {};
-                    const recip = m.recipient_name ? esc(m.recipient_name) : 'Destinataire';
+                    const recip = m.recipient_name ? esc(m.recipient_name) : esc(sengpT('ship.recipient'));
                     const code = esc(m.tracking_number || m.mission_code || '');
                     box.innerHTML = `
                         <div style="background:#fff;color:#1a1a2e;border-radius:12px;padding:16px;text-align:center;">
                             <div style="font-weight:800;font-size:15px;letter-spacing:1px;">SEN GP</div>
-                            <div style="font-size:15px;margin-top:6px;">Pour : <b>${recip}</b></div>
+                            <div style="font-size:15px;margin-top:6px;">${esc(sengpT('ship.qr_for'))} <b>${recip}</b></div>
                             <div style="font-size:12px;color:#555;margin-top:2px;">${esc(m.departure_city||'')} → ${esc(m.arrival_city||'')}</div>
-                            <img src="${j.data.qr_code_url}" alt="QR de livraison" style="width:200px;height:200px;display:block;margin:10px auto;">
+                            <img src="${j.data.qr_code_url}" alt="${esc(sengpT('dm.qr_delivery_alt'))}" style="width:200px;height:200px;display:block;margin:10px auto;">
                             <div style="font-weight:800;letter-spacing:1.5px;font-size:15px;">${code}</div>
                         </div>
-                        <div class="hint" style="text-align:center;">À coller sur le colis (capture d'écran possible).</div>`;
+                        <div class="hint" style="text-align:center;">${esc(sengpT('dm.qr_stick'))}</div>`;
                 } else {
-                    box.innerHTML = 'Erreur : ' + (j.error || j.message || 'génération échouée');
+                    box.innerHTML = esc(sengpT('envois.error', { message: j.error || j.message || sengpT('dm.generation_failed') }));
                 }
-            } catch (e) { box.innerHTML = 'Erreur de connexion.'; }
+            } catch (e) { box.innerHTML = esc(sengpT('errors.network')); }
         }
 
         // Pull-to-refresh.
         window.onPullRefresh = async () => { await load(); return true; };
 
-        load();
-
+        SengpI18n.ready.then(load);
+        window.addEventListener('sengp:languagechange', () => { if (mission) load(); });
         // Rafraîchissement auto tant que la mission est active.
         const ACTIVE = ['accepted','picked_up','in_transit','in_customs','out_for_delivery'];
         setInterval(() => {

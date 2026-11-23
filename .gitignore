@@ -27,3 +27,4 @@ rootkey.csv
 # Build files
 build/
 www/
+frontend/locales/.lock

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEN GP - Réclamations</title>
+    <title data-i18n="claim.page_title">SEN GP - Réclamations</title>
     <style>
         * {
             margin: 0;
@@ -556,13 +556,21 @@
             transform: translateY(-2px);
             box-shadow: 0 12px 28px rgba(78, 205, 196, 0.5);
         }
+        /* Droite a gauche (arabe) */
+        [dir="rtl"] .back-btn { transform: scaleX(-1); }
+        [dir="rtl"] .back-btn:hover { transform: scaleX(-1) translateX(-3px); }
+        [dir="rtl"] .claim-card:hover { transform: translateX(-5px); }
+        [dir="rtl"] .btn-text, [dir="rtl"] .claim-card, [dir="rtl"] .form-input, [dir="rtl"] .form-select, [dir="rtl"] .form-textarea { text-align: right; }
+        [dir="rtl"] .nav-badge { right: auto; left: 0; }
             /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
         </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="i18n.css">
     <script src="ui.js"></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -581,10 +589,10 @@
 
         <!-- Header -->
         <div class="header">
-            <button class="back-btn" onclick="goBack()">←</button>
+            <button class="back-btn" onclick="goBack()" aria-label="Retour" data-i18n-attr="aria-label:common.back">←</button>
             <div class="header-title">
-                <h1>Réclamations</h1>
-                <p>Gérez vos réclamations</p>
+                <h1 data-i18n="prof.claims">Réclamations</h1>
+                <p data-i18n="claim.subtitle">Gérez vos réclamations</p>
             </div>
         </div>
 
@@ -592,18 +600,18 @@
         <div class="content">
             <!-- Tabs -->
             <div class="tabs">
-                <button class="tab active" onclick="switchTab('active')">En cours</button>
-                <button class="tab" onclick="switchTab('resolved')">Résolues</button>
+                <button class="tab active" id="tab-active" onclick="switchTab('active')"><span data-i18n="dash.in_progress">En cours</span> (<span id="cnt-active">0</span>)</button>
+                <button class="tab" id="tab-resolved" onclick="switchTab('resolved')"><span data-i18n="claim.tab_resolved">Résolues</span> (<span id="cnt-resolved">0</span>)</button>
             </div>
 
             <!-- New Claim Button -->
             <button class="new-claim-btn" onclick="openNewClaimModal()">
                 <div class="btn-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
                 <div class="btn-text">
-                    <div class="btn-title">Nouvelle réclamation</div>
-                    <div class="btn-subtitle">Signalez un problème</div>
+                    <div class="btn-title" data-i18n="claim.new">Nouvelle réclamation</div>
+                    <div class="btn-subtitle" data-i18n="claim.new_s">Signalez un problème</div>
                 </div>
-                <div style="font-size: 20px; color: #1a1a2e;">→</div>
+                <div class="i18n-flip" style="font-size: 20px; color: #1a1a2e;">→</div>
             </button>
 
             <!-- Active Claims -->
@@ -621,27 +629,27 @@
         <div class="bottom-nav">
             <div class="nav-item" onclick="navigateTo('home')">
                 <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
-                <div class="nav-label">Accueil</div>
+                <div class="nav-label" data-i18n="nav.home">Accueil</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('missions')">
                 <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></div>
-                <div class="nav-label">Missions</div>
+                <div class="nav-label" data-i18n="nav.missions">Missions</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('trips')">
                 <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
-                <div class="nav-label">Trajets</div>
+                <div class="nav-label" data-i18n="nav.trips">Trajets</div>
             </div>
 
             <div class="nav-item active" onclick="navigateTo('claims')">
                 <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8M8 9h2"/></svg></div>
-                <div class="nav-label">Réclamations</div>
+                <div class="nav-label" data-i18n="prof.claims">Réclamations</div>
             </div>
 
             <div class="nav-item" onclick="navigateTo('profile')">
                 <div class="nav-icon"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
-                <div class="nav-label">Profil</div>
+                <div class="nav-label" data-i18n="nav.profile">Profil</div>
             </div>
         </div>
 
@@ -649,37 +657,37 @@
         <div class="modal-overlay" id="newClaimModal">
             <div class="modal">
                 <div class="modal-header">
-                    <h3 class="modal-title">Nouvelle réclamation</h3>
-                    <p class="modal-subtitle">Décrivez votre problème en détail</p>
+                    <h3 class="modal-title" data-i18n="claim.new">Nouvelle réclamation</h3>
+                    <p class="modal-subtitle" data-i18n="claim.modal_sub">Décrivez votre problème en détail</p>
                 </div>
                 <div class="modal-body">
                     <form id="claimForm">
                         <div class="form-group">
-                            <label class="form-label">Numéro de mission</label>
-                            <input type="text" id="missionNumber" class="form-input" placeholder="Ex: MIS-20251028-A1B2" required>
+                            <label class="form-label" data-i18n="rg.mission_number">Numéro de mission</label>
+                            <input type="text" id="missionNumber" class="form-input" placeholder="Ex: MIS-20251028-A1B2" data-i18n-attr="placeholder:rg.mission_ph" required>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Type de réclamation</label>
+                            <label class="form-label" data-i18n="claim.type_label">Type de réclamation</label>
                             <select id="claimType" class="form-select" required>
-                                <option value="">Sélectionnez un type</option>
-                                <option value="payment_issue">Problème de paiement</option>
-                                <option value="sender_issue">Problème avec l'expéditeur</option>
-                                <option value="package_issue">Problème avec le colis</option>
-                                <option value="delivery_issue">Problème de livraison</option>
-                                <option value="other">Autre</option>
+                                <option value="" data-i18n="claim.choose_type">Sélectionnez un type</option>
+                                <option value="payment_issue" data-i18n="rg.type_payment">Problème de paiement</option>
+                                <option value="sender_issue" data-i18n="rg.type_sender">Problème avec l'expéditeur</option>
+                                <option value="package_issue" data-i18n="rg.type_package">Problème avec le colis</option>
+                                <option value="delivery_issue" data-i18n="rg.type_delivery">Problème de livraison</option>
+                                <option value="other" data-i18n="claim.type_other">Autre</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Description détaillée</label>
-                            <textarea id="claimDescription" class="form-textarea" placeholder="Décrivez le problème rencontré..." required></textarea>
+                            <label class="form-label" data-i18n="rg.description">Description détaillée</label>
+                            <textarea id="claimDescription" class="form-textarea" placeholder="Décrivez le problème rencontré..." data-i18n-attr="placeholder:rg.description_ph" required></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-cancel" onclick="closeNewClaimModal()">Annuler</button>
-                    <button class="btn btn-submit" onclick="submitClaim()">Soumettre</button>
+                    <button class="btn btn-cancel" onclick="closeNewClaimModal()" data-i18n="common.cancel">Annuler</button>
+                    <button class="btn btn-submit" onclick="submitClaim()" data-i18n="claim.submit">Soumettre</button>
                 </div>
             </div>
         </div>
@@ -694,7 +702,7 @@
             // Update tab buttons
             const tabs = document.querySelectorAll('.tab');
             tabs.forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
 
             // Show/hide claim lists
             if (tab === 'active') {
@@ -737,7 +745,8 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    displayClaims(result.data || []);
+                    window.__claims = result.data || [];
+                    displayClaims(window.__claims);
                 } else {
                     console.error('Failed to load claims');
                     displayClaims([]);
@@ -752,10 +761,9 @@
             const activeClaims = claims.filter(c => c.status !== 'resolved');
             const resolvedClaims = claims.filter(c => c.status === 'resolved');
 
-            // Update tab labels
-            const tabs = document.querySelectorAll('.tab');
-            tabs[0].textContent = `En cours (${activeClaims.length})`;
-            tabs[1].textContent = `Résolues (${resolvedClaims.length})`;
+            // Update tab counts
+            document.getElementById('cnt-active').textContent = activeClaims.length;
+            document.getElementById('cnt-resolved').textContent = resolvedClaims.length;
 
             // Display active claims
             const activeContainer = document.getElementById('activeClaims');
@@ -763,8 +771,8 @@
                 activeContainer.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8M8 9h2"/></svg></div>
-                        <div class="empty-title">Aucune réclamation active</div>
-                        <div class="empty-description">Vous n'avez aucune réclamation en cours. Si vous rencontrez un problème, n'hésitez pas à le signaler.</div>
+                        <div class="empty-title">${window.sengpEsc(sengpT('claim.none_active'))}</div>
+                        <div class="empty-description">${window.sengpEsc(sengpT('rg.empty_active'))}</div>
                     </div>
                 `;
             } else {
@@ -777,13 +785,20 @@
                 resolvedContainer.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon"><svg class="ic" viewBox="0 0 24 24"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg></div>
-                        <div class="empty-title">Aucune réclamation résolue</div>
-                        <div class="empty-description">Vos réclamations résolues apparaîtront ici.</div>
+                        <div class="empty-title">${window.sengpEsc(sengpT('claim.none_resolved'))}</div>
+                        <div class="empty-description">${window.sengpEsc(sengpT('rg.empty_resolved'))}</div>
                     </div>
                 `;
             } else {
                 resolvedContainer.innerHTML = resolvedClaims.map(claim => createClaimCard(claim)).join('');
             }
+        }
+
+        // Libelle du type de reclamation (valeurs du formulaire et de la base).
+        function claimTypeLabel(t) {
+            const map = { payment_issue: 'rg.type_payment', sender_issue: 'rg.type_sender', package_issue: 'rg.type_package',
+                          delivery_issue: 'rg.type_delivery', other: 'claim.type_other' };
+            return map[t] ? sengpT(map[t]) : String(t).replace(/_/g, ' ');
         }
 
         function createClaimCard(claim) {
@@ -795,10 +810,10 @@
             };
 
             const statusLabels = {
-                pending: 'En attente',
-                in_progress: 'En cours',
-                resolved: 'Résolu',
-                rejected: 'Rejeté'
+                pending: sengpT('ship.status.pending'),
+                in_progress: sengpT('dash.in_progress'),
+                resolved: sengpT('claim.status_resolved'),
+                rejected: sengpT('rg.status_rejected')
             };
 
             const typeIcons = {
@@ -815,18 +830,18 @@
                         <div class="claim-type">
                             <div class="claim-icon">${typeIcons[claim.claim_type] || '<svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>'}</div>
                             <div class="claim-info">
-                                <h3>${window.sengpEsc(claim.claim_type ? claim.claim_type.replace(/_/g, ' ') : 'Réclamation')}</h3>
+                                <h3>${window.sengpEsc(claim.claim_type ? claimTypeLabel(claim.claim_type) : sengpT('claim.nav'))}</h3>
                                 <div class="claim-id">#${window.sengpEsc(claim.id || 'N/A')}</div>
                             </div>
                         </div>
                         <span class="claim-status ${statusClasses[claim.status] || 'status-pending'}">
-                            ${statusLabels[claim.status] || 'En attente'}
+                            ${window.sengpEsc(statusLabels[claim.status] || sengpT('ship.status.pending'))}
                         </span>
                     </div>
-                    <div class="claim-description">${window.sengpEsc(claim.description || 'Aucune description')}</div>
+                    <div class="claim-description">${window.sengpEsc(claim.description || sengpT('claim.no_description'))}</div>
                     <div class="claim-footer">
-                        <div class="claim-date">Créée le ${new Date(claim.created_at).toLocaleDateString('fr-FR')}</div>
-                        <div class="claim-shipment">Mission: ${window.sengpEsc(claim.mission_code || 'N/A')}</div>
+                        <div class="claim-date">${window.sengpEsc(sengpT('claim.created_on', { date: SengpI18n.fmt.date(claim.created_at, { day: 'numeric', month: 'numeric', year: 'numeric' }) }))}</div>
+                        <div class="claim-shipment">${window.sengpEsc(sengpT('rg.mission', { code: claim.mission_code || 'N/A' }))}</div>
                     </div>
                 </div>
             `;
@@ -839,7 +854,7 @@
             const description = document.getElementById('claimDescription').value;
 
             if (!missionNumber || !claimType || !description) {
-                alert('Veuillez remplir tous les champs');
+                alert(sengpT('rg.fill_all'));
                 return;
             }
 
@@ -858,27 +873,30 @@
                 });
 
                 if (response.ok) {
-                    alert('Réclamation soumise avec succès!\n\nVous recevrez une notification dès qu\'elle sera traitée.');
+                    alert(sengpT('claim.submitted'));
                     closeNewClaimModal();
                     loadUserClaims(); // Reload claims
                 } else {
                     const error = await response.json();
-                    alert('Erreur: ' + (error.message || 'Impossible de soumettre la réclamation'));
+                    alert(sengpT('envois.error', { message: error.message || sengpT('claim.submit_failed') }));
                 }
             } catch (error) {
                 console.error('Error submitting claim:', error);
-                alert('Erreur de connexion au serveur');
+                alert(sengpT('errors.network'));
             }
         }
 
         function viewClaimDetails(claimId) {
-            alert(`Voir les détails de la réclamation\n\nID: ${claimId}\n\nInformations complètes, historique, messages, etc.`);
+            alert(sengpT('claim.details_stub', { id: claimId }));
         }
 
         // Load claims on page load
         window.addEventListener('load', () => {
-            loadUserClaims();
+            SengpI18n.ready.then(() => { loadUserClaims(); });
         });
+
+        // Changement de langue : cartes et textes dynamiques se redessinent.
+        window.addEventListener('sengp:languagechange', () => { if (window.__claims) displayClaims(window.__claims); });
 
         function navigateTo(section) {
             const pages = {

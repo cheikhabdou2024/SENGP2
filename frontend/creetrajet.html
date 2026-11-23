@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>SEN GP - Créer un Trajet</title>
+    <title data-i18n="ct.page_title">SEN GP - Créer un Trajet</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -255,10 +255,26 @@
         /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
+
+        /* ---- droite a gauche (arabe) ---- */
+        [dir="rtl"] .ct-hero::after { background: linear-gradient(270deg, rgba(7, 20, 47, 0.55) 0%, rgba(7, 20, 47, 0.1) 60%, rgba(7, 20, 47, 0) 100%), linear-gradient(180deg, rgba(244, 248, 253, 0) 72%, #F4F8FD 100%); }
+        [dir="rtl"] .ct-logo { margin-left: 0; margin-right: 52px; }
+        [dir="rtl"] .ct-back { left: auto; right: 18px; }
+        [dir="rtl"] .ct-back .ct-i, [dir="rtl"] .ct-cam > .ct-i, [dir="rtl"] #nextBtn .ct-i, [dir="rtl"] .ct-opt > .ct-i { transform: scaleX(-1); }
+        [dir="rtl"] .ct-label:first-child { margin-left: 0; margin-right: -10px; }
+        [dir="rtl"] .ct-label:last-child { margin-right: 0; margin-left: -10px; }
+        [dir="rtl"] .ct-cam { text-align: right; }
+        [dir="rtl"] .ct-cam > .ct-i, [dir="rtl"] .ct-opt > .ct-i { margin-left: 0; margin-right: auto; }
+        [dir="rtl"] .ct-dates { text-align: right; }
+        [dir="rtl"] .ct-opt { text-align: right; }
+        [dir="rtl"] .ct-crumb { padding: 8px 8px 8px 12px; }
+        [dir="rtl"] .ct-slider, [dir="rtl"] .ct-slider input[type=range], [dir="rtl"] .ct-slider__ends { direction: ltr; }
     </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="i18n.css">
     <script src="ui.js"></script>
     <script src="geo-data.js" defer></script>
     <script src="geo.js" defer></script>
@@ -284,26 +300,26 @@
                 <img class="ct-bg" src="im/sengp-create-background.jpg" alt="" decoding="async">
             </picture>
             <div class="ct-hero__in"><img class="ct-logo" src="im/sengp-logo.png" alt="SEN GP" width="118" height="73"></div>
-            <button type="button" class="ct-back" onclick="goBack()" aria-label="Retour">
+            <button type="button" class="ct-back" onclick="goBack()" aria-label="Retour" data-i18n-attr="aria-label:common.back">
                 <svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
             </button>
             <div class="ct-title">
-                <h1>Créer un trajet</h1>
-                <p>Ajoutez votre prochain voyage</p>
+                <h1 data-i18n="ct.creer_un_trajet">Créer un trajet</h1>
+                <p data-i18n="ct.ajoutez_votre_prochain_voyage">Ajoutez votre prochain voyage</p>
             </div>
         </header>
 
         <div class="ct-body">
             <!-- Stepper -->
-            <section class="ct-steps" aria-label="Progression">
+            <section class="ct-steps" aria-label="Progression" data-i18n-attr="aria-label:ct.progression">
                 <div class="ct-steps__row">
                     <div class="ct-line"><i id="progressFill"></i></div>
                     <div class="ct-step active" id="step1"><span>1</span></div>
                     <div class="ct-step" id="step2"><span>2</span></div>
                 </div>
                 <div class="ct-labels">
-                    <div class="ct-label active" id="label1">Billet</div>
-                    <div class="ct-label" id="label2">Détails</div>
+                    <div class="ct-label active" id="label1" data-i18n="ct.billet">Billet</div>
+                    <div class="ct-label" id="label2" data-i18n="detail.details">Détails</div>
                 </div>
             </section>
 
@@ -312,8 +328,8 @@
                 <div class="ct-head">
                     <span class="ct-head__ic"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true" style="fill: currentColor; stroke: none;"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span>
                     <div>
-                        <h2>Votre billet d'avion</h2>
-                        <p>Importez une photo ou un fichier PDF de votre billet pour préremplir les détails du trajet.</p>
+                        <h2 data-i18n="ct.votre_billet_d_avion">Votre billet d'avion</h2>
+                        <p data-i18n="ct.importez_une_photo_ou">Importez une photo ou un fichier PDF de votre billet pour préremplir les détails du trajet.</p>
                     </div>
                 </div>
 
@@ -344,13 +360,13 @@
                             <path d="M208 124h28" stroke="#2F6BFF" stroke-width="4" stroke-linecap="round"/>
                         </svg>
                     </div>
-                    <img id="preview" class="ct-preview" alt="Aperçu du billet">
+                    <img id="preview" class="ct-preview" alt="Aperçu du billet" data-i18n-attr="alt:ct.apercu_du_billet">
                     <div id="pdfBadge" class="ct-pdf"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6"/></svg><b>PDF</b></div>
-                    <h3 id="uploadTitle">Ajouter votre billet</h3>
-                    <p id="uploadDesc">JPG, PNG ou PDF · 5 Mo max</p>
+                    <h3 id="uploadTitle" data-i18n="ct.ajouter_votre_billet">Ajouter votre billet</h3>
+                    <p id="uploadDesc" data-i18n="ct.jpg_png_ou_pdf">JPG, PNG ou PDF · 5 Mo max</p>
                     <button type="button" class="ct-btn" id="pickBtn" onclick="document.getElementById('fileInput').click()">
                         <svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6"/></svg>
-                        <span id="pickLabel">Choisir un fichier</span>
+                        <span id="pickLabel" data-i18n="ct.choisir_un_fichier">Choisir un fichier</span>
                     </button>
                 </div>
 
@@ -359,11 +375,11 @@
 
                 <button type="button" class="ct-cam" onclick="openCamera()">
                     <span class="ct-cam__ic"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3.5"/></svg></span>
-                    <span><b>Prendre une photo</b><small>Photographiez votre billet directement</small></span>
+                    <span><b data-i18n="ct.prendre_une_photo">Prendre une photo</b><small data-i18n="ct.photographiez_votre_billet_directement">Photographiez votre billet directement</small></span>
                     <svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
 
-                <p class="ct-secure"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.7 8.9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>Vos informations sont utilisées uniquement pour préparer votre trajet.</p>
+                <p class="ct-secure"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.7 8.9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg><span data-i18n="ct.vos_informations_sont_utilisees">Vos informations sont utilisées uniquement pour préparer votre trajet.</span></p>
             </div>
 
             <!-- Step 2: details -->
@@ -371,28 +387,28 @@
                 <div class="ct-grid2">
                     <!-- Trajet -->
                     <section class="ct-box">
-                        <div class="ct-box__h"><svg class="ct-i ct-ic-blue" viewBox="0 0 24 24" aria-hidden="true" style="fill: currentColor; stroke: none;"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg><h3>Trajet</h3></div>
+                        <div class="ct-box__h"><svg class="ct-i ct-ic-blue" viewBox="0 0 24 24" aria-hidden="true" style="fill: currentColor; stroke: none;"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg><h3 data-i18n="cr.trajet">Trajet</h3></div>
                         <div class="ct-route">
                             <button type="button" class="ct-place" id="placeDep" onclick="openPlaceSheet('dep')">
-                                <small>Départ</small>
-                                <span class="ct-place__main"><span class="ct-flag" id="flagDep"></span><b id="cityDep">Choisir</b></span>
-                                <small id="countryDep">Pays</small>
+                                <small data-i18n="dash.departure">Départ</small>
+                                <span class="ct-place__main"><span class="ct-flag" id="flagDep"></span><b id="cityDep" data-i18n="ct.choisir">Choisir</b></span>
+                                <small id="countryDep" data-i18n="ct.pays">Pays</small>
                             </button>
-                            <button type="button" class="ct-swap" onclick="swapPlaces()" aria-label="Inverser départ et arrivée"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></svg></button>
+                            <button type="button" class="ct-swap" onclick="swapPlaces()" aria-label="Inverser départ et arrivée" data-i18n-attr="aria-label:dash.swap_aria"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></svg></button>
                             <button type="button" class="ct-place" id="placeArr" onclick="openPlaceSheet('arr')">
-                                <small>Arrivée</small>
-                                <span class="ct-place__main"><span class="ct-flag" id="flagArr"></span><b id="cityArr">Choisir</b></span>
-                                <small id="countryArr">Pays</small>
+                                <small data-i18n="dash.arrival">Arrivée</small>
+                                <span class="ct-place__main"><span class="ct-flag" id="flagArr"></span><b id="cityArr" data-i18n="ct.choisir">Choisir</b></span>
+                                <small id="countryArr" data-i18n="ct.pays">Pays</small>
                             </button>
                         </div>
                     </section>
 
                     <!-- Dates -->
                     <section class="ct-box">
-                        <div class="ct-box__h"><svg class="ct-i ct-ic-blue" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg><h3>Dates du voyage</h3></div>
+                        <div class="ct-box__h"><svg class="ct-i ct-ic-blue" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg><h3 data-i18n="ct.dates_du_voyage">Dates du voyage</h3></div>
                         <button type="button" class="ct-dates" onclick="openDateSheet()">
-                            <span class="ct-date"><small>Départ</small><span class="ct-cal"><i>Jour</i><b id="dayDep">–</b></span><span class="ct-date__t"><b id="monthDep">Choisir</b><small id="timeDep"></small></span></span>
-                            <span class="ct-date"><small>Arrivée</small><span class="ct-cal"><i>Jour</i><b id="dayArr">–</b></span><span class="ct-date__t"><b id="monthArr">Choisir</b><small id="timeArr"></small></span></span>
+                            <span class="ct-date"><small data-i18n="dash.departure">Départ</small><span class="ct-cal"><i data-i18n="ct.jour">Jour</i><b id="dayDep">–</b></span><span class="ct-date__t"><b id="monthDep" data-i18n="ct.choisir">Choisir</b><small id="timeDep"></small></span></span>
+                            <span class="ct-date"><small data-i18n="dash.arrival">Arrivée</small><span class="ct-cal"><i data-i18n="ct.jour">Jour</i><b id="dayArr">–</b></span><span class="ct-date__t"><b id="monthArr" data-i18n="ct.choisir">Choisir</b><small id="timeArr"></small></span></span>
                         </button>
                     </section>
                 </div>
@@ -400,25 +416,25 @@
                 <!-- Poids -->
                 <section class="ct-box ct-weight">
                     <div class="ct-weight__main">
-                        <div class="ct-box__h"><svg class="ct-i ct-ic-blue" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l2 13H4z"/><path d="M9 8a3 3 0 0 1 6 0"/><path d="M12 12v4"/></svg><h3>Poids disponible</h3></div>
-                        <div class="ct-weight__v"><b id="weightVal">15</b> kg</div>
+                        <div class="ct-box__h"><svg class="ct-i ct-ic-blue" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l2 13H4z"/><path d="M9 8a3 3 0 0 1 6 0"/><path d="M12 12v4"/></svg><h3 data-i18n="ct.poids_disponible">Poids disponible</h3></div>
+                        <div class="ct-weight__v"><b id="weightVal">15</b> <span data-i18n="cr.kg">kg</span></div>
                         <div class="ct-slider">
                             <span class="ct-bubble" id="weightBubble">15 kg</span>
-                            <input type="range" id="availableWeight" min="1" max="50" step="1" value="15" oninput="syncWeight()" aria-label="Poids disponible en kilos">
+                            <input type="range" id="availableWeight" min="1" max="50" step="1" value="15" oninput="syncWeight()" aria-label="Poids disponible en kilos" data-i18n-attr="aria-label:ct.poids_disponible_en_kilos">
                         </div>
-                        <div class="ct-slider__ends"><span>0 kg</span><span>50 kg</span></div>
+                        <div class="ct-slider__ends"><span data-i18n="ct.0_kg">0 kg</span><span data-i18n="ct.50_kg">50 kg</span></div>
                     </div>
                     <div class="ct-weight__side">
                         <img src="im/sengp-suitcase.webp" alt="" width="420" height="386">
                         <div class="ct-cap">
-                            <small>Capacité maximale</small>
-                            <b>50 kg</b>
-                            <p>Poids que vous pouvez transporter en plus de vos bagages personnels.</p>
+                            <small data-i18n="ct.capacite_maximale">Capacité maximale</small>
+                            <b data-i18n="ct.50_kg">50 kg</b>
+                            <p data-i18n="ct.poids_que_vous_pouvez">Poids que vous pouvez transporter en plus de vos bagages personnels.</p>
                         </div>
                     </div>
                     <div class="ct-tip">
                         <svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-                        <div><b>Conseils</b><p>Vérifiez la limite de poids autorisée par la compagnie aérienne et gardez une marge pour vos bagages personnels.</p></div>
+                        <div><b data-i18n="ct.conseils">Conseils</b><p data-i18n="ct.verifiez_la_limite_de">Vérifiez la limite de poids autorisée par la compagnie aérienne et gardez une marge pour vos bagages personnels.</p></div>
                     </div>
                 </section>
             </div>
@@ -429,11 +445,11 @@
     <div class="ct-foot" id="foot">
         <div class="ct-foot__in">
             <div class="ct-actions">
-                <button type="button" class="ct-prev" id="prevBtn" onclick="prevStep()" style="display: none;">Précédent</button>
-                <button type="button" class="ct-next" id="nextBtn" onclick="nextStep()" disabled><span>Continuer</span><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
-                <button type="button" class="ct-next" id="submitBtn" onclick="submitTrip()" style="display: none;"><span>Créer le trajet</span></button>
+                <button type="button" class="ct-prev" id="prevBtn" onclick="prevStep()" style="display: none;" data-i18n="ct.precedent">Précédent</button>
+                <button type="button" class="ct-next" id="nextBtn" onclick="nextStep()" disabled><span data-i18n="common.continue">Continuer</span><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+                <button type="button" class="ct-next" id="submitBtn" onclick="submitTrip()" style="display: none;"><span data-i18n="ct.creer_le_trajet">Créer le trajet</span></button>
             </div>
-            <p id="footNote">Vous pourrez vérifier les informations à l'étape suivante.</p>
+            <p id="footNote" data-i18n="ct.vous_pourrez_verifier_les">Vous pourrez vérifier les informations à l'étape suivante.</p>
         </div>
     </div>
 
@@ -443,7 +459,7 @@
             <div class="ct-sheet__grab"><i></i></div>
             <div class="ct-sheet__head">
                 <div><h3 id="sheetTitle"></h3><p id="sheetSub"></p></div>
-                <button type="button" class="ct-close" onclick="closeSheet()" aria-label="Fermer"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+                <button type="button" class="ct-close" onclick="closeSheet()" aria-label="Fermer" data-i18n-attr="aria-label:common.close"><svg class="ct-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
             </div>
             <div class="ct-sheet__body" id="sheetBody"></div>
         </div>
@@ -453,6 +469,8 @@
     <script>
         let currentStep = 1;
         let uploadedFile = null;
+        function setI18n(el, key, params) { el.setAttribute('data-i18n', key); el.textContent = sengpT(key, params); }
+        function setText(el, text) { el.removeAttribute('data-i18n'); el.textContent = text; }
 
         function goBack() {
             window.location.href = 'dashgp.html';
@@ -473,7 +491,11 @@
         function flagHTML(country) {
             return FLAGS[country] ? '<svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + FLAGS[country] + '</svg>' : '';
         }
-        const countryName = c => COUNTRY_LABEL[c] || c;
+        // Nom de pays affiche dans la langue courante (la valeur envoyee a l'API reste le nom francais)
+        const countryName = c => {
+            const fr = COUNTRY_LABEL[c] || c;
+            return (window.SengpGeo && SengpGeo.displayCountry) ? SengpGeo.displayCountry(fr) : fr;
+        };
 
         const trip = { dep: { country: '', city: '' }, arr: { country: '', city: '' }, depDT: '', arrDT: '' };
 
@@ -481,8 +503,8 @@
             const key = side === 'dep' ? 'Dep' : 'Arr';
             const p = trip[side];
             document.getElementById('flag' + key).innerHTML = p.flag ? '<span style="font-size:20px;line-height:24px;width:100%;text-align:center">' + p.flag + '</span>' : flagHTML(p.country);
-            document.getElementById('city' + key).textContent = p.city || 'Choisir';
-            document.getElementById('country' + key).textContent = p.country ? countryName(p.country) : 'Pays';
+            if (p.city) setText(document.getElementById('city' + key), p.city); else setI18n(document.getElementById('city' + key), 'ct.choisir');
+            if (p.country) setText(document.getElementById('country' + key), countryName(p.country)); else setI18n(document.getElementById('country' + key), 'ct.pays');
             document.getElementById('place' + key).classList.toggle('is-empty', !p.city);
         }
 
@@ -509,7 +531,7 @@
         function openPlaceSheet(side) {
             const cur = trip[side];
             SengpGeo.open({
-                title: side === 'dep' ? 'Lieu de départ' : "Lieu d'arrivée",
+                title: sengpT(side === 'dep' ? 'dash.pick_departure' : 'dash.pick_arrival'),
                 country: cur.country,
                 onPick: sel => {
                     trip[side] = { country: sel.country, city: sel.region, flag: sel.flag };
@@ -519,12 +541,13 @@
         }
 
         // ---------- dates ----------
-        const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
         function renderDate(key, value) {
             const d = value ? new Date(value) : null;
             const ok = d && !isNaN(d);
             document.getElementById('day' + key).textContent = ok ? d.getDate() : '–';
-            document.getElementById('month' + key).textContent = ok ? MONTHS[d.getMonth()] + ' ' + d.getFullYear() : 'Choisir';
+            const monthEl = document.getElementById('month' + key);
+            if (ok) { const m = SengpI18n.fmt.date(d, { month: 'long', year: 'numeric' }); setText(monthEl, m.charAt(0).toUpperCase() + m.slice(1)); }
+            else setI18n(monthEl, 'ct.choisir');
             document.getElementById('time' + key).textContent = ok ? String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') : '';
         }
         function localNow() {
@@ -533,17 +556,17 @@
         }
         function openDateSheet() {
             sheetKind = 'dates';
-            openSheet('Dates du voyage', 'Heure locale du vol', `
-                <div class="ct-dfield"><label for="depDT">Date et heure de départ</label><input type="datetime-local" id="depDT" min="${localNow()}" value="${trip.depDT}"></div>
-                <div class="ct-dfield"><label for="arrDT">Date et heure d'arrivée</label><input type="datetime-local" id="arrDT" min="${localNow()}" value="${trip.arrDT}"></div>
+            openSheet(sengpT('ct.dates_du_voyage'), sengpT('ct.local_time'), `
+                <div class="ct-dfield"><label for="depDT">${sengpEsc(sengpT('ct.dep_datetime'))}</label><input type="datetime-local" id="depDT" min="${localNow()}" value="${trip.depDT}"></div>
+                <div class="ct-dfield"><label for="arrDT">${sengpEsc(sengpT('ct.arr_datetime'))}</label><input type="datetime-local" id="arrDT" min="${localNow()}" value="${trip.arrDT}"></div>
                 <div class="ct-dmsg" id="dateMsg" role="alert"></div>
-                <button type="button" class="ct-next" onclick="saveDates()"><span>Valider</span></button>`);
+                <button type="button" class="ct-next" onclick="saveDates()"><span>${sengpEsc(sengpT('ct.validate'))}</span></button>`);
         }
         function saveDates() {
             const dep = document.getElementById('depDT').value, arr = document.getElementById('arrDT').value;
             const msg = document.getElementById('dateMsg');
-            if (!dep || !arr) { msg.textContent = 'Renseignez la date de départ et la date d\'arrivée.'; return; }
-            if (new Date(arr) <= new Date(dep)) { msg.textContent = 'L\'arrivée doit être après le départ.'; return; }
+            if (!dep || !arr) { msg.textContent = sengpT('ct.dates_required'); return; }
+            if (new Date(arr) <= new Date(dep)) { msg.textContent = sengpT('ct.arrival_after'); return; }
             trip.depDT = dep; trip.arrDT = arr;
             renderDate('Dep', dep); renderDate('Arr', arr);
             closeSheet();
@@ -556,7 +579,7 @@
             const pct = (v - r.min) / (r.max - r.min);
             document.getElementById('weightVal').textContent = v;
             const b = document.getElementById('weightBubble');
-            b.textContent = v + ' kg';
+            b.textContent = v + ' ' + sengpT('cr.kg');
             // la pastille suit le curseur (rayon du pouce ≈ 16 px)
             b.style.left = 'calc(' + (pct * 100) + '% + ' + (16 - pct * 32 + 2) + 'px)';
             r.style.setProperty('--pct', (pct * 100) + '%');
@@ -564,14 +587,14 @@
 
         // ---------- envoi ----------
         async function submitTrip() {
-            if (!trip.dep.city || !trip.arr.city) { alert('Choisissez la ville de départ et la ville d\'arrivée.'); return; }
-            if (!trip.depDT || !trip.arrDT) { alert('Renseignez les dates du voyage.'); openDateSheet(); return; }
-            if (new Date(trip.arrDT) <= new Date(trip.depDT)) { alert('L\'arrivée doit être après le départ.'); openDateSheet(); return; }
+            if (!trip.dep.city || !trip.arr.city) { alert(sengpT('ct.need_cities')); return; }
+            if (!trip.depDT || !trip.arrDT) { alert(sengpT('ct.need_dates')); openDateSheet(); return; }
+            if (new Date(trip.arrDT) <= new Date(trip.depDT)) { alert(sengpT('ct.arrival_after')); openDateSheet(); return; }
             const availableWeight = document.getElementById('availableWeight').value;
 
             const authToken = localStorage.getItem('authToken');
             if (!authToken) {
-                alert('Session expirée. Veuillez vous reconnecter.');
+                alert(sengpT('errors.session_expired'));
                 window.location.href = 'connexion.html';
                 return;
             }
@@ -579,7 +602,7 @@
             const submitBtn = document.getElementById('submitBtn');
             const label = submitBtn.querySelector('span');
             try {
-                label.textContent = 'Création en cours...';
+                setI18n(label, 'ct.creating');
                 submitBtn.disabled = true;
 
                 const formData = new FormData();
@@ -600,17 +623,17 @@
                 const result = await response.json();
 
                 if (response.ok && result.success) {
-                    alert('Trajet créé avec succès !\n\nVous pouvez maintenant voir les missions disponibles.');
+                    alert(sengpT('ct.create_ok'));
                     window.location.href = 'dashgp.html';
                 } else {
-                    alert('Erreur lors de la création du trajet:\n\n' + (result.message || 'Erreur inconnue'));
-                    label.textContent = 'Créer le trajet';
+                    alert(sengpT('ct.create_error', { message: result.message || sengpT('ct.unknown_error') }));
+                    setI18n(label, 'ct.creer_le_trajet');
                     submitBtn.disabled = false;
                 }
             } catch (error) {
                 console.error('Error creating trip:', error);
-                alert('Erreur de connexion au serveur.\n\nVeuillez réessayer.');
-                label.textContent = 'Créer le trajet';
+                alert(sengpT('ct.conn_error'));
+                setI18n(label, 'ct.creer_le_trajet');
                 submitBtn.disabled = false;
             }
         }
@@ -625,9 +648,9 @@
             pdf.classList.toggle('on', isPdf);
             if (!isPdf) prev.src = dataUrl;
             document.getElementById('uploadArea').classList.add('has-file');
-            document.getElementById('uploadTitle').textContent = 'Billet ajouté';
-            document.getElementById('uploadDesc').textContent = file.name;
-            document.getElementById('pickLabel').textContent = 'Changer de fichier';
+            setI18n(document.getElementById('uploadTitle'), 'ct.ticket_added');
+            setText(document.getElementById('uploadDesc'), file.name);
+            setI18n(document.getElementById('pickLabel'), 'ct.change_file');
             document.getElementById('nextBtn').disabled = false;
         }
 
@@ -638,11 +661,11 @@
             if (!file) return;
             const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
             if (!isPdf && !/^image\//.test(file.type)) {
-                alert('Format non pris en charge.\n\nChoisissez une image (JPG, PNG) ou un PDF.');
+                alert(sengpT('ct.bad_format'));
                 return;
             }
             if (file.size > MAX_FILE) {
-                alert('Fichier trop volumineux.\n\nLa taille maximale est de 5 Mo.');
+                alert(sengpT('ct.too_big'));
                 return;
             }
             uploadedFile = file;
@@ -659,7 +682,7 @@
         function nextStep() {
             if (currentStep === 1) {
                 if (!uploadedFile) {
-                    alert('Veuillez ajouter une photo de votre billet d\'avion');
+                    alert(sengpT('ct.need_ticket'));
                     return;
                 }
 
@@ -744,15 +767,23 @@
         window.addEventListener('resize', syncFootHeight);
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => { SengpI18n.ready.then(() => {
             // Check authentication
             const authToken = localStorage.getItem('authToken');
             if (!authToken) {
-                alert('Vous devez vous connecter pour accéder à cette page');
+                alert(sengpT('ct.login_required'));
                 window.location.href = 'connexion.html';
                 return;
             }
 
+            syncWeight();
+        }); });
+
+        // Changement de langue : on redessine les textes ecrits par le script
+        window.addEventListener('sengp:languagechange', () => {
+            if (sheetKind === 'dates') closeSheet();
+            renderPlace('dep'); renderPlace('arr');
+            renderDate('Dep', trip.depDT); renderDate('Arr', trip.arrDT);
             syncWeight();
         });
     </script>

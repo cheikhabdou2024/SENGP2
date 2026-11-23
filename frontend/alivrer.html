@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEN GP - Colis à livrer</title>
+    <title data-i18n="dl.page_title">SEN GP - Colis à livrer</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
@@ -14,6 +14,8 @@
             position:sticky; top:0; background:rgba(20,18,40,.85); backdrop-filter:blur(10px); z-index:5; }
         .back-btn { width:38px; height:38px; border:none; border-radius:11px; cursor:pointer; background:rgba(255,255,255,.1); color:#fff; font-size:18px; }
         .header h1 { font-size:18px; }
+        /* Droite a gauche (arabe) */
+        [dir="rtl"] .back-btn, [dir="rtl"] .route .arrow { transform:scaleX(-1); }
         .content { padding:18px; }
         .card { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:16px; margin-bottom:12px; }
         .top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
@@ -49,8 +51,10 @@
         .done-note { font-size:12px; color:rgba(255,255,255,.6); margin:8px 2px 0; line-height:1.5; text-align:center; }
     </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="i18n.css">
     <script src="ui.js"></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -68,15 +72,13 @@
 <body class="ds">
     <div class="mobile-frame">
         <div class="header">
-            <button class="back-btn" onclick="location.href='dashgp.html'">←</button>
-            <h1><svg class="ic" viewBox="0 0 24 24" style="vertical-align:-3px;"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg> Colis à livrer</h1>
+            <button class="back-btn" onclick="location.href='dashgp.html'" aria-label="Retour" data-i18n-attr="aria-label:common.back">←</button>
+            <h1><svg class="ic" viewBox="0 0 24 24" style="vertical-align:-3px;"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg><span data-i18n="dl.colis_a_livrer">Colis à livrer</span></h1>
         </div>
         <div class="content">
             <button class="scan-cta" onclick="openScanner()">
-                <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg>
-                Scanner un colis
-            </button>
-            <div id="list"><div class="loading">Chargement…</div></div>
+                <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg><span data-i18n="dl.scanner_un_colis">Scanner un colis</span></button>
+            <div id="list"><div class="loading" data-i18n="common.loading">Chargement…</div></div>
             <div id="doneBox"></div>
         </div>
     </div>
@@ -89,11 +91,11 @@
             <div class="scan-frame"></div>
         </div>
         <div id="scanResult" class="scan-result" role="img"></div>
-        <div id="scanStatus" class="scan-status">Initialisation de la caméra…</div>
+        <div id="scanStatus" class="scan-status" data-i18n="dl.initialisation_de_la_camera">Initialisation de la caméra…</div>
         <div class="scan-actions">
-            <button id="scanFinish" class="scan-btn" style="display:none;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;" onclick="scanDone()">Scan terminé</button>
-            <button id="scanRetry" class="scan-btn" style="display:none;" onclick="retryScan()">Rescanner</button>
-            <button class="scan-btn ghost" onclick="closeScanner()">Fermer</button>
+            <button id="scanFinish" class="scan-btn" style="display:none;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;" onclick="scanDone()" data-i18n="dl.scan_termine">Scan terminé</button>
+            <button id="scanRetry" class="scan-btn" style="display:none;" onclick="retryScan()" data-i18n="dl.rescanner">Rescanner</button>
+            <button class="scan-btn ghost" onclick="closeScanner()" data-i18n="common.close">Fermer</button>
         </div>
     </div>
 
@@ -109,55 +111,57 @@
         const flag = c => (window.SengpGeo ? SengpGeo.flag(c) : '');
         const esc = window.sengpEsc;
         const ACTIVE=['accepted','picked_up','in_transit','in_customs','out_for_delivery'];
-        const STATUS={accepted:['Accepté','b-blue'],picked_up:['Récupéré','b-blue'],in_transit:['En transit','b-blue'],in_customs:['En douane','b-blue'],out_for_delivery:['En livraison','b-blue']};
+        const STATUS={accepted:['ship.status.accepted','b-blue'],picked_up:['ship.status.picked_up','b-blue'],in_transit:['ship.status.in_transit','b-blue'],in_customs:['ship.status.in_customs','b-blue'],out_for_delivery:['ship.status.out_for_delivery','b-blue']};
         // Étape suivante (le statut 'delivered' final est confirmé par le destinataire via QR).
-        const NEXT={accepted:['picked_up','Marquer récupéré'],picked_up:['in_transit','Départ en transit'],in_transit:['out_for_delivery','En livraison'],in_customs:['out_for_delivery','En livraison']};
-        function badge(s){var m=STATUS[String(s||'').toLowerCase()]||[s,'b-yellow'];return '<span class="badge '+m[1]+'">'+esc(m[0])+'</span>';}
+        const NEXT={accepted:['picked_up','dl.mark_picked'],picked_up:['in_transit','dl.start_transit'],in_transit:['out_for_delivery','ship.status.out_for_delivery'],in_customs:['out_for_delivery','ship.status.out_for_delivery']};
+        const NEXT_LABEL={picked_up:'dl.mark_picked',in_transit:'dl.start_transit',out_for_delivery:'ship.status.out_for_delivery'};
+        let loaded = false;
+        function badge(s){var m=STATUS[String(s||'').toLowerCase()];return '<span class="badge '+(m?m[1]:'b-yellow')+'">'+esc(m?sengpT(m[0]):s)+'</span>';}
 
         async function load(){
             if(!token){ location.href='connexion.html'; return; }
             try{
                 const res=await fetch(`${API}/missions/my-missions?limit=200`,{headers:{'Authorization':'Bearer '+token}});
-                if(!res.ok) throw new Error('Chargement impossible');
+                if(!res.ok) throw new Error(sengpT('detail.load_failed'));
                 const data=(await res.json()).data||[];
                 items=data.filter(m=>ACTIVE.includes(String(m.status||'').toLowerCase()));
                 if (focusMissionId) items = items.filter(m => String(m.id) === String(focusMissionId));
-                render(); renderDone();
+                loaded = true; render(); renderDone();
                 // Guided flow: auto-open the camera on the targeted colis.
                 if (focusMissionId && items.length && !scannerAutoOpened){ scannerAutoOpened = true; openScanner(); }
-            }catch(e){ document.getElementById('list').innerHTML='<div class="empty">Erreur: '+esc(e.message)+'</div>'; }
+            }catch(e){ document.getElementById('list').innerHTML='<div class="empty">'+esc(sengpT('envois.error',{message:e.message}))+'</div>'; }
         }
 
         function render(){
             const box=document.getElementById('list');
-            if(!items.length){ box.innerHTML='<div class="empty"><div class="ic"><svg class="ic" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div>Aucun colis à livrer pour le moment.</div>'; return; }
+            if(!items.length){ box.innerHTML='<div class="empty"><div class="ic"><svg class="ic" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div>'+esc(sengpT('dl.empty'))+'</div>'; return; }
             box.innerHTML=items.map(function(m){
                 const st=String(m.status||'').toLowerCase();
                 const phone=(m.recipient_phone||'').replace(/\s/g,'');
                 const nxt=NEXT[st];
                 return '<div class="card">'
-                    +'<div class="top"><div><div class="recipient">'+(m.recipient_name?esc(m.recipient_name):'Destinataire non renseigné')+'</div>'
+                    +'<div class="top"><div><div class="recipient">'+(m.recipient_name?esc(m.recipient_name):esc(sengpT('dl.recipient_unset')))+'</div>'
                     +'<div class="code">'+esc(m.mission_code||m.tracking_number||'')+'</div></div>'+badge(m.status)+'</div>'
                     +'<div class="route"><span class="flag">'+flag(m.departure_country)+'</span><span>'+esc(m.departure_city||'')+'</span><span class="arrow">→</span><span class="flag">'+flag(m.arrival_country)+'</span><span>'+esc(m.arrival_city||'')+'</span></div>'
                     +(m.recipient_phone?'<div class="line"><svg class="ic" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> '+esc(m.recipient_phone)+'</div>':'')
                     +(m.delivery_address?'<div class="line"><svg class="ic" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg> '+esc(m.delivery_address)+'</div>':'')
                     +'<div class="line"><svg class="ic" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg> '+(parseFloat(m.package_weight)||0)+' kg</div>'
                     +'<div class="actions">'
-                    +(phone?'<a class="btn btn-call" href="tel:'+esc(phone)+'"><svg class="ic" viewBox="0 0 24 24" style="vertical-align:-3px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Appeler</a>':'')
-                    +(nxt?'<button class="btn btn-next" onclick="advance(\''+m.id+'\',\''+nxt[0]+'\')">'+nxt[1]+'</button>':'')
+                    +(phone?'<a class="btn btn-call" href="tel:'+esc(phone)+'"><svg class="ic" viewBox="0 0 24 24" style="vertical-align:-3px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> '+esc(sengpT('dl.call'))+'</a>':'')
+                    +(nxt?'<button class="btn btn-next" onclick="advance(\''+m.id+'\',\''+nxt[0]+'\')">'+esc(sengpT(nxt[1]))+'</button>':'')
                     +'</div>'
-                    +(st==='out_for_delivery'?'<div class="note">À la remise, scannez le QR code du destinataire (bouton ci-dessus) pour confirmer la livraison.</div>':'')
+                    +(st==='out_for_delivery'?'<div class="note">'+esc(sengpT('dl.note_scan'))+'</div>':'')
                     +'</div>';
             }).join('');
         }
 
         async function advance(id, next){
-            if(!confirm('Confirmer : passer ce colis à « '+next+' » ?')) return;
+            if(!confirm(sengpT('dl.confirm_next',{label:sengpT(NEXT_LABEL[next]||next)}))) return;
             try{
                 const res=await fetch(`${API}/missions/${id}/status`,{method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({status:next})});
                 const j=await res.json();
-                if(res.ok&&j.success){ load(); } else alert('Erreur: '+(j.error||j.message||''));
-            }catch(e){ alert('Erreur de connexion.'); }
+                if(res.ok&&j.success){ load(); } else alert(sengpT('envois.error',{message:j.error||j.message||''}));
+            }catch(e){ alert(sengpT('errors.network')); }
         }
 
         // ───────── QR scanner (GP scans the recipient's QR to confirm delivery) ─────────
@@ -171,8 +175,9 @@
             document.getElementById('scanBox').style.display = kind ? 'none' : '';
         }
         function stepPrompt(){
-            document.getElementById('scanStepLbl').textContent = 'Étape ' + scanNum + '/2 · QR du ' + (scanNum === 1 ? 'destinataire' : 'colis');
-            setScanStatus(scanNum === 1 ? 'Visez le QR code du DESTINATAIRE (sur son téléphone)…' : 'Visez maintenant le QR code collé sur le COLIS…');
+            const stepLbl = document.getElementById('scanStepLbl'), stepKey = scanNum === 1 ? 'dl.step1' : 'dl.step2';
+            stepLbl.setAttribute('data-i18n', stepKey); stepLbl.textContent = sengpT(stepKey);
+            setScanStatus(scanNum === 1 ? 'dl.aim_recipient' : 'dl.aim_package');
         }
 
         function openScanner(){
@@ -187,7 +192,13 @@
             if (scanStream){ scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
             document.getElementById('scanOverlay').style.display = 'none';
         }
-        function setScanStatus(t){ document.getElementById('scanStatus').textContent = t; }
+        // key : clé de traduction ; params : variables (le texte ne suit alors plus un changement de langue) ; raw : texte brut (message de l'API).
+        function setScanStatus(key, params, raw){
+            const el = document.getElementById('scanStatus');
+            if (raw !== undefined){ el.removeAttribute('data-i18n'); el.textContent = raw; return; }
+            el.textContent = sengpT(key, params);
+            if (params) el.removeAttribute('data-i18n'); else el.setAttribute('data-i18n', key);
+        }
 
         // Native BarcodeDetector when available; otherwise load jsQR from CDN.
         function ensureJsQR(){
@@ -206,14 +217,14 @@
         async function startScan(){
             showResult(null);
             document.getElementById('scanRetry').style.display = 'none'; document.getElementById('scanFinish').style.display = 'none';
-            setScanStatus('Initialisation de la caméra…');
+            setScanStatus('dl.initialisation_de_la_camera');
             const video = document.getElementById('scanVideo');
             try {
                 scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                 video.srcObject = scanStream;
                 await video.play();
             } catch (e){
-                setScanStatus('Caméra indisponible. Autorisez l’accès à la caméra dans les réglages.');
+                setScanStatus('dl.camera_unavailable');
                 return;
             }
             stepPrompt();
@@ -248,10 +259,10 @@
         }
 
         function stopCamera(){ if (scanStream){ scanStream.getTracks().forEach(t => t.stop()); scanStream = null; } }
-        function fail(msg){
+        function fail(key, raw){
             stopCamera(); showResult('ko');
-            setScanStatus(msg);
-            document.getElementById('scanRetry').style.display = 'inline-block'; document.getElementById('scanRetry').textContent = 'Rescanner';
+            if (raw) setScanStatus(null, null, raw); else setScanStatus(key);
+            document.getElementById('scanRetry').style.display = 'inline-block'; document.getElementById('scanRetry').setAttribute('data-i18n', 'dl.rescanner'); document.getElementById('scanRetry').textContent = sengpT('dl.rescanner');
             scanStep = 'package'; pkgQr = null; rcpQr = null; scanNum = 1;          // on recommence proprement
         }
         async function onScanned(qrText){
@@ -260,20 +271,20 @@
             let scannedId = null, valid = false;
             try { const o = JSON.parse(t); if (o && o.id) { valid = true; scannedId = o.id; } } catch(e){}
             if (!valid && /\/d\/[A-Za-z0-9_-]{8,100}/.test(t)) valid = true;
-            if (!valid) return fail('Ce QR n’est pas un QR SEN GP.');
+            if (!valid) return fail('dl.not_sengp');
             if (scannedId && focusMissionId && String(scannedId) !== String(focusMissionId))
-                return fail('Ce QR ne correspond pas à ce colis.');
+                return fail('dl.wrong_parcel');
             if (scanNum === 1){
                 rcpQr = qrText; scanNum = 2; scanStep = 'package';
                 stopCamera(); showResult('ok');
                 document.getElementById('scanResultMsg') && (document.getElementById('scanResultMsg').textContent = '');
-                setScanStatus('QR du destinataire validé');
+                setScanStatus('dl.recipient_ok');
                 setTimeout(() => { stepPrompt(); startScan(); }, 1300);   // enchaîne le scan du colis
                 return;
             }
             pkgQr = qrText;
             stopCamera();
-            setScanStatus('Comparaison des QR codes…');
+            setScanStatus('dl.comparing');
             try {
                 const res = await fetch(`${API}/missions/verify-pair`, {
                     method: 'POST',
@@ -285,17 +296,17 @@
                 if (res.ok && j.success && d.match){
                     const m = d.mission || {};
                     showResult('ok');
-                    setScanStatus('Le colis ' + (m.mission_code || '') + ' appartient bien à ce destinataire' + (m.recipient_name ? ' (' + m.recipient_name + ')' : '') + ' — livraison confirmée.');
+                    setScanStatus(m.recipient_name ? 'dl.match_ok_name' : 'dl.match_ok', { code: m.mission_code || '', name: m.recipient_name || '' });
                     try { localStorage.setItem('sg_scan_ok', String((+localStorage.getItem('sg_scan_ok') || 0) + 1)); } catch(e){}
                     scanStep = 'package'; pkgQr = null; rcpQr = null; scanNum = 1;
-                    const rb = document.getElementById('scanRetry'); rb.textContent = 'Scanner un autre colis'; rb.style.display = 'inline-block';
+                    const rb = document.getElementById('scanRetry'); rb.setAttribute('data-i18n', 'dl.scan_another'); rb.textContent = sengpT('dl.scan_another'); rb.style.display = 'inline-block';
                     document.getElementById('scanFinish').style.display = 'inline-block';
                     load();
                 } else {
-                    fail(d.reason || j.error || j.message || 'QR incompatibles.');
+                    fail('dl.qr_incompatible', d.reason || j.error || j.message);
                 }
             } catch (e){
-                fail('Erreur réseau. Réessayez.');
+                fail('dl.network_retry');
             }
         }
         function retryScan(){ scanStep = 'package'; pkgQr = null; rcpQr = null; scanNum = 1; stepPrompt(); startScan(); }
@@ -306,30 +317,31 @@
             const box = document.getElementById('doneBox');
             if (!n){ box.innerHTML = ''; return; }
             const left = items.length;
-            box.innerHTML = '<button class="done-btn" onclick="scanDone()">Scan terminé</button>'
-                + '<p class="done-note">' + n + ' colis livré(s) cette tournée' + (left ? ' · ' + left + ' colis restent à scanner' : '')
-                + '. L’administration devra valider avant que vous puissiez de nouveau utiliser l’application.</p>';
+            box.innerHTML = '<button class="done-btn" onclick="scanDone()">' + esc(sengpT('dl.scan_termine')) + '</button>'
+                + '<p class="done-note">' + esc(sengpT('dl.done_note', { count: n }) + (left ? ' · ' + sengpT('dl.left_to_scan', { count: left }) : '')
+                + '. ' + sengpT('dl.admin_validate')) + '</p>';
         }
         async function scanDone(){
             const left = items.length;
-            const msg = 'Terminer le scan' + (left ? ' (' + left + ' colis non scanné(s))' : '') + ' ?\n\nL’application sera bloquée jusqu’à validation par l’administration.';
+            const msg = left ? sengpT('dl.finish_q_left', { count: left }) : sengpT('dl.finish_q');
             const ok = window.sengpConfirm
-                ? await window.sengpConfirm(msg, { title: 'Scan terminé', confirmLabel: 'Oui, terminé' })
+                ? await window.sengpConfirm(msg, { title: sengpT('dl.scan_termine'), confirmLabel: sengpT('dl.yes_done') })
                 : confirm(msg);
             if (!ok) return;
             try {
                 const res = await fetch(`${API}/missions/scan-complete`, { method:'POST', headers:{ 'Authorization':'Bearer '+token } });
                 const j = await res.json().catch(() => ({}));
-                if (!res.ok || !j.success) throw new Error(j.error || j.message || 'Échec');
+                if (!res.ok || !j.success) throw new Error(j.error || j.message || sengpT('dl.failed'));
                 try { localStorage.removeItem('sg_scan_ok'); } catch(e){}
                 closeScanner();
                 if (window.SengpGpGuard) window.SengpGpGuard.refresh();
                 renderDone();
-            } catch(e){ alert('Impossible de terminer le scan : ' + e.message); }
+            } catch(e){ alert(sengpT('dl.finish_failed', { message: e.message })); }
         }
 
         window.onPullRefresh = async () => { await load(); return true; };
-        load();
+        SengpI18n.ready.then(load);
+        window.addEventListener('sengp:languagechange', () => { if (loaded) { render(); renderDone(); } });
     </script>
     <script src="ptr.js"></script>
 </body>

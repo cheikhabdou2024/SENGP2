@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>SEN GP - Dashboard Gros Porteur</title>
+    <title data-i18n="gp.page_title">SEN GP - Dashboard Gros Porteur</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -375,12 +375,27 @@
         .jm-btn.jm-scan { background:linear-gradient(135deg,#4ECDC4,#44A08D); color:#06231f; box-shadow:0 12px 26px rgba(78,205,196,.42); }
         .jm-wait { font-size:13.5px; line-height:1.6; color:#FFD27A; background:rgba(255,215,0,.1); border:1px solid rgba(255,215,0,.3); border-radius:14px; padding:14px; display:flex; align-items:center; gap:10px; text-align:left; }
         .jm-wait svg { width:22px; height:22px; flex-shrink:0; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+        /* ---- Droite à gauche (arabe) ---- */
+        [dir="rtl"] .gh-row, [dir="rtl"] .gh-trip, [dir="rtl"] .gh-loc, [dir="rtl"] .gh-m, [dir="rtl"] .jm-item, [dir="rtl"] .jm-mission, [dir="rtl"] .jm-wait { text-align: right; }
+        [dir="rtl"] .gh-avatar::after { right: auto; left: -2px; }
+        [dir="rtl"] .gh-row > .gh-i { margin-left: 0; margin-right: auto; transform: scaleX(-1); }
+        [dir="rtl"] .gh-art { right: auto; left: -4px; transform: scaleX(-1); }
+        [dir="rtl"] .gh-cta > .gh-i:last-child, [dir="rtl"] .gh-trip__go .gh-i, [dir="rtl"] .gh-path .gh-i { transform: scaleX(-1); }
+        [dir="rtl"] .gh-trip { padding: 14px 8px 14px 16px; }
+        [dir="rtl"] .gh-nav .bell-badge { right: auto; left: -9px; }
+        [dir="rtl"] .gh-tab b { margin-left: 0; margin-right: 6px; }
+        [dir="rtl"] .gh-m::before { left: auto; right: 0; }
+        [dir="rtl"] .gh-city:last-child { text-align: left; }
+        [dir="rtl"] .gh-price { margin-left: 0; margin-right: auto; }
+        @media (max-width: 359px) { [dir="rtl"] .gh-trip { padding: 14px 16px; } }
     </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <script src="ui.js"></script>
     <script src="icons.js"></script>
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="i18n.css">
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
@@ -407,23 +422,23 @@
             <div class="gh-hero__top">
                 <div class="gh-brand">
                     <img src="im/sengp-logo.png" alt="SEN GP" width="132" height="82">
-                    <span>VOS COLIS, NOTRE ENGAGEMENT</span>
+                    <span data-i18n="gp.vos_colis_notre_engagement">VOS COLIS, NOTRE ENGAGEMENT</span>
                 </div>
-                <div class="gh-avatar" id="profileAvatar" onclick="openProfile()" role="button" tabindex="0" aria-label="Mon profil">
+                <div class="gh-avatar" id="profileAvatar" onclick="openProfile()" role="button" tabindex="0" aria-label="Mon profil" data-i18n-attr="aria-label:dash.profile_aria">
                     <span id="profileInitials">GP</span>
                 </div>
             </div>
             <div class="gh-hello greeting">
-                <h1>Bonjour, <em id="ghName">GP</em></h1>
-                <p>Prêt pour une nouvelle mission ?</p>
+                <h1 data-i18n-rich="gp.hello">Bonjour, <em id="ghName" data-slot="name">GP</em></h1>
+                <p data-i18n="gp.pret_pour_une_nouvelle">Prêt pour une nouvelle mission ?</p>
             </div>
         </header>
 
         <div class="gh-body">
             <!-- Mes missions -->
-            <section class="gh-card gh-reveal" style="--i:0" aria-label="Mes missions">
-                <h2>Mes <em>missions</em></h2>
-                <p>Consultez les missions qui vous sont confiées</p>
+            <section class="gh-card gh-reveal" style="--i:0" aria-label="Mes missions" data-i18n-attr="aria-label:gp.mes_missions">
+                <h2 data-i18n-rich="gp.my_missions">Mes <em data-slot="m" data-i18n="gp.missions">missions</em></h2>
+                <p data-i18n="gp.consultez_les_missions_qui">Consultez les missions qui vous sont confiées</p>
                 <div class="gh-art" aria-hidden="true">
                     <span class="glow"></span><span class="ring"></span><span class="ring r2"></span>
                     <img class="box" src="im/sengp-box-3d-cut.webp" alt="" width="378" height="255">
@@ -432,23 +447,23 @@
                 <div class="gh-rows">
                     <button type="button" class="gh-row gh-row--o" onclick="openMissionsSheet('soon')">
                         <span class="gh-row__ic"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span>
-                        <span><b id="statSoon">–</b><span class="l">À venir</span></span>
+                        <span><b id="statSoon">–</b><span class="l" data-i18n="track.tab_upcoming">À venir</span></span>
                         <svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                     </button>
                     <button type="button" class="gh-row gh-row--b" onclick="openMissionsSheet('active')">
                         <span class="gh-row__ic"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg></span>
-                        <span><b id="statActive">–</b><span class="l">En cours</span></span>
+                        <span><b id="statActive">–</b><span class="l" data-i18n="dash.in_progress">En cours</span></span>
                         <svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                     </button>
                     <button type="button" class="gh-row gh-row--g" onclick="openMissionsSheet('done')">
                         <span class="gh-row__ic"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>
-                        <span><b id="statDone">–</b><span class="l">Terminées</span></span>
+                        <span><b id="statDone">–</b><span class="l" data-i18n="gp.terminees">Terminées</span></span>
                         <svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                     </button>
                 </div>
                 <button type="button" class="gh-cta" onclick="openMissionsSheet('all')">
                     <svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
-                    <span>Voir mes missions</span>
+                    <span data-i18n="gp.voir_mes_missions">Voir mes missions</span>
                     <svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </button>
             </section>
@@ -465,32 +480,32 @@
                         <rect x="52" y="64" width="34" height="26" rx="3" fill="#E9B678"/><path d="M52 74h34M69 64v26" stroke="#C98F4C" stroke-width="2"/>
                     </svg>
                 </span>
-                <span class="gh-trip__t"><b>Créer un <em>trajet</em></b><small>Ajoutez votre billet et trouvez des missions sur votre trajet</small></span>
+                <span class="gh-trip__t"><b data-i18n-rich="gp.create_trip">Créer un <em data-slot="t" data-i18n="gp.trajet">trajet</em></b><small data-i18n="gp.ajoutez_votre_billet_et">Ajoutez votre billet et trouvez des missions sur votre trajet</small></span>
                 <span class="gh-trip__go"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
             </button>
 
             <!-- Partager ma position (suivi live) -->
             <button type="button" class="gh-loc gh-reveal" style="--i:2" id="locShareBtn" onclick="toggleLocationShare()">
                 <span class="gh-loc__ic" id="locShareIcon"><svg class="ic" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
-                <span class="gh-loc__t"><b>Partager ma position</b><small id="locShareSub">Suivi live désactivé</small></span>
+                <span class="gh-loc__t"><b data-i18n="gp.partager_ma_position">Partager ma position</b><small id="locShareSub">Suivi live désactivé</small></span>
                 <span class="gh-loc__st" id="locShareState">○</span>
             </button>
         </div>
     </div>
 
     <!-- Bottom navigation -->
-    <nav class="gh-nav" aria-label="Navigation principale">
+    <nav class="gh-nav" aria-label="Navigation principale" data-i18n-attr="aria-label:nav.main_aria">
         <button type="button" class="gh-nav__item" aria-current="page" onclick="navigateTo('home')">
-            <span class="gh-nav__icon"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span>Accueil</span>
+            <span class="gh-nav__icon"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span data-i18n="nav.home">Accueil</span>
         </button>
         <button type="button" class="gh-nav__item" onclick="navigateTo('trips')">
-            <span class="gh-nav__icon"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span><span>Trajets</span>
+            <span class="gh-nav__icon"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></span><span data-i18n="nav.trips">Trajets</span>
         </button>
         <button type="button" class="gh-nav__item" onclick="navigateTo('notifications')">
-            <span class="gh-nav__icon"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="bell-badge hidden" id="notifNavBadge">0</span></span><span class="lbl-long">Notifications</span><span class="lbl-short">Notifs</span>
+            <span class="gh-nav__icon"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="bell-badge hidden" id="notifNavBadge">0</span></span><span class="lbl-long" data-i18n="nav.notifications">Notifications</span><span class="lbl-short" data-i18n="nav.notifs_short">Notifs</span>
         </button>
         <button type="button" class="gh-nav__item" onclick="navigateTo('profile')">
-            <span class="gh-nav__icon"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span>Profil</span>
+            <span class="gh-nav__icon"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span data-i18n="nav.profile">Profil</span>
         </button>
     </nav>
 
@@ -499,8 +514,8 @@
         <div class="gh-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
             <div class="gh-sheet__grab"><i></i></div>
             <div class="gh-sheet__head">
-                <div><h3 id="sheetTitle">Mes <em>missions</em></h3><p id="sheetSub">Chargement…</p></div>
-                <button type="button" class="gh-close" onclick="closeMissionsSheet()" aria-label="Fermer"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+                <div><h3 id="sheetTitle" data-i18n-rich="gp.my_missions">Mes <em data-slot="m" data-i18n="gp.missions">missions</em></h3><p id="sheetSub" data-i18n="common.loading">Chargement…</p></div>
+                <button type="button" class="gh-close" onclick="closeMissionsSheet()" aria-label="Fermer" data-i18n-attr="aria-label:common.close"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
             </div>
             <div class="gh-tabs" role="tablist" id="ghTabs"></div>
             <div class="gh-list" id="ghList"></div>
@@ -513,13 +528,13 @@
         <div class="gps-gate-card">
             <img src="im/sengp-logo.jpg" class="gps-gate-logo" alt="SEN GP">
             <div class="gps-gate-radar"><span class="pin"><svg class="ic" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span></div>
-            <h2 id="gpsGateTitle">Activez votre GPS</h2>
-            <p>Pour accepter et réaliser des missions, SEN GP doit <b>suivre votre position en temps réel</b> pendant tout le trajet, jusqu'à la livraison. Activez le GPS avant de continuer.</p>
+            <h2 id="gpsGateTitle" data-i18n="gp.activez_votre_gps">Activez votre GPS</h2>
+            <p data-i18n-rich="gp.gate_text">Pour accepter et réaliser des missions, SEN GP doit <b data-slot="track" data-i18n="gp.suivre_votre_position_en">suivre votre position en temps réel</b> pendant tout le trajet, jusqu'à la livraison. Activez le GPS avant de continuer.</p>
             <button class="gps-gate-btn" id="gpsGateBtn" onclick="gpsGateOk()">
-                <span><svg class="ic" viewBox="0 0 24 24"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg></span><span id="gpsGateBtnLabel">OK, activer le GPS</span>
+                <span><svg class="ic" viewBox="0 0 24 24"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg></span><span id="gpsGateBtnLabel" data-i18n="gp.ok_activer_le_gps">OK, activer le GPS</span>
             </button>
             <div class="gps-gate-status" id="gpsGateStatus"></div>
-            <div class="gps-gate-hint">Vous pourrez gérer cette autorisation dans les réglages de votre téléphone.</div>
+            <div class="gps-gate-hint" data-i18n="gp.vous_pourrez_gerer_cette">Vous pourrez gérer cette autorisation dans les réglages de votre téléphone.</div>
         </div>
     </div>
 
@@ -531,6 +546,7 @@
 
         // Check authentication on page load
         window.addEventListener('DOMContentLoaded', async () => {
+            await SengpI18n.ready;
             await checkAuthentication();
             // Le popup GPS s'impose avant toute interaction avec le dashboard.
             await enforceGpsGate();
@@ -542,9 +558,9 @@
         // ---------- Journey mode: persistent guided popup for the confirmed trip ----------
         const JOURNEY_ORDER = ['accepted','picked_up','in_transit','out_for_delivery'];
         const JOURNEY_BTN = {
-            accepted:   { to:'picked_up',        label:'Colis récupéré',       ic:'<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/>' },
-            picked_up:  { to:'in_transit',       label:'Démarrer le transit',  ic:'<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>' },
-            in_transit: { to:'out_for_delivery', label:'Arrivé à destination',  ic:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>' }
+            accepted:   { to:'picked_up',        label:'gp.j.btn.picked_up',   ic:'<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/>' },
+            picked_up:  { to:'in_transit',       label:'gp.j.btn.in_transit',  ic:'<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>' },
+            in_transit: { to:'out_for_delivery', label:'gp.j.btn.arrived',  ic:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>' }
         };
         let journey = { open:false, card:null, close:null, missions:[], poll:null };
 
@@ -568,7 +584,7 @@
             if (!journey.open){
                 journey.open = true;
                 window.sengpModal({
-                    title: 'Votre voyage',
+                    title: sengpT('gp.j.title'),
                     bodyHTML: '<div id="journeyBody"></div>',
                     actions: [],
                     onMount: (card) => { journey.card = card; renderJourney(); }
@@ -592,28 +608,28 @@
         }
         function jStepsHTML(st){
             const stageIdx = JOURNEY_ORDER.indexOf(st);
-            const steps = [['picked_up','Récupéré'],['in_transit','En Transit'],['out_for_delivery','À Destination']];
+            const steps = [['picked_up','ship.status.picked_up'],['in_transit','ship.status.in_transit'],['out_for_delivery','gp.st.out_for_delivery']];
             return steps.map(([k,lbl]) => {
                 const si = JOURNEY_ORDER.indexOf(k);
                 const cls = si < stageIdx ? 'done' : (si === stageIdx ? 'current' : '');
-                return '<div class="jm-step '+cls+'">'+lbl+'</div>';
+                return '<div class="jm-step '+cls+'">'+jEsc(sengpT(lbl))+'</div>';
             }).join('<div class="jm-sep"></div>');
         }
         // Each mission advances independently, with its own step button / scan.
         function jMissionCard(m){
             const st = String(m.status||'').toLowerCase();
-            const route = jEsc((m.departure_city||'')+' → '+(m.arrival_city||''));
+            const route = jEsc((m.departure_city||'')+(SengpI18n.dir === 'rtl' ? ' ← ' : ' → ')+(m.arrival_city||''));
             const code = jEsc(m.mission_code||m.tracking_number||'');
             const recip = m.recipient_name ? ' · '+jEsc(m.recipient_name) : '';
             let action = '';
             if (JOURNEY_BTN[st]){
                 const b = JOURNEY_BTN[st];
-                action = '<button class="jm-btn" onclick="journeyAdvanceOne(\''+m.id+'\',\''+b.to+'\')"><svg viewBox="0 0 24 24">'+b.ic+'</svg>'+b.label+'</button>';
+                action = '<button class="jm-btn" onclick="journeyAdvanceOne(\''+m.id+'\',\''+b.to+'\')"><svg viewBox="0 0 24 24">'+b.ic+'</svg>'+jEsc(sengpT(b.label))+'</button>';
             } else if (st === 'out_for_delivery'){
                 if (m.arrival_confirmed){
-                    action = '<button class="jm-btn jm-scan" onclick="window.location.href=\'alivrer.html?mission='+encodeURIComponent(m.id)+'\'"><svg viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg>Scanner le QR du destinataire</button>';
+                    action = '<button class="jm-btn jm-scan" onclick="window.location.href=\'alivrer.html?mission='+encodeURIComponent(m.id)+'\'"><svg viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg>'+jEsc(sengpT('gp.j.scan'))+'</button>';
                 } else {
-                    action = '<div class="jm-wait"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>En attente de la confirmation de votre arrivée par l\'administration (appel WhatsApp)…</div>';
+                    action = '<div class="jm-wait"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>'+jEsc(sengpT('gp.j.wait'))+'</div>';
                 }
             }
             return '<div class="jm-mission"><div class="jm-route">'+route+'</div>'
@@ -627,9 +643,9 @@
             const missions = journey.missions;
             let name = 'GP';
             try { name = JSON.parse(localStorage.getItem('userData')||'{}').first_name || 'GP'; } catch(e){}
-            const greeting = 'Bonjour GP <b>'+jEsc(name)+'</b>, vous êtes sur le point d\'expédier '
-                + (missions.length>1 ? '<b>'+missions.length+' missions confirmées</b>' : '<b>votre mission confirmée</b>')
-                + '. Gardez votre GPS allumé et validez chaque étape ci-dessous, mission par mission.';
+            const what = sengpT('gp.j.what', { count: missions.length });
+            const greeting = jEsc(sengpT('gp.j.greeting', { name: '@@N@@', what: '@@W@@' }))
+                .replace('@@N@@', '<b>'+jEsc(name)+'</b>').replace('@@W@@', '<b>'+jEsc(what)+'</b>');
             body.innerHTML = '<div class="jm-greeting">'+greeting+'</div><div class="jm-list">'
                 + missions.map(jMissionCard).join('') + '</div>';
         }
@@ -656,18 +672,27 @@
         const BG_GEO = (IS_NATIVE && window.Capacitor && window.Capacitor.registerPlugin)
             ? window.Capacitor.registerPlugin('BackgroundGeolocation') : null;
 
-        function locShareUI(on, sub) {
+        let locLast = { on: false, key: null, params: null };
+        function locShareUI(on, subKey, params) {
+            locLast = { on: !!on, key: subKey || null, params: params || null };
             document.getElementById('locShareIcon').innerHTML = on
                 ? '<svg class="ic" viewBox="0 0 24 24"><path d="M13 7 9 3 5 7l4 4"/><path d="m17 11 4 4-4 4-4-4"/><path d="m8 12 4 4 6-6-4-4Z"/><path d="m16 8 3-3"/><path d="M9 21a6 6 0 0 0-6-6"/></svg>'
                 : '<svg class="ic" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>';
             document.getElementById('locShareState').textContent = on ? 'ON' : 'OFF';
             document.getElementById('locShareBtn').classList.toggle('on', !!on);
-            document.getElementById('locShareSub').textContent = sub || (on ? 'Suivi live activé' : 'Suivi live désactivé');
+            const subEl = document.getElementById('locShareSub');
+            subEl.removeAttribute('data-i18n');
+            subEl.textContent = sengpT(subKey || (on ? 'gp.loc.on' : 'gp.suivi_live_desactive'), params || undefined);
         }
 
         // ---- Popup GPS obligatoire ----
         function showGpsGate() { document.getElementById('gpsGate').classList.add('show'); }
         function hideGpsGate() { document.getElementById('gpsGate').classList.remove('show'); }
+        function setGateLabel(key) {
+            const el = document.getElementById('gpsGateBtnLabel');
+            el.setAttribute('data-i18n', key);
+            el.textContent = sengpT(key);
+        }
         function gpsGateStatus(msg, ok) {
             const el = document.getElementById('gpsGateStatus');
             el.textContent = msg || '';
@@ -706,15 +731,15 @@
         async function gpsGateOk() {
             const btn = document.getElementById('gpsGateBtn');
             btn.disabled = true;
-            gpsGateStatus('Activation du GPS…', true);
+            gpsGateStatus(sengpT('gp.gate.activating'), true);
             try {
                 const Geo = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation;
                 if (Geo && Geo.requestPermissions) {
                     const p = await Geo.requestPermissions();
                     const s = p.location || p.coarseLocation;
                     if (s !== 'granted') {
-                        gpsGateStatus('Autorisation refusée. Activez la localisation dans les réglages, puis réessayez.', false);
-                        document.getElementById('gpsGateBtnLabel').textContent = 'Réessayer';
+                        gpsGateStatus(sengpT('gp.gate.denied'), false);
+                        setGateLabel('common.retry');
                         btn.disabled = false;
                         return;
                     }
@@ -722,13 +747,13 @@
                 // Déclenche un vrai relevé (et, sur Android, l'invite à activer la
                 // localisation du téléphone si elle est éteinte).
                 await getPosition();
-                gpsGateStatus('GPS activé ✓', true);
+                gpsGateStatus(sengpT('gp.gate.on'), true);
                 await startLocationShare();
                 setTimeout(hideGpsGate, 500);
             } catch (e) {
-                const msg = (e && e.message) ? e.message : 'GPS indisponible';
-                gpsGateStatus('Activez la localisation de votre téléphone, puis réessayez. (' + msg + ')', false);
-                document.getElementById('gpsGateBtnLabel').textContent = 'Réessayer';
+                const msg = (e && e.message) ? e.message : sengpT('gp.err.gps_unavailable');
+                gpsGateStatus(sengpT('gp.gate.retry_msg', { msg }), false);
+                setGateLabel('common.retry');
                 btn.disabled = false;
             }
         }
@@ -747,7 +772,7 @@
 
         async function startLocationShare() {
             localStorage.setItem('gpLiveShare', '1');
-            locShareUI(true, 'Activation…');
+            locShareUI(true, 'gp.loc.activating');
             await sendLocationOnce();
             if (locShareTimer) clearInterval(locShareTimer);
             // Filet : un envoi périodique même si watchPosition ne déclenche pas.
@@ -780,15 +805,15 @@
             if (BG_GEO) {
                 try {
                     bgWatcherId = await BG_GEO.addWatcher({
-                        backgroundTitle: 'SEN GP — suivi de livraison',
-                        backgroundMessage: 'Partage de votre position pendant le trajet.',
+                        backgroundTitle: sengpT('gp.bg_title'),
+                        backgroundMessage: sengpT('gp.bg_msg'),
                         requestPermissions: true,
                         stale: false,
                         distanceFilter: 50
                     }, (location, error) => {
                         if (error) {
                             if (error.code === 'NOT_AUTHORIZED') {
-                                locShareUI(true, 'Autorisez « Toujours » la localisation');
+                                locShareUI(true, 'gp.loc.always');
                             }
                             console.warn('background geolocation', error);
                             return;
@@ -838,9 +863,9 @@
                     let perm = await Geo.checkPermissions();
                     const granted = p => p && (p.location === 'granted' || p.coarseLocation === 'granted');
                     if (!granted(perm) && Geo.requestPermissions) perm = await Geo.requestPermissions();
-                    if (!granted(perm)) throw new Error('Autorisez la localisation dans les réglages.');
+                    if (!granted(perm)) { const pe = new Error(sengpT('gp.err.perm')); pe.gpPerm = true; throw pe; }
                 } catch (e) {
-                    if (e && /Autorisez/.test(e.message)) throw e;
+                    if (e && e.gpPerm) throw e;
                     // checkPermissions peut ne pas exister sur certaines versions : on continue.
                 }
                 // D'abord rapide (réseau), sinon haute précision (GPS).
@@ -853,10 +878,10 @@
                 }
             }
             return new Promise((resolve, reject) => {
-                if (!navigator.geolocation) return reject(new Error('Géolocalisation indisponible'));
+                if (!navigator.geolocation) return reject(new Error(sengpT('gp.err.geo_unavailable')));
                 navigator.geolocation.getCurrentPosition(
                     pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-                    err => reject(new Error(err && err.message ? err.message : 'GPS indisponible')),
+                    err => reject(new Error(err && err.message ? err.message : sengpT('gp.err.gps_unavailable'))),
                     { enableHighAccuracy: false, timeout: 20000, maximumAge: 60000 }
                 );
             });
@@ -871,7 +896,7 @@
                 });
                 const data = res.ok ? ((await res.json()).data || []) : [];
                 const active = data.filter(m => ACTIVE_STATUSES.includes(String(m.status || '').toLowerCase()));
-                if (active.length === 0) { locShareUI(true, 'Aucune mission en transit'); return; }
+                if (active.length === 0) { locShareUI(true, 'gp.loc.no_mission'); return; }
 
                 let sent = 0;
                 await Promise.all(active.map(m =>
@@ -881,11 +906,11 @@
                         body: JSON.stringify({ lat, lng })
                     }).then(r => { if (r.ok) sent++; }).catch(() => {})
                 ));
-                const t = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-                locShareUI(true, `Position partagée (${sent}) · ${t}`);
+                const t = new Date().toLocaleTimeString(SengpI18n.fmt.localeTag(), { hour: '2-digit', minute: '2-digit' });
+                locShareUI(true, 'gp.loc.shared', { sent, time: t });
             } catch (e) {
                 console.warn('push location error', e);
-                locShareUI(true, 'Position indisponible : ' + (e && e.message ? e.message : 'GPS'));
+                locShareUI(true, 'gp.loc.unavailable', { msg: (e && e.message ? e.message : 'GPS') });
             }
         }
 
@@ -898,7 +923,7 @@
                 await pushLocationToActiveMissions(pos.lat, pos.lng);
             } catch (e) {
                 console.warn('Location share error', e);
-                locShareUI(true, 'Position indisponible : ' + (e && e.message ? e.message : 'GPS'));
+                locShareUI(true, 'gp.loc.unavailable', { msg: (e && e.message ? e.message : 'GPS') });
             }
         }
 
@@ -915,7 +940,7 @@
             const userData = localStorage.getItem('userData');
 
             if (!authToken || !userData) {
-                alert('Vous devez vous connecter pour accéder au dashboard');
+                alert(sengpT('gp.need_login'));
                 window.location.href = 'connexion.html';
                 return;
             }
@@ -925,7 +950,7 @@
 
                 // Verify user is GP
                 if (currentUser.user_type !== 'gp') {
-                    alert('Accès non autorisé. Ce dashboard est réservé aux GP.');
+                    alert(sengpT('gp.not_gp'));
                     window.location.href = 'connexion.html';
                     return;
                 }
@@ -980,20 +1005,20 @@
         // ---------- Mes missions ----------
         // À venir = confiée / acceptée mais pas encore récupérée ; En cours = colis en main ; Terminées = livrée.
         const GROUPS = {
-            soon:   { label: 'À venir',   statuses: ['pending', 'matched', 'accepted'] },
-            active: { label: 'En cours',  statuses: ['picked_up', 'in_transit', 'in_customs', 'out_for_delivery'] },
-            done:   { label: 'Terminées', statuses: ['delivered'] }
+            soon:   { label: 'track.tab_upcoming', statuses: ['pending', 'matched', 'accepted'] },
+            active: { label: 'dash.in_progress', statuses: ['picked_up', 'in_transit', 'in_customs', 'out_for_delivery'] },
+            done:   { label: 'gp.terminees', statuses: ['delivered'] }
         };
         const STATUS_UI = {
-            pending:          { label: 'À venir',        acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' },
-            matched:          { label: 'À confirmer',    acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' },
-            accepted:         { label: 'Confirmée',      acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' },
-            picked_up:        { label: 'Récupéré',       acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' },
-            in_transit:       { label: 'En transit',     acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' },
-            in_customs:       { label: 'En douane',      acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' },
-            out_for_delivery: { label: 'À destination',  acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' },
-            delivered:        { label: 'Terminée',       acc: '#17A34A', bg: '#D9F5E6', fg: '#13803F' },
-            cancelled:        { label: 'Annulée',        acc: '#94A3B8', bg: '#EDF1F6', fg: '#64748B' }
+            pending:          { label: 'track.tab_upcoming', acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' },
+            matched:          { label: 'gp.st.matched', acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' },
+            accepted:         { label: 'gp.st.accepted', acc: '#F7931E', bg: '#FFE9D2', fg: '#C86A00' },
+            picked_up:        { label: 'ship.status.picked_up', acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' },
+            in_transit:       { label: 'ship.status.in_transit', acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' },
+            in_customs:       { label: 'ship.status.in_customs', acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' },
+            out_for_delivery: { label: 'gp.st.out_for_delivery', acc: '#2F6BFF', bg: '#DDEBFF', fg: '#1D5FD6' },
+            delivered:        { label: 'gp.st.delivered', acc: '#17A34A', bg: '#D9F5E6', fg: '#13803F' },
+            cancelled:        { label: 'mission.status.cancelled', acc: '#94A3B8', bg: '#EDF1F6', fg: '#64748B' }
         };
         let ghMissions = [];
         let ghFilter = 'all';
@@ -1031,12 +1056,18 @@
         function shortDate(d) {
             if (!d) return '';
             const dt = new Date(d);
-            return isNaN(dt) ? '' : dt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+            return isNaN(dt) ? '' : SengpI18n.fmt.date(dt, { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function dispCountry(c) {
+            if (!c) return '';
+            return (window.SengpGeo && SengpGeo.displayCountry) ? SengpGeo.displayCountry(c) : c;
         }
 
         function missionCardHTML(m, i) {
-            const ui = STATUS_UI[String(m.status || '').toLowerCase()] || { label: m.status || '—', acc: '#94A3B8', bg: '#EDF1F6', fg: '#64748B' };
+            const ui = STATUS_UI[String(m.status || '').toLowerCase()] || { raw: true, label: m.status || '—', acc: '#94A3B8', bg: '#EDF1F6', fg: '#64748B' };
             const code = jEsc(m.mission_code || m.tracking_number || '');
+            const stLabel = ui.raw ? ui.label : sengpT(ui.label);
             const weight = m.package_weight != null ? m.package_weight : m.weight;
             const date = shortDate(m.departure_date);
             const price = parseFloat(m.price || 0);
@@ -1044,20 +1075,20 @@
             // Mission assignée par l'admin et en attente de réponse : le GP l'accepte ou la décline.
             const respond = String(m.status || '').toLowerCase() === 'matched'
                 ? `<div class="gh-resp">
-                    <button type="button" class="gh-resp__no" onclick="event.stopPropagation();respondToMission('${mid}','decline')"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>Décliner</button>
-                    <button type="button" class="gh-resp__yes" onclick="event.stopPropagation();respondToMission('${mid}','accept')"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Accepter</button>
+                    <button type="button" class="gh-resp__no" onclick="event.stopPropagation();respondToMission('${mid}','decline')"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>${jEsc(sengpT('notif.ma_decline'))}</button>
+                    <button type="button" class="gh-resp__yes" onclick="event.stopPropagation();respondToMission('${mid}','accept')"><svg class="gh-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>${jEsc(sengpT('notif.ma_accept'))}</button>
                 </div>` : '';
             return `<div class="gh-m" role="button" tabindex="0" style="--i:${Math.min(i, 8)};--gh-acc:${ui.acc};--gh-chipbg:${ui.bg};--gh-chipfg:${ui.fg}" onclick="viewMissionDetails('${mid}')" onkeydown="if(event.key==='Enter')viewMissionDetails('${mid}')">
-                <div class="gh-m__top"><span class="gh-chip">${ui.label}</span><span class="gh-code">${code}</span></div>
+                <div class="gh-m__top"><span class="gh-chip">${jEsc(stLabel)}</span><span class="gh-code">${code}</span></div>
                 <div class="gh-route">
-                    <div class="gh-city"><b>${jEsc(m.departure_city || '?')}</b><small>${getCountryFlag(m.departure_country)} ${jEsc(m.departure_country || '')}</small></div>
+                    <div class="gh-city"><b>${jEsc(m.departure_city || '?')}</b><small>${getCountryFlag(m.departure_country)} ${jEsc(dispCountry(m.departure_country))}</small></div>
                     <div class="gh-path">${ICON.plane}</div>
-                    <div class="gh-city"><b>${jEsc(m.arrival_city || '?')}</b><small>${getCountryFlag(m.arrival_country)} ${jEsc(m.arrival_country || '')}</small></div>
+                    <div class="gh-city"><b>${jEsc(m.arrival_city || '?')}</b><small>${getCountryFlag(m.arrival_country)} ${jEsc(dispCountry(m.arrival_country))}</small></div>
                 </div>
                 <div class="gh-meta">
                     ${weight ? `<span class="gh-pill">${ICON.box}${jEsc(weight)} kg</span>` : ''}
                     ${date ? `<span class="gh-pill">${ICON.cal}${jEsc(date)}</span>` : ''}
-                    ${price ? `<span class="gh-price">${price.toLocaleString('fr-FR')} <small>FCFA</small></span>` : ''}
+                    ${price ? `<span class="gh-price">${jEsc(SengpI18n.fmt.number(price))} <small>FCFA</small></span>` : ''}
                 </div>${respond}
             </div>`;
         }
@@ -1066,7 +1097,7 @@
         async function respondToMission(id, action) {
             if (ghBusy) return;
             if (action === 'decline') {
-                const ok = await sengpConfirm('Décliner cette mission ? Elle sera ré-assignée à un autre GP de votre catégorie.', { okLabel: 'Décliner', cancelLabel: 'Annuler' });
+                const ok = await sengpConfirm(sengpT('notif.ma_decline_confirm'), { okLabel: sengpT('notif.ma_decline'), cancelLabel: sengpT('common.cancel') });
                 if (!ok) return;
             }
             ghBusy = true;
@@ -1078,35 +1109,37 @@
                 });
                 if (!res.ok) {
                     const err = await res.json().catch(() => ({}));
-                    throw new Error(err.message || 'Action impossible');
+                    throw new Error(err.message || sengpT('notif.ma_failed'));
                 }
             } catch (e) {
                 ghBusy = false;
-                sengpAlert(e.message || 'Action impossible. Réessayez.');
+                sengpAlert(e.message || sengpT('notif.ma_failed'));
                 return;
             }
             ghBusy = false;
             await loadMissions();
             if (document.getElementById('missionsOverlay').classList.contains('show')) renderMissionsSheet();
             sengpAlert(action === 'accept'
-                ? 'Mission acceptée. L’équipe SEN GP vous contactera pour organiser la remise du colis.'
-                : 'Mission déclinée. Elle sera ré-assignée à un autre GP.');
+                ? sengpT('notif.ma_alert_ok')
+                : sengpT('notif.ma_alert_no'));
             if (action === 'accept') initJourney();
         }
 
         function renderMissionsSheet() {
             const counts = { all: ghMissions.length };
             Object.keys(GROUPS).forEach(k => { counts[k] = ghMissions.filter(m => groupOf(m) === k).length; });
-            const tabs = [['all', 'Toutes']].concat(Object.keys(GROUPS).map(k => [k, GROUPS[k].label]));
+            const tabs = [['all', sengpT('notif.tab_all')]].concat(Object.keys(GROUPS).map(k => [k, sengpT(GROUPS[k].label)]));
             document.getElementById('ghTabs').innerHTML = tabs.map(([k, l]) =>
-                `<button type="button" class="gh-tab" role="tab" aria-selected="${k === ghFilter}" onclick="setMissionsFilter('${k}')">${l}<b>${counts[k]}</b></button>`).join('');
+                `<button type="button" class="gh-tab" role="tab" aria-selected="${k === ghFilter}" onclick="setMissionsFilter('${k}')">${jEsc(l)}<b>${counts[k]}</b></button>`).join('');
             const list = ghFilter === 'all' ? ghMissions : ghMissions.filter(m => groupOf(m) === ghFilter);
-            document.getElementById('sheetSub').textContent = ghLoaded
-                ? (list.length === 0 ? 'Aucune mission' : list.length + (list.length > 1 ? ' missions' : ' mission'))
-                : 'Impossible de charger vos missions';
+            const subEl = document.getElementById('sheetSub');
+            subEl.removeAttribute('data-i18n');
+            subEl.textContent = ghLoaded
+                ? (list.length === 0 ? sengpT('dash.note_none_active') : sengpT('gp.missions_count', { count: list.length }))
+                : sengpT('gp.load_failed');
             document.getElementById('ghList').innerHTML = list.length
                 ? list.map(missionCardHTML).join('')
-                : `<div class="gh-empty">${ICON.box}<br>${ghLoaded ? 'Aucune mission dans cette catégorie pour le moment.' : 'Vérifiez votre connexion puis réessayez.'}</div>`;
+                : `<div class="gh-empty">${ICON.box}<br>${jEsc(ghLoaded ? sengpT('gp.empty_cat') : sengpT('gp.check_connection'))}</div>`;
             document.getElementById('ghList').scrollTop = 0;
         }
 
@@ -1126,6 +1159,17 @@
             document.getElementById('scroller').classList.remove('is-locked');
         }
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMissionsSheet(); });
+
+        // Changement de langue : feuille des missions, popup de voyage et état du partage suivent.
+        window.addEventListener('sengp:languagechange', () => {
+            if (document.getElementById('missionsOverlay').classList.contains('show')) renderMissionsSheet();
+            if (journey.open && journey.card) {
+                const h = journey.card.querySelector('h3');
+                if (h) h.textContent = sengpT('gp.j.title');
+                renderJourney();
+            }
+            locShareUI(locLast.on, locLast.key, locLast.params);
+        });
 
         function getCountryFlag(country) {
             const flags = {

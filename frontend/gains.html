@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEN GP - Mes Gains</title>
+    <title data-i18n="gn.page_title">SEN GP - Mes Gains</title>
     <style>
         * {
             margin: 0;
@@ -409,13 +409,21 @@
         }
         .nav-badge.new { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #1a1a2e; }
         .nav-badge.hidden { display: none; }
+        /* Droite a gauche (arabe) */
+        [dir="rtl"] .back-btn { transform: scaleX(-1); }
+        [dir="rtl"] .back-btn:hover { transform: scaleX(-1) translateX(-3px); }
+        [dir="rtl"] .transaction-card:hover { transform: translateX(-5px); }
+        [dir="rtl"] .transaction-amount { text-align: left; }
+        [dir="rtl"] .nav-badge { left: auto; right: calc(50% + 5px); }
             /* sengp-responsive-override */
         .mobile-frame{max-width:100%!important;width:100%!important;height:100vh!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;margin:0!important;}
         body{padding:0!important;}
         </style>
     <script src="api.js"></script>
+    <script src="i18n.js"></script>
     <script src="config.js"></script>
     <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="i18n.css">
     <script src="ui.js"></script>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -434,10 +442,10 @@
 
         <!-- Header -->
         <div class="header">
-            <button class="back-btn" onclick="goBack()">←</button>
+            <button class="back-btn" onclick="goBack()" aria-label="Retour" data-i18n-attr="aria-label:common.back">←</button>
             <div class="header-title">
-                <h1>Mes Gains</h1>
-                <p>Gérez vos revenus</p>
+                <h1 data-i18n="gn.title">Mes Gains</h1>
+                <p data-i18n="gn.subtitle">Gérez vos revenus</p>
             </div>
         </div>
 
@@ -445,10 +453,10 @@
         <div class="content">
             <!-- Balance Section -->
             <div class="balance-section">
-                <div class="balance-label">Solde disponible</div>
+                <div class="balance-label" data-i18n="gn.available">Solde disponible</div>
                 <div class="balance-amount" id="availableBalance">0 FCFA</div>
                 <div class="balance-pending" id="pendingBalance">En attente: 0 FCFA</div>
-                <button class="withdraw-btn" onclick="withdraw()">Retirer</button>
+                <button class="withdraw-btn" onclick="withdraw()" data-i18n="gn.withdraw">Retirer</button>
             </div>
 
             <!-- Stats Section -->
@@ -456,58 +464,58 @@
                 <div class="stat-card">
                     <div class="stat-icon"><svg class="ic" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg></div>
                     <div class="stat-value" id="statThisMonth">0</div>
-                    <div class="stat-label">Ce mois</div>
+                    <div class="stat-label" data-i18n="gn.this_month">Ce mois</div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-icon"><svg class="ic" viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></div>
                     <div class="stat-value" id="statAverage">0</div>
-                    <div class="stat-label">Moyenne</div>
+                    <div class="stat-label" data-i18n="gn.average">Moyenne</div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-icon"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
                     <div class="stat-value" id="statMissions">0</div>
-                    <div class="stat-label">Missions</div>
+                    <div class="stat-label" data-i18n="nav.missions">Missions</div>
                 </div>
             </div>
 
             <!-- Transactions Section -->
             <div class="transactions-section" id="txnSection">
                 <div class="section-header">
-                    <h2 class="section-title">Transactions</h2>
-                    <button class="filter-btn" onclick="filterTransactions()">Filtrer</button>
+                    <h2 class="section-title" data-i18n="gn.transactions">Transactions</h2>
+                    <button class="filter-btn" onclick="filterTransactions()" data-i18n="gn.filter">Filtrer</button>
                 </div>
 
-                <p style="text-align:center;color:rgba(255,255,255,0.5);padding:40px;">Chargement des transactions…</p>
+                <p style="text-align:center;color:rgba(255,255,255,0.5);padding:40px;" data-i18n="gn.loading_txn">Chargement des transactions…</p>
             </div>
         </div>
 
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
-            <div class="nav-item" onclick="navigateTo('home')" tabindex="0" role="button" aria-label="Accueil">
+            <div class="nav-item" onclick="navigateTo('home')" tabindex="0" role="button" aria-label="Accueil" data-i18n-attr="aria-label:nav.home">
                 <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-6h5v6"/></svg></div>
-                <div class="nav-label">Accueil</div>
+                <div class="nav-label" data-i18n="nav.home">Accueil</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('missions')" tabindex="0" role="button" aria-label="Missions">
+            <div class="nav-item" onclick="navigateTo('missions')" tabindex="0" role="button" aria-label="Missions" data-i18n-attr="aria-label:nav.missions">
                 <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
-                <div class="nav-label">Missions</div>
+                <div class="nav-label" data-i18n="nav.missions">Missions</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('trips')" tabindex="0" role="button" aria-label="Trajets">
+            <div class="nav-item" onclick="navigateTo('trips')" tabindex="0" role="button" aria-label="Trajets" data-i18n-attr="aria-label:nav.trips">
                 <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
-                <div class="nav-label">Trajets</div>
+                <div class="nav-label" data-i18n="nav.trips">Trajets</div>
             </div>
 
-            <div class="nav-item active" onclick="navigateTo('earnings')" tabindex="0" role="button" aria-label="Gains">
+            <div class="nav-item active" onclick="navigateTo('earnings')" tabindex="0" role="button" aria-label="Gains" data-i18n-attr="aria-label:nav.earnings">
                 <div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-                <div class="nav-label">Gains</div>
+                <div class="nav-label" data-i18n="nav.earnings">Gains</div>
             </div>
 
-            <div class="nav-item" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil">
+            <div class="nav-item" onclick="navigateTo('profile')" tabindex="0" role="button" aria-label="Profil" data-i18n-attr="aria-label:nav.profile">
                 <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
-                <div class="nav-label">Profil</div>
+                <div class="nav-label" data-i18n="nav.profile">Profil</div>
             </div>
         </div>
     </div>
@@ -515,13 +523,14 @@
     <script>
         const API_BASE_URL = window.API_BASE_URL;
         let availableBalance = 0;
+        let walletState = null, txnState = null;
 
         function getAuthToken() {
             return localStorage.getItem('authToken');
         }
 
         function formatFCFA(amount) {
-            return `${Number(amount || 0).toLocaleString('fr-FR')} FCFA`;
+            return SengpI18n.fmt.currency(Number(amount || 0));
         }
 
         function shortAmount(amount) {
@@ -533,6 +542,15 @@
 
         function goBack() {
             window.location.href = 'dashgp.html';
+        }
+
+        function renderWallet() {
+            const wallet = walletState || {};
+            document.getElementById('availableBalance').textContent = formatFCFA(wallet.available_balance);
+            document.getElementById('pendingBalance').textContent = sengpT('gn.pending', { amount: formatFCFA(wallet.pending_balance) });
+            document.getElementById('statThisMonth').textContent = shortAmount(wallet.this_month);
+            document.getElementById('statAverage').textContent = shortAmount(wallet.average);
+            document.getElementById('statMissions').textContent = wallet.missions_completed || 0;
         }
 
         async function loadWallet() {
@@ -551,11 +569,8 @@
                 if (walletRes.ok) {
                     const wallet = (await walletRes.json()).data;
                     availableBalance = wallet.available_balance || 0;
-                    document.getElementById('availableBalance').textContent = formatFCFA(wallet.available_balance);
-                    document.getElementById('pendingBalance').textContent = `En attente: ${formatFCFA(wallet.pending_balance)}`;
-                    document.getElementById('statThisMonth').textContent = shortAmount(wallet.this_month);
-                    document.getElementById('statAverage').textContent = shortAmount(wallet.average);
-                    document.getElementById('statMissions').textContent = wallet.missions_completed || 0;
+                    walletState = wallet;
+                    renderWallet();
                 }
 
                 if (txnRes.ok) {
@@ -568,15 +583,16 @@
         }
 
         function renderTransactions(transactions) {
+            txnState = transactions;
             const statusLabels = {
                 completed: 'Terminé', pending: 'En attente', processing: 'En cours',
                 failed: 'Échoué', approved: 'Approuvé', rejected: 'Rejeté'
             };
-            const titles = { income: 'Paiement reçu', expense: 'Paiement envoyé', withdrawal: 'Retrait effectué' };
+            const titles = { income: sengpT('gn.t_income'), expense: sengpT('gn.t_expense'), withdrawal: sengpT('gn.t_withdrawal') };
 
             let cards = '';
             if (transactions.length === 0) {
-                cards = '<p style="text-align:center;color:rgba(255,255,255,0.5);padding:40px;">Aucune transaction</p>';
+                cards = '<p style="text-align:center;color:rgba(255,255,255,0.5);padding:40px;">' + window.sengpEsc(sengpT('gn.no_txn')) + '</p>';
             } else {
                 cards = transactions.map(tx => {
                     const isIncome = tx.direction === 'income';
@@ -585,12 +601,12 @@
                     const icon = isIncome
                         ? '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12l4 4 4-4"/></svg>'
                         : '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16V8M8 12l4-4 4 4"/></svg>';
-                    const date = new Date(tx.created_at).toLocaleDateString('fr-FR');
+                    const date = SengpI18n.fmt.date(tx.created_at, { day: 'numeric', month: 'numeric', year: 'numeric' });
                     return `
                         <div class="transaction-card">
                             <div class="transaction-icon ${cls}">${icon}</div>
                             <div class="transaction-info">
-                                <div class="transaction-title">${titles[tx.direction] || 'Transaction'}</div>
+                                <div class="transaction-title">${window.sengpEsc(titles[tx.direction] || sengpT('gn.t_default'))}</div>
                                 <div class="transaction-details">${window.sengpEsc(tx.method || '')} • ${window.sengpEsc(tx.reference || '')}</div>
                             </div>
                             <div class="transaction-amount">
@@ -604,7 +620,7 @@
 
             document.getElementById('txnSection').innerHTML = `
                 <div class="section-header">
-                    <h2 class="section-title">Transactions</h2>
+                    <h2 class="section-title">${window.sengpEsc(sengpT('gn.transactions'))}</h2>
                 </div>
                 ${cards}
             `;
@@ -613,17 +629,17 @@
         async function withdraw() {
             const token = getAuthToken();
             if (availableBalance <= 0) {
-                alert('Solde insuffisant pour effectuer un retrait.');
+                alert(sengpT('gn.no_funds'));
                 return;
             }
 
-            const amount = prompt(`Montant à retirer (solde disponible: ${formatFCFA(availableBalance)})`);
+            const amount = prompt(sengpT('gn.ask_amount', { balance: formatFCFA(availableBalance) }));
             if (!amount) return;
 
-            const method = prompt('Méthode de retrait (wave, orange_money, free_money, bank_transfer):', 'wave');
+            const method = prompt(sengpT('gn.ask_method'), 'wave');
             if (!method) return;
 
-            const account_number = prompt('Numéro de compte / téléphone:');
+            const account_number = prompt(sengpT('gn.ask_account'));
             if (!account_number) return;
 
             try {
@@ -635,14 +651,14 @@
                 const result = await response.json();
 
                 if (response.ok && result.success) {
-                    alert('Demande de retrait envoyée !\n\nElle sera traitée par un administrateur sous 24-48h.');
+                    alert(sengpT('gn.requested'));
                     loadWallet();
                 } else {
-                    alert('Erreur: ' + (result.error || result.message || 'Demande de retrait échouée'));
+                    alert(sengpT('envois.error', { message: result.error || result.message || sengpT('gn.request_failed') }));
                 }
             } catch (error) {
                 console.error('Error requesting withdrawal:', error);
-                alert('Erreur de connexion au serveur.');
+                alert(sengpT('errors.network'));
             }
         }
 
@@ -660,7 +676,13 @@
             }
         }
 
-        window.addEventListener('load', loadWallet);
+        window.addEventListener('load', () => { SengpI18n.ready.then(loadWallet); });
+
+        // Changement de langue : montants, statuts et transactions se redessinent.
+        window.addEventListener('sengp:languagechange', () => {
+            renderWallet();
+            if (txnState) renderTransactions(txnState);
+        });
     </script>
 </body>
 </html>
