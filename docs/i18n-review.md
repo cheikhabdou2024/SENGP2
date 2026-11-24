@@ -57,8 +57,8 @@ Traduites automatiquement sur les trois surfaces, avec le même vocabulaire impo
 - **Turc, néerlandais** : « Notifs » rendu par le même mot que « Notifications » (plus de gain de place).
 
 Défauts constatés dans les textes **source** (communs aux langues, non corrigés) :
-- `prof.copyright` : « © 2025 » dans l'application, « © 2026 » sur le site.
-- `ms.published` (« Publiée {ago} ») est suivi d'un `{ago}` qui contient déjà « Publié il y a… » : le français affiche « Publiée Publié il y a 3h ». Les traductions russe et turque évitent le doublon.
+- `prof.copyright` : corrigé (« © 2026 » partout).
+- `ms.published` : supprimé (l'ancienneté affichée contient déjà « Publié il y a… »).
 - `prof.faq3_a` parle de « l'onglet Alertes » alors que l'onglet s'appelle Notifications.
 - `cr.terms_stub`, `cr.privacy_stub`, `pay.download_alert` : textes provisoires de maquette (« Dans la version complète… ») encore affichés.
 - `gn.ask_method` : identifiants d'API (`wave`, `orange_money`, `free_money`, `bank_transfer`) dans un texte affiché ; le serveur (E121/E123) n'accepte que `wave` et `orange_money`.

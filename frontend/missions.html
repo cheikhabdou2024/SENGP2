@@ -869,7 +869,7 @@
                         <div class="detail-item"><span><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span>${esc(sengpT('ms.arrival_on', { date: formatDate(m.desired_arrival_date) }))}</span></div>
                     </div>
                     <div class="mission-footer">
-                        <span class="mission-date">${esc(sengpT('ms.published', { ago: timeAgo(m.created_at) }))}</span>
+                        <span class="mission-date">${esc(timeAgo(m.created_at))}</span>
                     </div>
                     <div class="action-buttons">
                         <button class="btn btn-details" onclick="viewDetails('${m.id}')" style="flex:1;">${esc(sengpT('ms.view_details'))}</button>
