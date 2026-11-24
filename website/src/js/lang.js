@@ -13,12 +13,21 @@
 (function () {
   'use strict';
   var KEY = 'sengp.site.lang';
-  var SUPPORTED = ['fr', 'en', 'ar', 'es', 'pt'];
+  var SUPPORTED = ['fr', 'en', 'ar', 'es', 'pt', 'it', 'de', 'nl', 'ru', 'zh', 'hi', 'ja', 'ko', 'tr'];
   var ZONES = {
     fr: 'Europe/Paris Europe/Brussels Europe/Luxembourg Europe/Monaco Africa/Dakar Africa/Bamako Africa/Abidjan Africa/Ouagadougou Africa/Conakry Africa/Niamey Africa/Lome Africa/Porto-Novo Africa/Douala Africa/Libreville Africa/Brazzaville Africa/Kinshasa Africa/Lubumbashi Indian/Antananarivo Africa/Djibouti Africa/Bangui Africa/Ndjamena America/Port-au-Prince Indian/Reunion America/Martinique America/Guadeloupe America/Cayenne Pacific/Tahiti Pacific/Noumea',
     ar: 'Africa/Casablanca Africa/Algiers Africa/Tunis Africa/Cairo Africa/Tripoli Asia/Riyadh Asia/Dubai Asia/Qatar Asia/Kuwait Asia/Bahrain Asia/Muscat Asia/Amman Asia/Beirut Asia/Baghdad Asia/Damascus Asia/Aden Africa/Khartoum Africa/Nouakchott',
     es: 'Europe/Madrid America/Mexico_City America/Argentina/Buenos_Aires America/Bogota America/Santiago America/Lima America/Caracas America/Guayaquil America/Guatemala America/Havana America/Santo_Domingo America/La_Paz America/Tegucigalpa America/Asuncion America/El_Salvador America/Managua America/Costa_Rica America/Panama America/Montevideo Africa/Malabo',
-    pt: 'Europe/Lisbon America/Sao_Paulo Africa/Luanda Africa/Maputo Atlantic/Cape_Verde Africa/Bissau Africa/Sao_Tome'
+    pt: 'Europe/Lisbon America/Sao_Paulo Africa/Luanda Africa/Maputo Atlantic/Cape_Verde Africa/Bissau Africa/Sao_Tome',
+    it: 'Europe/Rome Europe/San_Marino Europe/Vatican',
+    de: 'Europe/Berlin Europe/Busingen Europe/Vienna Europe/Zurich Europe/Vaduz',
+    nl: 'Europe/Amsterdam America/Paramaribo',
+    ru: 'Europe/Moscow Europe/Kaliningrad Europe/Samara Europe/Volgograd Europe/Kirov Europe/Saratov Europe/Ulyanovsk Europe/Astrakhan Asia/Yekaterinburg Asia/Omsk Asia/Novosibirsk Asia/Barnaul Asia/Tomsk Asia/Krasnoyarsk Asia/Irkutsk Asia/Chita Asia/Yakutsk Asia/Vladivostok Asia/Sakhalin Asia/Magadan Asia/Kamchatka Europe/Minsk',
+    zh: 'Asia/Shanghai Asia/Urumqi',
+    hi: 'Asia/Kolkata Asia/Calcutta',
+    ja: 'Asia/Tokyo',
+    ko: 'Asia/Seoul',
+    tr: 'Europe/Istanbul Asia/Istanbul'
   };
   var zoneLang = {};
   Object.keys(ZONES).forEach(function (l) { ZONES[l].split(' ').forEach(function (z) { zoneLang[z] = l; }); });

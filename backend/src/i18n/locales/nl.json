@@ -1,0 +1,223 @@
+{
+  "errors": {
+    "Claim not found": "Klacht niet gevonden",
+    "Mission not found": "Opdracht niet gevonden",
+    "Mission introuvable": "Opdracht niet gevonden",
+    "Not your mission": "Dit is niet jouw opdracht",
+    "Invalid token": "Ongeldig token",
+    "Trip not found": "Reis niet gevonden",
+    "Stockage de fichiers non configuré": "Bestandsopslag is niet geconfigureerd",
+    "Aucun fichier reçu": "Geen bestand ontvangen",
+    "Type de fichier non autorisé": "Bestandstype niet toegestaan",
+    "No token provided": "Geen token opgegeven",
+    "Server configuration error": "Fout in de serverconfiguratie",
+    "Session expired or revoked": "Sessie verlopen of ingetrokken",
+    "Token expired": "Token verlopen",
+    "Authentication failed": "Authenticatie mislukt",
+    "Authentication required": "Authenticatie vereist",
+    "Insufficient permissions": "Onvoldoende rechten",
+    "Resource already exists": "De bron bestaat al",
+    "Invalid reference": "Ongeldige verwijzing",
+    "Required field missing": "Verplicht veld ontbreekt",
+    "File size too large": "Bestand te groot",
+    "Validation failed": "Validatie mislukt",
+    "Email already registered": "Dit e-mailadres is al geregistreerd",
+    "Phone number already registered": "Dit telefoonnummer is al geregistreerd",
+    "Google auth is not configured": "Inloggen met Google is niet geconfigureerd",
+    "Invalid Google token": "Ongeldig Google-token",
+    "Account is suspended": "Het account is geschorst",
+    "Account type mismatch": "Onjuist accounttype",
+    "Invalid credentials": "Ongeldige inloggegevens",
+    "User not found": "Gebruiker niet gevonden",
+    "Invalid current password": "Ongeldig huidig wachtwoord",
+    "You can only update your own claims": "Je kunt alleen je eigen klachten wijzigen",
+    "No fields to update": "Geen veld om bij te werken",
+    "Aucun champ à mettre à jour": "Geen veld om bij te werken",
+    "Not found": "Niet gevonden",
+    "Mission not found or not yours": "Opdracht niet gevonden of niet van jou",
+    "Mission cancelled": "Opdracht geannuleerd",
+    "Format QR code invalide": "Ongeldige QR-code-indeling",
+    "Données QR code invalides": "Ongeldige QR-codegegevens",
+    "Ce colis ne fait pas partie de vos missions": "Dit pakket maakt geen deel uit van je opdrachten",
+    "Ce colis a déjà été livré": "Dit pakket is al bezorgd",
+    "Cette mission a été annulée": "Deze opdracht is geannuleerd",
+    "En attente de la confirmation d'arrivée par l'administration.": "Wachten op bevestiging van de aankomst door de administratie.",
+    "Profil GP introuvable": "GP-profiel niet gevonden",
+    "Aucun colis livré : scannez au moins un colis avant de terminer.": "Geen pakket bezorgd: scan minstens één pakket voordat je afrondt.",
+    "Cette mission ne vous a pas été assignée": "Deze opdracht is niet aan je toegewezen",
+    "Mission not found or not awaiting your response": "Opdracht niet gevonden of wacht niet op jouw antwoord",
+    "Mission is not in transit": "De opdracht is niet onderweg",
+    "La mission est déjà livrée": "De opdracht is al bezorgd",
+    "La mission est déjà annulée": "De opdracht is al geannuleerd",
+    "Vous n'êtes pas autorisé à modifier cette mission": "Je mag deze opdracht niet wijzigen",
+    "Notification not found": "Melding niet gevonden",
+    "You can only pay for your own missions": "Je kunt alleen je eigen opdrachten betalen",
+    "Invalid payment amount": "Ongeldig betalingsbedrag",
+    "This mission has already been paid": "Deze opdracht is al betaald",
+    "Failed to initiate payment with provider": "De betaling kan niet worden gestart bij de aanbieder",
+    "You can only update your own trips": "Je kunt alleen je eigen reizen wijzigen",
+    "You can only cancel your own trips": "Je kunt alleen je eigen reizen annuleren",
+    "A completed trip cannot be cancelled": "Een voltooide reis kan niet worden geannuleerd",
+    "Withdrawal method is required": "De opnamemethode is verplicht",
+    "Account number is required": "Het rekeningnummer is verplicht",
+    "Insufficient available balance": "Onvoldoende beschikbaar saldo",
+    "Withdrawal not found or not pending": "Opname niet gevonden of niet in behandeling",
+    "Withdrawal not found or not in approved state": "Opname niet gevonden of niet goedgekeurd",
+    "Withdrawal not found or not cancellable": "Opname niet gevonden of kan niet worden geannuleerd",
+    "Failed to fetch profile": "Het profiel kan niet worden geladen",
+    "Ce numéro de téléphone est déjà utilisé": "Dit telefoonnummer is al in gebruik",
+    "Mise à jour échouée": "Bijwerken mislukt",
+    "This account belongs to a different profile type": "Dit account hoort bij een ander profieltype",
+    "Invalid email or password": "Onjuist e-mailadres of wachtwoord",
+    "You cannot view this claim": "Je kunt deze klacht niet bekijken",
+    "Only expediteurs can create missions": "Alleen verzenders kunnen opdrachten aanmaken",
+    "Invalid user type": "Ongeldig gebruikerstype",
+    "Cette mission ne peut plus être modifiée": "Deze opdracht kan niet meer worden gewijzigd",
+    "Aucun champ modifiable fourni": "Geen wijzigbaar veld opgegeven",
+    "Only GPs can accept missions": "Alleen GP’s kunnen opdrachten accepteren",
+    "Only GPs can decline missions": "Alleen GP’s kunnen opdrachten weigeren",
+    "lat and lng are required": "Breedtegraad en lengtegraad zijn verplicht",
+    "Les deux QR codes sont requis": "Beide QR-codes zijn vereist",
+    "Only GPs can verify delivery": "Alleen GP’s kunnen een bezorging verifiëren",
+    "QR code data is required": "De QR-codegegevens zijn verplicht",
+    "Tracking number not found": "Trackingnummer niet gevonden",
+    "Payment not found": "Betaling niet gevonden",
+    "You cannot view this payment": "Je kunt deze betaling niet bekijken",
+    "Envoi introuvable": "Zending niet gevonden",
+    "Colis introuvable": "Pakket niet gevonden",
+    "Erreur de suivi": "Trackingfout",
+    "Erreur": "Fout",
+    "Only GPs can create trips": "Alleen GP’s kunnen reizen aanmaken",
+    "Arrival date must be after departure date": "De aankomstdatum moet na de vertrekdatum liggen",
+    "mission_id or mission_code is required": "mission_id of mission_code is verplicht",
+    "Arrival city is required": "De aankomststad is verplicht",
+    "Arrival country is required": "Het aankomstland is verplicht",
+    "Available weight must be greater than 0": "Het beschikbare gewicht moet groter zijn dan 0",
+    "Current password is required": "Het huidige wachtwoord is verplicht",
+    "Delivery address is required": "Het bezorgadres is verplicht",
+    "Departure city is required": "De vertrekstad is verplicht",
+    "Departure country is required": "Het vertrekland is verplicht",
+    "Description cannot be empty": "De beschrijving mag niet leeg zijn",
+    "Description is required": "De beschrijving is verplicht",
+    "First name is required": "De voornaam is verplicht",
+    "Google id_token is required": "Het Google-token (id_token) is verplicht",
+    "Invalid arrival date": "Ongeldige aankomstdatum",
+    "Invalid departure date": "Ongeldige vertrekdatum",
+    "Invalid email format": "Ongeldige e-mailindeling",
+    "Invalid expected type": "Ongeldig verwacht type",
+    "Invalid notification_type": "Ongeldig meldingstype",
+    "Invalid priority": "Ongeldige prioriteit",
+    "Invalid resolution status": "Ongeldige oplossingsstatus",
+    "Invalid status": "Ongeldige status",
+    "Invalid withdrawal method": "Ongeldige opnamemethode",
+    "Last name is required": "De achternaam is verplicht",
+    "Message is required": "Het bericht is verplicht",
+    "New password must be at least 8 characters long": "Het nieuwe wachtwoord moet minstens 8 tekens bevatten",
+    "Offered price must be greater than 0": "De voorgestelde prijs moet groter zijn dan 0",
+    "Package weight must be greater than 0": "Het gewicht van het pakket moet groter zijn dan 0",
+    "Password is required": "Het wachtwoord is verplicht",
+    "Password must be at least 8 characters long": "Het wachtwoord moet minstens 8 tekens bevatten",
+    "Pickup address is required": "Het ophaaladres is verplicht",
+    "Resolution is required": "De oplossing is verplicht",
+    "Title is required": "De titel is verplicht",
+    "User type must be either expediteur or gp": "Het gebruikerstype moet verzender of GP zijn",
+    "amount must be a positive number": "Het bedrag moet een positief getal zijn",
+    "payment_method must be wave or orange_money": "De betaalmethode moet wave of orange_money zijn",
+    "user_id is required": "De gebruikersidentificatie is verplicht",
+    "Invalid language": "Ongeldige taal"
+  },
+  "patterns": {
+    "0": "De minimale opname is {1}",
+    "1": "Statuswijziging niet toegestaan: {1}"
+  },
+  "templates": {
+    "claim_reply": {
+      "title": "Antwoord op je klacht {code}",
+      "message": "{text}"
+    },
+    "claim_resolved_credited": {
+      "title": "Klacht {code} opgelost",
+      "message": "Een vergoeding van {amount} is bijgeschreven op je portemonnee."
+    },
+    "claim_resolved_granted": {
+      "title": "Klacht {code} opgelost",
+      "message": "Er is je een vergoeding van {amount} toegekend. Ons team neemt contact met je op voor de uitbetaling."
+    },
+    "mission_assigned": {
+      "title": "Opdracht toegewezen: {route}",
+      "message": "Er is een nieuwe opdracht ({code}) aan je toegewezen. Accepteer of weiger deze vanuit je meldingen."
+    },
+    "mission_reassigned": {
+      "title": "Opdracht opnieuw toegewezen: {route}",
+      "message": "Opdracht {code} is (opnieuw) aan je toegewezen. Accepteer of weiger deze vanuit je meldingen."
+    },
+    "arrival_confirmed": {
+      "title": "Aankomst bevestigd",
+      "message": "Aankomst bevestigd voor {code}. Je kunt nu de QR-code van de ontvanger scannen om te bezorgen."
+    },
+    "access_restored": {
+      "title": "Toegang hersteld",
+      "message": "De administratie heeft het einde van je reis gevalideerd. Je kunt de app weer gebruiken."
+    },
+    "payment_refunded": {
+      "title": "Betaling terugbetaald",
+      "message": "Je betaling {code} van {amount} is terugbetaald."
+    },
+    "payment_refunded_reason": {
+      "title": "Betaling terugbetaald",
+      "message": "Je betaling {code} van {amount} is terugbetaald: {reason}."
+    },
+    "identity_verified": {
+      "title": "Identiteit geverifieerd",
+      "message": "Je identiteitsbewijs is goedgekeurd. Je account is nu geverifieerd."
+    },
+    "identity_rejected": {
+      "title": "Identiteitsbewijs geweigerd",
+      "message": "Je identiteitsbewijs is geweigerd. Dien het opnieuw in."
+    },
+    "identity_rejected_reason": {
+      "title": "Identiteitsbewijs geweigerd",
+      "message": "Je identiteitsbewijs is geweigerd: {reason}. Dien het opnieuw in."
+    },
+    "parcel_delivered": {
+      "title": "Pakket bezorgd",
+      "message": "Je pakket {code} is overhandigd aan de ontvanger (QR-code bevestigd)."
+    },
+    "parcel_delivered_named": {
+      "title": "Pakket bezorgd",
+      "message": "Je pakket {code} is overhandigd aan {name} (QR-code bevestigd)."
+    },
+    "earnings_credited": {
+      "title": "Inkomsten bijgeschreven",
+      "message": "Je hebt {amount} verdiend met opdracht {code}."
+    },
+    "gp_arrived": {
+      "title": "GP op bestemming aangekomen",
+      "message": "De GP is op bestemming aangekomen voor opdracht {code}. De overhandiging van het pakket is nabij."
+    },
+    "payment_confirmed": {
+      "title": "Betaling bevestigd",
+      "message": "Je betaling van {amount} is bevestigd."
+    },
+    "withdrawal_approved": {
+      "title": "Opname goedgekeurd",
+      "message": "Je opname van {amount} is goedgekeurd. De betaling is onderweg."
+    },
+    "withdrawal_paid": {
+      "title": "Opname uitbetaald",
+      "message": "Je opname van {amount} is uitbetaald."
+    },
+    "withdrawal_paid_ref": {
+      "title": "Opname uitbetaald",
+      "message": "Je opname van {amount} is uitbetaald (ref. {ref})."
+    },
+    "withdrawal_rejected": {
+      "title": "Opname afgewezen",
+      "message": "Je opname van {amount} is afgewezen. Het geld is weer bijgeschreven."
+    },
+    "withdrawal_rejected_reason": {
+      "title": "Opname afgewezen",
+      "message": "Je opname van {amount} is afgewezen: {reason}. Het geld is weer bijgeschreven."
+    }
+  }
+}

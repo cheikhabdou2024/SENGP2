@@ -1,0 +1,223 @@
+{
+  "errors": {
+    "Claim not found": "未找到投诉",
+    "Mission not found": "未找到任务",
+    "Mission introuvable": "未找到任务",
+    "Not your mission": "这不是您的任务",
+    "Invalid token": "令牌无效",
+    "Trip not found": "未找到行程",
+    "Stockage de fichiers non configuré": "未配置文件存储",
+    "Aucun fichier reçu": "未收到任何文件",
+    "Type de fichier non autorisé": "不允许的文件类型",
+    "No token provided": "未提供令牌",
+    "Server configuration error": "服务器配置错误",
+    "Session expired or revoked": "会话已过期或已被撤销",
+    "Token expired": "令牌已过期",
+    "Authentication failed": "身份验证失败",
+    "Authentication required": "需要身份验证",
+    "Insufficient permissions": "权限不足",
+    "Resource already exists": "资源已存在",
+    "Invalid reference": "引用无效",
+    "Required field missing": "缺少必填字段",
+    "File size too large": "文件过大",
+    "Validation failed": "验证失败",
+    "Email already registered": "该电子邮箱已注册",
+    "Phone number already registered": "该手机号码已注册",
+    "Google auth is not configured": "未配置 Google 登录",
+    "Invalid Google token": "Google 令牌无效",
+    "Account is suspended": "账户已被停用",
+    "Account type mismatch": "账户类型不正确",
+    "Invalid credentials": "凭据无效",
+    "User not found": "未找到用户",
+    "Invalid current password": "当前密码无效",
+    "You can only update your own claims": "您只能修改自己的投诉",
+    "No fields to update": "没有需要更新的字段",
+    "Aucun champ à mettre à jour": "没有需要更新的字段",
+    "Not found": "未找到",
+    "Mission not found or not yours": "未找到任务，或该任务不属于您",
+    "Mission cancelled": "任务已取消",
+    "Format QR code invalide": "二维码格式无效",
+    "Données QR code invalides": "二维码数据无效",
+    "Ce colis ne fait pas partie de vos missions": "该包裹不属于您的任务",
+    "Ce colis a déjà été livré": "该包裹已送达",
+    "Cette mission a été annulée": "该任务已被取消",
+    "En attente de la confirmation d'arrivée par l'administration.": "正在等待管理方确认抵达。",
+    "Profil GP introuvable": "未找到 GP 档案",
+    "Aucun colis livré : scannez au moins un colis avant de terminer.": "没有已送达的包裹：结束前请至少扫描一个包裹。",
+    "Cette mission ne vous a pas été assignée": "该任务未分配给您",
+    "Mission not found or not awaiting your response": "未找到任务，或该任务无需您回复",
+    "Mission is not in transit": "该任务不在运输中",
+    "La mission est déjà livrée": "该任务已送达",
+    "La mission est déjà annulée": "该任务已被取消",
+    "Vous n'êtes pas autorisé à modifier cette mission": "您无权修改该任务",
+    "Notification not found": "未找到通知",
+    "You can only pay for your own missions": "您只能为自己的任务付款",
+    "Invalid payment amount": "付款金额无效",
+    "This mission has already been paid": "该任务已付款",
+    "Failed to initiate payment with provider": "无法向支付服务商发起付款",
+    "You can only update your own trips": "您只能修改自己的行程",
+    "You can only cancel your own trips": "您只能取消自己的行程",
+    "A completed trip cannot be cancelled": "已完成的行程无法取消",
+    "Withdrawal method is required": "必须选择提现方式",
+    "Account number is required": "必须填写账号",
+    "Insufficient available balance": "可用余额不足",
+    "Withdrawal not found or not pending": "未找到提现，或该提现不处于待处理状态",
+    "Withdrawal not found or not in approved state": "未找到提现，或该提现未获批准",
+    "Withdrawal not found or not cancellable": "未找到提现，或该提现无法取消",
+    "Failed to fetch profile": "无法加载档案",
+    "Ce numéro de téléphone est déjà utilisé": "该手机号码已被使用",
+    "Mise à jour échouée": "更新失败",
+    "This account belongs to a different profile type": "该账户属于其他类型的档案",
+    "Invalid email or password": "电子邮箱或密码不正确",
+    "You cannot view this claim": "您无权查看该投诉",
+    "Only expediteurs can create missions": "只有寄件人可以创建任务",
+    "Invalid user type": "用户类型无效",
+    "Cette mission ne peut plus être modifiée": "该任务已无法修改",
+    "Aucun champ modifiable fourni": "未提供可修改的字段",
+    "Only GPs can accept missions": "只有 GP 可以接受任务",
+    "Only GPs can decline missions": "只有 GP 可以拒绝任务",
+    "lat and lng are required": "纬度和经度为必填项",
+    "Les deux QR codes sont requis": "两个二维码均为必填项",
+    "Only GPs can verify delivery": "只有 GP 可以核验送达",
+    "QR code data is required": "二维码数据为必填项",
+    "Tracking number not found": "未找到追踪号",
+    "Payment not found": "未找到付款记录",
+    "You cannot view this payment": "您无权查看该付款记录",
+    "Envoi introuvable": "未找到寄件",
+    "Colis introuvable": "未找到包裹",
+    "Erreur de suivi": "追踪错误",
+    "Erreur": "错误",
+    "Only GPs can create trips": "只有 GP 可以创建行程",
+    "Arrival date must be after departure date": "到达日期必须晚于出发日期",
+    "mission_id or mission_code is required": "mission_id 或 mission_code 为必填项",
+    "Arrival city is required": "必须填写到达城市",
+    "Arrival country is required": "必须填写到达国家",
+    "Available weight must be greater than 0": "可用重量必须大于 0",
+    "Current password is required": "必须填写当前密码",
+    "Delivery address is required": "必须填写送达地址",
+    "Departure city is required": "必须填写出发城市",
+    "Departure country is required": "必须填写出发国家",
+    "Description cannot be empty": "描述不能为空",
+    "Description is required": "必须填写描述",
+    "First name is required": "必须填写名字",
+    "Google id_token is required": "必须提供 Google 令牌（id_token）",
+    "Invalid arrival date": "到达日期无效",
+    "Invalid departure date": "出发日期无效",
+    "Invalid email format": "电子邮箱格式无效",
+    "Invalid expected type": "预期类型无效",
+    "Invalid notification_type": "通知类型无效",
+    "Invalid priority": "优先级无效",
+    "Invalid resolution status": "处理状态无效",
+    "Invalid status": "状态无效",
+    "Invalid withdrawal method": "提现方式无效",
+    "Last name is required": "必须填写姓氏",
+    "Message is required": "必须填写消息",
+    "New password must be at least 8 characters long": "新密码至少需要 8 个字符",
+    "Offered price must be greater than 0": "报价必须大于 0",
+    "Package weight must be greater than 0": "包裹重量必须大于 0",
+    "Password is required": "必须填写密码",
+    "Password must be at least 8 characters long": "密码至少需要 8 个字符",
+    "Pickup address is required": "必须填写取件地址",
+    "Resolution is required": "必须填写处理结果",
+    "Title is required": "必须填写标题",
+    "User type must be either expediteur or gp": "用户类型必须是寄件人或 GP",
+    "amount must be a positive number": "金额必须为正数",
+    "payment_method must be wave or orange_money": "付款方式必须是 wave 或 orange_money",
+    "user_id is required": "必须提供用户标识",
+    "Invalid language": "语言无效"
+  },
+  "patterns": {
+    "0": "最低提现金额为 {1}",
+    "1": "不允许的状态变更：{1}"
+  },
+  "templates": {
+    "claim_reply": {
+      "title": "您的投诉 {code} 已有回复",
+      "message": "{text}"
+    },
+    "claim_resolved_credited": {
+      "title": "投诉 {code} 已处理",
+      "message": "{amount} 的赔偿已存入您的钱包。"
+    },
+    "claim_resolved_granted": {
+      "title": "投诉 {code} 已处理",
+      "message": "我们已批准向您赔偿 {amount}。我们的团队将与您联系办理支付。"
+    },
+    "mission_assigned": {
+      "title": "任务已分配：{route}",
+      "message": "一项新任务（{code}）已分配给您。请在通知中接受或拒绝。"
+    },
+    "mission_reassigned": {
+      "title": "任务已重新分配：{route}",
+      "message": "任务 {code} 已（重新）分配给您。请在通知中接受或拒绝。"
+    },
+    "arrival_confirmed": {
+      "title": "已确认抵达",
+      "message": "{code} 已确认抵达。您现在可以扫描收件人的二维码来完成送达。"
+    },
+    "access_restored": {
+      "title": "访问已恢复",
+      "message": "管理方已确认您的行程结束。您可以再次使用应用。"
+    },
+    "payment_refunded": {
+      "title": "付款已退款",
+      "message": "您的付款 {code}（{amount}）已退款。"
+    },
+    "payment_refunded_reason": {
+      "title": "付款已退款",
+      "message": "您的付款 {code}（{amount}）已退款：{reason}。"
+    },
+    "identity_verified": {
+      "title": "身份已验证",
+      "message": "您的身份证件已通过验证。您的账户现已完成认证。"
+    },
+    "identity_rejected": {
+      "title": "身份证件被拒绝",
+      "message": "您的身份证件被拒绝。请重新提交。"
+    },
+    "identity_rejected_reason": {
+      "title": "身份证件被拒绝",
+      "message": "您的身份证件被拒绝：{reason}。请重新提交。"
+    },
+    "parcel_delivered": {
+      "title": "包裹已送达",
+      "message": "您的包裹 {code} 已交给收件人（二维码已确认）。"
+    },
+    "parcel_delivered_named": {
+      "title": "包裹已送达",
+      "message": "您的包裹 {code} 已交给 {name}（二维码已确认）。"
+    },
+    "earnings_credited": {
+      "title": "收益已入账",
+      "message": "您因任务 {code} 获得了 {amount}。"
+    },
+    "gp_arrived": {
+      "title": "GP 已抵达目的地",
+      "message": "GP 已抵达任务 {code} 的目的地。即将交接包裹。"
+    },
+    "payment_confirmed": {
+      "title": "付款已确认",
+      "message": "您的 {amount} 付款已确认。"
+    },
+    "withdrawal_approved": {
+      "title": "提现已批准",
+      "message": "您的 {amount} 提现已获批准。付款正在进行中。"
+    },
+    "withdrawal_paid": {
+      "title": "提现已支付",
+      "message": "您的 {amount} 提现已支付。"
+    },
+    "withdrawal_paid_ref": {
+      "title": "提现已支付",
+      "message": "您的 {amount} 提现已支付（参考号 {ref}）。"
+    },
+    "withdrawal_rejected": {
+      "title": "提现被拒绝",
+      "message": "您的 {amount} 提现被拒绝。资金已退回。"
+    },
+    "withdrawal_rejected_reason": {
+      "title": "提现被拒绝",
+      "message": "您的 {amount} 提现被拒绝：{reason}。资金已退回。"
+    }
+  }
+}

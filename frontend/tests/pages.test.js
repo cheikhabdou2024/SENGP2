@@ -117,5 +117,5 @@ test('le build copie les langues et i18n.js', () => {
   const build = read('scripts/build.js');
   assert.match(build, /'locales'/);
   assert.ok(fs.existsSync(path.join(root, 'i18n.js')));
-  for (const l of ['fr', 'en', 'ar', 'es', 'pt']) assert.ok(fs.existsSync(path.join(root, 'locales', l + '.json')), l);
+  for (const l of require('../i18n.js').SUPPORTED) assert.ok(fs.existsSync(path.join(root, 'locales', l + '.json')), l);
 });

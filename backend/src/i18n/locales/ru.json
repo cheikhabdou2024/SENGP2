@@ -1,0 +1,223 @@
+{
+  "errors": {
+    "Claim not found": "Претензия не найдена",
+    "Mission not found": "Заказ не найден",
+    "Mission introuvable": "Заказ не найден",
+    "Not your mission": "Это не ваш заказ",
+    "Invalid token": "Недействительный токен",
+    "Trip not found": "Поездка не найдена",
+    "Stockage de fichiers non configuré": "Хранилище файлов не настроено",
+    "Aucun fichier reçu": "Файл не получен",
+    "Type de fichier non autorisé": "Тип файла не разрешён",
+    "No token provided": "Токен не передан",
+    "Server configuration error": "Ошибка конфигурации сервера",
+    "Session expired or revoked": "Сеанс истёк или отозван",
+    "Token expired": "Срок действия токена истёк",
+    "Authentication failed": "Ошибка аутентификации",
+    "Authentication required": "Требуется аутентификация",
+    "Insufficient permissions": "Недостаточно прав",
+    "Resource already exists": "Ресурс уже существует",
+    "Invalid reference": "Недопустимая ссылка",
+    "Required field missing": "Отсутствует обязательное поле",
+    "File size too large": "Файл слишком большой",
+    "Validation failed": "Проверка не пройдена",
+    "Email already registered": "Этот e-mail уже зарегистрирован",
+    "Phone number already registered": "Этот номер телефона уже зарегистрирован",
+    "Google auth is not configured": "Вход через Google не настроен",
+    "Invalid Google token": "Недействительный токен Google",
+    "Account is suspended": "Аккаунт приостановлен",
+    "Account type mismatch": "Неверный тип аккаунта",
+    "Invalid credentials": "Неверные учётные данные",
+    "User not found": "Пользователь не найден",
+    "Invalid current password": "Неверный текущий пароль",
+    "You can only update your own claims": "Вы можете изменять только свои собственные претензии",
+    "No fields to update": "Нет полей для обновления",
+    "Aucun champ à mettre à jour": "Нет полей для обновления",
+    "Not found": "Не найдено",
+    "Mission not found or not yours": "Заказ не найден или не принадлежит вам",
+    "Mission cancelled": "Заказ отменён",
+    "Format QR code invalide": "Недопустимый формат QR-кода",
+    "Données QR code invalides": "Недопустимые данные QR-кода",
+    "Ce colis ne fait pas partie de vos missions": "Эта посылка не входит в ваши заказы",
+    "Ce colis a déjà été livré": "Эта посылка уже доставлена",
+    "Cette mission a été annulée": "Этот заказ был отменён",
+    "En attente de la confirmation d'arrivée par l'administration.": "Ожидание подтверждения прибытия администрацией.",
+    "Profil GP introuvable": "Профиль GP не найден",
+    "Aucun colis livré : scannez au moins un colis avant de terminer.": "Ни одна посылка не доставлена: отсканируйте хотя бы одну посылку, прежде чем завершить.",
+    "Cette mission ne vous a pas été assignée": "Этот заказ вам не назначен",
+    "Mission not found or not awaiting your response": "Заказ не найден или не ожидает вашего ответа",
+    "Mission is not in transit": "Заказ не находится в пути",
+    "La mission est déjà livrée": "Заказ уже доставлен",
+    "La mission est déjà annulée": "Заказ уже отменён",
+    "Vous n'êtes pas autorisé à modifier cette mission": "У вас нет разрешения изменять этот заказ",
+    "Notification not found": "Уведомление не найдено",
+    "You can only pay for your own missions": "Вы можете оплачивать только свои собственные заказы",
+    "Invalid payment amount": "Недопустимая сумма платежа",
+    "This mission has already been paid": "Этот заказ уже оплачен",
+    "Failed to initiate payment with provider": "Не удалось инициировать платёж у поставщика",
+    "You can only update your own trips": "Вы можете изменять только свои собственные поездки",
+    "You can only cancel your own trips": "Вы можете отменять только свои собственные поездки",
+    "A completed trip cannot be cancelled": "Завершённую поездку нельзя отменить",
+    "Withdrawal method is required": "Способ вывода обязателен",
+    "Account number is required": "Номер счёта обязателен",
+    "Insufficient available balance": "Недостаточно доступных средств",
+    "Withdrawal not found or not pending": "Вывод не найден или не находится в ожидании",
+    "Withdrawal not found or not in approved state": "Вывод не найден или не одобрен",
+    "Withdrawal not found or not cancellable": "Вывод не найден или не может быть отменён",
+    "Failed to fetch profile": "Не удалось загрузить профиль",
+    "Ce numéro de téléphone est déjà utilisé": "Этот номер телефона уже используется",
+    "Mise à jour échouée": "Не удалось обновить",
+    "This account belongs to a different profile type": "Этот аккаунт принадлежит другому типу профиля",
+    "Invalid email or password": "Неверный e-mail или пароль",
+    "You cannot view this claim": "Вы не можете просматривать эту претензию",
+    "Only expediteurs can create missions": "Создавать заказы могут только отправители",
+    "Invalid user type": "Недопустимый тип пользователя",
+    "Cette mission ne peut plus être modifiée": "Этот заказ больше нельзя изменить",
+    "Aucun champ modifiable fourni": "Не передано ни одного изменяемого поля",
+    "Only GPs can accept missions": "Принимать заказы могут только GP",
+    "Only GPs can decline missions": "Отклонять заказы могут только GP",
+    "lat and lng are required": "Широта и долгота обязательны",
+    "Les deux QR codes sont requis": "Необходимы оба QR-кода",
+    "Only GPs can verify delivery": "Проверять доставку могут только GP",
+    "QR code data is required": "Данные QR-кода обязательны",
+    "Tracking number not found": "Номер отслеживания не найден",
+    "Payment not found": "Платёж не найден",
+    "You cannot view this payment": "Вы не можете просматривать этот платёж",
+    "Envoi introuvable": "Отправление не найдено",
+    "Colis introuvable": "Посылка не найдена",
+    "Erreur de suivi": "Ошибка отслеживания",
+    "Erreur": "Ошибка",
+    "Only GPs can create trips": "Создавать поездки могут только GP",
+    "Arrival date must be after departure date": "Дата прибытия должна быть позже даты отправления",
+    "mission_id or mission_code is required": "mission_id или mission_code обязателен",
+    "Arrival city is required": "Город прибытия обязателен",
+    "Arrival country is required": "Страна прибытия обязательна",
+    "Available weight must be greater than 0": "Доступный вес должен быть больше 0",
+    "Current password is required": "Текущий пароль обязателен",
+    "Delivery address is required": "Адрес доставки обязателен",
+    "Departure city is required": "Город отправления обязателен",
+    "Departure country is required": "Страна отправления обязательна",
+    "Description cannot be empty": "Описание не может быть пустым",
+    "Description is required": "Описание обязательно",
+    "First name is required": "Имя обязательно",
+    "Google id_token is required": "Токен Google (id_token) обязателен",
+    "Invalid arrival date": "Недопустимая дата прибытия",
+    "Invalid departure date": "Недопустимая дата отправления",
+    "Invalid email format": "Недопустимый формат e-mail",
+    "Invalid expected type": "Недопустимый ожидаемый тип",
+    "Invalid notification_type": "Недопустимый тип уведомления",
+    "Invalid priority": "Недопустимый приоритет",
+    "Invalid resolution status": "Недопустимый статус решения",
+    "Invalid status": "Недопустимый статус",
+    "Invalid withdrawal method": "Недопустимый способ вывода",
+    "Last name is required": "Фамилия обязательна",
+    "Message is required": "Сообщение обязательно",
+    "New password must be at least 8 characters long": "Новый пароль должен содержать не менее 8 символов",
+    "Offered price must be greater than 0": "Предлагаемая цена должна быть больше 0",
+    "Package weight must be greater than 0": "Вес посылки должен быть больше 0",
+    "Password is required": "Пароль обязателен",
+    "Password must be at least 8 characters long": "Пароль должен содержать не менее 8 символов",
+    "Pickup address is required": "Адрес забора обязателен",
+    "Resolution is required": "Решение обязательно",
+    "Title is required": "Заголовок обязателен",
+    "User type must be either expediteur or gp": "Тип пользователя должен быть «отправитель» или «GP»",
+    "amount must be a positive number": "Сумма должна быть положительным числом",
+    "payment_method must be wave or orange_money": "Способ оплаты должен быть wave или orange_money",
+    "user_id is required": "Идентификатор пользователя обязателен",
+    "Invalid language": "Недопустимый язык"
+  },
+  "patterns": {
+    "0": "Минимальная сумма вывода: {1}",
+    "1": "Изменение статуса не разрешено: {1}"
+  },
+  "templates": {
+    "claim_reply": {
+      "title": "Ответ на вашу претензию {code}",
+      "message": "{text}"
+    },
+    "claim_resolved_credited": {
+      "title": "Претензия {code} решена",
+      "message": "Компенсация в размере {amount} зачислена на ваш кошелёк."
+    },
+    "claim_resolved_granted": {
+      "title": "Претензия {code} решена",
+      "message": "Вам назначена компенсация в размере {amount}. Наша команда свяжется с вами для выплаты."
+    },
+    "mission_assigned": {
+      "title": "Заказ назначен: {route}",
+      "message": "Вам назначен новый заказ ({code}). Примите или отклоните его в уведомлениях."
+    },
+    "mission_reassigned": {
+      "title": "Заказ переназначен: {route}",
+      "message": "Заказ {code} (пере)назначен вам. Примите или отклоните его в уведомлениях."
+    },
+    "arrival_confirmed": {
+      "title": "Прибытие подтверждено",
+      "message": "Прибытие подтверждено для {code}. Теперь вы можете отсканировать QR-код получателя для доставки."
+    },
+    "access_restored": {
+      "title": "Доступ восстановлен",
+      "message": "Администрация подтвердила завершение вашей поездки. Вы снова можете пользоваться приложением."
+    },
+    "payment_refunded": {
+      "title": "Платёж возвращён",
+      "message": "Ваш платёж {code} на сумму {amount} возвращён."
+    },
+    "payment_refunded_reason": {
+      "title": "Платёж возвращён",
+      "message": "Ваш платёж {code} на сумму {amount} возвращён: {reason}."
+    },
+    "identity_verified": {
+      "title": "Личность подтверждена",
+      "message": "Ваш документ, удостоверяющий личность, принят. Ваш аккаунт теперь подтверждён."
+    },
+    "identity_rejected": {
+      "title": "Документ, удостоверяющий личность, отклонён",
+      "message": "Ваш документ, удостоверяющий личность, отклонён. Пожалуйста, отправьте его снова."
+    },
+    "identity_rejected_reason": {
+      "title": "Документ, удостоверяющий личность, отклонён",
+      "message": "Ваш документ, удостоверяющий личность, отклонён: {reason}. Пожалуйста, отправьте его снова."
+    },
+    "parcel_delivered": {
+      "title": "Посылка доставлена",
+      "message": "Ваша посылка {code} передана получателю (QR-код подтверждён)."
+    },
+    "parcel_delivered_named": {
+      "title": "Посылка доставлена",
+      "message": "Ваша посылка {code} передана получателю {name} (QR-код подтверждён)."
+    },
+    "earnings_credited": {
+      "title": "Доход зачислен",
+      "message": "Вы заработали {amount} за заказ {code}."
+    },
+    "gp_arrived": {
+      "title": "GP прибыл в пункт назначения",
+      "message": "GP прибыл в пункт назначения по заказу {code}. Передача посылки скоро состоится."
+    },
+    "payment_confirmed": {
+      "title": "Платёж подтверждён",
+      "message": "Ваш платёж на сумму {amount} подтверждён."
+    },
+    "withdrawal_approved": {
+      "title": "Вывод одобрен",
+      "message": "Ваш вывод на сумму {amount} одобрен. Платёж выполняется."
+    },
+    "withdrawal_paid": {
+      "title": "Вывод выплачен",
+      "message": "Ваш вывод на сумму {amount} выплачен."
+    },
+    "withdrawal_paid_ref": {
+      "title": "Вывод выплачен",
+      "message": "Ваш вывод на сумму {amount} выплачен (ном. {ref})."
+    },
+    "withdrawal_rejected": {
+      "title": "Вывод отклонён",
+      "message": "Ваш вывод на сумму {amount} отклонён. Средства возвращены на баланс."
+    },
+    "withdrawal_rejected_reason": {
+      "title": "Вывод отклонён",
+      "message": "Ваш вывод на сумму {amount} отклонён: {reason}. Средства возвращены на баланс."
+    }
+  }
+}

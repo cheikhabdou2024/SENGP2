@@ -21,7 +21,7 @@
     // Langue du bouton Google : celle choisie dans l'application (i18n.js), francais par defaut.
     function googleLocale() {
         var l = (window.SengpI18n && window.SengpI18n.lang) || 'fr';
-        return l === 'pt' ? 'pt-PT' : l;
+        return l === 'pt' ? 'pt-PT' : l === 'zh' ? 'zh-CN' : l;
     }
 
     function initGoogleButton() {

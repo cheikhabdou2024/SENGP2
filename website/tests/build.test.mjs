@@ -8,7 +8,7 @@ import { execFileSync } from 'node:child_process';
 
 const ROOT = path.join(import.meta.dirname, '..');
 const DIST = fs.mkdtempSync(path.join(os.tmpdir(), 'sengp-site-'));
-const LANGS = ['fr', 'en', 'ar', 'es', 'pt'];
+const LANGS = JSON.parse(fs.readFileSync(path.join(ROOT, 'site.config.json'), 'utf8')).site.languages;
 const PAGES = ['', 'comment-ca-marche/', 'destinations/', 'a-propos/', 'faq/', 'contact/'];
 const LEGAL = ['mentions-legales/', 'confidentialite/', 'conditions/'];
 const read = (...p) => fs.readFileSync(path.join(DIST, ...p), 'utf8');
@@ -74,7 +74,7 @@ test('aucun marqueur interne ne reste dans le HTML', () => {
 // ---- choix de la langue (src/js/lang.js)
 function run({ lang = 'fr', languages = ['fr-FR'], tz = 'Europe/Paris', saved = null, ua = 'Mozilla/5.0', nav = 'navigate', webdriver = false }) {
   const calls = { replaced: null, stored: {} };
-  const links = { en: '/en/faq/', fr: '/faq/', ar: '/ar/faq/', es: '/es/faq/', pt: '/pt/faq/' };
+  const links = Object.fromEntries(LANGS.map(l => [l, l === 'fr' ? '/faq/' : `/${l}/faq/`]));
   const listeners = {};
   const ctx = {
     document: {
@@ -98,10 +98,12 @@ test('langue : appareil en anglais -> page anglaise, choix memorise', () => {
   assert.equal(calls.stored['sengp.site.lang'], 'en');
 });
 test('langue : langue non geree -> pays du fuseau horaire ; sinon anglais', () => {
-  assert.equal(run({ languages: ['de-DE'], tz: 'Asia/Dubai' }).calls.replaced, '/ar/faq/');
-  assert.equal(run({ languages: ['de-DE'], tz: 'America/Sao_Paulo' }).calls.replaced, '/pt/faq/');
-  assert.equal(run({ languages: ['de-DE'], tz: 'Africa/Dakar' }).calls.replaced, null);
-  assert.equal(run({ languages: ['de-DE'], tz: 'Asia/Tokyo' }).calls.replaced, '/en/faq/');
+  assert.equal(run({ languages: ['sv-SE'], tz: 'Asia/Dubai' }).calls.replaced, '/ar/faq/');
+  assert.equal(run({ languages: ['sv-SE'], tz: 'America/Sao_Paulo' }).calls.replaced, '/pt/faq/');
+  assert.equal(run({ languages: ['sv-SE'], tz: 'Africa/Dakar' }).calls.replaced, null);
+  assert.equal(run({ languages: ['sv-SE'], tz: 'Asia/Tokyo' }).calls.replaced, '/ja/faq/');
+  assert.equal(run({ languages: ['sv-SE'], tz: 'Asia/Bangkok' }).calls.replaced, '/en/faq/');
+  assert.equal(run({ languages: ['zh-CN'] }).calls.replaced, '/zh/faq/');
 });
 test('langue : choix memorise prioritaire ; francais choisi -> pas de redirection', () => {
   assert.equal(run({ languages: ['en'], saved: 'fr' }).calls.replaced, null);

@@ -1,0 +1,223 @@
+{
+  "errors": {
+    "Claim not found": "クレームが見つかりません",
+    "Mission not found": "依頼が見つかりません",
+    "Mission introuvable": "依頼が見つかりません",
+    "Not your mission": "ご自身の依頼ではありません",
+    "Invalid token": "トークンが無効です",
+    "Trip not found": "旅程が見つかりません",
+    "Stockage de fichiers non configuré": "ファイルの保存先が設定されていません",
+    "Aucun fichier reçu": "ファイルが受信されませんでした",
+    "Type de fichier non autorisé": "許可されていないファイル形式です",
+    "No token provided": "トークンが指定されていません",
+    "Server configuration error": "サーバーの設定エラーです",
+    "Session expired or revoked": "セッションの有効期限が切れたか、無効になりました",
+    "Token expired": "トークンの有効期限が切れています",
+    "Authentication failed": "認証に失敗しました",
+    "Authentication required": "認証が必要です",
+    "Insufficient permissions": "権限が不足しています",
+    "Resource already exists": "このリソースはすでに存在します",
+    "Invalid reference": "参照が無効です",
+    "Required field missing": "必須項目が入力されていません",
+    "File size too large": "ファイルが大きすぎます",
+    "Validation failed": "入力内容の検証に失敗しました",
+    "Email already registered": "このメールアドレスはすでに登録されています",
+    "Phone number already registered": "この電話番号はすでに登録されています",
+    "Google auth is not configured": "Googleログインが設定されていません",
+    "Invalid Google token": "Googleトークンが無効です",
+    "Account is suspended": "このアカウントは停止されています",
+    "Account type mismatch": "アカウントの種類が一致しません",
+    "Invalid credentials": "認証情報が無効です",
+    "User not found": "ユーザーが見つかりません",
+    "Invalid current password": "現在のパスワードが正しくありません",
+    "You can only update your own claims": "ご自身のクレームのみ変更できます",
+    "No fields to update": "更新する項目がありません",
+    "Aucun champ à mettre à jour": "更新する項目がありません",
+    "Not found": "見つかりません",
+    "Mission not found or not yours": "依頼が見つからないか、ご自身の依頼ではありません",
+    "Mission cancelled": "依頼はキャンセルされました",
+    "Format QR code invalide": "QRコードの形式が無効です",
+    "Données QR code invalides": "QRコードのデータが無効です",
+    "Ce colis ne fait pas partie de vos missions": "この荷物はご自身の依頼に含まれていません",
+    "Ce colis a déjà été livré": "この荷物はすでに配達済みです",
+    "Cette mission a été annulée": "この依頼はキャンセルされました",
+    "En attente de la confirmation d'arrivée par l'administration.": "運営による到着の確認を待っています。",
+    "Profil GP introuvable": "GPプロフィールが見つかりません",
+    "Aucun colis livré : scannez au moins un colis avant de terminer.": "配達済みの荷物がありません。終了する前に、少なくとも1個の荷物をスキャンしてください。",
+    "Cette mission ne vous a pas été assignée": "この依頼はあなたに割り当てられていません",
+    "Mission not found or not awaiting your response": "依頼が見つからないか、あなたの回答を待っていません",
+    "Mission is not in transit": "この依頼は輸送中ではありません",
+    "La mission est déjà livrée": "この依頼はすでに配達済みです",
+    "La mission est déjà annulée": "この依頼はすでにキャンセルされています",
+    "Vous n'êtes pas autorisé à modifier cette mission": "この依頼を変更する権限がありません",
+    "Notification not found": "通知が見つかりません",
+    "You can only pay for your own missions": "ご自身の依頼のみお支払いできます",
+    "Invalid payment amount": "お支払い金額が無効です",
+    "This mission has already been paid": "この依頼はすでにお支払い済みです",
+    "Failed to initiate payment with provider": "決済事業者でお支払いを開始できませんでした",
+    "You can only update your own trips": "ご自身の旅程のみ変更できます",
+    "You can only cancel your own trips": "ご自身の旅程のみキャンセルできます",
+    "A completed trip cannot be cancelled": "完了した旅程はキャンセルできません",
+    "Withdrawal method is required": "引き出し方法は必須です",
+    "Account number is required": "口座番号は必須です",
+    "Insufficient available balance": "利用可能な残高が不足しています",
+    "Withdrawal not found or not pending": "引き出しが見つからないか、保留中ではありません",
+    "Withdrawal not found or not in approved state": "引き出しが見つからないか、承認済みではありません",
+    "Withdrawal not found or not cancellable": "引き出しが見つからないか、キャンセルできません",
+    "Failed to fetch profile": "プロフィールを読み込めませんでした",
+    "Ce numéro de téléphone est déjà utilisé": "この電話番号はすでに使用されています",
+    "Mise à jour échouée": "更新に失敗しました",
+    "This account belongs to a different profile type": "このアカウントは別の種類のプロフィールに属しています",
+    "Invalid email or password": "メールアドレスまたはパスワードが正しくありません",
+    "You cannot view this claim": "このクレームは閲覧できません",
+    "Only expediteurs can create missions": "送り主のみが依頼を作成できます",
+    "Invalid user type": "ユーザーの種類が無効です",
+    "Cette mission ne peut plus être modifiée": "この依頼はもう変更できません",
+    "Aucun champ modifiable fourni": "変更可能な項目が指定されていません",
+    "Only GPs can accept missions": "GPのみが依頼を承諾できます",
+    "Only GPs can decline missions": "GPのみが依頼を辞退できます",
+    "lat and lng are required": "緯度と経度は必須です",
+    "Les deux QR codes sont requis": "2つのQRコードが必要です",
+    "Only GPs can verify delivery": "GPのみが配達を確認できます",
+    "QR code data is required": "QRコードのデータは必須です",
+    "Tracking number not found": "追跡番号が見つかりません",
+    "Payment not found": "お支払いが見つかりません",
+    "You cannot view this payment": "このお支払いは閲覧できません",
+    "Envoi introuvable": "発送が見つかりません",
+    "Colis introuvable": "荷物が見つかりません",
+    "Erreur de suivi": "追跡エラー",
+    "Erreur": "エラー",
+    "Only GPs can create trips": "GPのみが旅程を作成できます",
+    "Arrival date must be after departure date": "到着日は出発日より後にしてください",
+    "mission_id or mission_code is required": "mission_idまたはmission_codeは必須です",
+    "Arrival city is required": "到着都市は必須です",
+    "Arrival country is required": "到着国は必須です",
+    "Available weight must be greater than 0": "空き重量は0より大きくしてください",
+    "Current password is required": "現在のパスワードは必須です",
+    "Delivery address is required": "配達先住所は必須です",
+    "Departure city is required": "出発都市は必須です",
+    "Departure country is required": "出発国は必須です",
+    "Description cannot be empty": "内容を空にすることはできません",
+    "Description is required": "内容は必須です",
+    "First name is required": "名は必須です",
+    "Google id_token is required": "Googleのid_tokenは必須です",
+    "Invalid arrival date": "到着日が無効です",
+    "Invalid departure date": "出発日が無効です",
+    "Invalid email format": "メールアドレスの形式が無効です",
+    "Invalid expected type": "想定される種類が無効です",
+    "Invalid notification_type": "通知の種類が無効です",
+    "Invalid priority": "優先度が無効です",
+    "Invalid resolution status": "解決ステータスが無効です",
+    "Invalid status": "ステータスが無効です",
+    "Invalid withdrawal method": "引き出し方法が無効です",
+    "Last name is required": "姓は必須です",
+    "Message is required": "メッセージは必須です",
+    "New password must be at least 8 characters long": "新しいパスワードは8文字以上にしてください",
+    "Offered price must be greater than 0": "提示価格は0より大きくしてください",
+    "Package weight must be greater than 0": "荷物の重量は0より大きくしてください",
+    "Password is required": "パスワードは必須です",
+    "Password must be at least 8 characters long": "パスワードは8文字以上にしてください",
+    "Pickup address is required": "集荷先住所は必須です",
+    "Resolution is required": "解決内容は必須です",
+    "Title is required": "タイトルは必須です",
+    "User type must be either expediteur or gp": "ユーザーの種類は送り主またはGPにしてください",
+    "amount must be a positive number": "金額は正の数にしてください",
+    "payment_method must be wave or orange_money": "お支払い方法はwaveまたはorange_moneyにしてください",
+    "user_id is required": "ユーザーIDは必須です",
+    "Invalid language": "言語が無効です"
+  },
+  "patterns": {
+    "0": "最低引き出し額は{1}です",
+    "1": "このステータス変更は許可されていません：{1}"
+  },
+  "templates": {
+    "claim_reply": {
+      "title": "クレーム{code}への返信",
+      "message": "{text}"
+    },
+    "claim_resolved_credited": {
+      "title": "クレーム{code}が解決しました",
+      "message": "補償金{amount}がウォレットに入金されました。"
+    },
+    "claim_resolved_granted": {
+      "title": "クレーム{code}が解決しました",
+      "message": "補償金{amount}が認められました。お支払いについて、当社チームからご連絡します。"
+    },
+    "mission_assigned": {
+      "title": "依頼が割り当てられました：{route}",
+      "message": "新しい依頼（{code}）が割り当てられました。通知から承諾または辞退してください。"
+    },
+    "mission_reassigned": {
+      "title": "依頼が再割り当てされました：{route}",
+      "message": "依頼{code}が（再）割り当てされました。通知から承諾または辞退してください。"
+    },
+    "arrival_confirmed": {
+      "title": "到着を確認しました",
+      "message": "{code}の到着を確認しました。受取人のQRを読み取って配達できます。"
+    },
+    "access_restored": {
+      "title": "アクセスが回復しました",
+      "message": "運営があなたの旅の終了を確認しました。アプリを再び利用できます。"
+    },
+    "payment_refunded": {
+      "title": "お支払いが返金されました",
+      "message": "お支払い{code}（{amount}）が返金されました。"
+    },
+    "payment_refunded_reason": {
+      "title": "お支払いが返金されました",
+      "message": "お支払い{code}（{amount}）が返金されました：{reason}。"
+    },
+    "identity_verified": {
+      "title": "本人確認が完了しました",
+      "message": "身分証明書が承認されました。アカウントの確認が完了しました。"
+    },
+    "identity_rejected": {
+      "title": "身分証明書が承認されませんでした",
+      "message": "身分証明書が承認されませんでした。もう一度提出してください。"
+    },
+    "identity_rejected_reason": {
+      "title": "身分証明書が承認されませんでした",
+      "message": "身分証明書が承認されませんでした：{reason}。もう一度提出してください。"
+    },
+    "parcel_delivered": {
+      "title": "荷物が配達されました",
+      "message": "荷物{code}が受取人に引き渡されました（QR確認済み）。"
+    },
+    "parcel_delivered_named": {
+      "title": "荷物が配達されました",
+      "message": "荷物{code}が{name}さんに引き渡されました（QR確認済み）。"
+    },
+    "earnings_credited": {
+      "title": "収入が入金されました",
+      "message": "依頼{code}の報酬として{amount}を獲得しました。"
+    },
+    "gp_arrived": {
+      "title": "GPが目的地に到着しました",
+      "message": "依頼{code}のGPが目的地に到着しました。まもなく荷物の受け渡しです。"
+    },
+    "payment_confirmed": {
+      "title": "お支払いを確認しました",
+      "message": "{amount}のお支払いを確認しました。"
+    },
+    "withdrawal_approved": {
+      "title": "引き出しが承認されました",
+      "message": "{amount}の引き出しが承認されました。お支払いの手続き中です。"
+    },
+    "withdrawal_paid": {
+      "title": "引き出し額が支払われました",
+      "message": "{amount}の引き出し額が支払われました。"
+    },
+    "withdrawal_paid_ref": {
+      "title": "引き出し額が支払われました",
+      "message": "{amount}の引き出し額が支払われました（参照番号：{ref}）。"
+    },
+    "withdrawal_rejected": {
+      "title": "引き出しが却下されました",
+      "message": "{amount}の引き出しが却下されました。資金は戻し入れられました。"
+    },
+    "withdrawal_rejected_reason": {
+      "title": "引き出しが却下されました",
+      "message": "{amount}の引き出しが却下されました：{reason}。資金は戻し入れられました。"
+    }
+  }
+}

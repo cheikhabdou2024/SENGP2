@@ -51,17 +51,20 @@ test('resolveLanguage : choix memorise > langue de l\'appareil > pays > anglais'
   assert.equal(r({ languages: ['fr-SN'] }), 'fr');
   assert.equal(r({ languages: ['ar-MA', 'fr'] }), 'ar');
   assert.equal(r({ languages: ['EN_us'] }), 'en');
-  assert.equal(r({ languages: ['de-DE', 'es-MX'] }), 'es', 'premiere langue prise en charge de la liste');
-  assert.equal(r({ languages: ['de-DE'], timeZone: 'Europe/Madrid' }), 'es', 'appareil non pris en charge : pays');
+  assert.equal(r({ languages: ['sv-SE', 'es-MX'] }), 'es', 'premiere langue prise en charge de la liste');
+  assert.equal(r({ languages: ['sv-SE'], timeZone: 'Europe/Madrid' }), 'es', 'appareil non pris en charge : pays');
   assert.equal(r({ languages: ['wo'], timeZone: 'Africa/Dakar' }), 'fr');
-  assert.equal(r({ languages: ['zh-CN'], timeZone: 'Asia/Shanghai' }), 'en');
+  assert.equal(r({ languages: ['zh-CN'] }), 'zh');
+  assert.equal(r({ languages: ['sv'], timeZone: 'Asia/Tokyo' }), 'ja', 'fuseau -> pays -> langue');
+  assert.equal(r({ languages: ['sv'], timeZone: 'Asia/Bangkok' }), 'en');
   assert.equal(r({}), 'en');
 });
 
 test('countryOfTimeZone : fuseaux connus et inconnus', () => {
   assert.equal(i18n.countryOfTimeZone('Africa/Dakar'), 'SN');
   assert.equal(i18n.countryOfTimeZone('America/Sao_Paulo'), 'BR');
-  assert.equal(i18n.countryOfTimeZone('Asia/Tokyo'), null);
+  assert.equal(i18n.countryOfTimeZone('Asia/Tokyo'), 'JP');
+  assert.equal(i18n.countryOfTimeZone('Asia/Bangkok'), null);
   assert.equal(i18n.countryOfTimeZone(undefined), null);
 });
 
@@ -75,7 +78,7 @@ test('chaque pays de la table pointe vers une langue prise en charge et un fusea
 
 test('direction : seul l\'arabe est de droite a gauche', () => {
   assert.equal(i18n.direction('ar'), 'rtl');
-  for (const l of ['fr', 'en', 'es', 'pt']) assert.equal(i18n.direction(l), 'ltr');
+  for (const l of i18n.SUPPORTED.filter(x => x !== 'ar')) assert.equal(i18n.direction(l), 'ltr');
 });
 
 // ---- traduction ----
@@ -124,7 +127,7 @@ test('setLanguage : memorise, change lang/dir, emet l\'evenement, refuse une lan
   assert.equal(html.attrs.lang, 'pt');
   assert.equal(inst.t('common.back'), 'Voltar');
   assert.ok(events.includes('sengp:languagechange'));
-  await assert.rejects(() => inst.setLanguage('de'));
+  await assert.rejects(() => inst.setLanguage('sv'));
   assert.equal(store.sengpLang, 'pt');
 });
 
@@ -163,7 +166,7 @@ test('formats : chiffres latins dans toutes les langues, FCFA conserve', async (
     await inst.init();
     const out = inst.fmt.currency(1234567);
     assert.match(out, /^[\d\s.,  ٬]+FCFA$/, `${lang} : ${out}`);
-    assert.ok(/1.?234.?567/.test(out), `${lang} : ${out}`);
+    assert.ok(/1.?234.?567/.test(out) || (lang === 'hi' && /12,34,567/.test(out)), `${lang} : ${out}`); // l'hindi groupe a l'indienne
     assert.ok(/[0-9]/.test(inst.fmt.date('2026-11-23T10:00:00Z')), `${lang} : date`);
   }
   const { inst } = make({ languages: ['fr'] });
@@ -186,7 +189,7 @@ test('locales : toutes les valeurs sont des textes non vides, sans balise HTML',
   }
 });
 
-test('locales : les cinq langues ont les memes cles, hors formes de pluriel propres a chaque langue', () => {
+test('locales : toutes les langues ont les memes cles, hors formes de pluriel propres a chaque langue', () => {
   const groups = d => new Set(Object.keys(d).map(baseKey));
   const ref = groups(dict.fr);
   for (const lang of i18n.SUPPORTED) {
@@ -285,13 +288,13 @@ test('selecteur de langue : monte une seule fois dans [data-i18n-switcher], chan
   await inst.setLanguage('es');
   assert.equal(host.children.length, 1, 'un seul selecteur malgre deux chargements');
   const select = host.children[0];
-  assert.deepEqual(select.children.map(o => o.value), ['fr', 'en', 'ar', 'es', 'pt']);
-  assert.deepEqual(select.children.map(o => o.textContent), ['Français', 'English', 'العربية', 'Español', 'Português']);
+  assert.deepEqual(select.children.map(o => o.value), ['fr', 'en', 'ar', 'es', 'pt', 'it', 'de', 'nl', 'ru', 'zh', 'hi', 'ja', 'ko', 'tr']);
+  assert.deepEqual(select.children.map(o => o.textContent), ['Français', 'English', 'العربية', 'Español', 'Português', 'Italiano', 'Deutsch', 'Nederlands', 'Русский', '简体中文', 'हिन्दी', '日本語', '한국어', 'Türkçe']);
 });
 
 test('l\'instance expose les langues et leurs noms (feuille « Langue » du profil)', () => {
   const { inst } = make({ languages: ['fr'] });
-  assert.deepEqual(inst.supported, ['fr', 'en', 'ar', 'es', 'pt']);
+  assert.deepEqual(inst.supported, ['fr', 'en', 'ar', 'es', 'pt', 'it', 'de', 'nl', 'ru', 'zh', 'hi', 'ja', 'ko', 'tr']);
   assert.equal(inst.nativeNames.ar, 'العربية');
   assert.equal(inst.fmt.localeTag(), 'fr-FR');
 });

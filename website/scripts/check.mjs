@@ -32,7 +32,9 @@ for (const f of htmls) {
   const title = (h.match(/<title>([^<]*)<\/title>/) || [])[1] || '';
   if (!title || title.length > 70) warn(f, `titre vide ou trop long (${title.length})`);
   const desc = (h.match(/<meta name="description" content="([^"]*)"/) || [])[1] || '';
-  if (desc.length < 50 || desc.length > 200) warn(f, `description hors 50–200 caractères (${desc.length})`);
+  const cjk = /[぀-ヿ一-鿿가-힯]/.test(desc); // une description CJK est ~3 fois plus courte
+  const [lo, hi] = cjk ? [20, 120] : [50, 200];
+  if (desc.length < lo || desc.length > hi) warn(f, `description hors ${lo}–${hi} caractères (${desc.length})`);
   for (const m of h.matchAll(/<img\b[^>]*>/g)) {
     if (!/\salt=/.test(m[0])) warn(f, 'image sans attribut alt : ' + m[0].slice(0, 80));
     if (!/\swidth=/.test(m[0]) || !/\sheight=/.test(m[0])) warn(f, 'image sans width/height : ' + m[0].slice(0, 80));

@@ -42,3 +42,25 @@ Priorité de relecture : écrans de paiement et de livraison (QR), messages d'er
 - Les messages de validation détaillés du serveur sont traduits, mais l'application n'affiche que le message général (« Échec de la validation ») : afficher le détail par champ est une évolution de l'interface.
 - Les textes juridiques (CGU, confidentialité, mentions légales) restent en français : ne pas les traduire sans validation d'un juriste.
 - La console d'administration reste en français.
+
+## 5. Langues ajoutées après la phase E (it, de, nl, ru, zh, hi, ja, ko, tr)
+
+Traduites automatiquement sur les trois surfaces, avec le même vocabulaire imposé (voir le tableau du brief : expéditeur, GP, colis, envoi, mission, trajet, suivi, livraison, paiement à la livraison, réclamation). Registres choisis, identiques sur l'application, le serveur et le site : italien « tu », allemand « Sie », néerlandais « je », russe « вы », turc « siz », chinois « 您 », hindi « आप », japonais です・ます, coréen 합니다체.
+
+À faire relire en priorité :
+- **Textes assemblés par morceaux** (l'ordre des mots dépend du code, fragile hors français) : `gp.gate_text`, `gp.my_missions`, `gp.create_trip`, `gp.j.greeting`, `tj.title`, `tj.add_1`/`tj.add_2`, `ms.info_rich`, `ms.published`, `onb.s1_*`, `onb.s2_*`, `login.title_a`/`login.title_b`, `envois.wa_msg`, `pwa.ios_*`. Les afficher dans l'application dans chaque langue.
+- **Italien** : « viaggiatore » est utilisé sur le site pour « voyageur » (la consigne disait « trasportatore (GP) »).
+- **Chinois, japonais** : glose ajoutée par le traducteur pour « GP (gros porteur) » dans la FAQ du site (`大件携带者`, `大型荷物の運び手`) : à valider ou retirer.
+- **Allemand** : « Abgang » pour « Départ » dans quelques libellés courts (préférer « Abreise »).
+- **Hindi** : « destinataire » rendu « पाने वाला » (terme non imposé) ; noms de villes transcrits à l'oreille.
+- **Coréen** : « 착불 » évité (ambigu) au profit de « 배송 시 결제 » ; particules 이/가, 을/를 sur les variables.
+- **Turc, néerlandais** : « Notifs » rendu par le même mot que « Notifications » (plus de gain de place).
+
+Défauts constatés dans les textes **source** (communs aux langues, non corrigés) :
+- `prof.copyright` : « © 2025 » dans l'application, « © 2026 » sur le site.
+- `ms.published` (« Publiée {ago} ») est suivi d'un `{ago}` qui contient déjà « Publié il y a… » : le français affiche « Publiée Publié il y a 3h ». Les traductions russe et turque évitent le doublon.
+- `prof.faq3_a` parle de « l'onglet Alertes » alors que l'onglet s'appelle Notifications.
+- `cr.terms_stub`, `cr.privacy_stub`, `pay.download_alert` : textes provisoires de maquette (« Dans la version complète… ») encore affichés.
+- `gn.ask_method` : identifiants d'API (`wave`, `orange_money`, `free_money`, `bank_transfer`) dans un texte affiché ; le serveur (E121/E123) n'accepte que `wave` et `orange_money`.
+- Message d'erreur serveur « Only expediteurs can create missions » : mot français dans l'anglais.
+- Textes à retours à la ligne (alertes, QR, paiement) : les traductions respectent désormais le même nombre de lignes que le français.

@@ -109,6 +109,16 @@ mark.todo { background: #FFE58A; color: #5B3B00; padding: 0 4px; border-radius: 
   .brand__txt small { display: none; }
 }
 
+/* Menu replie par le script (site.js) quand les libelles de la langue ne tiennent pas sur une ligne */
+html.is-compact .burger { display: flex; }
+html.is-compact .nav { position: absolute; left: 0; right: 0; top: var(--header-h); flex-direction: column; align-items: stretch; gap: 4px; padding: 14px 20px 22px; background: rgba(8, 20, 46, 0.97); border-bottom: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35); visibility: hidden; opacity: 0; transform: translateY(-10px); transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s; }
+html.is-compact .nav.is-open { visibility: visible; opacity: 1; transform: none; transition: opacity 0.25s ease, transform 0.25s ease; }
+html.is-compact .nav__link { padding: 14px 16px; font-size: 1.05rem; }
+html.is-compact .nav__link::after { display: none; }
+html.is-compact .nav__link[aria-current="page"] { background: rgba(255, 255, 255, 0.1); }
+html.is-compact .nav__cta { margin: 8px 0 0; min-height: 52px; }
+html.is-compact .brand__txt small { display: none; }
+
 /* --------------------------------------------------------------------- hero */
 .hero { position: relative; isolation: isolate; color: #fff; overflow: hidden; background: var(--navy); }
 .hero__bg { position: absolute; inset: 0; z-index: -2; }
@@ -308,3 +318,21 @@ mark.todo { background: #FFE58A; color: #5B3B00; padding: 0 4px; border-radius: 
 .lang__list a:hover, .lang__list a[aria-current] { background: rgba(255, 255, 255, 0.12); color: #fff; }
 .lang__list a[aria-current]::after { content: "✓"; margin-inline-start: 8px; color: var(--amber); }
 @media (max-width: 880px) { .lang { margin-inline-start: auto; } .site-header__in .nav { margin-inline-start: 0; } }
+
+/* ---------- langues : polices et coupures de ligne ---------- */
+:lang(zh) { font-family: Inter, system-ui, "Microsoft YaHei", "PingFang SC", "Noto Sans SC", "Hiragino Sans GB", sans-serif; }
+:lang(ja) { font-family: Inter, system-ui, "Yu Gothic UI", "Hiragino Sans", "Noto Sans JP", Meiryo, sans-serif; }
+:lang(ko) { font-family: Inter, system-ui, "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+:lang(hi) { font-family: Inter, system-ui, "Nirmala UI", "Noto Sans Devanagari", "Mangal", sans-serif; }
+:lang(ru), :lang(tr) { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+:lang(zh) *, :lang(ja) *, :lang(ko) *, :lang(hi) * { letter-spacing: 0 !important; }
+:lang(zh), :lang(ja) { line-break: strict; overflow-wrap: anywhere; }
+:lang(ko) { word-break: keep-all; }
+:lang(zh) h1, :lang(zh) h2, :lang(zh) h3, :lang(ja) h1, :lang(ja) h2, :lang(ja) h3 { font-weight: 800; }
+:lang(de) h1, :lang(de) h2, :lang(de) h3, :lang(nl) h1, :lang(nl) h2, :lang(nl) h3 { hyphens: auto; overflow-wrap: break-word; }
+.lang__list { max-height: min(70vh, 540px); overflow-y: auto; }
+
+html.no-tagline .brand__txt small { display: none; }
+html.is-compact .lang { margin-inline-start: auto; }
+html.is-compact .site-header__in .nav { margin-inline-start: 0; }
+.brand__txt b { white-space: nowrap; }

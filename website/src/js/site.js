@@ -16,6 +16,26 @@
     window.addEventListener('resize', function () { if (window.innerWidth > 880) close(); });
   }
 
+  // Menu replie automatiquement quand les libelles de la langue (russe, allemand...) ne tiennent pas sur une ligne
+  var barIn = document.querySelector('.site-header__in');
+  if (barIn) {
+    var tagline = document.querySelector('.brand__txt small');
+    var fit = function () {
+      var root = document.documentElement;
+      var over = function () { return barIn.scrollWidth > barIn.clientWidth + 1; };
+      // la devise sous le logo est coupee en plusieurs lignes quand la place manque (langues aux libelles longs)
+      var wrapped = function () { return tagline && tagline.getBoundingClientRect().height > 1.6 * (parseFloat(getComputedStyle(tagline).lineHeight) || 14); };
+      root.classList.remove('is-compact', 'no-tagline');
+      if (window.innerWidth <= 880) return;
+      if (over() || wrapped()) root.classList.add('no-tagline');   // 1) on retire d'abord la devise sous le logo
+      if (over()) root.classList.add('is-compact');                // 2) sinon le menu passe en burger
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    window.addEventListener('load', fit);
+  }
+
   // Menu de langue : se ferme au clic ailleurs et avec Echap
   var langBox = document.querySelector('.lang__d');
   if (langBox) {

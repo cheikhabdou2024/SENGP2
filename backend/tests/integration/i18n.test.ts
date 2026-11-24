@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import pool from '../../src/config/database';
 import { NotificationService } from '../../src/services/notification.service';
 import { NotificationType } from '../../src/types';
@@ -18,7 +20,7 @@ describe('messages d\'erreur traduits', () => {
       ['ar', 'البريد الإلكتروني أو كلمة المرور غير صحيحة'],
       ['es-ES,es;q=0.9', 'Correo o contraseña incorrectos'],
       ['pt-BR', 'Email ou palavra-passe incorretos'],
-      ['de-DE', 'Invalid email or password'],
+      ['sv-SE', 'Invalid email or password'],
     ];
     for (const [header, expected] of cases) {
       const req = api().post('/api/v1/auth/login');
@@ -122,5 +124,38 @@ describe('messages de validation traduits', () => {
     expect(es.errors.map((e: any) => e.message)).toContain('La contraseña debe tener al menos 8 caracteres');
     const none = await send();
     expect(none.errors.map((e: any) => e.message)).toContain('Password must be at least 8 characters long');
+  });
+});
+
+describe('langues supplementaires', () => {
+  const locale = (l: string) => JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'src', 'i18n', 'locales', `${l}.json`), 'utf8'));
+
+  it('les erreurs sont rendues dans la langue demandee (it, de, nl, ru, zh, hi, ja, ko, tr)', async () => {
+    for (const l of ['it', 'de', 'nl', 'ru', 'zh', 'hi', 'ja', 'ko', 'tr']) {
+      const res = await api().post('/api/v1/auth/login').set('Accept-Language', `${l}-XX,en;q=0.5`).send(LOGIN);
+      expect(res.status).toBe(401);
+      expect(res.body.error).toBe(locale(l).errors['Invalid email or password']);
+      expect(res.body.error).not.toBe('Invalid email or password');
+    }
+  });
+
+  it('la langue du compte accepte les nouvelles langues et refuse les autres', async () => {
+    const u = await registerUser('expediteur');
+    for (const l of ['ja', 'hi', 'tr']) {
+      const ok = await api().put('/api/v1/users/me').set(auth(u)).send({ language: l });
+      expect(ok.status).toBe(200);
+      expect(ok.body.data.language).toBe(l);
+    }
+    const bad = await api().put('/api/v1/users/me').set(auth(u)).send({ language: 'sv' });
+    expect(bad.status).toBe(400);
+  });
+
+  it('les notifications sont rendues dans la langue enregistree (ru)', async () => {
+    const u = await registerUser('expediteur');
+    await pool.query(`UPDATE users SET language = 'ru' WHERE id = $1`, [u.id]);
+    await NotificationService.create({ user_id: u.id, notification_type: NotificationType.PAYMENT_RECEIVED, template: 'payment_confirmed', params: { amount: 15000 } });
+    const n = (await pool.query('SELECT title, message FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1', [u.id])).rows[0];
+    expect(n.title).toBe(locale('ru').templates.payment_confirmed.title);
+    expect(n.message).toContain('FCFA');
   });
 });

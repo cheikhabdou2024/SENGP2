@@ -27,14 +27,20 @@
 })(typeof window !== 'undefined' ? window : globalThis, function () {
   'use strict';
 
-  var SUPPORTED = ['fr', 'en', 'ar', 'es', 'pt'];
+  var SUPPORTED = ['fr', 'en', 'ar', 'es', 'pt', 'it', 'de', 'nl', 'ru', 'zh', 'hi', 'ja', 'ko', 'tr'];
   var SOURCE = 'fr';
   var FALLBACK = 'en';
   var RTL = ['ar'];
   var STORAGE_KEY = 'sengpLang';
-  var NATIVE_NAMES = { fr: 'Français', en: 'English', ar: 'العربية', es: 'Español', pt: 'Português' };
+  var NATIVE_NAMES = {
+    fr: 'Français', en: 'English', ar: 'العربية', es: 'Español', pt: 'Português',
+    it: 'Italiano', de: 'Deutsch', nl: 'Nederlands', ru: 'Русский', zh: '简体中文', hi: 'हिन्दी', ja: '日本語', ko: '한국어', tr: 'Türkçe'
+  };
   // Chiffres latins partout (y compris en arabe) : les montants restent lisibles et identiques a l'ecran de paiement.
-  var LOCALE_TAGS = { fr: 'fr-FR', en: 'en-GB', ar: 'ar-u-nu-latn', es: 'es', pt: 'pt' };
+  var LOCALE_TAGS = {
+    fr: 'fr-FR', en: 'en-GB', ar: 'ar-u-nu-latn', es: 'es', pt: 'pt',
+    it: 'it', de: 'de', nl: 'nl', ru: 'ru', zh: 'zh-CN', hi: 'hi-u-nu-latn', ja: 'ja', ko: 'ko', tr: 'tr'
+  };
 
   // Pays dont la langue est prise en charge : { ISO: [langue, fuseaux horaires principaux] }.
   var COUNTRIES = {
@@ -56,7 +62,16 @@
     HN: ['es', ['America/Tegucigalpa']], PY: ['es', ['America/Asuncion']], SV: ['es', ['America/El_Salvador']], NI: ['es', ['America/Managua']],
     CR: ['es', ['America/Costa_Rica']], PA: ['es', ['America/Panama']], UY: ['es', ['America/Montevideo']], GQ: ['es', ['Africa/Malabo']],
     PT: ['pt', ['Europe/Lisbon']], BR: ['pt', ['America/Sao_Paulo']], AO: ['pt', ['Africa/Luanda']], MZ: ['pt', ['Africa/Maputo']],
-    CV: ['pt', ['Atlantic/Cape_Verde']], GW: ['pt', ['Africa/Bissau']], ST: ['pt', ['Africa/Sao_Tome']]
+    CV: ['pt', ['Atlantic/Cape_Verde']], GW: ['pt', ['Africa/Bissau']], ST: ['pt', ['Africa/Sao_Tome']],
+    IT: ['it', ['Europe/Rome']], SM: ['it', ['Europe/San_Marino']], VA: ['it', ['Europe/Vatican']],
+    DE: ['de', ['Europe/Berlin', 'Europe/Busingen']], AT: ['de', ['Europe/Vienna']], CH: ['de', ['Europe/Zurich']], LI: ['de', ['Europe/Vaduz']],
+    NL: ['nl', ['Europe/Amsterdam']], SR: ['nl', ['America/Paramaribo']],
+    RU: ['ru', ['Europe/Moscow', 'Europe/Kaliningrad', 'Europe/Samara', 'Europe/Volgograd', 'Europe/Kirov', 'Europe/Saratov', 'Europe/Ulyanovsk', 'Europe/Astrakhan', 'Asia/Yekaterinburg', 'Asia/Omsk', 'Asia/Novosibirsk', 'Asia/Barnaul', 'Asia/Tomsk', 'Asia/Krasnoyarsk', 'Asia/Irkutsk', 'Asia/Chita', 'Asia/Yakutsk', 'Asia/Vladivostok', 'Asia/Sakhalin', 'Asia/Magadan', 'Asia/Kamchatka']],
+    BY: ['ru', ['Europe/Minsk']],
+    CN: ['zh', ['Asia/Shanghai', 'Asia/Urumqi']],
+    IN: ['hi', ['Asia/Kolkata', 'Asia/Calcutta']],
+    JP: ['ja', ['Asia/Tokyo']], KR: ['ko', ['Asia/Seoul']],
+    TR: ['tr', ['Europe/Istanbul', 'Asia/Istanbul']]
   };
 
   var ZONE_COUNTRY = {};

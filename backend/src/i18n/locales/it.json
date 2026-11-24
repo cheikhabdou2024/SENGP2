@@ -1,0 +1,223 @@
+{
+  "errors": {
+    "Claim not found": "Reclamo non trovato",
+    "Mission not found": "Missione non trovata",
+    "Mission introuvable": "Missione non trovata",
+    "Not your mission": "Questa non è la tua missione",
+    "Invalid token": "Token non valido",
+    "Trip not found": "Viaggio non trovato",
+    "Stockage de fichiers non configuré": "Archiviazione dei file non configurata",
+    "Aucun fichier reçu": "Nessun file ricevuto",
+    "Type de fichier non autorisé": "Tipo di file non consentito",
+    "No token provided": "Nessun token fornito",
+    "Server configuration error": "Errore di configurazione del server",
+    "Session expired or revoked": "Sessione scaduta o revocata",
+    "Token expired": "Token scaduto",
+    "Authentication failed": "Autenticazione non riuscita",
+    "Authentication required": "Autenticazione richiesta",
+    "Insufficient permissions": "Autorizzazioni insufficienti",
+    "Resource already exists": "La risorsa esiste già",
+    "Invalid reference": "Riferimento non valido",
+    "Required field missing": "Campo obbligatorio mancante",
+    "File size too large": "File troppo grande",
+    "Validation failed": "Convalida non riuscita",
+    "Email already registered": "Questa e-mail è già registrata",
+    "Phone number already registered": "Questo numero di telefono è già registrato",
+    "Google auth is not configured": "L'accesso con Google non è configurato",
+    "Invalid Google token": "Token Google non valido",
+    "Account is suspended": "L'account è sospeso",
+    "Account type mismatch": "Tipo di account non corretto",
+    "Invalid credentials": "Credenziali non valide",
+    "User not found": "Utente non trovato",
+    "Invalid current password": "Password attuale non valida",
+    "You can only update your own claims": "Puoi modificare solo i tuoi reclami",
+    "No fields to update": "Nessun campo da aggiornare",
+    "Aucun champ à mettre à jour": "Nessun campo da aggiornare",
+    "Not found": "Non trovato",
+    "Mission not found or not yours": "Missione non trovata o non tua",
+    "Mission cancelled": "Missione annullata",
+    "Format QR code invalide": "Formato del QR code non valido",
+    "Données QR code invalides": "Dati del QR code non validi",
+    "Ce colis ne fait pas partie de vos missions": "Questo pacco non fa parte delle tue missioni",
+    "Ce colis a déjà été livré": "Questo pacco è già stato consegnato",
+    "Cette mission a été annulée": "Questa missione è stata annullata",
+    "En attente de la confirmation d'arrivée par l'administration.": "In attesa della conferma di arrivo da parte dell'amministrazione.",
+    "Profil GP introuvable": "Profilo GP non trovato",
+    "Aucun colis livré : scannez au moins un colis avant de terminer.": "Nessun pacco consegnato: scansiona almeno un pacco prima di terminare.",
+    "Cette mission ne vous a pas été assignée": "Questa missione non ti è stata assegnata",
+    "Mission not found or not awaiting your response": "Missione non trovata o non in attesa della tua risposta",
+    "Mission is not in transit": "La missione non è in transito",
+    "La mission est déjà livrée": "La missione è già stata consegnata",
+    "La mission est déjà annulée": "La missione è già stata annullata",
+    "Vous n'êtes pas autorisé à modifier cette mission": "Non sei autorizzato a modificare questa missione",
+    "Notification not found": "Notifica non trovata",
+    "You can only pay for your own missions": "Puoi pagare solo le tue missioni",
+    "Invalid payment amount": "Importo del pagamento non valido",
+    "This mission has already been paid": "Questa missione è già stata pagata",
+    "Failed to initiate payment with provider": "Impossibile avviare il pagamento presso il fornitore",
+    "You can only update your own trips": "Puoi modificare solo i tuoi viaggi",
+    "You can only cancel your own trips": "Puoi annullare solo i tuoi viaggi",
+    "A completed trip cannot be cancelled": "Un viaggio completato non può essere annullato",
+    "Withdrawal method is required": "Il metodo di prelievo è obbligatorio",
+    "Account number is required": "Il numero di conto è obbligatorio",
+    "Insufficient available balance": "Saldo disponibile insufficiente",
+    "Withdrawal not found or not pending": "Prelievo non trovato o non in attesa",
+    "Withdrawal not found or not in approved state": "Prelievo non trovato o non approvato",
+    "Withdrawal not found or not cancellable": "Prelievo non trovato o non annullabile",
+    "Failed to fetch profile": "Impossibile caricare il profilo",
+    "Ce numéro de téléphone est déjà utilisé": "Questo numero di telefono è già in uso",
+    "Mise à jour échouée": "Aggiornamento non riuscito",
+    "This account belongs to a different profile type": "Questo account appartiene a un altro tipo di profilo",
+    "Invalid email or password": "E-mail o password errata",
+    "You cannot view this claim": "Non puoi consultare questo reclamo",
+    "Only expediteurs can create missions": "Solo i mittenti possono creare missioni",
+    "Invalid user type": "Tipo di utente non valido",
+    "Cette mission ne peut plus être modifiée": "Questa missione non può più essere modificata",
+    "Aucun champ modifiable fourni": "Nessun campo modificabile fornito",
+    "Only GPs can accept missions": "Solo i GP possono accettare missioni",
+    "Only GPs can decline missions": "Solo i GP possono rifiutare missioni",
+    "lat and lng are required": "Latitudine e longitudine sono obbligatorie",
+    "Les deux QR codes sont requis": "Entrambi i QR code sono richiesti",
+    "Only GPs can verify delivery": "Solo i GP possono verificare una consegna",
+    "QR code data is required": "I dati del QR code sono obbligatori",
+    "Tracking number not found": "Numero di tracciamento non trovato",
+    "Payment not found": "Pagamento non trovato",
+    "You cannot view this payment": "Non puoi consultare questo pagamento",
+    "Envoi introuvable": "Spedizione non trovata",
+    "Colis introuvable": "Pacco non trovato",
+    "Erreur de suivi": "Errore di tracciamento",
+    "Erreur": "Errore",
+    "Only GPs can create trips": "Solo i GP possono creare viaggi",
+    "Arrival date must be after departure date": "La data di arrivo deve essere successiva alla data di partenza",
+    "mission_id or mission_code is required": "mission_id o mission_code è obbligatorio",
+    "Arrival city is required": "La città di arrivo è obbligatoria",
+    "Arrival country is required": "Il paese di arrivo è obbligatorio",
+    "Available weight must be greater than 0": "Il peso disponibile deve essere maggiore di 0",
+    "Current password is required": "La password attuale è obbligatoria",
+    "Delivery address is required": "L'indirizzo di consegna è obbligatorio",
+    "Departure city is required": "La città di partenza è obbligatoria",
+    "Departure country is required": "Il paese di partenza è obbligatorio",
+    "Description cannot be empty": "La descrizione non può essere vuota",
+    "Description is required": "La descrizione è obbligatoria",
+    "First name is required": "Il nome è obbligatorio",
+    "Google id_token is required": "Il token Google (id_token) è obbligatorio",
+    "Invalid arrival date": "Data di arrivo non valida",
+    "Invalid departure date": "Data di partenza non valida",
+    "Invalid email format": "Formato e-mail non valido",
+    "Invalid expected type": "Tipo atteso non valido",
+    "Invalid notification_type": "Tipo di notifica non valido",
+    "Invalid priority": "Priorità non valida",
+    "Invalid resolution status": "Stato di risoluzione non valido",
+    "Invalid status": "Stato non valido",
+    "Invalid withdrawal method": "Metodo di prelievo non valido",
+    "Last name is required": "Il cognome è obbligatorio",
+    "Message is required": "Il messaggio è obbligatorio",
+    "New password must be at least 8 characters long": "La nuova password deve contenere almeno 8 caratteri",
+    "Offered price must be greater than 0": "Il prezzo proposto deve essere maggiore di 0",
+    "Package weight must be greater than 0": "Il peso del pacco deve essere maggiore di 0",
+    "Password is required": "La password è obbligatoria",
+    "Password must be at least 8 characters long": "La password deve contenere almeno 8 caratteri",
+    "Pickup address is required": "L'indirizzo di ritiro è obbligatorio",
+    "Resolution is required": "La risoluzione è obbligatoria",
+    "Title is required": "Il titolo è obbligatorio",
+    "User type must be either expediteur or gp": "Il tipo di utente deve essere mittente o GP",
+    "amount must be a positive number": "L'importo deve essere un numero positivo",
+    "payment_method must be wave or orange_money": "Il metodo di pagamento deve essere wave o orange_money",
+    "user_id is required": "L'identificativo dell'utente è obbligatorio",
+    "Invalid language": "Lingua non valida"
+  },
+  "patterns": {
+    "0": "Il prelievo minimo è {1}",
+    "1": "Cambio di stato non consentito: {1}"
+  },
+  "templates": {
+    "claim_reply": {
+      "title": "Risposta al tuo reclamo {code}",
+      "message": "{text}"
+    },
+    "claim_resolved_credited": {
+      "title": "Reclamo {code} risolto",
+      "message": "Un risarcimento di {amount} è stato accreditato sul tuo portafoglio."
+    },
+    "claim_resolved_granted": {
+      "title": "Reclamo {code} risolto",
+      "message": "Ti è stato concesso un risarcimento di {amount}. Il nostro team ti contatterà per il versamento."
+    },
+    "mission_assigned": {
+      "title": "Missione assegnata: {route}",
+      "message": "Ti è stata assegnata una nuova missione ({code}). Accetta o rifiuta dalle tue notifiche."
+    },
+    "mission_reassigned": {
+      "title": "Missione riassegnata: {route}",
+      "message": "La missione {code} ti è stata (ri)assegnata. Accetta o rifiuta dalle tue notifiche."
+    },
+    "arrival_confirmed": {
+      "title": "Arrivo confermato",
+      "message": "Arrivo confermato per {code}. Ora puoi scansionare il QR del destinatario per consegnare."
+    },
+    "access_restored": {
+      "title": "Accesso ripristinato",
+      "message": "L'amministrazione ha convalidato la fine del tuo viaggio. Puoi usare di nuovo l'app."
+    },
+    "payment_refunded": {
+      "title": "Pagamento rimborsato",
+      "message": "Il tuo pagamento {code} di {amount} è stato rimborsato."
+    },
+    "payment_refunded_reason": {
+      "title": "Pagamento rimborsato",
+      "message": "Il tuo pagamento {code} di {amount} è stato rimborsato: {reason}."
+    },
+    "identity_verified": {
+      "title": "Identità verificata",
+      "message": "Il tuo documento d'identità è stato convalidato. Il tuo account è ora verificato."
+    },
+    "identity_rejected": {
+      "title": "Documento d'identità rifiutato",
+      "message": "Il tuo documento d'identità è stato rifiutato. Inviarlo di nuovo, grazie."
+    },
+    "identity_rejected_reason": {
+      "title": "Documento d'identità rifiutato",
+      "message": "Il tuo documento d'identità è stato rifiutato: {reason}. Inviarlo di nuovo, grazie."
+    },
+    "parcel_delivered": {
+      "title": "Pacco consegnato",
+      "message": "Il tuo pacco {code} è stato consegnato al destinatario (QR confermato)."
+    },
+    "parcel_delivered_named": {
+      "title": "Pacco consegnato",
+      "message": "Il tuo pacco {code} è stato consegnato a {name} (QR confermato)."
+    },
+    "earnings_credited": {
+      "title": "Guadagni accreditati",
+      "message": "Hai guadagnato {amount} per la missione {code}."
+    },
+    "gp_arrived": {
+      "title": "GP arrivato a destinazione",
+      "message": "Il GP è arrivato a destinazione per la missione {code}. La consegna del pacco è imminente."
+    },
+    "payment_confirmed": {
+      "title": "Pagamento confermato",
+      "message": "Il tuo pagamento di {amount} è stato confermato."
+    },
+    "withdrawal_approved": {
+      "title": "Prelievo approvato",
+      "message": "Il tuo prelievo di {amount} è stato approvato. Il pagamento è in corso."
+    },
+    "withdrawal_paid": {
+      "title": "Prelievo pagato",
+      "message": "Il tuo prelievo di {amount} è stato pagato."
+    },
+    "withdrawal_paid_ref": {
+      "title": "Prelievo pagato",
+      "message": "Il tuo prelievo di {amount} è stato pagato (rif. {ref})."
+    },
+    "withdrawal_rejected": {
+      "title": "Prelievo respinto",
+      "message": "Il tuo prelievo di {amount} è stato respinto. I fondi sono stati riaccreditati."
+    },
+    "withdrawal_rejected_reason": {
+      "title": "Prelievo respinto",
+      "message": "Il tuo prelievo di {amount} è stato respinto: {reason}. I fondi sono stati riaccreditati."
+    }
+  }
+}

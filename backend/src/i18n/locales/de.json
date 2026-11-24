@@ -1,0 +1,223 @@
+{
+  "errors": {
+    "Claim not found": "Reklamation nicht gefunden",
+    "Mission not found": "Auftrag nicht gefunden",
+    "Mission introuvable": "Auftrag nicht gefunden",
+    "Not your mission": "Dies ist nicht Ihr Auftrag",
+    "Invalid token": "Ungültiges Token",
+    "Trip not found": "Reise nicht gefunden",
+    "Stockage de fichiers non configuré": "Dateispeicher nicht konfiguriert",
+    "Aucun fichier reçu": "Keine Datei empfangen",
+    "Type de fichier non autorisé": "Dateityp nicht zulässig",
+    "No token provided": "Kein Token angegeben",
+    "Server configuration error": "Fehler in der Serverkonfiguration",
+    "Session expired or revoked": "Sitzung abgelaufen oder widerrufen",
+    "Token expired": "Token abgelaufen",
+    "Authentication failed": "Authentifizierung fehlgeschlagen",
+    "Authentication required": "Authentifizierung erforderlich",
+    "Insufficient permissions": "Unzureichende Berechtigungen",
+    "Resource already exists": "Die Ressource existiert bereits",
+    "Invalid reference": "Ungültige Referenz",
+    "Required field missing": "Pflichtfeld fehlt",
+    "File size too large": "Datei zu groß",
+    "Validation failed": "Validierung fehlgeschlagen",
+    "Email already registered": "Diese E-Mail-Adresse ist bereits registriert",
+    "Phone number already registered": "Diese Telefonnummer ist bereits registriert",
+    "Google auth is not configured": "Die Google-Anmeldung ist nicht konfiguriert",
+    "Invalid Google token": "Ungültiges Google-Token",
+    "Account is suspended": "Das Konto ist gesperrt",
+    "Account type mismatch": "Falscher Kontotyp",
+    "Invalid credentials": "Ungültige Zugangsdaten",
+    "User not found": "Nutzer nicht gefunden",
+    "Invalid current password": "Aktuelles Passwort ungültig",
+    "You can only update your own claims": "Sie können nur Ihre eigenen Reklamationen ändern",
+    "No fields to update": "Keine Felder zu aktualisieren",
+    "Aucun champ à mettre à jour": "Keine Felder zu aktualisieren",
+    "Not found": "Nicht gefunden",
+    "Mission not found or not yours": "Auftrag nicht gefunden oder gehört nicht Ihnen",
+    "Mission cancelled": "Auftrag storniert",
+    "Format QR code invalide": "Ungültiges QR-Code-Format",
+    "Données QR code invalides": "Ungültige QR-Code-Daten",
+    "Ce colis ne fait pas partie de vos missions": "Dieses Paket gehört nicht zu Ihren Aufträgen",
+    "Ce colis a déjà été livré": "Dieses Paket wurde bereits zugestellt",
+    "Cette mission a été annulée": "Dieser Auftrag wurde storniert",
+    "En attente de la confirmation d'arrivée par l'administration.": "Warten auf die Bestätigung der Ankunft durch die Verwaltung.",
+    "Profil GP introuvable": "GP-Profil nicht gefunden",
+    "Aucun colis livré : scannez au moins un colis avant de terminer.": "Kein Paket zugestellt: Scannen Sie mindestens ein Paket, bevor Sie abschließen.",
+    "Cette mission ne vous a pas été assignée": "Dieser Auftrag wurde Ihnen nicht zugewiesen",
+    "Mission not found or not awaiting your response": "Auftrag nicht gefunden oder wartet nicht auf Ihre Antwort",
+    "Mission is not in transit": "Der Auftrag ist nicht unterwegs",
+    "La mission est déjà livrée": "Der Auftrag wurde bereits zugestellt",
+    "La mission est déjà annulée": "Der Auftrag wurde bereits storniert",
+    "Vous n'êtes pas autorisé à modifier cette mission": "Sie sind nicht berechtigt, diesen Auftrag zu ändern",
+    "Notification not found": "Benachrichtigung nicht gefunden",
+    "You can only pay for your own missions": "Sie können nur Ihre eigenen Aufträge bezahlen",
+    "Invalid payment amount": "Ungültiger Zahlungsbetrag",
+    "This mission has already been paid": "Dieser Auftrag wurde bereits bezahlt",
+    "Failed to initiate payment with provider": "Die Zahlung konnte beim Anbieter nicht gestartet werden",
+    "You can only update your own trips": "Sie können nur Ihre eigenen Reisen ändern",
+    "You can only cancel your own trips": "Sie können nur Ihre eigenen Reisen stornieren",
+    "A completed trip cannot be cancelled": "Eine beendete Reise kann nicht storniert werden",
+    "Withdrawal method is required": "Die Auszahlungsart ist erforderlich",
+    "Account number is required": "Die Kontonummer ist erforderlich",
+    "Insufficient available balance": "Verfügbares Guthaben nicht ausreichend",
+    "Withdrawal not found or not pending": "Auszahlung nicht gefunden oder nicht ausstehend",
+    "Withdrawal not found or not in approved state": "Auszahlung nicht gefunden oder nicht genehmigt",
+    "Withdrawal not found or not cancellable": "Auszahlung nicht gefunden oder nicht stornierbar",
+    "Failed to fetch profile": "Das Profil konnte nicht geladen werden",
+    "Ce numéro de téléphone est déjà utilisé": "Diese Telefonnummer wird bereits verwendet",
+    "Mise à jour échouée": "Aktualisierung fehlgeschlagen",
+    "This account belongs to a different profile type": "Dieses Konto gehört zu einem anderen Profiltyp",
+    "Invalid email or password": "E-Mail oder Passwort falsch",
+    "You cannot view this claim": "Sie können diese Reklamation nicht einsehen",
+    "Only expediteurs can create missions": "Nur Absender können Aufträge erstellen",
+    "Invalid user type": "Ungültiger Nutzertyp",
+    "Cette mission ne peut plus être modifiée": "Dieser Auftrag kann nicht mehr geändert werden",
+    "Aucun champ modifiable fourni": "Kein änderbares Feld angegeben",
+    "Only GPs can accept missions": "Nur GP können Aufträge annehmen",
+    "Only GPs can decline missions": "Nur GP können Aufträge ablehnen",
+    "lat and lng are required": "Breitengrad und Längengrad sind erforderlich",
+    "Les deux QR codes sont requis": "Beide QR-Codes sind erforderlich",
+    "Only GPs can verify delivery": "Nur GP können eine Zustellung überprüfen",
+    "QR code data is required": "Die QR-Code-Daten sind erforderlich",
+    "Tracking number not found": "Sendungsnummer nicht gefunden",
+    "Payment not found": "Zahlung nicht gefunden",
+    "You cannot view this payment": "Sie können diese Zahlung nicht einsehen",
+    "Envoi introuvable": "Sendung nicht gefunden",
+    "Colis introuvable": "Paket nicht gefunden",
+    "Erreur de suivi": "Fehler bei der Sendungsverfolgung",
+    "Erreur": "Fehler",
+    "Only GPs can create trips": "Nur GP können Reisen erstellen",
+    "Arrival date must be after departure date": "Das Ankunftsdatum muss nach dem Abreisedatum liegen",
+    "mission_id or mission_code is required": "mission_id oder mission_code ist erforderlich",
+    "Arrival city is required": "Die Ankunftsstadt ist erforderlich",
+    "Arrival country is required": "Das Ankunftsland ist erforderlich",
+    "Available weight must be greater than 0": "Das verfügbare Gewicht muss größer als 0 sein",
+    "Current password is required": "Das aktuelle Passwort ist erforderlich",
+    "Delivery address is required": "Die Zustelladresse ist erforderlich",
+    "Departure city is required": "Die Abreisestadt ist erforderlich",
+    "Departure country is required": "Das Abreiseland ist erforderlich",
+    "Description cannot be empty": "Die Beschreibung darf nicht leer sein",
+    "Description is required": "Die Beschreibung ist erforderlich",
+    "First name is required": "Der Vorname ist erforderlich",
+    "Google id_token is required": "Das Google-Token (id_token) ist erforderlich",
+    "Invalid arrival date": "Ungültiges Ankunftsdatum",
+    "Invalid departure date": "Ungültiges Abreisedatum",
+    "Invalid email format": "Ungültiges E-Mail-Format",
+    "Invalid expected type": "Ungültiger erwarteter Typ",
+    "Invalid notification_type": "Ungültiger Benachrichtigungstyp",
+    "Invalid priority": "Ungültige Priorität",
+    "Invalid resolution status": "Ungültiger Lösungsstatus",
+    "Invalid status": "Ungültiger Status",
+    "Invalid withdrawal method": "Ungültige Auszahlungsart",
+    "Last name is required": "Der Nachname ist erforderlich",
+    "Message is required": "Die Nachricht ist erforderlich",
+    "New password must be at least 8 characters long": "Das neue Passwort muss mindestens 8 Zeichen lang sein",
+    "Offered price must be greater than 0": "Der angebotene Preis muss größer als 0 sein",
+    "Package weight must be greater than 0": "Das Gewicht des Pakets muss größer als 0 sein",
+    "Password is required": "Das Passwort ist erforderlich",
+    "Password must be at least 8 characters long": "Das Passwort muss mindestens 8 Zeichen lang sein",
+    "Pickup address is required": "Die Abholadresse ist erforderlich",
+    "Resolution is required": "Die Lösung ist erforderlich",
+    "Title is required": "Der Titel ist erforderlich",
+    "User type must be either expediteur or gp": "Der Nutzertyp muss Absender oder GP sein",
+    "amount must be a positive number": "Der Betrag muss eine positive Zahl sein",
+    "payment_method must be wave or orange_money": "Die Zahlungsart muss wave oder orange_money sein",
+    "user_id is required": "Die Nutzerkennung ist erforderlich",
+    "Invalid language": "Ungültige Sprache"
+  },
+  "patterns": {
+    "0": "Die Mindestauszahlung beträgt {1}",
+    "1": "Statusänderung nicht zulässig: {1}"
+  },
+  "templates": {
+    "claim_reply": {
+      "title": "Antwort auf Ihre Reklamation {code}",
+      "message": "{text}"
+    },
+    "claim_resolved_credited": {
+      "title": "Reklamation {code} gelöst",
+      "message": "Eine Entschädigung von {amount} wurde Ihrem Guthaben gutgeschrieben."
+    },
+    "claim_resolved_granted": {
+      "title": "Reklamation {code} gelöst",
+      "message": "Ihnen wurde eine Entschädigung von {amount} zugesprochen. Unser Team wird Sie bezüglich der Auszahlung kontaktieren."
+    },
+    "mission_assigned": {
+      "title": "Auftrag zugewiesen: {route}",
+      "message": "Ihnen wurde ein neuer Auftrag ({code}) zugewiesen. Nehmen Sie ihn in Ihren Benachrichtigungen an oder lehnen Sie ihn ab."
+    },
+    "mission_reassigned": {
+      "title": "Auftrag neu zugewiesen: {route}",
+      "message": "Der Auftrag {code} wurde Ihnen (neu) zugewiesen. Nehmen Sie ihn in Ihren Benachrichtigungen an oder lehnen Sie ihn ab."
+    },
+    "arrival_confirmed": {
+      "title": "Ankunft bestätigt",
+      "message": "Ankunft für {code} bestätigt. Sie können jetzt den QR-Code des Empfängers scannen, um zuzustellen."
+    },
+    "access_restored": {
+      "title": "Zugriff wiederhergestellt",
+      "message": "Die Verwaltung hat das Ende Ihrer Reise bestätigt. Sie können die App wieder nutzen."
+    },
+    "payment_refunded": {
+      "title": "Zahlung erstattet",
+      "message": "Ihre Zahlung {code} über {amount} wurde erstattet."
+    },
+    "payment_refunded_reason": {
+      "title": "Zahlung erstattet",
+      "message": "Ihre Zahlung {code} über {amount} wurde erstattet: {reason}."
+    },
+    "identity_verified": {
+      "title": "Identität verifiziert",
+      "message": "Ihr Ausweisdokument wurde bestätigt. Ihr Konto ist jetzt verifiziert."
+    },
+    "identity_rejected": {
+      "title": "Ausweisdokument abgelehnt",
+      "message": "Ihr Ausweisdokument wurde abgelehnt. Bitte reichen Sie es erneut ein."
+    },
+    "identity_rejected_reason": {
+      "title": "Ausweisdokument abgelehnt",
+      "message": "Ihr Ausweisdokument wurde abgelehnt: {reason}. Bitte reichen Sie es erneut ein."
+    },
+    "parcel_delivered": {
+      "title": "Paket zugestellt",
+      "message": "Ihr Paket {code} wurde dem Empfänger übergeben (QR-Code bestätigt)."
+    },
+    "parcel_delivered_named": {
+      "title": "Paket zugestellt",
+      "message": "Ihr Paket {code} wurde an {name} übergeben (QR-Code bestätigt)."
+    },
+    "earnings_credited": {
+      "title": "Einnahmen gutgeschrieben",
+      "message": "Sie haben {amount} für den Auftrag {code} verdient."
+    },
+    "gp_arrived": {
+      "title": "GP am Ziel angekommen",
+      "message": "Der GP ist am Ziel des Auftrags {code} angekommen. Die Übergabe des Pakets steht unmittelbar bevor."
+    },
+    "payment_confirmed": {
+      "title": "Zahlung bestätigt",
+      "message": "Ihre Zahlung über {amount} wurde bestätigt."
+    },
+    "withdrawal_approved": {
+      "title": "Auszahlung genehmigt",
+      "message": "Ihre Auszahlung über {amount} wurde genehmigt. Die Zahlung läuft."
+    },
+    "withdrawal_paid": {
+      "title": "Auszahlung bezahlt",
+      "message": "Ihre Auszahlung über {amount} wurde bezahlt."
+    },
+    "withdrawal_paid_ref": {
+      "title": "Auszahlung bezahlt",
+      "message": "Ihre Auszahlung über {amount} wurde bezahlt (Ref. {ref})."
+    },
+    "withdrawal_rejected": {
+      "title": "Auszahlung abgelehnt",
+      "message": "Ihre Auszahlung über {amount} wurde abgelehnt. Das Geld wurde wieder gutgeschrieben."
+    },
+    "withdrawal_rejected_reason": {
+      "title": "Auszahlung abgelehnt",
+      "message": "Ihre Auszahlung über {amount} wurde abgelehnt: {reason}. Das Geld wurde wieder gutgeschrieben."
+    }
+  }
+}

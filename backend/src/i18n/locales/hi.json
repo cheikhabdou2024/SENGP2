@@ -1,0 +1,223 @@
+{
+  "errors": {
+    "Claim not found": "शिकायत नहीं मिली",
+    "Mission not found": "मिशन नहीं मिला",
+    "Mission introuvable": "मिशन नहीं मिला",
+    "Not your mission": "यह आपका मिशन नहीं है",
+    "Invalid token": "अमान्य टोकन",
+    "Trip not found": "यात्रा नहीं मिली",
+    "Stockage de fichiers non configuré": "फ़ाइल स्टोरेज कॉन्फ़िगर नहीं है",
+    "Aucun fichier reçu": "कोई फ़ाइल नहीं मिली",
+    "Type de fichier non autorisé": "फ़ाइल का प्रकार अनुमत नहीं है",
+    "No token provided": "कोई टोकन नहीं दिया गया",
+    "Server configuration error": "सर्वर कॉन्फ़िगरेशन में त्रुटि",
+    "Session expired or revoked": "सेशन समाप्त हो गया है या रद्द कर दिया गया है",
+    "Token expired": "टोकन की अवधि समाप्त हो गई है",
+    "Authentication failed": "प्रमाणीकरण विफल रहा",
+    "Authentication required": "प्रमाणीकरण आवश्यक है",
+    "Insufficient permissions": "अपर्याप्त अधिकार",
+    "Resource already exists": "यह संसाधन पहले से मौजूद है",
+    "Invalid reference": "अमान्य संदर्भ",
+    "Required field missing": "आवश्यक फ़ील्ड नहीं भरा गया",
+    "File size too large": "फ़ाइल बहुत बड़ी है",
+    "Validation failed": "सत्यापन विफल रहा",
+    "Email already registered": "यह ईमेल पहले से पंजीकृत है",
+    "Phone number already registered": "यह फ़ोन नंबर पहले से पंजीकृत है",
+    "Google auth is not configured": "Google से लॉग इन कॉन्फ़िगर नहीं है",
+    "Invalid Google token": "अमान्य Google टोकन",
+    "Account is suspended": "खाता निलंबित है",
+    "Account type mismatch": "खाते का प्रकार गलत है",
+    "Invalid credentials": "अमान्य लॉग इन जानकारी",
+    "User not found": "उपयोगकर्ता नहीं मिला",
+    "Invalid current password": "मौजूदा पासवर्ड गलत है",
+    "You can only update your own claims": "आप केवल अपनी ही शिकायतें बदल सकते हैं",
+    "No fields to update": "अपडेट करने के लिए कोई फ़ील्ड नहीं है",
+    "Aucun champ à mettre à jour": "अपडेट करने के लिए कोई फ़ील्ड नहीं है",
+    "Not found": "नहीं मिला",
+    "Mission not found or not yours": "मिशन नहीं मिला या आपका नहीं है",
+    "Mission cancelled": "मिशन रद्द हो गया है",
+    "Format QR code invalide": "QR कोड का फ़ॉर्मैट अमान्य है",
+    "Données QR code invalides": "QR कोड का डेटा अमान्य है",
+    "Ce colis ne fait pas partie de vos missions": "यह पार्सल आपके मिशनों में शामिल नहीं है",
+    "Ce colis a déjà été livré": "यह पार्सल पहले ही डिलीवर हो चुका है",
+    "Cette mission a été annulée": "यह मिशन रद्द कर दिया गया है",
+    "En attente de la confirmation d'arrivée par l'administration.": "एडमिनिस्ट्रेशन द्वारा आगमन की पुष्टि की प्रतीक्षा है।",
+    "Profil GP introuvable": "GP प्रोफ़ाइल नहीं मिली",
+    "Aucun colis livré : scannez au moins un colis avant de terminer.": "कोई पार्सल डिलीवर नहीं हुआ: समाप्त करने से पहले कम से कम एक पार्सल स्कैन करें।",
+    "Cette mission ne vous a pas été assignée": "यह मिशन आपको नहीं सौंपा गया है",
+    "Mission not found or not awaiting your response": "मिशन नहीं मिला या आपके उत्तर की प्रतीक्षा में नहीं है",
+    "Mission is not in transit": "मिशन रास्ते में नहीं है",
+    "La mission est déjà livrée": "मिशन पहले ही डिलीवर हो चुका है",
+    "La mission est déjà annulée": "मिशन पहले ही रद्द हो चुका है",
+    "Vous n'êtes pas autorisé à modifier cette mission": "आपको इस मिशन को बदलने की अनुमति नहीं है",
+    "Notification not found": "नोटिफ़िकेशन नहीं मिला",
+    "You can only pay for your own missions": "आप केवल अपने ही मिशनों का भुगतान कर सकते हैं",
+    "Invalid payment amount": "भुगतान की राशि अमान्य है",
+    "This mission has already been paid": "इस मिशन का भुगतान पहले ही हो चुका है",
+    "Failed to initiate payment with provider": "भुगतान प्रदाता के साथ भुगतान शुरू नहीं किया जा सका",
+    "You can only update your own trips": "आप केवल अपनी ही यात्राएँ बदल सकते हैं",
+    "You can only cancel your own trips": "आप केवल अपनी ही यात्राएँ रद्द कर सकते हैं",
+    "A completed trip cannot be cancelled": "पूरी हो चुकी यात्रा रद्द नहीं की जा सकती",
+    "Withdrawal method is required": "निकासी का तरीका आवश्यक है",
+    "Account number is required": "खाता नंबर आवश्यक है",
+    "Insufficient available balance": "उपलब्ध बैलेंस पर्याप्त नहीं है",
+    "Withdrawal not found or not pending": "निकासी नहीं मिली या प्रतीक्षा में नहीं है",
+    "Withdrawal not found or not in approved state": "निकासी नहीं मिली या स्वीकृत नहीं है",
+    "Withdrawal not found or not cancellable": "निकासी नहीं मिली या रद्द नहीं की जा सकती",
+    "Failed to fetch profile": "प्रोफ़ाइल लोड नहीं हो सकी",
+    "Ce numéro de téléphone est déjà utilisé": "यह फ़ोन नंबर पहले से उपयोग में है",
+    "Mise à jour échouée": "अपडेट विफल रहा",
+    "This account belongs to a different profile type": "यह खाता किसी दूसरे प्रकार की प्रोफ़ाइल का है",
+    "Invalid email or password": "ईमेल या पासवर्ड गलत है",
+    "You cannot view this claim": "आप यह शिकायत नहीं देख सकते",
+    "Only expediteurs can create missions": "केवल भेजने वाले ही मिशन बना सकते हैं",
+    "Invalid user type": "उपयोगकर्ता का प्रकार अमान्य है",
+    "Cette mission ne peut plus être modifiée": "यह मिशन अब बदला नहीं जा सकता",
+    "Aucun champ modifiable fourni": "बदलने योग्य कोई फ़ील्ड नहीं दिया गया",
+    "Only GPs can accept missions": "केवल GP ही मिशन स्वीकार कर सकते हैं",
+    "Only GPs can decline missions": "केवल GP ही मिशन अस्वीकार कर सकते हैं",
+    "lat and lng are required": "अक्षांश और देशांतर आवश्यक हैं",
+    "Les deux QR codes sont requis": "दोनों QR कोड आवश्यक हैं",
+    "Only GPs can verify delivery": "केवल GP ही डिलीवरी की जाँच कर सकते हैं",
+    "QR code data is required": "QR कोड का डेटा आवश्यक है",
+    "Tracking number not found": "ट्रैकिंग नंबर नहीं मिला",
+    "Payment not found": "भुगतान नहीं मिला",
+    "You cannot view this payment": "आप यह भुगतान नहीं देख सकते",
+    "Envoi introuvable": "शिपमेंट नहीं मिला",
+    "Colis introuvable": "पार्सल नहीं मिला",
+    "Erreur de suivi": "ट्रैकिंग में त्रुटि",
+    "Erreur": "त्रुटि",
+    "Only GPs can create trips": "केवल GP ही यात्राएँ बना सकते हैं",
+    "Arrival date must be after departure date": "आगमन की तारीख प्रस्थान की तारीख के बाद की होनी चाहिए",
+    "mission_id or mission_code is required": "mission_id या mission_code आवश्यक है",
+    "Arrival city is required": "आगमन का शहर आवश्यक है",
+    "Arrival country is required": "आगमन का देश आवश्यक है",
+    "Available weight must be greater than 0": "उपलब्ध वज़न 0 से अधिक होना चाहिए",
+    "Current password is required": "मौजूदा पासवर्ड आवश्यक है",
+    "Delivery address is required": "डिलीवरी का पता आवश्यक है",
+    "Departure city is required": "प्रस्थान का शहर आवश्यक है",
+    "Departure country is required": "प्रस्थान का देश आवश्यक है",
+    "Description cannot be empty": "विवरण खाली नहीं हो सकता",
+    "Description is required": "विवरण आवश्यक है",
+    "First name is required": "पहला नाम आवश्यक है",
+    "Google id_token is required": "Google टोकन (id_token) आवश्यक है",
+    "Invalid arrival date": "आगमन की तारीख अमान्य है",
+    "Invalid departure date": "प्रस्थान की तारीख अमान्य है",
+    "Invalid email format": "ईमेल का फ़ॉर्मैट अमान्य है",
+    "Invalid expected type": "अपेक्षित प्रकार अमान्य है",
+    "Invalid notification_type": "नोटिफ़िकेशन का प्रकार अमान्य है",
+    "Invalid priority": "प्राथमिकता अमान्य है",
+    "Invalid resolution status": "समाधान की स्थिति अमान्य है",
+    "Invalid status": "स्थिति अमान्य है",
+    "Invalid withdrawal method": "निकासी का तरीका अमान्य है",
+    "Last name is required": "उपनाम आवश्यक है",
+    "Message is required": "संदेश आवश्यक है",
+    "New password must be at least 8 characters long": "नया पासवर्ड कम से कम 8 अक्षरों का होना चाहिए",
+    "Offered price must be greater than 0": "प्रस्तावित कीमत 0 से अधिक होनी चाहिए",
+    "Package weight must be greater than 0": "पार्सल का वज़न 0 से अधिक होना चाहिए",
+    "Password is required": "पासवर्ड आवश्यक है",
+    "Password must be at least 8 characters long": "पासवर्ड कम से कम 8 अक्षरों का होना चाहिए",
+    "Pickup address is required": "पिकअप का पता आवश्यक है",
+    "Resolution is required": "समाधान आवश्यक है",
+    "Title is required": "शीर्षक आवश्यक है",
+    "User type must be either expediteur or gp": "उपयोगकर्ता का प्रकार भेजने वाला या GP होना चाहिए",
+    "amount must be a positive number": "राशि एक धनात्मक संख्या होनी चाहिए",
+    "payment_method must be wave or orange_money": "भुगतान का तरीका wave या orange_money होना चाहिए",
+    "user_id is required": "उपयोगकर्ता की पहचान (user_id) आवश्यक है",
+    "Invalid language": "भाषा अमान्य है"
+  },
+  "patterns": {
+    "0": "न्यूनतम निकासी {1} है",
+    "1": "स्थिति में यह बदलाव अनुमत नहीं है: {1}"
+  },
+  "templates": {
+    "claim_reply": {
+      "title": "आपकी शिकायत {code} का उत्तर",
+      "message": "{text}"
+    },
+    "claim_resolved_credited": {
+      "title": "शिकायत {code} सुलझ गई",
+      "message": "आपके वॉलेट में {amount} का मुआवज़ा जमा कर दिया गया है।"
+    },
+    "claim_resolved_granted": {
+      "title": "शिकायत {code} सुलझ गई",
+      "message": "आपको {amount} का मुआवज़ा दिया गया है। भुगतान के लिए हमारी टीम आपसे संपर्क करेगी।"
+    },
+    "mission_assigned": {
+      "title": "मिशन सौंपा गया: {route}",
+      "message": "आपको एक नया मिशन ({code}) सौंपा गया है। अपने नोटिफ़िकेशन से स्वीकार या अस्वीकार करें।"
+    },
+    "mission_reassigned": {
+      "title": "मिशन फिर से सौंपा गया: {route}",
+      "message": "मिशन {code} आपको (फिर से) सौंपा गया है। अपने नोटिफ़िकेशन से स्वीकार या अस्वीकार करें।"
+    },
+    "arrival_confirmed": {
+      "title": "आगमन की पुष्टि हो गई",
+      "message": "{code} के लिए आगमन की पुष्टि हो गई है। अब आप डिलीवरी के लिए पाने वाले का QR स्कैन कर सकते हैं।"
+    },
+    "access_restored": {
+      "title": "पहुँच बहाल हो गई",
+      "message": "एडमिनिस्ट्रेशन ने आपकी यात्रा के समापन की पुष्टि कर दी है। आप ऐप फिर से इस्तेमाल कर सकते हैं।"
+    },
+    "payment_refunded": {
+      "title": "भुगतान वापस किया गया",
+      "message": "आपका {amount} का भुगतान {code} वापस कर दिया गया है।"
+    },
+    "payment_refunded_reason": {
+      "title": "भुगतान वापस किया गया",
+      "message": "आपका {amount} का भुगतान {code} वापस कर दिया गया है: {reason}।"
+    },
+    "identity_verified": {
+      "title": "पहचान सत्यापित हो गई",
+      "message": "आपका पहचान पत्र मान्य कर दिया गया है। आपका खाता अब सत्यापित है।"
+    },
+    "identity_rejected": {
+      "title": "पहचान पत्र अस्वीकृत",
+      "message": "आपका पहचान पत्र अस्वीकार कर दिया गया है। कृपया उसे फिर से जमा करें।"
+    },
+    "identity_rejected_reason": {
+      "title": "पहचान पत्र अस्वीकृत",
+      "message": "आपका पहचान पत्र अस्वीकार कर दिया गया है: {reason}। कृपया उसे फिर से जमा करें।"
+    },
+    "parcel_delivered": {
+      "title": "पार्सल डिलीवर हो गया",
+      "message": "आपका पार्सल {code} पाने वाले को सौंप दिया गया है (QR की पुष्टि हुई)।"
+    },
+    "parcel_delivered_named": {
+      "title": "पार्सल डिलीवर हो गया",
+      "message": "आपका पार्सल {code} {name} को सौंप दिया गया है (QR की पुष्टि हुई)।"
+    },
+    "earnings_credited": {
+      "title": "कमाई जमा हुई",
+      "message": "आपने मिशन {code} के लिए {amount} कमाए हैं।"
+    },
+    "gp_arrived": {
+      "title": "GP गंतव्य पर पहुँच गया",
+      "message": "मिशन {code} के लिए GP गंतव्य पर पहुँच गया है। पार्सल सौंपा जाना बस होने वाला है।"
+    },
+    "payment_confirmed": {
+      "title": "भुगतान की पुष्टि हो गई",
+      "message": "आपके {amount} के भुगतान की पुष्टि हो गई है।"
+    },
+    "withdrawal_approved": {
+      "title": "निकासी स्वीकृत",
+      "message": "आपकी {amount} की निकासी स्वीकृत हो गई है। भुगतान जारी है।"
+    },
+    "withdrawal_paid": {
+      "title": "निकासी का भुगतान हो गया",
+      "message": "आपकी {amount} की निकासी का भुगतान हो गया है।"
+    },
+    "withdrawal_paid_ref": {
+      "title": "निकासी का भुगतान हो गया",
+      "message": "आपकी {amount} की निकासी का भुगतान हो गया है (संदर्भ {ref})।"
+    },
+    "withdrawal_rejected": {
+      "title": "निकासी अस्वीकृत",
+      "message": "आपकी {amount} की निकासी अस्वीकार कर दी गई है। राशि आपके खाते में वापस जमा कर दी गई है।"
+    },
+    "withdrawal_rejected_reason": {
+      "title": "निकासी अस्वीकृत",
+      "message": "आपकी {amount} की निकासी अस्वीकार कर दी गई है: {reason}। राशि आपके खाते में वापस जमा कर दी गई है।"
+    }
+  }
+}

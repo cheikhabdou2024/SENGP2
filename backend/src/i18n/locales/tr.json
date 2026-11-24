@@ -1,0 +1,223 @@
+{
+  "errors": {
+    "Claim not found": "Şikâyet bulunamadı",
+    "Mission not found": "Görev bulunamadı",
+    "Mission introuvable": "Görev bulunamadı",
+    "Not your mission": "Bu sizin göreviniz değil",
+    "Invalid token": "Geçersiz jeton",
+    "Trip not found": "Yolculuk bulunamadı",
+    "Stockage de fichiers non configuré": "Dosya depolama yapılandırılmamış",
+    "Aucun fichier reçu": "Dosya alınmadı",
+    "Type de fichier non autorisé": "Dosya türüne izin verilmiyor",
+    "No token provided": "Jeton sağlanmadı",
+    "Server configuration error": "Sunucu yapılandırma hatası",
+    "Session expired or revoked": "Oturumun süresi doldu veya iptal edildi",
+    "Token expired": "Jetonun süresi doldu",
+    "Authentication failed": "Kimlik doğrulama başarısız oldu",
+    "Authentication required": "Kimlik doğrulama gerekli",
+    "Insufficient permissions": "Yetersiz yetki",
+    "Resource already exists": "Kaynak zaten var",
+    "Invalid reference": "Geçersiz referans",
+    "Required field missing": "Zorunlu alan eksik",
+    "File size too large": "Dosya boyutu çok büyük",
+    "Validation failed": "Doğrulama başarısız oldu",
+    "Email already registered": "Bu e-posta adresi zaten kayıtlı",
+    "Phone number already registered": "Bu telefon numarası zaten kayıtlı",
+    "Google auth is not configured": "Google ile giriş yapılandırılmamış",
+    "Invalid Google token": "Geçersiz Google jetonu",
+    "Account is suspended": "Hesap askıya alındı",
+    "Account type mismatch": "Hesap türü uyuşmuyor",
+    "Invalid credentials": "Geçersiz kimlik bilgileri",
+    "User not found": "Kullanıcı bulunamadı",
+    "Invalid current password": "Mevcut şifre geçersiz",
+    "You can only update your own claims": "Yalnızca kendi şikâyetlerinizi değiştirebilirsiniz",
+    "No fields to update": "Güncellenecek alan yok",
+    "Aucun champ à mettre à jour": "Güncellenecek alan yok",
+    "Not found": "Bulunamadı",
+    "Mission not found or not yours": "Görev bulunamadı veya size ait değil",
+    "Mission cancelled": "Görev iptal edildi",
+    "Format QR code invalide": "Geçersiz QR kod biçimi",
+    "Données QR code invalides": "Geçersiz QR kod verileri",
+    "Ce colis ne fait pas partie de vos missions": "Bu koli görevlerinizin bir parçası değil",
+    "Ce colis a déjà été livré": "Bu koli zaten teslim edildi",
+    "Cette mission a été annulée": "Bu görev iptal edildi",
+    "En attente de la confirmation d'arrivée par l'administration.": "Varışın yönetim tarafından onaylanması bekleniyor.",
+    "Profil GP introuvable": "GP profili bulunamadı",
+    "Aucun colis livré : scannez au moins un colis avant de terminer.": "Teslim edilen koli yok: bitirmeden önce en az bir koli tarayın.",
+    "Cette mission ne vous a pas été assignée": "Bu görev size atanmadı",
+    "Mission not found or not awaiting your response": "Görev bulunamadı veya yanıtınızı beklemiyor",
+    "Mission is not in transit": "Görev yolda değil",
+    "La mission est déjà livrée": "Görev zaten teslim edildi",
+    "La mission est déjà annulée": "Görev zaten iptal edildi",
+    "Vous n'êtes pas autorisé à modifier cette mission": "Bu görevi değiştirme yetkiniz yok",
+    "Notification not found": "Bildirim bulunamadı",
+    "You can only pay for your own missions": "Yalnızca kendi görevleriniz için ödeme yapabilirsiniz",
+    "Invalid payment amount": "Geçersiz ödeme tutarı",
+    "This mission has already been paid": "Bu görevin ödemesi zaten yapıldı",
+    "Failed to initiate payment with provider": "Ödeme sağlayıcı nezdinde ödeme başlatılamadı",
+    "You can only update your own trips": "Yalnızca kendi yolculuklarınızı değiştirebilirsiniz",
+    "You can only cancel your own trips": "Yalnızca kendi yolculuklarınızı iptal edebilirsiniz",
+    "A completed trip cannot be cancelled": "Tamamlanmış bir yolculuk iptal edilemez",
+    "Withdrawal method is required": "Para çekme yöntemi zorunludur",
+    "Account number is required": "Hesap numarası zorunludur",
+    "Insufficient available balance": "Kullanılabilir bakiye yetersiz",
+    "Withdrawal not found or not pending": "Para çekme talebi bulunamadı veya beklemede değil",
+    "Withdrawal not found or not in approved state": "Para çekme talebi bulunamadı veya onaylanmış durumda değil",
+    "Withdrawal not found or not cancellable": "Para çekme talebi bulunamadı veya iptal edilemez",
+    "Failed to fetch profile": "Profil yüklenemedi",
+    "Ce numéro de téléphone est déjà utilisé": "Bu telefon numarası zaten kullanımda",
+    "Mise à jour échouée": "Güncelleme başarısız oldu",
+    "This account belongs to a different profile type": "Bu hesap farklı bir profil türüne ait",
+    "Invalid email or password": "E-posta veya şifre hatalı",
+    "You cannot view this claim": "Bu şikâyeti görüntüleyemezsiniz",
+    "Only expediteurs can create missions": "Yalnızca gönderenler görev oluşturabilir",
+    "Invalid user type": "Geçersiz kullanıcı türü",
+    "Cette mission ne peut plus être modifiée": "Bu görev artık değiştirilemez",
+    "Aucun champ modifiable fourni": "Değiştirilebilir alan sağlanmadı",
+    "Only GPs can accept missions": "Yalnızca GP’ler görevleri kabul edebilir",
+    "Only GPs can decline missions": "Yalnızca GP’ler görevleri reddedebilir",
+    "lat and lng are required": "Enlem ve boylam zorunludur",
+    "Les deux QR codes sont requis": "Her iki QR kodu da gereklidir",
+    "Only GPs can verify delivery": "Yalnızca GP’ler bir teslimatı doğrulayabilir",
+    "QR code data is required": "QR kod verileri zorunludur",
+    "Tracking number not found": "Takip numarası bulunamadı",
+    "Payment not found": "Ödeme bulunamadı",
+    "You cannot view this payment": "Bu ödemeyi görüntüleyemezsiniz",
+    "Envoi introuvable": "Gönderi bulunamadı",
+    "Colis introuvable": "Koli bulunamadı",
+    "Erreur de suivi": "Takip hatası",
+    "Erreur": "Hata",
+    "Only GPs can create trips": "Yalnızca GP’ler yolculuk oluşturabilir",
+    "Arrival date must be after departure date": "Varış tarihi çıkış tarihinden sonra olmalıdır",
+    "mission_id or mission_code is required": "mission_id veya mission_code zorunludur",
+    "Arrival city is required": "Varış şehri zorunludur",
+    "Arrival country is required": "Varış ülkesi zorunludur",
+    "Available weight must be greater than 0": "Kullanılabilir ağırlık 0’dan büyük olmalıdır",
+    "Current password is required": "Mevcut şifre zorunludur",
+    "Delivery address is required": "Teslimat adresi zorunludur",
+    "Departure city is required": "Çıkış şehri zorunludur",
+    "Departure country is required": "Çıkış ülkesi zorunludur",
+    "Description cannot be empty": "Açıklama boş olamaz",
+    "Description is required": "Açıklama zorunludur",
+    "First name is required": "Ad zorunludur",
+    "Google id_token is required": "Google jetonu (id_token) zorunludur",
+    "Invalid arrival date": "Geçersiz varış tarihi",
+    "Invalid departure date": "Geçersiz çıkış tarihi",
+    "Invalid email format": "Geçersiz e-posta biçimi",
+    "Invalid expected type": "Geçersiz beklenen tür",
+    "Invalid notification_type": "Geçersiz bildirim türü",
+    "Invalid priority": "Geçersiz öncelik",
+    "Invalid resolution status": "Geçersiz çözüm durumu",
+    "Invalid status": "Geçersiz durum",
+    "Invalid withdrawal method": "Geçersiz para çekme yöntemi",
+    "Last name is required": "Soyad zorunludur",
+    "Message is required": "Mesaj zorunludur",
+    "New password must be at least 8 characters long": "Yeni şifre en az 8 karakter içermelidir",
+    "Offered price must be greater than 0": "Önerilen ücret 0’dan büyük olmalıdır",
+    "Package weight must be greater than 0": "Kolinin ağırlığı 0’dan büyük olmalıdır",
+    "Password is required": "Şifre zorunludur",
+    "Password must be at least 8 characters long": "Şifre en az 8 karakter içermelidir",
+    "Pickup address is required": "Teslim alma adresi zorunludur",
+    "Resolution is required": "Çözüm zorunludur",
+    "Title is required": "Başlık zorunludur",
+    "User type must be either expediteur or gp": "Kullanıcı türü gönderen veya GP olmalıdır",
+    "amount must be a positive number": "Tutar pozitif bir sayı olmalıdır",
+    "payment_method must be wave or orange_money": "Ödeme yöntemi wave veya orange_money olmalıdır",
+    "user_id is required": "Kullanıcı kimliği zorunludur",
+    "Invalid language": "Geçersiz dil"
+  },
+  "patterns": {
+    "0": "Asgari para çekme tutarı {1}",
+    "1": "Duruma geçişe izin verilmiyor: {1}"
+  },
+  "templates": {
+    "claim_reply": {
+      "title": "{code} şikâyetinize yanıt",
+      "message": "{text}"
+    },
+    "claim_resolved_credited": {
+      "title": "{code} şikâyeti çözüldü",
+      "message": "{amount} tutarında bir tazminat cüzdanınıza yatırıldı."
+    },
+    "claim_resolved_granted": {
+      "title": "{code} şikâyeti çözüldü",
+      "message": "Size {amount} tutarında bir tazminat tanındı. Ödeme için ekibimiz sizinle iletişime geçecek."
+    },
+    "mission_assigned": {
+      "title": "Görev atandı: {route}",
+      "message": "Size yeni bir görev ({code}) atandı. Bildirimlerinizden kabul edin veya reddedin."
+    },
+    "mission_reassigned": {
+      "title": "Görev yeniden atandı: {route}",
+      "message": "{code} görevi size (yeniden) atandı. Bildirimlerinizden kabul edin veya reddedin."
+    },
+    "arrival_confirmed": {
+      "title": "Varış onaylandı",
+      "message": "{code} için varış onaylandı. Artık teslimat için alıcının QR kodunu tarayabilirsiniz."
+    },
+    "access_restored": {
+      "title": "Erişim yeniden sağlandı",
+      "message": "Yönetim, yolculuğunuzun bitişini doğruladı. Uygulamayı yeniden kullanabilirsiniz."
+    },
+    "payment_refunded": {
+      "title": "Ödeme iade edildi",
+      "message": "{amount} tutarındaki {code} ödemeniz iade edildi."
+    },
+    "payment_refunded_reason": {
+      "title": "Ödeme iade edildi",
+      "message": "{amount} tutarındaki {code} ödemeniz iade edildi: {reason}."
+    },
+    "identity_verified": {
+      "title": "Kimlik doğrulandı",
+      "message": "Kimlik belgeniz onaylandı. Hesabınız artık doğrulandı."
+    },
+    "identity_rejected": {
+      "title": "Kimlik belgesi reddedildi",
+      "message": "Kimlik belgeniz reddedildi. Lütfen tekrar gönderin."
+    },
+    "identity_rejected_reason": {
+      "title": "Kimlik belgesi reddedildi",
+      "message": "Kimlik belgeniz reddedildi: {reason}. Lütfen tekrar gönderin."
+    },
+    "parcel_delivered": {
+      "title": "Koli teslim edildi",
+      "message": "{code} kolinizin alıcıya teslimi yapıldı (QR onaylandı)."
+    },
+    "parcel_delivered_named": {
+      "title": "Koli teslim edildi",
+      "message": "{code} kolinizin {name} adlı kişiye teslimi yapıldı (QR onaylandı)."
+    },
+    "earnings_credited": {
+      "title": "Kazanç yatırıldı",
+      "message": "{code} görevi için {amount} kazandınız."
+    },
+    "gp_arrived": {
+      "title": "GP varış noktasına ulaştı",
+      "message": "GP, {code} görevi için varış noktasına ulaştı. Kolinin teslimi çok yakında."
+    },
+    "payment_confirmed": {
+      "title": "Ödeme onaylandı",
+      "message": "{amount} tutarındaki ödemeniz onaylandı."
+    },
+    "withdrawal_approved": {
+      "title": "Para çekme onaylandı",
+      "message": "{amount} tutarındaki para çekme talebiniz onaylandı. Ödeme işleme alınıyor."
+    },
+    "withdrawal_paid": {
+      "title": "Para çekme ödendi",
+      "message": "{amount} tutarındaki para çekme talebiniz ödendi."
+    },
+    "withdrawal_paid_ref": {
+      "title": "Para çekme ödendi",
+      "message": "{amount} tutarındaki para çekme talebiniz ödendi (ref. {ref})."
+    },
+    "withdrawal_rejected": {
+      "title": "Para çekme reddedildi",
+      "message": "{amount} tutarındaki para çekme talebiniz reddedildi. Tutar hesabınıza yeniden yatırıldı."
+    },
+    "withdrawal_rejected_reason": {
+      "title": "Para çekme reddedildi",
+      "message": "{amount} tutarındaki para çekme talebiniz reddedildi: {reason}. Tutar hesabınıza yeniden yatırıldı."
+    }
+  }
+}

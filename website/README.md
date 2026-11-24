@@ -21,7 +21,7 @@ node scripts/recette.mjs                         # 31 vérifications + captures 
 La carte des destinations est générée par `scripts/make-map.py` (Natural Earth, domaine public).
 
 ## Langues
-Le site est généré en français (`/`), anglais (`/en/`), arabe (`/ar/`, de droite à gauche), espagnol (`/es/`) et portugais (`/pt/`) à partir des mêmes pages françaises : traductions dans `src/locales/<langue>.json`. Procédure et limites : `docs/i18n.md` (« Phase D »).
+Le site est généré en 14 langues : français (`/`), puis `/en/`, `/ar/` (de droite à gauche), `/es/`, `/pt/`, `/it/`, `/de/`, `/nl/`, `/ru/`, `/zh/`, `/hi/`, `/ja/`, `/ko/`, `/tr/`, à partir des mêmes pages françaises : traductions dans `src/locales/<langue>.json`. Procédure et limites : `docs/i18n.md` (« Phase D »).
 ```
 npm run extract      # liste les textes français à traduire (src/locales/_segments.json)
 npm run i18n:check   # contrôle des dictionnaires (complétude, balises)

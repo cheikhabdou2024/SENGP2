@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
-const LANGS = ['fr', 'en', 'ar', 'es', 'pt'];
+const LANGS = require('../i18n.js').SUPPORTED;
 const dict = Object.fromEntries(LANGS.map(l => [l, JSON.parse(fs.readFileSync(path.join(root, 'locales', l + '.json'), 'utf8'))]));
 const read = f => fs.readFileSync(path.join(root, f), 'utf8');
 const pages = fs.readdirSync(root).filter(f => f.endsWith('.html') && /src="i18n\.js"/.test(read(f)));
@@ -30,7 +30,7 @@ test('i18n.js est charge apres api.js et avant les scripts de la page', () => {
   }
 });
 
-test('chaque data-i18n existe dans les cinq langues, et le texte francais de la page est celui de fr.json', () => {
+test('chaque data-i18n existe dans toutes les langues, et le texte francais de la page est celui de fr.json', () => {
   for (const page of pages) {
     const html = read(page);
     for (const m of html.matchAll(/<(\w+)\b[^>]*\bdata-i18n="([^"]+)"[^>]*>([^<]*)<\/\1>/g)) {

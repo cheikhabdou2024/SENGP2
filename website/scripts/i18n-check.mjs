@@ -47,7 +47,7 @@ for (const lang of langs) {
     if (sig(a) !== sig(b) || !balanced(b)) { problems.push(`balises differentes : ${s.key}\n      -> ${t}`); continue; }
     if (/["]/.test(t) && s.kind === 'attr') problems.push(`guillemet droit interdit dans un attribut : ${t}`);
     if (t === s.key && s.key.length > 25 && /\s/.test(s.key) && !/[@\d]/.test(s.key) && (s.key.match(/,/g) || []).length < 3) problems.push(`identique au francais : ${s.key}`);
-    if (/[«»]/.test(t) && lang !== 'fr') problems.push(`guillemets francais : ${t}`);
+    if (/[«»]/.test(t) && !['fr', 'ru', 'it', 'tr', 'de'].includes(lang)) problems.push(`guillemets francais : ${t}`);
     ok++;
   }
   for (const k of Object.keys(dict)) if (!keys.has(k)) problems.push(`cle inutilisee (texte francais modifie ?) : ${k}`);

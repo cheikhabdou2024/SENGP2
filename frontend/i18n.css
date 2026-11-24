@@ -41,3 +41,12 @@
 
 /* Les fleches de navigation sont retournees en droite-a-gauche. */
 [dir="rtl"] .i18n-flip { transform: scaleX(-1); }
+
+/* Ecritures sans police Inter : polices systeme adaptees, pas d'interlettrage (il casse les caracteres lies) */
+html:lang(zh) body, html:lang(zh) button, html:lang(zh) input, html:lang(zh) select, html:lang(zh) textarea { font-family: 'Inter', -apple-system, 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', 'Hiragino Sans GB', sans-serif; }
+html:lang(ja) body, html:lang(ja) button, html:lang(ja) input, html:lang(ja) select, html:lang(ja) textarea { font-family: 'Inter', -apple-system, 'Yu Gothic UI', 'Hiragino Sans', 'Noto Sans JP', Meiryo, sans-serif; }
+html:lang(ko) body, html:lang(ko) button, html:lang(ko) input, html:lang(ko) select, html:lang(ko) textarea { font-family: 'Inter', -apple-system, 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; }
+html:lang(hi) body, html:lang(hi) button, html:lang(hi) input, html:lang(hi) select, html:lang(hi) textarea { font-family: 'Inter', -apple-system, 'Nirmala UI', 'Noto Sans Devanagari', Mangal, sans-serif; }
+html:lang(zh) *, html:lang(ja) *, html:lang(ko) *, html:lang(hi) * { letter-spacing: 0 !important; }
+html:lang(zh) body, html:lang(ja) body { line-break: strict; overflow-wrap: anywhere; }
+html:lang(ko) body { word-break: keep-all; }

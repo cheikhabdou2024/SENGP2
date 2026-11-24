@@ -85,6 +85,15 @@ const LANG_META = {
   ar: { name: 'العربية', dir: 'rtl', og: 'ar_AR' },
   es: { name: 'Español', dir: 'ltr', og: 'es_ES' },
   pt: { name: 'Português', dir: 'ltr', og: 'pt_PT' },
+  it: { name: 'Italiano', dir: 'ltr', og: 'it_IT' },
+  de: { name: 'Deutsch', dir: 'ltr', og: 'de_DE' },
+  nl: { name: 'Nederlands', dir: 'ltr', og: 'nl_NL' },
+  ru: { name: 'Русский', dir: 'ltr', og: 'ru_RU' },
+  zh: { name: '简体中文', dir: 'ltr', og: 'zh_CN' },
+  hi: { name: 'हिन्दी', dir: 'ltr', og: 'hi_IN' },
+  ja: { name: '日本語', dir: 'ltr', og: 'ja_JP' },
+  ko: { name: '한국어', dir: 'ltr', og: 'ko_KR' },
+  tr: { name: 'Türkçe', dir: 'ltr', og: 'tr_TR' },
 };
 const LANGS = cfg.site.languages || ['fr'];
 const DEFAULT_LANG = cfg.site.locale;

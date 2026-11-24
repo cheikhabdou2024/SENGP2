@@ -1,0 +1,223 @@
+{
+  "errors": {
+    "Claim not found": "불만 접수를 찾을 수 없습니다",
+    "Mission not found": "미션을 찾을 수 없습니다",
+    "Mission introuvable": "미션을 찾을 수 없습니다",
+    "Not your mission": "회원님의 미션이 아닙니다",
+    "Invalid token": "유효하지 않은 토큰입니다",
+    "Trip not found": "여정을 찾을 수 없습니다",
+    "Stockage de fichiers non configuré": "파일 저장소가 구성되지 않았습니다",
+    "Aucun fichier reçu": "수신된 파일이 없습니다",
+    "Type de fichier non autorisé": "허용되지 않는 파일 형식입니다",
+    "No token provided": "토큰이 제공되지 않았습니다",
+    "Server configuration error": "서버 구성 오류",
+    "Session expired or revoked": "세션이 만료되었거나 취소되었습니다",
+    "Token expired": "토큰이 만료되었습니다",
+    "Authentication failed": "인증에 실패했습니다",
+    "Authentication required": "인증이 필요합니다",
+    "Insufficient permissions": "권한이 부족합니다",
+    "Resource already exists": "이미 존재하는 리소스입니다",
+    "Invalid reference": "유효하지 않은 참조입니다",
+    "Required field missing": "필수 항목이 누락되었습니다",
+    "File size too large": "파일 크기가 너무 큽니다",
+    "Validation failed": "유효성 검사에 실패했습니다",
+    "Email already registered": "이미 등록된 이메일입니다",
+    "Phone number already registered": "이미 등록된 전화번호입니다",
+    "Google auth is not configured": "Google 로그인이 구성되지 않았습니다",
+    "Invalid Google token": "유효하지 않은 Google 토큰입니다",
+    "Account is suspended": "계정이 정지되었습니다",
+    "Account type mismatch": "계정 유형이 일치하지 않습니다",
+    "Invalid credentials": "로그인 정보가 올바르지 않습니다",
+    "User not found": "사용자를 찾을 수 없습니다",
+    "Invalid current password": "현재 비밀번호가 올바르지 않습니다",
+    "You can only update your own claims": "본인의 불만 접수만 수정할 수 있습니다",
+    "No fields to update": "업데이트할 항목이 없습니다",
+    "Aucun champ à mettre à jour": "업데이트할 항목이 없습니다",
+    "Not found": "찾을 수 없습니다",
+    "Mission not found or not yours": "미션을 찾을 수 없거나 회원님의 미션이 아닙니다",
+    "Mission cancelled": "취소된 미션입니다",
+    "Format QR code invalide": "QR 코드 형식이 올바르지 않습니다",
+    "Données QR code invalides": "QR 코드 데이터가 올바르지 않습니다",
+    "Ce colis ne fait pas partie de vos missions": "이 소포는 회원님의 미션에 속하지 않습니다",
+    "Ce colis a déjà été livré": "이 소포는 이미 배달되었습니다",
+    "Cette mission a été annulée": "이 미션은 취소되었습니다",
+    "En attente de la confirmation d'arrivée par l'administration.": "관리팀의 도착 확인을 기다리는 중입니다.",
+    "Profil GP introuvable": "GP 프로필을 찾을 수 없습니다",
+    "Aucun colis livré : scannez au moins un colis avant de terminer.": "배달된 소포가 없습니다. 종료하기 전에 소포를 하나 이상 스캔해 주세요.",
+    "Cette mission ne vous a pas été assignée": "이 미션은 회원님에게 배정되지 않았습니다",
+    "Mission not found or not awaiting your response": "미션을 찾을 수 없거나 회원님의 응답을 기다리고 있지 않습니다",
+    "Mission is not in transit": "미션이 운송 중이 아닙니다",
+    "La mission est déjà livrée": "미션이 이미 배달되었습니다",
+    "La mission est déjà annulée": "미션이 이미 취소되었습니다",
+    "Vous n'êtes pas autorisé à modifier cette mission": "이 미션을 수정할 권한이 없습니다",
+    "Notification not found": "알림을 찾을 수 없습니다",
+    "You can only pay for your own missions": "본인의 미션만 결제할 수 있습니다",
+    "Invalid payment amount": "결제 금액이 올바르지 않습니다",
+    "This mission has already been paid": "이 미션은 이미 결제되었습니다",
+    "Failed to initiate payment with provider": "결제 업체를 통해 결제를 시작할 수 없습니다",
+    "You can only update your own trips": "본인의 여정만 수정할 수 있습니다",
+    "You can only cancel your own trips": "본인의 여정만 취소할 수 있습니다",
+    "A completed trip cannot be cancelled": "완료된 여정은 취소할 수 없습니다",
+    "Withdrawal method is required": "출금 방법은 필수입니다",
+    "Account number is required": "계좌번호는 필수입니다",
+    "Insufficient available balance": "사용 가능한 잔액이 부족합니다",
+    "Withdrawal not found or not pending": "출금을 찾을 수 없거나 대기 중이 아닙니다",
+    "Withdrawal not found or not in approved state": "출금을 찾을 수 없거나 승인된 상태가 아닙니다",
+    "Withdrawal not found or not cancellable": "출금을 찾을 수 없거나 취소할 수 없습니다",
+    "Failed to fetch profile": "프로필을 불러올 수 없습니다",
+    "Ce numéro de téléphone est déjà utilisé": "이미 사용 중인 전화번호입니다",
+    "Mise à jour échouée": "업데이트에 실패했습니다",
+    "This account belongs to a different profile type": "이 계정은 다른 프로필 유형에 속합니다",
+    "Invalid email or password": "이메일 또는 비밀번호가 올바르지 않습니다",
+    "You cannot view this claim": "이 불만 접수를 조회할 수 없습니다",
+    "Only expediteurs can create missions": "보내는 사람만 미션을 만들 수 있습니다",
+    "Invalid user type": "사용자 유형이 올바르지 않습니다",
+    "Cette mission ne peut plus être modifiée": "이 미션은 더 이상 수정할 수 없습니다",
+    "Aucun champ modifiable fourni": "수정 가능한 항목이 제공되지 않았습니다",
+    "Only GPs can accept missions": "GP만 미션을 수락할 수 있습니다",
+    "Only GPs can decline missions": "GP만 미션을 거절할 수 있습니다",
+    "lat and lng are required": "위도와 경도는 필수입니다",
+    "Les deux QR codes sont requis": "두 QR 코드가 모두 필요합니다",
+    "Only GPs can verify delivery": "GP만 배달을 확인할 수 있습니다",
+    "QR code data is required": "QR 코드 데이터는 필수입니다",
+    "Tracking number not found": "추적 번호를 찾을 수 없습니다",
+    "Payment not found": "결제를 찾을 수 없습니다",
+    "You cannot view this payment": "이 결제를 조회할 수 없습니다",
+    "Envoi introuvable": "배송을 찾을 수 없습니다",
+    "Colis introuvable": "소포를 찾을 수 없습니다",
+    "Erreur de suivi": "추적 오류",
+    "Erreur": "오류",
+    "Only GPs can create trips": "GP만 여정을 만들 수 있습니다",
+    "Arrival date must be after departure date": "도착일은 출발일 이후여야 합니다",
+    "mission_id or mission_code is required": "mission_id 또는 mission_code는 필수입니다",
+    "Arrival city is required": "도착 도시는 필수입니다",
+    "Arrival country is required": "도착 국가는 필수입니다",
+    "Available weight must be greater than 0": "가용 무게는 0보다 커야 합니다",
+    "Current password is required": "현재 비밀번호는 필수입니다",
+    "Delivery address is required": "배달 주소는 필수입니다",
+    "Departure city is required": "출발 도시는 필수입니다",
+    "Departure country is required": "출발 국가는 필수입니다",
+    "Description cannot be empty": "설명은 비워 둘 수 없습니다",
+    "Description is required": "설명은 필수입니다",
+    "First name is required": "이름은 필수입니다",
+    "Google id_token is required": "Google 토큰(id_token)은 필수입니다",
+    "Invalid arrival date": "도착일이 올바르지 않습니다",
+    "Invalid departure date": "출발일이 올바르지 않습니다",
+    "Invalid email format": "이메일 형식이 올바르지 않습니다",
+    "Invalid expected type": "예상 유형이 올바르지 않습니다",
+    "Invalid notification_type": "알림 유형이 올바르지 않습니다",
+    "Invalid priority": "우선순위가 올바르지 않습니다",
+    "Invalid resolution status": "해결 상태가 올바르지 않습니다",
+    "Invalid status": "상태가 올바르지 않습니다",
+    "Invalid withdrawal method": "출금 방법이 올바르지 않습니다",
+    "Last name is required": "성은 필수입니다",
+    "Message is required": "메시지는 필수입니다",
+    "New password must be at least 8 characters long": "새 비밀번호는 8자 이상이어야 합니다",
+    "Offered price must be greater than 0": "제안 가격은 0보다 커야 합니다",
+    "Package weight must be greater than 0": "소포 무게는 0보다 커야 합니다",
+    "Password is required": "비밀번호는 필수입니다",
+    "Password must be at least 8 characters long": "비밀번호는 8자 이상이어야 합니다",
+    "Pickup address is required": "수거 주소는 필수입니다",
+    "Resolution is required": "해결 내용은 필수입니다",
+    "Title is required": "제목은 필수입니다",
+    "User type must be either expediteur or gp": "사용자 유형은 보내는 사람 또는 GP여야 합니다",
+    "amount must be a positive number": "금액은 양수여야 합니다",
+    "payment_method must be wave or orange_money": "결제 수단은 wave 또는 orange_money여야 합니다",
+    "user_id is required": "사용자 식별자는 필수입니다",
+    "Invalid language": "언어가 올바르지 않습니다"
+  },
+  "patterns": {
+    "0": "최소 출금 금액은 {1}입니다",
+    "1": "허용되지 않는 상태 변경입니다: {1}"
+  },
+  "templates": {
+    "claim_reply": {
+      "title": "불만 접수 {code}에 대한 답변",
+      "message": "{text}"
+    },
+    "claim_resolved_credited": {
+      "title": "불만 접수 {code} 해결됨",
+      "message": "{amount}의 보상금이 회원님의 지갑에 입금되었습니다."
+    },
+    "claim_resolved_granted": {
+      "title": "불만 접수 {code} 해결됨",
+      "message": "{amount}의 보상금이 지급되기로 결정되었습니다. 지급 관련하여 저희 팀이 연락드리겠습니다."
+    },
+    "mission_assigned": {
+      "title": "미션 배정: {route}",
+      "message": "새 미션({code})이 배정되었습니다. 알림에서 수락 또는 거절해 주세요."
+    },
+    "mission_reassigned": {
+      "title": "미션 재배정: {route}",
+      "message": "미션 {code}이(가) (재)배정되었습니다. 알림에서 수락 또는 거절해 주세요."
+    },
+    "arrival_confirmed": {
+      "title": "도착 확인됨",
+      "message": "{code}의 도착이 확인되었습니다. 이제 받는 사람의 QR을 스캔하여 배달할 수 있습니다."
+    },
+    "access_restored": {
+      "title": "접근이 복구되었습니다",
+      "message": "관리팀이 여행 종료를 확인했습니다. 앱을 다시 사용하실 수 있습니다."
+    },
+    "payment_refunded": {
+      "title": "결제 환불됨",
+      "message": "{amount}의 결제 {code}이(가) 환불되었습니다."
+    },
+    "payment_refunded_reason": {
+      "title": "결제 환불됨",
+      "message": "{amount}의 결제 {code}이(가) 환불되었습니다: {reason}."
+    },
+    "identity_verified": {
+      "title": "신원 확인됨",
+      "message": "신분증이 승인되었습니다. 이제 계정이 인증되었습니다."
+    },
+    "identity_rejected": {
+      "title": "신분증 거부됨",
+      "message": "신분증이 거부되었습니다. 다시 제출해 주세요."
+    },
+    "identity_rejected_reason": {
+      "title": "신분증 거부됨",
+      "message": "신분증이 거부되었습니다: {reason}. 다시 제출해 주세요."
+    },
+    "parcel_delivered": {
+      "title": "소포 배달 완료",
+      "message": "소포 {code}이(가) 받는 사람에게 인계되었습니다(QR 확인됨)."
+    },
+    "parcel_delivered_named": {
+      "title": "소포 배달 완료",
+      "message": "소포 {code}이(가) {name}님에게 인계되었습니다(QR 확인됨)."
+    },
+    "earnings_credited": {
+      "title": "수익 입금됨",
+      "message": "미션 {code}로 {amount}을(를) 받으셨습니다."
+    },
+    "gp_arrived": {
+      "title": "GP 목적지 도착",
+      "message": "GP가 미션 {code}의 목적지에 도착했습니다. 곧 소포가 인계됩니다."
+    },
+    "payment_confirmed": {
+      "title": "결제 확인됨",
+      "message": "{amount} 결제가 확인되었습니다."
+    },
+    "withdrawal_approved": {
+      "title": "출금 승인됨",
+      "message": "{amount} 출금이 승인되었습니다. 지급이 진행 중입니다."
+    },
+    "withdrawal_paid": {
+      "title": "출금 지급됨",
+      "message": "{amount} 출금이 지급되었습니다."
+    },
+    "withdrawal_paid_ref": {
+      "title": "출금 지급됨",
+      "message": "{amount} 출금이 지급되었습니다(참조 {ref})."
+    },
+    "withdrawal_rejected": {
+      "title": "출금 거부됨",
+      "message": "{amount} 출금이 거부되었습니다. 자금이 다시 입금되었습니다."
+    },
+    "withdrawal_rejected_reason": {
+      "title": "출금 거부됨",
+      "message": "{amount} 출금이 거부되었습니다: {reason}. 자금이 다시 입금되었습니다."
+    }
+  }
+}
