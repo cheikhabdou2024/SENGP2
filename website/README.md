@@ -20,6 +20,15 @@ node scripts/recette.mjs                         # 31 vérifications + captures 
 `node scripts/recette-how.mjs` : 23 vérifications de la page « Comment ça marche » (captures dans `recette/how/`). `node scripts/recette-about.mjs` : 24 vérifications de la page « À propos ». `scripts/shoot-flow.mjs` régénère les captures de l'application utilisées par cette page.
 La carte des destinations est générée par `scripts/make-map.py` (Natural Earth, domaine public).
 
+## Langues
+Le site est généré en français (`/`), anglais (`/en/`), arabe (`/ar/`, de droite à gauche), espagnol (`/es/`) et portugais (`/pt/`) à partir des mêmes pages françaises : traductions dans `src/locales/<langue>.json`. Procédure et limites : `docs/i18n.md` (« Phase D »).
+```
+npm run extract      # liste les textes français à traduire (src/locales/_segments.json)
+npm run i18n:check   # contrôle des dictionnaires (complétude, balises)
+npm test             # tests : localisation, build, hreflang, choix de la langue
+```
+Les pages juridiques restent en français uniquement.
+
 ## Structure
 - `site.config.json` — **toutes** les informations de l'entreprise (raison sociale, RCCM, NINEA, adresse, téléphone, email, réseaux) + navigation + `live` / `legalReviewed`.
 - `src/pages/**/index.html` — une page par dossier ; première ligne `<!--meta {…} -->` (titre, description, clé de navigation).

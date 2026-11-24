@@ -296,3 +296,15 @@ mark.todo { background: #FFE58A; color: #5B3B00; padding: 0 4px; border-radius: 
   .aud__art { top: 14px; right: 50%; transform: translateX(50%); width: 150px; }
   .aud__art--box { width: 140px; }
 }
+
+/* ---------- menu de langue ---------- */
+.site-header__in .nav { margin-inline-start: auto; }
+.lang { position: relative; margin-inline-start: 6px; }
+.lang__btn { list-style: none; display: flex; align-items: center; gap: 7px; height: 42px; padding: 0 13px; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 14px; background: rgba(255, 255, 255, 0.08); color: #fff; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.04em; cursor: pointer; transition: background 0.2s ease; }
+.lang__btn::-webkit-details-marker { display: none; }
+.lang__btn:hover, .lang__d[open] .lang__btn { background: rgba(255, 255, 255, 0.16); }
+.lang__list { position: absolute; top: calc(100% + 8px); inset-inline-end: 0; z-index: 80; min-width: 168px; margin: 0; padding: 6px; list-style: none; background: rgba(8, 20, 46, 0.98); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 14px; box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35); }
+.lang__list a { display: block; padding: 10px 14px; border-radius: 10px; color: #E6EEF9; font-weight: 600; text-decoration: none; }
+.lang__list a:hover, .lang__list a[aria-current] { background: rgba(255, 255, 255, 0.12); color: #fff; }
+.lang__list a[aria-current]::after { content: "✓"; margin-inline-start: 8px; color: var(--amber); }
+@media (max-width: 880px) { .lang { margin-inline-start: auto; } .site-header__in .nav { margin-inline-start: 0; } }

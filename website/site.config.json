@@ -7,7 +7,14 @@
     "url": "https://www.sengp.co",
     "locale": "fr",
     "appUrl": "https://sengp.vercel.app",
-    "description": "SEN GP met en relation des expéditeurs et des voyageurs pour envoyer des colis entre le Sénégal et le reste du monde, avec suivi en temps réel et remise sécurisée."
+    "description": "SEN GP met en relation des expéditeurs et des voyageurs pour envoyer des colis entre le Sénégal et le reste du monde, avec suivi en temps réel et remise sécurisée.",
+    "languages": [
+      "fr",
+      "en",
+      "ar",
+      "es",
+      "pt"
+    ]
   },
   "company": {
     "legalName": "SENEGAL GP",

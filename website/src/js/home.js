@@ -89,21 +89,14 @@
   /* ---------- destinations : carte + liste ---------- */
   var dest = document.querySelector('[data-dest]');
   if (dest) {
-    var DATA = {
-      'france': ['Sénégal → France', 'Paris, Lyon, Marseille, Toulouse, Nice'],
-      'espagne': ['Sénégal → Espagne', 'Madrid, Barcelone, Valence, Séville, Bilbao'],
-      'italie': ['Sénégal → Italie', 'Rome, Milan, Naples, Turin, Florence'],
-      'etats-unis': ['Sénégal → États-Unis', 'New York, Los Angeles, Chicago, Houston, Miami'],
-      'canada': ['Sénégal → Canada', 'Toronto, Montréal, Vancouver, Calgary, Ottawa'],
-      'algerie': ['Sénégal → Algérie', 'Alger, Oran, Constantine, Annaba, Tlemcen']
-    };
     var btns = Array.prototype.slice.call(dest.querySelectorAll('[data-dest-btn]'));
     var title = document.getElementById('destTitle'), cities = document.getElementById('destCities');
     var select = function (key) {
       btns.forEach(function (b) { var on = b.getAttribute('data-dest-btn') === key; b.classList.toggle('is-active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
       dest.querySelectorAll('[data-route]').forEach(function (p) { p.classList.toggle('is-active', p.getAttribute('data-route') === key); });
       dest.querySelectorAll('[data-pt]').forEach(function (p) { p.classList.toggle('is-active', p.getAttribute('data-pt') === key); });
-      title.textContent = DATA[key][0]; cities.textContent = DATA[key][1];
+      var btn = btns.filter(function (b) { return b.getAttribute('data-dest-btn') === key; })[0];
+      if (btn) { title.textContent = btn.getAttribute('data-title') || ''; cities.textContent = btn.getAttribute('data-cities') || ''; }
     };
     btns.forEach(function (b) {
       var k = b.getAttribute('data-dest-btn');

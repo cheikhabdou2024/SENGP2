@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{site.locale}}">
+<html lang="{{lang}}" dir="{{dir}}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7,10 +7,13 @@
 <meta name="description" content="{{page.description}}">
 <meta name="robots" content="{{page.robots}}">
 <link rel="canonical" href="{{page.canonical}}">
+{{{alternatesHtml}}}
+<script src="/js/lang.js"></script>
 <meta name="theme-color" content="#0B1D3A">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{{site.name}}">
-<meta property="og:locale" content="fr_FR">
+<meta property="og:locale" content="{{page.ogLocale}}">
+{{{ogAlternates}}}
 <meta property="og:title" content="{{pageTitle}}">
 <meta property="og:description" content="{{page.description}}">
 <meta property="og:url" content="{{page.canonical}}">

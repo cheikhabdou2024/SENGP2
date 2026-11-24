@@ -1,0 +1,78 @@
+/* Arabe (de droite à gauche).
+   Le sens des flex/grid et du texte suit déjà dir="rtl" ; ce fichier miroite les propriétés « physiques »
+   (left/right, marges, transform) de site.css, home.css, how.css, about.css et destinations.css, et corrige la
+   typographie. Chargé uniquement sur les pages RTL, après les feuilles de la page. */
+
+/* Typographie : l'interlettrage casse la liaison des lettres arabes */
+[dir="rtl"] * { letter-spacing: 0 !important; }
+
+/* Pas de défilement horizontal créé par des éléments cachés hors écran */
+[dir="rtl"] .skip { left: auto; right: -999px; }
+[dir="rtl"] .skip:focus { left: auto; right: 8px; }
+[dir="rtl"] body { overflow-x: clip; }
+
+/* ---- en-tête, navigation ---- */
+[dir="rtl"] .nav__link::after { transform-origin: right; }
+[dir="rtl"] .nav__cta { margin-left: 0; margin-right: 10px; }
+@media (max-width: 1100px) { [dir="rtl"] .nav__cta { margin-left: 0; margin-right: 6px; } }
+@media (max-width: 880px) { [dir="rtl"] .nav__cta { margin: 8px 0 0; } }
+
+/* ---- listes, foire aux questions ---- */
+[dir="rtl"] .ticks li { padding-left: 0; padding-right: 34px; }
+[dir="rtl"] .ticks li::before { left: auto; right: 0; }
+[dir="rtl"] .flow__item::before { left: auto; right: 27px; }
+[dir="rtl"] .faq summary { padding: 20px 24px 20px 56px; }
+[dir="rtl"] .faq summary::after { right: auto; left: 22px; }
+[dir="rtl"] .faqx__q { text-align: right; }
+
+/* ---- cartes « pour qui ? » (accueil) ---- */
+[dir="rtl"] .aud { padding-right: clamp(26px, 4vw, 40px); padding-left: clamp(150px, 34%, 230px); }
+[dir="rtl"] .aud__art { right: auto; left: -6px; }
+@media (max-width: 560px) {
+  [dir="rtl"] .aud { padding-left: clamp(26px, 4vw, 40px); }
+  [dir="rtl"] .aud__art { left: auto; right: 50%; }
+}
+
+/* ---- accueil ---- */
+[dir="rtl"] .hx__route { right: auto; left: clamp(0px, 1vw, 24px); transform-origin: center; }
+@media (max-width: 880px) { [dir="rtl"] .hx__route { left: 4%; right: 4%; } }
+[dir="rtl"] .parc__tabs { margin-right: 0; margin-left: -44px; }
+@media (max-width: 880px) { [dir="rtl"] .parc__tabs { margin-left: 0; } }
+[dir="rtl"] .parc__tab, [dir="rtl"] .appdemo__tab { text-align: right; }
+[dir="rtl"] .appchip--a { left: auto; right: 2%; }
+[dir="rtl"] .appchip--b { right: auto; left: 0; }
+[dir="rtl"] .final__faq { margin-left: 0; margin-right: 6px; }
+[dir="rtl"] .note--left { text-align: right; }
+
+/* Parcours en 4 étapes : cartes alternées de part et d'autre de l'axe */
+[dir="rtl"] .journey__card { text-align: right; }
+[dir="rtl"] .journey__step:nth-of-type(even) .journey__card { margin-right: 0; margin-left: 56px; }
+[dir="rtl"] .journey__step:nth-of-type(odd) .journey__card { margin-left: 0; margin-right: 56px; }
+@media (max-width: 760px) {
+  [dir="rtl"] .journey__rail { left: auto; right: 31px; margin-left: 0; }
+  [dir="rtl"] .journey__plane { left: auto; right: 32px; margin: -22px -22px 0 0; }
+  [dir="rtl"] .journey__node { left: auto; right: 32px; transform: translate(50%, 0); }
+  [dir="rtl"] .journey__step.is-on .journey__node { transform: translate(50%, 0) scale(1.08); }
+  [dir="rtl"] .journey__step:nth-of-type(n) .journey__card { margin: 0 76px 0 0; text-align: right; }
+}
+
+/* ---- « Comment ça marche » ---- */
+[dir="rtl"] .hw__trails { right: auto; left: 0; }
+[dir="rtl"] .steps2__list::before, [dir="rtl"] .steps2__list::after { left: auto; right: 27px; }
+[dir="rtl"] .steps2__box { right: auto; left: 4%; }
+[dir="rtl"] .steps2__trav { left: auto; right: -12%; transform: rotate(3deg); }
+
+/* ---- « À propos » ---- */
+[dir="rtl"] .ab-hero__route { right: auto; left: 3%; }
+@media (max-width: 880px) { [dir="rtl"] .ab-hero__route { left: 11%; right: auto; } }
+[dir="rtl"] .pillar__art--qr img { right: auto; left: 8%; }
+[dir="rtl"] .pillar:hover .qrphone { transform: rotate(3deg) translateX(22px) translateY(-4px); }
+
+/* ---- destinations et tarifs ---- */
+[dir="rtl"] .price__table th, [dir="rtl"] .price__table td { text-align: right; }
+
+/* ---- menu de langue (les liens ne sont jamais inversés) ---- */
+[dir="rtl"] .lang__list a { text-align: right; }
+
+/* Flèches « → » : le texte arabe utilise déjà « ← » ; les icônes fléchées directionnelles se retournent */
+[dir="rtl"] .ico-arrow { transform: scaleX(-1); }

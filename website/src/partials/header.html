@@ -4,11 +4,12 @@
       <img src="/assets/logo.webp" alt="" width="132" height="82">
       <span class="brand__txt"><b>SEN GP</b><small>{{site.tagline}}</small></span>
     </a>
-    <nav class="nav" id="nav" aria-label="Navigation principale">
+    <nav class="nav" id="nav" aria-label="Navigation principale" data-i18n-split>
       {{{navHtml}}}
       <a class="btn btn--sm btn--grad nav__cta" href="{{site.appUrl}}" rel="noopener">Ouvrir l'application</a>
     </nav>
-    <button class="burger" id="burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav">
+    {{{langMenu}}}
+    <button class="burger" id="burger" type="button" aria-label="Ouvrir le menu" data-label-open="Ouvrir le menu" data-label-close="Fermer le menu" aria-expanded="false" aria-controls="nav">
       <span></span><span></span><span></span>
     </button>
   </div>
