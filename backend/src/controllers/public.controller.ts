@@ -5,6 +5,8 @@ import { ResponseUtil } from '../utils/response';
 import logger from '../utils/logger';
 import QRCode from 'qrcode';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /** Keep only safe characters for a public token used in URLs / HTML. */
 function sanitizeToken(t: string): string {
   return String(t || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 100);
@@ -36,12 +38,25 @@ export class PublicController {
 
   /** Payment result pages shown by the provider redirect (success / error). */
   static paymentResultPage(ok: boolean): (req: Request, res: Response) => void {
-    return (_req: Request, res: Response): void => {
-      const title = ok ? 'Paiement réussi' : 'Paiement non abouti';
+    return (req: Request, res: Response): void => {
+      // Web payer: hand over to the web app, which checks the real payment status itself.
+      const open = String(req.query.open || '');
+      const payment = String(req.query.payment || '');
+      if (req.query.web === '1' && UUID_RE.test(open) && UUID_RE.test(payment)) {
+        const base = (process.env.WEB_APP_URL || (process.env.FRONTEND_URL || '').split(',')[0] || 'https://sengp.vercel.app').replace(/\/+$/, '');
+        const target = new URL(`${base}/envois.html`);
+        target.searchParams.set('open', open);
+        target.searchParams.set('payment', payment);
+        target.searchParams.set('result', ok ? 'success' : 'cancel');
+        res.redirect(302, target.toString());
+        return;
+      }
+
+      const title = ok ? 'Retour du paiement' : 'Paiement non abouti';
       const icon = ok ? '✓' : '✕';
       const color = ok ? '#7ee081' : '#ff8f8f';
       const msg = ok
-        ? "Votre paiement a bien été reçu. Vous pouvez fermer cette page et revenir à l'application SEN GP — votre envoi y apparaîtra."
+        ? "Merci. Nous vérifions votre paiement : sa confirmation apparaîtra dans l'application SEN GP. Vous pouvez fermer cette page."
         : "Le paiement n'a pas abouti. Vous pouvez fermer cette page et réessayer depuis l'application SEN GP.";
       const html = `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">

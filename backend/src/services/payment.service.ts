@@ -101,9 +101,20 @@ export class PaymentService {
     const payment = inserted.rows[0];
 
     try {
-      const frontend = (process.env.FRONTEND_URL || '').split(',')[0] || '';
-      const successUrl = process.env.PAYMENT_SUCCESS_URL || `${frontend}/paiement.html`;
-      const errorUrl = process.env.PAYMENT_ERROR_URL || `${frontend}/creenvoi.html`;
+      // Back from the provider, the payer lands on a page that knows which payment it is about
+      // (it never trusts the redirect itself: the status comes from the webhook). `web=1` makes the
+      // server's result page hand the payer over to the web app instead of the native app.
+      const webApp = (process.env.WEB_APP_URL || (process.env.FRONTEND_URL || '').split(',')[0] || 'https://sengp.vercel.app').replace(/\/+$/, '');
+      const returnUrl = (base: string, result: 'success' | 'cancel') => {
+        const url = new URL(base);
+        url.searchParams.set('open', mission.id);
+        url.searchParams.set('payment', payment.id);
+        url.searchParams.set('result', result);
+        if (data.return_to === 'web') url.searchParams.set('web', '1');
+        return url.toString();
+      };
+      const successUrl = returnUrl(process.env.PAYMENT_SUCCESS_URL || `${webApp}/envois.html`, 'success');
+      const errorUrl = returnUrl(process.env.PAYMENT_ERROR_URL || `${webApp}/envois.html`, 'cancel');
 
       const checkout = await provider.createCheckout({
         amount,

@@ -138,3 +138,53 @@ describe('paiement par carte (Stripe Checkout)', () => {
     expect(res.status).toBe(404);
   });
 });
+
+describe('retour du paiement sur le web', () => {
+  const UUID = '8b1f7a52-3c1e-4d0a-9d7b-2f6f1d3a9c10';
+
+  it("renvoie le payeur vers l'application avec la mission et le paiement, sans rien affirmer", async () => {
+    process.env.PAYMENT_SUCCESS_URL = 'https://api.test/payment-success';
+    process.env.PAYMENT_ERROR_URL = 'https://api.test/payment-error';
+    const owner = await registerUser('expediteur');
+    const m = await createMission(owner, { offered_price: 20000 });
+    const res = await api().post('/api/v1/payments').set(auth(owner)).send({ mission_id: m.id, payment_method: 'card', return_to: 'web' });
+    const form = new URLSearchParams((mockedAxios.post.mock.calls[0] as any[])[1]);
+    const ok = new URL(form.get('success_url') as string);
+    expect(ok.origin + ok.pathname).toBe('https://api.test/payment-success');
+    expect(ok.searchParams.get('open')).toBe(m.id);
+    expect(ok.searchParams.get('payment')).toBe(res.body.data.payment.id);
+    expect(ok.searchParams.get('web')).toBe('1');
+    expect(new URL(form.get('cancel_url') as string).searchParams.get('result')).toBe('cancel');
+    delete process.env.PAYMENT_SUCCESS_URL;
+    delete process.env.PAYMENT_ERROR_URL;
+  });
+
+  it("n'ajoute pas web=1 pour l'application native", async () => {
+    process.env.PAYMENT_SUCCESS_URL = 'https://api.test/payment-success';
+    const owner = await registerUser('expediteur');
+    const m = await createMission(owner);
+    await api().post('/api/v1/payments').set(auth(owner)).send({ mission_id: m.id, payment_method: 'card', return_to: 'app' });
+    const form = new URLSearchParams((mockedAxios.post.mock.calls[0] as any[])[1]);
+    expect(new URL(form.get('success_url') as string).searchParams.has('web')).toBe(false);
+    delete process.env.PAYMENT_SUCCESS_URL;
+  });
+
+  it("la page de retour passe la main à l'application web (succès comme annulation)", async () => {
+    process.env.WEB_APP_URL = 'https://app.test';
+    const r = await api().get('/payment-success').query({ open: UUID, payment: UUID, web: '1' });
+    expect(r.status).toBe(302);
+    expect(r.headers.location).toBe(`https://app.test/envois.html?open=${UUID}&payment=${UUID}&result=success`);
+    const c = await api().get('/payment-error').query({ open: UUID, payment: UUID, web: '1' });
+    expect(c.headers.location).toContain('result=cancel');
+    delete process.env.WEB_APP_URL;
+  });
+
+  it('refuse de rediriger avec des identifiants invalides, et affiche une page sans promesse de succès', async () => {
+    const bad = await api().get('/payment-success').query({ open: '//evil.test', payment: UUID, web: '1' });
+    expect(bad.status).toBe(200);
+    expect(bad.text).not.toContain('bien été reçu');
+    const app = await api().get('/payment-success');
+    expect(app.status).toBe(200);
+    expect(app.text).toContain('sengp://payment/success');
+  });
+});

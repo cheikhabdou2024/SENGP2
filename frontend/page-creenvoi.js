@@ -952,7 +952,7 @@
                 const payRes = await fetch(`${window.API_BASE_URL}/payments`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mission_id: mission.id, payment_method })
+                    body: JSON.stringify({ mission_id: mission.id, payment_method, return_to: (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser) ? 'app' : 'web' })
                 });
                 const payResult = await payRes.json();
                 if (!payRes.ok || !payResult.success) {
