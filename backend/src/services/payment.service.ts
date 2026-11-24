@@ -5,7 +5,8 @@ import logger from '../utils/logger';
 import { config } from '../config/env';
 import { withTransaction } from '../utils/transaction';
 import { AppError } from '../utils/AppError';
-import { getProvider, getProviderByWebhookKey } from './providers';
+import { getProvider, getProviderByWebhookKey, isCardEnabled } from './providers';
+import { currentLang } from '../i18n';
 import { NotificationService } from './notification.service';
 
 const UUID_REGEX =
@@ -49,6 +50,10 @@ export class PaymentService {
     }
     if (data.amount !== undefined && Number(data.amount) !== amount) {
       logger.warn(`Payment amount mismatch for mission ${mission.mission_code}: client sent ${data.amount}, price is ${amount}`);
+    }
+
+    if (data.payment_method === 'card' && !isCardEnabled()) {
+      throw AppError.badRequest('Card payments are not available');
     }
 
     const alreadyPaid = await pool.query(
@@ -106,6 +111,8 @@ export class PaymentService {
         reference: payment_code,
         successUrl,
         errorUrl,
+        description: `SEN GP - ${mission.mission_code}`,
+        locale: currentLang() || undefined,
       });
 
       const updated = await pool.query(
@@ -190,6 +197,11 @@ export class PaymentService {
     if (parsed.status === 'completed' && parsed.amount !== undefined && parsed.amount !== Number(payment.amount)) {
       logger.error(`Webhook ${webhookKey}: amount mismatch for ${payment.payment_code} (got ${parsed.amount}, expected ${payment.amount})`);
       return { status: 400, message: 'Amount mismatch' };
+    }
+
+    if (parsed.status === 'completed' && parsed.currency && parsed.currency !== String(payment.currency).toUpperCase()) {
+      logger.error(`Webhook ${webhookKey}: currency mismatch for ${payment.payment_code} (got ${parsed.currency}, expected ${payment.currency})`);
+      return { status: 400, message: 'Currency mismatch' };
     }
 
     if (parsed.status === 'completed') {

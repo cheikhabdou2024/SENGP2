@@ -91,7 +91,9 @@ Référence des routes de l'API REST. Source de vérité : `backend/src/routes/*
 |---|---|---|
 | POST | `/payments/webhook/wave` | Webhook Wave (signature HMAC `t=…,v1=…`). Sans authentification. Répond 500 sur erreur transitoire pour que Wave réessaie. |
 | POST | `/payments/webhook/orange` | Webhook Orange Money. |
+| POST | `/payments/webhook/stripe` | Webhook Stripe (signature `Stripe-Signature` `t=…,v1=…`, tolérance 5 min). Événements : `checkout.session.completed`, `…async_payment_succeeded`, `…async_payment_failed`, `…expired`. Sans authentification. |
 | POST | `/payments` | Crée un paiement (expéditeur). 409 si la mission est déjà payée. |
+| GET | `/payments/methods` | Moyens en ligne disponibles : `{ card: boolean }` (vrai si Stripe est configuré). |
 | GET | `/payments/my-payments`, `/payments/:id` | Historique et détail. |
 
 ## Portefeuille et retraits

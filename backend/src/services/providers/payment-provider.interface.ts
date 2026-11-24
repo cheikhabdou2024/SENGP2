@@ -1,5 +1,5 @@
 /**
- * Common abstraction over the mobile-money providers (Wave, Orange Money).
+ * Common abstraction over the payment providers (Wave, Orange Money, Stripe cards).
  *
  * Both providers use the same shape of flow: create a hosted checkout, redirect
  * the payer to a provider URL, then receive an asynchronous webhook/callback that
@@ -20,6 +20,10 @@ export interface CreateCheckoutParams {
   successUrl: string;
   /** Where the provider redirects the payer on cancel/error. */
   errorUrl: string;
+  /** Short label shown to the payer on the provider page (optional). */
+  description?: string;
+  /** Payer's language, for providers that can translate their page (optional). */
+  locale?: string;
 }
 
 export interface CheckoutResult {
@@ -41,6 +45,8 @@ export interface ParsedWebhook {
   providerTxnId?: string;
   /** Amount the provider says it collected, when the callback carries one. */
   amount?: number;
+  /** ISO currency the provider says it collected, when the callback carries one. */
+  currency?: string;
   /**
    * Per-transaction secret used to correlate + authenticate the callback when
    * there is no reference echoed back (Orange `notif_token`). The service looks
@@ -51,7 +57,7 @@ export interface ParsedWebhook {
 }
 
 export interface PaymentProvider {
-  /** Matches the `payment_method` enum value, e.g. "wave" | "orange_money". */
+  /** Matches the `payment_method` enum value, e.g. "wave" | "orange_money" | "card". */
   readonly method: string;
 
   /** Create a hosted checkout and return the redirect URL. */

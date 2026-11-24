@@ -12,9 +12,13 @@ const router = Router();
 // provider layer.
 router.post('/webhook/wave', PaymentController.webhookWave);
 router.post('/webhook/orange', PaymentController.webhookOrange);
+router.post('/webhook/stripe', PaymentController.webhookStripe);
 
 // Everything below requires authentication
 router.use(AuthMiddleware.verifyToken);
+
+// Online methods currently available (cards depend on the Stripe configuration)
+router.get('/methods', PaymentController.methods);
 
 // Current user's payments
 router.get('/my-payments', PaymentController.getMyPayments);

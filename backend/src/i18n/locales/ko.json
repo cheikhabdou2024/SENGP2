@@ -122,7 +122,8 @@
     "Title is required": "제목은 필수입니다",
     "User type must be either expediteur or gp": "사용자 유형은 보내는 사람 또는 GP여야 합니다",
     "amount must be a positive number": "금액은 양수여야 합니다",
-    "payment_method must be wave or orange_money": "결제 수단은 wave 또는 orange_money여야 합니다",
+    "Unsupported payment method": "지원하지 않는 결제 수단입니다",
+    "Card payments are not available": "카드 결제를 사용할 수 없습니다",
     "user_id is required": "사용자 식별자는 필수입니다",
     "Invalid language": "언어가 올바르지 않습니다"
   },

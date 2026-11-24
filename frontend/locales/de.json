@@ -585,6 +585,8 @@
   "cr.mode_de_paiement": "Zahlungsart",
   "cr.wave": "Wave",
   "cr.transfert_instantane": "Sofortüberweisung",
+  "cr.card": "Bankkarte",
+  "cr.card_sub": "Visa, Mastercard · sichere Zahlung",
   "cr.paiement_a_la_livraison": "Zahlung bei Lieferung",
   "cr.especes_au_destinataire": "Bargeld vom Empfänger",
   "cr.orange_money": "Orange Money",

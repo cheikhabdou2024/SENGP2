@@ -601,6 +601,8 @@
   "cr.mode_de_paiement": "طريقة الدفع",
   "cr.wave": "Wave",
   "cr.transfert_instantane": "تحويل فوري",
+  "cr.card": "بطاقة مصرفية",
+  "cr.card_sub": "فيزا، ماستركارد · دفع آمن",
   "cr.paiement_a_la_livraison": "الدفع عند التسليم",
   "cr.especes_au_destinataire": "نقدًا من المستلم",
   "cr.orange_money": "Orange Money",

@@ -122,7 +122,8 @@
     "Title is required": "De titel is verplicht",
     "User type must be either expediteur or gp": "Het gebruikerstype moet verzender of GP zijn",
     "amount must be a positive number": "Het bedrag moet een positief getal zijn",
-    "payment_method must be wave or orange_money": "De betaalmethode moet wave of orange_money zijn",
+    "Unsupported payment method": "Betaalmethode niet ondersteund",
+    "Card payments are not available": "Betalen met kaart is niet beschikbaar",
     "user_id is required": "De gebruikersidentificatie is verplicht",
     "Invalid language": "Ongeldige taal"
   },

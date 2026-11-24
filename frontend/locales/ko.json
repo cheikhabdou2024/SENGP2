@@ -581,6 +581,8 @@
   "cr.mode_de_paiement": "결제 방법",
   "cr.wave": "Wave",
   "cr.transfert_instantane": "즉시 송금",
+  "cr.card": "은행 카드",
+  "cr.card_sub": "Visa, Mastercard · 안전 결제",
   "cr.paiement_a_la_livraison": "배송 시 결제",
   "cr.especes_au_destinataire": "받는 사람에게 현금 결제",
   "cr.orange_money": "Orange Money",

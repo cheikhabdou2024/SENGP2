@@ -808,6 +808,16 @@
             nextBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
         }
 
+        // L'option carte n'apparaît que si le serveur a Stripe configuré.
+        (async function showCardIfAvailable() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const r = await fetch(`${window.API_BASE_URL}/payments/methods`, { headers: token ? { 'Authorization': `Bearer ${token}` } : {} });
+                const j = await r.json();
+                if (j && j.data && j.data.card) document.getElementById('payCardOpt').hidden = false;
+            } catch (e) { /* carte indisponible : on reste sur Wave et paiement à la livraison */ }
+        })();
+
         function selectPaymentMethod(method) {
             selectedPaymentMethod = method;
             togglePayButton();
@@ -937,8 +947,8 @@
                     return;
                 }
 
-                // 2b. Paiement en ligne (Wave).
-                const payment_method = 'wave';
+                // 2b. Paiement en ligne (Wave ou carte bancaire via Stripe).
+                const payment_method = selectedPaymentMethod === 'card' ? 'card' : 'wave';
                 const payRes = await fetch(`${window.API_BASE_URL}/payments`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },

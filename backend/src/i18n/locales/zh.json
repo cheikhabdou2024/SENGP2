@@ -122,7 +122,8 @@
     "Title is required": "必须填写标题",
     "User type must be either expediteur or gp": "用户类型必须是寄件人或 GP",
     "amount must be a positive number": "金额必须为正数",
-    "payment_method must be wave or orange_money": "付款方式必须是 wave 或 orange_money",
+    "Unsupported payment method": "不支持该付款方式",
+    "Card payments are not available": "暂不支持银行卡付款",
     "user_id is required": "必须提供用户标识",
     "Invalid language": "语言无效"
   },

@@ -122,7 +122,8 @@
     "Title is required": "タイトルは必須です",
     "User type must be either expediteur or gp": "ユーザーの種類は送り主またはGPにしてください",
     "amount must be a positive number": "金額は正の数にしてください",
-    "payment_method must be wave or orange_money": "お支払い方法はwaveまたはorange_moneyにしてください",
+    "Unsupported payment method": "このお支払い方法には対応していません",
+    "Card payments are not available": "カード決済は現在ご利用いただけません",
     "user_id is required": "ユーザーIDは必須です",
     "Invalid language": "言語が無効です"
   },

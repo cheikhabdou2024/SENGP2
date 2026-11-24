@@ -134,7 +134,8 @@ export const ERRORS: Record<string, Row> = {
   'Title is required': ['Le titre est obligatoire', 'Title is required', 'العنوان مطلوب', 'El título es obligatorio', 'O título é obrigatório'],
   'User type must be either expediteur or gp': ['Le type d\'utilisateur doit être expéditeur ou GP', 'User type must be either expediteur or gp', 'يجب أن يكون نوع المستخدم مُرسِلًا أو ناقلًا (GP)', 'El tipo de usuario debe ser remitente o GP', 'O tipo de utilizador deve ser remetente ou GP'],
   'amount must be a positive number': ['Le montant doit être un nombre positif', 'amount must be a positive number', 'يجب أن يكون المبلغ رقمًا موجبًا', 'El importe debe ser un número positivo', 'O montante deve ser um número positivo'],
-  'payment_method must be wave or orange_money': ['Le moyen de paiement doit être wave ou orange_money', 'payment_method must be wave or orange_money', 'يجب أن تكون وسيلة الدفع wave أو orange_money', 'El medio de pago debe ser wave u orange_money', 'O meio de pagamento deve ser wave ou orange_money'],
+  'Unsupported payment method': ['Moyen de paiement non pris en charge', 'Unsupported payment method', 'وسيلة الدفع غير مدعومة', 'Medio de pago no admitido', 'Meio de pagamento não suportado'],
+  'Card payments are not available': ["Le paiement par carte n'est pas disponible", 'Card payments are not available', 'الدفع بالبطاقة غير متاح', 'El pago con tarjeta no está disponible', 'O pagamento por cartão não está disponível'],
   'user_id is required': ['L\'identifiant de l\'utilisateur est obligatoire', 'user_id is required', 'معرّف المستخدم مطلوب', 'El identificador de usuario es obligatorio', 'O identificador do utilizador é obrigatório'],
   'Invalid language': ['Langue invalide', 'Invalid language', 'لغة غير صالحة', 'Idioma no válido', 'Idioma inválido'],
 };

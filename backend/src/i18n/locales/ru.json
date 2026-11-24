@@ -122,7 +122,8 @@
     "Title is required": "Заголовок обязателен",
     "User type must be either expediteur or gp": "Тип пользователя должен быть «отправитель» или «GP»",
     "amount must be a positive number": "Сумма должна быть положительным числом",
-    "payment_method must be wave or orange_money": "Способ оплаты должен быть wave или orange_money",
+    "Unsupported payment method": "Способ оплаты не поддерживается",
+    "Card payments are not available": "Оплата картой недоступна",
     "user_id is required": "Идентификатор пользователя обязателен",
     "Invalid language": "Недопустимый язык"
   },

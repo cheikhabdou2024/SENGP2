@@ -585,6 +585,8 @@
   "cr.mode_de_paiement": "Betaalmethode",
   "cr.wave": "Wave",
   "cr.transfert_instantane": "Directe overboeking",
+  "cr.card": "Bankkaart",
+  "cr.card_sub": "Visa, Mastercard · veilig betalen",
   "cr.paiement_a_la_livraison": "Betaling bij levering",
   "cr.especes_au_destinataire": "Contant aan de ontvanger",
   "cr.orange_money": "Orange Money",

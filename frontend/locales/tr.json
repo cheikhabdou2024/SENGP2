@@ -585,6 +585,8 @@
   "cr.mode_de_paiement": "Ödeme yöntemi",
   "cr.wave": "Wave",
   "cr.transfert_instantane": "Anında transfer",
+  "cr.card": "Banka kartı",
+  "cr.card_sub": "Visa, Mastercard · güvenli ödeme",
   "cr.paiement_a_la_livraison": "Kapıda ödeme",
   "cr.especes_au_destinataire": "Alıcıya nakit",
   "cr.orange_money": "Orange Money",

@@ -593,6 +593,8 @@
   "cr.mode_de_paiement": "Способ оплаты",
   "cr.wave": "Wave",
   "cr.transfert_instantane": "Мгновенный перевод",
+  "cr.card": "Банковская карта",
+  "cr.card_sub": "Visa, Mastercard · безопасная оплата",
   "cr.paiement_a_la_livraison": "Оплата при получении",
   "cr.especes_au_destinataire": "Наличными получателю",
   "cr.orange_money": "Orange Money",

@@ -122,7 +122,8 @@
     "Title is required": "Der Titel ist erforderlich",
     "User type must be either expediteur or gp": "Der Nutzertyp muss Absender oder GP sein",
     "amount must be a positive number": "Der Betrag muss eine positive Zahl sein",
-    "payment_method must be wave or orange_money": "Die Zahlungsart muss wave oder orange_money sein",
+    "Unsupported payment method": "Zahlungsart nicht unterstützt",
+    "Card payments are not available": "Kartenzahlung ist nicht verfügbar",
     "user_id is required": "Die Nutzerkennung ist erforderlich",
     "Invalid language": "Ungültige Sprache"
   },

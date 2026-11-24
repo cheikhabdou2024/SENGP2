@@ -153,3 +153,16 @@ Run the **full happy path** once per provider (Wave, then Orange):
 - Reconciliation job for stuck `pending` payments.
 - The "Carte bancaire" option was removed (Wave/Orange are mobile money only); add
   a card processor separately if needed.
+
+---
+
+## Cartes bancaires (Stripe Checkout)
+
+Le serveur sait encaisser par carte via **Stripe Checkout** (page hébergée par Stripe : le numéro de carte ne passe jamais par nos serveurs, 3D Secure est géré par Stripe, la page est traduite dans la langue de l'utilisateur quand Stripe la propose). Monnaie : **XOF** (sans décimales). Tant que Stripe n'est pas configuré, l'option « Carte bancaire » reste **masquée** dans l'application et `POST /payments` avec `card` répond 400.
+
+1. **Compte Stripe** : Stripe n'ouvre pas de compte au Sénégal ; il faut une entité dans un pays pris en charge. Activer le XOF comme monnaie de règlement/présentation et vérifier le montant minimum.
+2. **Clés** : `STRIPE_SECRET_KEY` (clé secrète) dans App Runner, en test (`sk_test_…`) d'abord.
+3. **Webhook** : dans le tableau de bord Stripe, ajouter l'endpoint `https://<API>/api/v1/payments/webhook/stripe` pour `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed` et `checkout.session.expired`, puis copier le secret `whsec_…` dans `STRIPE_WEBHOOK_SECRET`.
+4. **Essai en mode test** : carte `4242 4242 4242 4242` (succès), `4000 0000 0000 9995` (refusée). Vérifier : paiement `completed`, notification reçue, expéditeur crédité en `total_spent`.
+5. **Passage en production** : clés `sk_live_…` et un **nouveau** secret de webhook (le mode live a son propre endpoint). Premier essai avec un petit montant, puis remboursement depuis Stripe.
+6. **Non couvert** : les remboursements faits depuis Stripe ne sont pas encore répercutés automatiquement (événement `charge.refunded` non traité) ; les contestations (`charge.dispute.*`) non plus.

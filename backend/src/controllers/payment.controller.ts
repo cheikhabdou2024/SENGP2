@@ -3,7 +3,9 @@ import { Response } from 'express';
 import { PaymentService } from '../services/payment.service';
 import { ResponseUtil } from '../utils/response';
 import { AuthRequest } from '../types';
+import { tr } from '../i18n';
 import logger from '../utils/logger';
+import { isCardEnabled } from '../services/providers';
 
 export class PaymentController {
   /**
@@ -24,7 +26,7 @@ export class PaymentController {
       logger.error('Payment creation error:', error);
 
       if (error instanceof AppError) {
-        res.status(error.statusCode).json({ success: false, error: error.message });
+        res.status(error.statusCode).json({ success: false, error: tr(error.message) });
         return;
       }
 
@@ -108,6 +110,22 @@ export class PaymentController {
    */
   static async webhookOrange(req: AuthRequest, res: Response): Promise<void> {
     await PaymentController.handleWebhook('orange', req, res);
+  }
+
+  /**
+   * Stripe webhook (public, signature-verified)
+   * POST /api/v1/payments/webhook/stripe
+   */
+  static async webhookStripe(req: AuthRequest, res: Response): Promise<void> {
+    await PaymentController.handleWebhook('stripe', req, res);
+  }
+
+  /**
+   * Which online payment methods can be offered right now.
+   * GET /api/v1/payments/methods
+   */
+  static async methods(_req: AuthRequest, res: Response): Promise<void> {
+    ResponseUtil.success(res, { card: isCardEnabled() });
   }
 
   private static async handleWebhook(key: string, req: AuthRequest, res: Response): Promise<void> {

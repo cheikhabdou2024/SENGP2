@@ -585,6 +585,8 @@
   "cr.mode_de_paiement": "भुगतान का तरीका",
   "cr.wave": "Wave",
   "cr.transfert_instantane": "तुरंत ट्रांसफ़र",
+  "cr.card": "बैंक कार्ड",
+  "cr.card_sub": "Visa, Mastercard · सुरक्षित भुगतान",
   "cr.paiement_a_la_livraison": "डिलीवरी पर भुगतान",
   "cr.especes_au_destinataire": "पाने वाले को नकद",
   "cr.orange_money": "Orange Money",

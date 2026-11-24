@@ -122,7 +122,8 @@
     "Title is required": "Başlık zorunludur",
     "User type must be either expediteur or gp": "Kullanıcı türü gönderen veya GP olmalıdır",
     "amount must be a positive number": "Tutar pozitif bir sayı olmalıdır",
-    "payment_method must be wave or orange_money": "Ödeme yöntemi wave veya orange_money olmalıdır",
+    "Unsupported payment method": "Desteklenmeyen ödeme yöntemi",
+    "Card payments are not available": "Kartla ödeme kullanılamıyor",
     "user_id is required": "Kullanıcı kimliği zorunludur",
     "Invalid language": "Geçersiz dil"
   },

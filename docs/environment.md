@@ -48,6 +48,7 @@ Tests d'intégration : `TEST_DATABASE_URL` (le nom de base doit se terminer par 
 | `DELIVERY_GEOFENCE_KM` | — | Rayon de validation GPS à la livraison. |
 | `PAYMENT_SUCCESS_URL`, `PAYMENT_ERROR_URL` | — | Pages de retour après paiement. |
 | `WAVE_API_KEY`, `WAVE_API_SECRET`, `WAVE_API_BASE` | — | Wave : clé d'API, secret de signature des webhooks (HMAC-SHA256), URL de base. |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_API_BASE` | — | Stripe (carte bancaire) : clé secrète (`sk_test_…` puis `sk_live_…`), secret de signature des webhooks (`whsec_…`), URL de base. **L'option carte n'apparaît dans l'application que si les deux premières sont renseignées** (`GET /payments/methods`). |
 | `ORANGE_MONEY_CLIENT_ID`, `ORANGE_MONEY_CLIENT_SECRET`, `ORANGE_MONEY_MERCHANT_KEY`, `ORANGE_TOKEN_URL`, `ORANGE_WEBPAY_URL`, `ORANGE_MONEY_CALLBACK_URL` | — | Orange Money. |
 
 Procédure de mise en production des paiements : `docs/go-live-payments.md`.

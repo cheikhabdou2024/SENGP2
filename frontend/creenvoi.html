@@ -1470,6 +1470,7 @@
         /* payment method */
         .rc-pay { margin-top: 18px; display: flex; flex-direction: column; gap: 12px; }
         .rc-opt { position: relative; display: block; margin: 0; cursor: pointer; }
+        .rc-opt[hidden] { display: none; }
         .rc-opt input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; padding: 0; border: 0; }
         .rc-opt__in { display: flex; align-items: center; gap: 14px; min-height: 76px; padding: 12px 14px; border: 1.5px solid var(--cr-line); border-radius: 20px; background: #fff; transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; }
         .rc-opt__logo { width: 46px; height: 46px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 13px; background: #F1F5FA; overflow: hidden; }
@@ -1952,6 +1953,14 @@
                             <span class="rc-opt__in">
                                 <span class="rc-opt__logo"><img src="im/wave.jpg" alt="" width="46" height="46"></span>
                                 <span class="rc-opt__t"><b data-i18n="cr.wave">Wave</b><small data-i18n="cr.transfert_instantane">Transfert instantané</small></span>
+                                <span class="rc-opt__radio" aria-hidden="true"></span>
+                            </span>
+                        </label>
+                        <label class="rc-opt" id="payCardOpt" hidden>
+                            <input type="radio" name="payMethod" value="card" onchange="selectPaymentMethod('card')">
+                            <span class="rc-opt__in">
+                                <span class="rc-opt__logo"><svg class="cr-i" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></span>
+                                <span class="rc-opt__t"><b data-i18n="cr.card">Carte bancaire</b><small data-i18n="cr.card_sub">Visa, Mastercard · paiement sécurisé</small></span>
                                 <span class="rc-opt__radio" aria-hidden="true"></span>
                             </span>
                         </label>

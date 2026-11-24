@@ -581,6 +581,8 @@
   "cr.mode_de_paiement": "お支払い方法",
   "cr.wave": "Wave",
   "cr.transfert_instantane": "即時送金",
+  "cr.card": "銀行カード",
+  "cr.card_sub": "Visa、Mastercard · 安全なお支払い",
   "cr.paiement_a_la_livraison": "代金引換",
   "cr.especes_au_destinataire": "受取人から現金で",
   "cr.orange_money": "Orange Money",

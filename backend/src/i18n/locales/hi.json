@@ -122,7 +122,8 @@
     "Title is required": "शीर्षक आवश्यक है",
     "User type must be either expediteur or gp": "उपयोगकर्ता का प्रकार भेजने वाला या GP होना चाहिए",
     "amount must be a positive number": "राशि एक धनात्मक संख्या होनी चाहिए",
-    "payment_method must be wave or orange_money": "भुगतान का तरीका wave या orange_money होना चाहिए",
+    "Unsupported payment method": "भुगतान का यह तरीका समर्थित नहीं है",
+    "Card payments are not available": "कार्ड से भुगतान उपलब्ध नहीं है",
     "user_id is required": "उपयोगकर्ता की पहचान (user_id) आवश्यक है",
     "Invalid language": "भाषा अमान्य है"
   },

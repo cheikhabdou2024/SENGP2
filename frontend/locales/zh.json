@@ -581,6 +581,8 @@
   "cr.mode_de_paiement": "付款方式",
   "cr.wave": "Wave",
   "cr.transfert_instantane": "即时转账",
+  "cr.card": "银行卡",
+  "cr.card_sub": "Visa、Mastercard · 安全支付",
   "cr.paiement_a_la_livraison": "货到付款",
   "cr.especes_au_destinataire": "向收件人收取现金",
   "cr.orange_money": "Orange Money",
