@@ -28,3 +28,6 @@ rootkey.csv
 build/
 www/
 frontend/locales/.lock
+
+# Feuilles de relecture generees par scripts/i18n-qa.mjs --kit
+docs/review/

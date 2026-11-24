@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { validationResult, ValidationChain } from 'express-validator';
 import { ResponseUtil } from '../utils/response';
+import { tr } from '../i18n';
 
 export class ValidationMiddleware {
   /**
@@ -19,7 +20,7 @@ export class ValidationMiddleware {
 
       const extractedErrors = errors.array().map((err: any) => ({
         field: err.param,
-        message: err.msg,
+        message: tr(String(err.msg)),
         value: err.value,
       }));
 

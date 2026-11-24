@@ -107,3 +107,20 @@ describe('notifications dans la langue du destinataire', () => {
     await expect(NotificationService.create({ user_id: u.id, notification_type: NotificationType.SYSTEM_ALERT })).rejects.toThrow();
   });
 });
+
+describe('messages de validation traduits', () => {
+  it('le detail de chaque champ suit la langue demandee', async () => {
+    const send = async (lang?: string) => {
+      const req = api().post('/api/v1/auth/register');
+      if (lang) req.set('Accept-Language', lang);
+      return (await req.send({ email: 'x' })).body;
+    };
+    const ar = await send('ar');
+    expect(ar.error).toBe('فشل التحقق من البيانات');
+    expect(ar.errors.map((e: any) => e.message)).toContain('يجب ألا تقل كلمة المرور عن 8 أحرف');
+    const es = await send('es');
+    expect(es.errors.map((e: any) => e.message)).toContain('La contraseña debe tener al menos 8 caracteres');
+    const none = await send();
+    expect(none.errors.map((e: any) => e.message)).toContain('Password must be at least 8 characters long');
+  });
+});
