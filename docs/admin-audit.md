@@ -104,4 +104,11 @@ Cloche en haut à droite = notifications personnelles (remplace l'entrée « Ale
 
 **Lots 1 et 2 réalisés (25 novembre 2026, non déployés).** S1, S2, S3, S4 et S6 corrigés ; F1 (commission, assurance, retrait minimum branchés ; champs « pays » retirés), F2 (mode de paiement enregistré sur la mission, affiché, compté dans la ventilation) et F3 (filtres et libellés) corrigés. Tests : `admin-security.test.ts` et `admin-accuracy.test.ts`.
 
-Restent hors périmètre de ces deux lots : suivi du reversement des espèces par les GP (F2, seconde moitié), remboursement réel chez le fournisseur (F4), lots 3 à 5.
+**Lot 3 réalisé (25 novembre 2026, non déployé).** Interface seule, aucun changement serveur.
+- Menu regroupé par métier : Pilotage (À traiter, Vue d'ensemble, Analyses), Opérations (Missions, Affectations, Trajets, Utilisateurs), Finances (Paiements, Retraits), Confiance (Vérification d'identité, Réclamations, Avis), Équipe & système (Équipe et rôles, Journal d'audit, Diffusions, Paramètres). Le doublon « Revenus & Comm. » et l'entrée « Alertes » sont retirés du menu (la cloche en haut à droite reste). Un groupe sans entrée autorisée est masqué.
+- Page d'accueil « À traiter » (`frontend/admin-todo.js`) : compteurs des arrivées à confirmer, scans à valider, missions à affecter, identités à vérifier, retraits en attente (avec le montant), réclamations ouvertes et litiges, chacun ne s'affichant que si le rôle y a droit, avec un lien vers la liste déjà filtrée. Total en pastille dans le menu, actualisé toutes les 60 s.
+- Adresse = état : `#/missions?status=disputed&q=…&page=2`, `#/users?type=admin`, `#/missions/<id>`, `#/users/<id>`, `#/trips/<id>`. Rechargement, bouton Précédent et partage de lien fonctionnent ; une vue interdite ou inconnue retombe sur « À traiter ». Les filtres Type, Expéditeur et GP, qui n'étaient jamais remis à zéro en changeant de vue, le sont désormais.
+- Équipe et rôles : bouton « Voir les comptes admin » (liste des utilisateurs filtrée sur les admins).
+- Écart avec la cible : les fiches mission, utilisateur et trajet restent des fenêtres, mais avec leur propre adresse ; les onglets Missions (Toutes / À affecter / En cours / Litiges) et Utilisateurs (Tous / À vérifier / Admins) ne sont pas faits, les tuiles « À traiter » en tiennent lieu.
+
+Restent hors périmètre de ces lots : suivi du reversement des espèces par les GP (F2, seconde moitié), remboursement réel chez le fournisseur (F4), lots 3 à 5.

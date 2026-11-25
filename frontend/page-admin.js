@@ -11,7 +11,7 @@
         let me = null;
         try { me = JSON.parse(localStorage.getItem('userData') || 'null'); } catch (e) {}
 
-        const state = { view: 'overview', page: 1, search: '', status: '' };
+        const state = { view: 'todo', page: 1, search: '', status: '', uType: '', mExpediteur: '', tGp: '' };
         let myPerms = null;   // string[] of the signed-in admin's permissions (['*'] = all)
         let allPerms = [];    // full catalog, for the role editor
 
@@ -39,9 +39,14 @@
         }
 
         // ---------- Modal helpers (replace confirm/prompt) ----------
-        function closeModal(){ const m = document.getElementById('modalOv'); if (m) m.remove(); }
+        function closeModal(keepRoute){
+            const m = document.getElementById('modalOv');
+            if (!m) return;
+            m.remove();
+            if (_detail && !keepRoute) { _detail = false; history.replaceState(null, '', routeHash()); }
+        }
         function openModal(innerHtml){
-            closeModal();
+            closeModal(true);
             const ov = document.createElement('div');
             ov.id = 'modalOv'; ov.className = 'modal-ov';
             ov.innerHTML = '<div class="modal" role="dialog" aria-modal="true">' + innerHtml + '</div>';
@@ -126,6 +131,7 @@
 
         function logout(){
             stopArrivalWatch();
+            if (window.stopTodoWatch) window.stopTodoWatch();
             localStorage.removeItem('authToken'); localStorage.removeItem('userData');
             token = null; me = null;
             document.getElementById('app').style.display = 'none';
@@ -142,9 +148,10 @@
             ['sideAvatar','topAvatar'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = initials; });
             await loadPermissions();
             applyPermissionGates();
-            switchView('overview', document.querySelector('.nav-link'));
+            applyRoute();
             startArrivalWatch();
             startAlertWatch();
+            if (window.startTodoWatch) window.startTodoWatch();
         }
         // Topbar search → jump to Users filtered by the query.
         function globalSearchGo(){
@@ -178,18 +185,89 @@
             document.querySelectorAll('.nav-link[data-perm]').forEach(el => {
                 el.style.display = can(el.getAttribute('data-perm')) ? '' : 'none';
             });
+            document.querySelectorAll('.nav-section').forEach(sec => {
+                let n = sec.nextElementSibling, any = false;
+                while (n && !n.classList.contains('nav-section')) { if (n.style.display !== 'none') any = true; n = n.nextElementSibling; }
+                sec.style.display = any ? '' : 'none';
+            });
         }
 
-        function switchView(view, el){
-            state.view = view; state.page = 1; state.search = ''; state.status = '';
-            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-            if (el) el.classList.add('active');
+        // ---------- Adresse = état (liens profonds, bouton Précédent) ----------
+        // #/missions?status=disputed&q=…&page=2   ·   #/missions/<id> ouvre la fiche
+        const ROUTE_VIEWS = ['todo','overview','analytics','users','missions','matching','alerts','trips','kyc','payments','withdrawals','claims','reviews','roles','audit','broadcast','settings'];
+        const DETAIL_VIEWS = ['missions','users','trips'];
+        let _routing = false, _detail = false;
+        function routeHash(){
+            const p = new URLSearchParams();
+            if (state.search) p.set('q', state.search);
+            if (state.status) p.set('status', state.status);
+            if (state.view === 'users' && state.uType) p.set('type', state.uType);
+            if (state.view === 'missions' && state.mExpediteur) p.set('exp', state.mExpediteur);
+            if (state.view === 'trips' && state.tGp) p.set('gp', state.tGp);
+            if (state.page > 1) p.set('page', state.page);
+            const qs = p.toString();
+            return '#/' + state.view + (qs ? '?' + qs : '');
+        }
+        function syncRoute(){
+            if (_routing || _detail) return;
+            const h = routeHash();
+            if (location.hash !== h) history.pushState(null, '', h);
+        }
+        function routeDetail(view, id){
+            const h = '#/' + view + '/' + id;
+            _detail = true;
+            if (location.hash !== h) history.pushState(null, '', h);
+        }
+        function routeDetailFailed(){ _detail = false; history.replaceState(null, '', routeHash()); }
+        function viewAllowed(view){
+            if (!ROUTE_VIEWS.includes(view)) return false;
+            const link = document.querySelector('.nav-link[data-view="' + view + '"]');
+            const perm = link && link.getAttribute('data-perm');
+            return !perm || can(perm);
+        }
+        function markNav(view){
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.toggle('active', n.getAttribute('data-view') === view));
+        }
+        function applyRoute(){
+            if (!token || !myPerms) return;
+            const h = location.hash.replace(/^#\/?/, '');
+            const parts = h.split('?');
+            const seg = (parts[0] || '').split('/');
+            const params = new URLSearchParams(parts[1] || '');
+            let view = seg[0];
+            if (!viewAllowed(view)) view = viewAllowed('todo') ? 'todo' : 'overview';
+            _routing = true;
+            _detail = false; closeModal(true);
+            Object.assign(state, {
+                view, page: Math.max(1, parseInt(params.get('page'), 10) || 1),
+                search: params.get('q') || '', status: params.get('status') || '',
+                uType: params.get('type') || '', mExpediteur: params.get('exp') || '', tGp: params.get('gp') || ''
+            });
+            markNav(view);
+            render();
+            _routing = false;
+            const id = seg[1];
+            if (id && DETAIL_VIEWS.includes(view)) {
+                if (view === 'missions') showMissionDetail(id);
+                else if (view === 'users') showUserDetail(id);
+                else if (view === 'trips') showTripDetail(id);
+            }
+        }
+        window.addEventListener('popstate', () => { if (document.getElementById('app').style.display !== 'none') applyRoute(); });
+
+        // `preset` : filtres appliqués d'emblée, ex. switchView('missions', null, { status: 'disputed' }).
+        function switchView(view, el, preset){
+            Object.assign(state, { view, page: 1, search: '', status: '', uType: '', mExpediteur: '', tGp: '' }, preset || {});
+            _detail = false;
+            markNav(view);
+            syncRoute();
             render();
         }
 
         // ---------- Views ----------
         async function render(){
             const main = document.getElementById('main');
+            if (state.view === 'todo') return renderTodo(main);
             if (state.view === 'overview') return renderOverview(main);
             if (state.view === 'analytics') return renderAnalytics(main);
             if (state.view === 'roles') return renderRoles(main);
@@ -731,7 +809,7 @@
 
                 main.innerHTML = `
                     <div class="page-head">
-                        <div><h1>Analytics</h1><p>Analysez les performances et l'activité de votre plateforme.</p></div>
+                        <div><h1>Analyses</h1><p>Analysez les performances et l'activité de votre plateforme.</p></div>
                         <div class="head-tools"><span class="pill-btn">${rangeLabel}</span>${exportBtn}</div>
                     </div>
                     ${kpis}
@@ -758,6 +836,7 @@
         }
 
         async function loadList(){
+            syncRoute();
             const area = document.getElementById('tableArea');
             area.innerHTML = '<div class="loading">Chargement…</div>';
             const q = `?page=${state.page}&limit=20`
@@ -1025,7 +1104,8 @@
         }
         async function showUserDetail(id){
             const { ok, json } = await api('/admin/users/'+id);
-            if (!ok) { toast('Erreur chargement du profil', 'err'); return; }
+            if (!ok) { routeDetailFailed(); toast('Erreur chargement du profil', 'err'); return; }
+            routeDetail('users', id);
             const d = json.data; const u = d.user; const s = d.stats || {};
             const docs = [];
             if (u.identity_document_url) docs.push(`<a href="${esc(u.identity_document_url)}" target="_blank"><img src="${esc(u.identity_document_url)}" style="width:100%;border-radius:8px;border:1px solid rgba(255,255,255,.15)"></a>`);
@@ -1066,6 +1146,7 @@
             loadKyc();
         }
         async function loadKyc(){
+            syncRoute();
             const area = document.getElementById('kycArea');
             area.innerHTML = '<div class="loading">Chargement…</div>';
             const q = `?page=${state.page}&limit=20` + (state.search ? `&search=${encodeURIComponent(state.search)}` : '');
@@ -1249,7 +1330,8 @@
         // ---------- Mission detail (timeline + GPS map + parties) ----------
         async function showMissionDetail(id){
             const { ok, json } = await api('/admin/missions/'+id);
-            if (!ok) { toast('Erreur chargement de la mission', 'err'); return; }
+            if (!ok) { routeDetailFailed(); toast('Erreur chargement de la mission', 'err'); return; }
+            routeDetail('missions', id);
             const d = json.data; const m = d.mission;
             const tel = (p) => p ? `<a href="tel:${esc(p)}">${esc(p)}</a>` : '—';
             const party = (label, name, phone, email) =>
@@ -1298,7 +1380,8 @@
         // ---------- Trip detail + moderation ----------
         async function showTripDetail(id){
             const { ok, json } = await api('/admin/trips/'+id);
-            if (!ok) { toast('Erreur chargement du trajet', 'err'); return; }
+            if (!ok) { routeDetailFailed(); toast('Erreur chargement du trajet', 'err'); return; }
+            routeDetail('trips', id);
             const t = json.data.trip; const missions = json.data.missions || [];
             const rows = missions.map(m => `<tr><td>${esc(m.mission_code)}</td><td>${esc((m.departure_city||'?')+'→'+(m.arrival_city||'?'))}</td><td>${fcfa(m.price)}</td><td><span class="badge ${badgeFor(m.status)}">${esc(stFr(m.status))}</span></td></tr>`).join('')
                 || '<tr><td colspan="4" style="color:rgba(255,255,255,.4)">Aucune mission liée</td></tr>';
@@ -1487,8 +1570,8 @@
                 <div class="kpi-val">${esc(value)}</div><div class="kpi-bottom"><span style="font-size:12px;color:var(--faint)">${esc(sub)}</span></div></div>`;
             main.innerHTML = `
                 <div class="page-head">
-                    <div><h1>Rôles & Admins</h1><p>Gérez les rôles d'accès et les comptes administrateurs.</p></div>
-                    <div class="head-tools">${createBtn}</div>
+                    <div><h1>Équipe et rôles</h1><p>Gérez les rôles d'accès et les comptes administrateurs.</p></div>
+                    <div class="head-tools"><button class="pill-btn" onclick="switchView('users',null,{uType:'admin'})">Voir les comptes admin</button>${createBtn}</div>
                 </div>
                 <div class="kpi-grid">
                     ${kcard(SengpIcons.svg('shield',18),'#8b5cf6','Total rôles', _roles.length, 'système + personnalisés')}
@@ -1551,7 +1634,7 @@
         // ---------- Broadcast ----------
         function renderBroadcast(main){
             main.innerHTML = `
-                <div class="page-head"><div><h1>Broadcast</h1><p>Envoyez une notification à un segment d'utilisateurs.</p></div></div>
+                <div class="page-head"><div><h1>Diffusions</h1><p>Envoyez une notification à un segment d'utilisateurs.</p></div></div>
                 <div class="grid-2">
                     <div class="panel">
                         <div class="panel-head"><h3>Nouvelle diffusion</h3></div>
