@@ -1,5 +1,8 @@
 import pool from '../../config/database';
-import { ALL_PERMISSIONS } from '../../utils/permissions';
+import { ALL_PERMISSIONS, canGrant } from '../../utils/permissions';
+
+/** Action refused because the acting admin lacks the rights to do it (maps to HTTP 403). */
+export class AdminForbidden extends Error {}
 
 /** Rôles et permissions (RBAC). */
 export class AdminRoleService {
@@ -25,11 +28,33 @@ export class AdminRoleService {
     return clean;
   }
 
-  static async createRole(data: { key?: string; name: string; description?: string; permissions: any }) {
+  /** Refuse an action that would leave the platform without any active super admin. */
+  static async assertNotLastSuperAdmin(userId: string) {
+    const r = await pool.query(
+      `SELECT u.id FROM users u JOIN admin_role ar ON ar.id = u.admin_role_id
+        WHERE ar.key = 'super_admin' AND u.user_type = 'admin' AND u.deleted_at IS NULL
+          AND u.status NOT IN ('suspended', 'deleted')`
+    );
+    const ids = r.rows.map((x: any) => x.id);
+    if (ids.includes(userId) && ids.length <= 1) {
+      throw new Error('Cannot remove or suspend the last super admin');
+    }
+  }
+
+  /** Revoke the sessions of every admin holding a role, so a change applies at once. */
+  private static async revokeRoleHolders(roleId: string) {
+    await pool.query(
+      `UPDATE users SET token_version = COALESCE(token_version, 0) + 1 WHERE admin_role_id = $1`,
+      [roleId]
+    );
+  }
+
+  static async createRole(data: { key?: string; name: string; description?: string; permissions: any }, actorPerms?: string[]) {
     if (!data.name) throw new Error('name is required');
     const key = (data.key || data.name).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
     if (!key) throw new Error('A valid key or name is required');
     const perms = this.sanitizePermissions(data.permissions || []);
+    if (!canGrant(actorPerms, perms)) throw new AdminForbidden('You cannot grant permissions you do not hold');
     const exists = await pool.query('SELECT 1 FROM admin_role WHERE key = $1', [key]);
     if (exists.rows.length) throw new Error('A role with this key already exists');
     const r = await pool.query(
@@ -41,7 +66,7 @@ export class AdminRoleService {
     return r.rows[0];
   }
 
-  static async updateRole(id: string, data: { name?: string; description?: string; permissions?: any }) {
+  static async updateRole(id: string, data: { name?: string; description?: string; permissions?: any }, actorPerms?: string[]) {
     const cur = await pool.query('SELECT is_system FROM admin_role WHERE id = $1', [id]);
     if (cur.rows.length === 0) throw new Error('Role not found');
     // System-role permissions are managed in code (re-synced on deploy); editing
@@ -55,7 +80,9 @@ export class AdminRoleService {
     if (data.name !== undefined) { sets.push(`name = $${i++}`); args.push(data.name); }
     if (data.description !== undefined) { sets.push(`description = $${i++}`); args.push(data.description); }
     if (data.permissions !== undefined) {
-      sets.push(`permissions = $${i++}`); args.push(JSON.stringify(this.sanitizePermissions(data.permissions)));
+      const perms = this.sanitizePermissions(data.permissions);
+      if (!canGrant(actorPerms, perms)) throw new AdminForbidden('You cannot grant permissions you do not hold');
+      sets.push(`permissions = $${i++}`); args.push(JSON.stringify(perms));
     }
     if (sets.length === 0) throw new Error('No updatable fields provided');
     args.push(id);
@@ -64,6 +91,7 @@ export class AdminRoleService {
        RETURNING id, key, name, description, permissions, is_system, created_at, updated_at`,
       args
     );
+    if (data.permissions !== undefined) await this.revokeRoleHolders(id);
     return r.rows[0];
   }
 
@@ -83,13 +111,21 @@ export class AdminRoleService {
   }
 
   /** Assign an admin role to a user (promoting them to admin in the process). */
-  static async setUserRole(userId: string, roleId: string) {
+  static async setUserRole(userId: string, roleId: string, actorPerms?: string[]) {
     if (!roleId) throw new Error('role_id is required');
     const role = await pool.query('SELECT id, key, name, permissions FROM admin_role WHERE id = $1', [roleId]);
     if (role.rows.length === 0) throw new Error('Role not found');
+    let granted = role.rows[0].permissions;
+    if (typeof granted === 'string') { try { granted = JSON.parse(granted); } catch { granted = []; } }
+    if (!canGrant(actorPerms, Array.isArray(granted) ? granted : [])) {
+      throw new AdminForbidden('You cannot assign a role with more permissions than you hold');
+    }
+    // Moving the last super admin to another role would lock everyone out.
+    if (role.rows[0].key !== 'super_admin') await this.assertNotLastSuperAdmin(userId);
     const r = await pool.query(
       `UPDATE users
-          SET admin_role_id = $1, user_type = 'admin', status = 'verified', updated_at = CURRENT_TIMESTAMP
+          SET admin_role_id = $1, user_type = 'admin', status = 'verified',
+              token_version = COALESCE(token_version, 0) + 1, updated_at = CURRENT_TIMESTAMP
         WHERE id = $2 AND deleted_at IS NULL
         RETURNING id, email, user_type, admin_role_id`,
       [roleId, userId]

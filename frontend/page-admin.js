@@ -83,10 +83,22 @@
         function badgeFor(status){
             const s = String(status||'').toLowerCase();
             if (['completed','delivered','approved','verified','active','resolved'].includes(s)) return 'b-green';
-            if (['pending','processing','open','published','accepted','in_transit','investigating'].includes(s)) return 'b-yellow';
-            if (['failed','cancelled','rejected','suspended','closed'].includes(s)) return 'b-red';
+            if (['pending','processing','open','published','accepted','in_transit','in_progress','matched','picked_up','in_customs','out_for_delivery','medium','high'].includes(s)) return 'b-yellow';
+            if (['failed','cancelled','rejected','suspended','closed','disputed','refunded','urgent'].includes(s)) return 'b-red';
             return 'b-gray';
         }
+        // Libellés français des statuts (la base stocke des valeurs anglaises).
+        const STATUS_FR = {
+            pending:'En attente', matched:'Affectée', accepted:'Acceptée', picked_up:'Colis récupéré', in_transit:'En transit',
+            in_customs:'En douane', out_for_delivery:'En livraison', delivered:'Livrée', cancelled:'Annulé', disputed:'Litige',
+            processing:'En cours', completed:'Terminé', failed:'Échoué', refunded:'Remboursé',
+            approved:'Approuvé', rejected:'Rejeté', open:'Ouverte', in_progress:'En traitement', resolved:'Résolue', closed:'Clôturée',
+            draft:'Brouillon', published:'Publié', active:'Actif', verified:'Vérifié', suspended:'Suspendu', deleted:'Supprimé',
+            low:'Faible', medium:'Moyenne', high:'Haute', urgent:'Urgente'
+        };
+        function stFr(v){ return STATUS_FR[String(v||'').toLowerCase()] || String(v||'—'); }
+        const PAY_LABEL = { cod:'À la livraison', wave:'Wave', orange_money:'Orange Money', free_money:'Free Money', card:'Carte bancaire', bank_transfer:'Virement', cash:'Espèces' };
+        function payLabel(v){ return v ? (PAY_LABEL[v] || v) : '—'; }
 
         // ---------- Auth ----------
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -377,15 +389,15 @@
 
         function statusFilter(){
             const opts = {
-                users: ['', 'pending','verified','suspended'],
-                missions: ['', 'pending','accepted','in_transit','delivered','cancelled'],
+                users: ['', 'pending','verified','suspended','deleted'],
+                missions: ['', 'pending','matched','accepted','picked_up','in_transit','in_customs','out_for_delivery','delivered','cancelled','disputed'],
                 trips: ['', 'draft','published','active','completed','cancelled'],
-                payments: ['', 'pending','completed','failed'],
-                withdrawals: ['', 'pending','approved','rejected','completed'],
-                claims: ['', 'open','investigating','resolved','closed']
+                payments: ['', 'pending','processing','completed','failed','refunded','cancelled'],
+                withdrawals: ['', 'pending','approved','processing','completed','rejected','cancelled'],
+                claims: ['', 'open','in_progress','resolved','rejected','closed']
             }[state.view];
             if (!opts) return '';
-            return `<select id="status">${opts.map(o => `<option value="${o}"${o===state.status?' selected':''}>${o||'Tous les statuts'}</option>`).join('')}</select>`;
+            return `<select id="status">${opts.map(o => `<option value="${o}"${o===state.status?' selected':''}>${o?stFr(o):'Tous les statuts'}</option>`).join('')}</select>`;
         }
 
         function applyFilters(){
@@ -468,7 +480,11 @@
                     api('/admin/analytics/gp-performance?limit=5'));
                 const res = await Promise.all(reqs);
                 if (!res[0].ok) throw new Error((res[0].json&&res[0].json.error)||'Erreur');
-                const s = res[0].json.data;
+                // The server hides the blocks this admin may not read (null): show them as unavailable.
+                const raw = res[0].json.data;
+                const none = new Proxy({}, { get: () => 0 });
+                const s = {}; ['users','missions','trips','payments','withdrawals','claims'].forEach(k => { s[k] = raw[k] || none; });
+                const dash = (k, v) => raw[k] ? v : '—';
                 const activity = (res[1].ok && res[1].json.data) || [];
                 const cur = hasAn && res[2].ok ? res[2].json.data.totals : null;
                 const prev = hasAn && res[3].ok ? res[3].json.data.totals : null;
@@ -488,11 +504,11 @@
                         <div class="kpi-bottom">${delta || '<span class="kpi-delta flat">—</span>'}${spark}</div></div>`;
                 };
                 const kpis = `<div class="kpi-grid">
-                    ${kpi(SengpIcons.svg('briefcase',18),'#8b5cf6','Volume traité', fcfa(s.payments.gross_volume), 'gross', '#8b5cf6')}
-                    ${kpi(SengpIcons.svg('package',18),'#34d399','Missions', s.missions.total, 'missions', '#34d399')}
-                    ${kpi(SengpIcons.svg('users',18),'#38bdf8','Utilisateurs', s.users.total, 'new_users', '#38bdf8')}
-                    ${kpi(SengpIcons.svg('receipt',18),'#fbbf24','Paiements', s.payments.completed_count, 'payments', '#fbbf24')}
-                    ${kpi(SengpIcons.svg('shield',18),'#fb7185','Réclamations', s.claims.open, null, '#fb7185')}
+                    ${kpi(SengpIcons.svg('briefcase',18),'#8b5cf6','Volume traité', dash('payments', fcfa(s.payments.gross_volume)), 'gross', '#8b5cf6')}
+                    ${kpi(SengpIcons.svg('package',18),'#34d399','Missions', dash('missions', s.missions.total), 'missions', '#34d399')}
+                    ${kpi(SengpIcons.svg('users',18),'#38bdf8','Utilisateurs', dash('users', s.users.total), 'new_users', '#38bdf8')}
+                    ${kpi(SengpIcons.svg('receipt',18),'#fbbf24','Paiements', dash('payments', s.payments.completed_count), 'payments', '#fbbf24')}
+                    ${kpi(SengpIcons.svg('shield',18),'#fb7185','Réclamations', dash('claims', s.claims.open), null, '#fb7185')}
                 </div>`;
 
                 // Revenue chart
@@ -626,7 +642,8 @@
         }
         const PM_META = { wave:{l:'Wave',c:'#22c55e'}, orange_money:{l:'Orange Money',c:'#fb923c'},
             free_money:{l:'Free Money',c:'#38bdf8'}, card:{l:'Carte bancaire',c:'#fbbf24'},
-            bank_transfer:{l:'Virement',c:'#8b5cf6'}, cash:{l:'Espèces',c:'#a78bfa'} };
+            bank_transfer:{l:'Virement',c:'#8b5cf6'}, cash:{l:'Espèces',c:'#a78bfa'},
+            cod:{l:'À la livraison',c:'#f472b6'} };
         let _anSeries = [];
         function setAnRange(r){ state.aRange = r; renderAnalytics(document.getElementById('main')); }
         function anEvoSvg(){
@@ -699,13 +716,13 @@
 
                 // Recent activity table
                 const typeBadge = { mission:['Mission','b-blue'], payment:['Paiement','b-blue'], user:['Utilisateur','b-blue'], claim:['Réclamation','b-red'] };
-                const actDesc = a => a.kind==='mission' ? `Mission ${a.ref} ${esc(a.detail)}${a.extra?(' – '+esc(a.extra)):''}`
+                const actDesc = a => a.kind==='mission' ? `Mission ${a.ref} ${esc(stFr(a.detail))}${a.extra?(' – '+esc(a.extra)):''}`
                     : a.kind==='payment' ? `Paiement reçu${a.who?(' de '+esc(a.who)):''}` : a.kind==='user' ? `Nouvel utilisateur inscrit${a.who?(' – '+esc(a.who)):''}` : `Réclamation ${a.ref} ${esc(a.detail)}`;
                 const actRows = ((act.ok && act.json.data)||[]).map(a => { const tb = typeBadge[a.kind]||['—','b-gray'];
                     const montant = a.kind==='payment' ? fcfa(a.extra) : '—';
                     return `<tr><td>${new Date(a.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</td>
                     <td><span class="badge ${tb[1]}">${tb[0]}</span></td><td>${actDesc(a)}</td><td>${montant}</td>
-                    <td><span class="badge ${badgeFor(a.detail)}">${esc(a.detail||'—')}</span></td><td>${esc(a.who||'—')}</td></tr>`;
+                    <td><span class="badge ${badgeFor(a.detail)}">${esc(stFr(a.detail))}</span></td><td>${esc(a.who||'—')}</td></tr>`;
                 }).join('') || '<tr><td colspan="6" style="color:var(--faint)">Aucune activité</td></tr>';
 
                 const seg = ['7j','30j','3mois','1an'].map(r => `<button class="${state.aRange===r?'active':''}" onclick="setAnRange('${r}')">${r}</button>`).join('');
@@ -809,7 +826,7 @@
                     ]; }
                 },
                 missions: {
-                    head: ['Code','Trajet','Prix','Statut','Expéditeur','GP','Actions'],
+                    head: ['Code','Trajet','Prix','Paiement','Statut','Expéditeur','GP','Actions'],
                     row: m => {
                         const acts = [];
                         acts.push(['act-edit','Détails',`showMissionDetail('${m.id}')`]);
@@ -829,7 +846,9 @@
                         if (can('missions:delete')) acts.push(['act-del','Suppr.',`delMission('${m.id}','${esc(m.mission_code)}')`]);
                         return [
                             esc(m.mission_code), esc((m.departure_city||'?')+' → '+(m.arrival_city||'?')),
-                            fcfa(m.price), `<span class="badge ${badgeFor(m.status)}">${esc(m.status)}</span>`,
+                            fcfa(m.price),
+                            `${esc(payLabel(m.payment_method))}${m.paid ? ' <span class="badge b-green">Payé</span>' : (m.payment_method === 'cod' ? ' <span class="badge b-yellow">À encaisser</span>' : '')}`,
+                            `<span class="badge ${badgeFor(m.status)}">${esc(stFr(m.status))}</span>`,
                             esc(m.expediteur_name||'—'), esc(m.gp_name||'—'),
                             actions(acts)
                         ];
@@ -844,7 +863,7 @@
                         return [
                         esc(t.trip_code), esc((t.departure_city||'?')+' → '+(t.arrival_city||'?')),
                         esc(t.gp_name||'—'), dt(t.departure_date),
-                        `<span class="badge ${badgeFor(t.status)}">${esc(t.status)}</span>`,
+                        `<span class="badge ${badgeFor(t.status)}">${esc(stFr(t.status))}</span>`,
                         `${t.current_packages||0}/${t.max_packages||0}`,
                         actions(acts)
                     ]; }
@@ -853,7 +872,7 @@
                     head: ['Code','Montant','Commission','Net','Méthode','Statut','Payeur','Bénéf.','Date','Actions'],
                     row: p => [
                         esc(p.payment_code), fcfa(p.amount), fcfa(p.commission), fcfa(p.net_amount),
-                        esc(p.payment_method), `<span class="badge ${badgeFor(p.status)}">${esc(p.status)}</span>`,
+                        esc(payLabel(p.payment_method)), `<span class="badge ${badgeFor(p.status)}">${esc(stFr(p.status))}</span>`,
                         esc(p.payer_name||'—'), esc(p.payee_name||'—'), dt(p.created_at),
                         actions((p.status==='completed' && can('payments:refund')) ? [['act-del','Rembourser',`refundPayment('${p.id}','${esc(p.payment_code)}')`]] : [])
                     ]
@@ -873,7 +892,7 @@
                         return [
                         esc(w.withdrawal_code), esc(w.gp_name||w.gp_id||'—'), fcfa(w.amount),
                         esc(w.withdrawal_method), esc(w.account_number||'—'),
-                        `<span class="badge ${badgeFor(w.status)}">${esc(w.status)}</span>`,
+                        `<span class="badge ${badgeFor(w.status)}">${esc(stFr(w.status))}</span>`,
                         acts.length ? actions(acts) : '—'
                     ]; }
                 },
@@ -885,8 +904,8 @@
                         const msg = `<div style="max-width:240px;white-space:normal;">${esc(c.description||'—')}</div>${audio}`;
                         return [
                             esc(c.claim_code), esc(c.claim_type),
-                            `<span class="badge ${badgeFor(c.priority)}">${esc(c.priority)}</span>`,
-                            `<span class="badge ${badgeFor(c.status)}">${esc(c.status)}</span>`,
+                            `<span class="badge ${badgeFor(c.priority)}">${esc(stFr(c.priority))}</span>`,
+                            `<span class="badge ${badgeFor(c.status)}">${esc(stFr(c.status))}</span>`,
                             esc(c.claimant_name||'—'),
                             msg,
                             (function(){ const a=[['act-ok','Fil',`showClaimThread('${c.id}')`]]; if(can('claims:write')) a.push(['act-edit','Traiter',`editClaim('${c.id}','${esc(c.status)}')`]); return actions(a); })()
@@ -1015,11 +1034,11 @@
                 ? `<span class="badge b-green">Vérifié</span>`
                 : (docs.length ? `<span class="badge b-yellow">En attente</span>` : `<span class="badge b-gray">Aucune pièce</span>`);
             const recent = (d.recent_missions||[]).map(m =>
-                `<tr><td>${esc(m.mission_code)}</td><td>${esc((m.departure_city||'?')+'→'+(m.arrival_city||'?'))}</td><td><span class="badge ${badgeFor(m.status)}">${esc(m.status)}</span></td><td>${dt(m.created_at)}</td></tr>`).join('')
+                `<tr><td>${esc(m.mission_code)}</td><td>${esc((m.departure_city||'?')+'→'+(m.arrival_city||'?'))}</td><td><span class="badge ${badgeFor(m.status)}">${esc(stFr(m.status))}</span></td><td>${dt(m.created_at)}</td></tr>`).join('')
                 || '<tr><td colspan="4" style="color:rgba(255,255,255,.4)">Aucune mission</td></tr>';
             openModal(
                 `<h3>${esc(u.first_name+' '+u.last_name)}</h3>`
-              + `<p class="hint">${esc(u.email)} · ${esc(u.phone||'—')} · <span class="badge b-blue">${esc(u.user_type)}</span> <span class="badge ${badgeFor(u.status)}">${esc(u.status)}</span> ${kyc}</p>`
+              + `<p class="hint">${esc(u.email)} · ${esc(u.phone||'—')} · <span class="badge b-blue">${esc(u.user_type)}</span> <span class="badge ${badgeFor(u.status)}">${esc(stFr(u.status))}</span> ${kyc}</p>`
               + `<div class="stats-grid" style="grid-template-columns:repeat(2,1fr)">`
               + card('Envois (expéditeur)', s.missions_as_expediteur||0)
               + card('Missions (GP)', s.missions_as_gp||0)
@@ -1241,7 +1260,7 @@
             const tl = (d.tracking||[]).map(t => {
                 const gps = (t.latitude && t.longitude) ? ` · <a href="https://www.google.com/maps?q=${t.latitude},${t.longitude}" target="_blank">${(+t.latitude).toFixed(4)}, ${(+t.longitude).toFixed(4)}</a>` : '';
                 return `<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)">
-                    <div style="display:flex;justify-content:space-between;gap:8px"><span class="badge ${badgeFor(t.status)}">${esc(t.status)}</span>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span class="badge ${badgeFor(t.status)}">${esc(stFr(t.status))}</span>
                     <span style="font-size:11px;color:rgba(255,255,255,.5)">${new Date(t.created_at).toLocaleString('fr-FR')}</span></div>
                     <div style="font-size:13px;color:rgba(255,255,255,.75);margin-top:3px">${esc(t.location||'')}${esc(t.description?(' — '+t.description):'')}${gps}</div></div>`;
             }).join('') || '<div style="color:rgba(255,255,255,.4);padding:8px 0">Aucun événement de suivi.</div>';
@@ -1251,12 +1270,12 @@
             const map = last ? `<div style="font-weight:600;margin:12px 0 6px">Dernière position</div>
                 <iframe title="carte" width="100%" height="220" style="border:1px solid rgba(255,255,255,.15);border-radius:10px"
                  src="https://www.openstreetmap.org/export/embed.html?bbox=${(+last.longitude-0.02)}%2C${(+last.latitude-0.02)}%2C${(+last.longitude+0.02)}%2C${(+last.latitude+0.02)}&layer=mapnik&marker=${last.latitude}%2C${last.longitude}"></iframe>` : '';
-            const pay = (d.payments||[]).map(p => `<tr><td>${esc(p.payment_code)}</td><td>${fcfa(p.amount)}</td><td>${esc(p.payment_method)}</td><td><span class="badge ${badgeFor(p.status)}">${esc(p.status)}</span></td></tr>`).join('') || '<tr><td colspan="4" style="color:rgba(255,255,255,.4)">Aucun paiement</td></tr>';
-            const clm = (d.claims||[]).map(c => `<span class="badge ${badgeFor(c.status)}">${esc(c.claim_code)} · ${esc(c.claim_type)} (${esc(c.status)})</span>`).join(' ') || '<span style="color:rgba(255,255,255,.4)">Aucune</span>';
+            const pay = (d.payments||[]).map(p => `<tr><td>${esc(p.payment_code)}</td><td>${fcfa(p.amount)}</td><td>${esc(payLabel(p.payment_method))}</td><td><span class="badge ${badgeFor(p.status)}">${esc(stFr(p.status))}</span></td></tr>`).join('') || '<tr><td colspan="4" style="color:rgba(255,255,255,.4)">Aucun paiement</td></tr>';
+            const clm = (d.claims||[]).map(c => `<span class="badge ${badgeFor(c.status)}">${esc(c.claim_code)} · ${esc(c.claim_type)} (${esc(stFr(c.status))})</span>`).join(' ') || '<span style="color:rgba(255,255,255,.4)">Aucune</span>';
             const reassignBtn = (m.gp_id && can('missions:assign'))
                 ? `<button class="btn-confirm" onclick="closeModal();reassignMissionUI('${m.id}','${esc(m.mission_code)}')">Réassigner</button>` : '';
             openModal(
-                `<h3>${esc(m.mission_code)} <span class="badge ${badgeFor(m.status)}">${esc(m.status)}</span></h3>`
+                `<h3>${esc(m.mission_code)} <span class="badge ${badgeFor(m.status)}">${esc(stFr(m.status))}</span></h3>`
               + `<p class="hint">${esc((m.departure_city||'?')+' → '+(m.arrival_city||'?'))} · ${fcfa(m.final_price || m.offered_price)} · ${esc(String(m.package_weight||'?'))} kg${m.arrival_confirmed?' · arrivée confirmée':''}</p>`
               + `<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px">`
               + party('Expéditeur', m.expediteur_name, m.expediteur_phone, m.expediteur_email)
@@ -1269,6 +1288,7 @@
               + (m.trip_code?`<div style="font-size:13px;color:rgba(255,255,255,.7)">Trajet : ${esc(m.trip_code)} ${m.flight_number?('· '+esc(m.flight_number)):''} ${m.airline?('· '+esc(m.airline)):''}</div>`:'')
               + map
               + `<div style="font-weight:600;margin:14px 0 4px">Suivi</div>${tl}`
+              + `<div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:10px">Mode de paiement choisi : <b>${esc(payLabel(m.payment_method))}</b>${m.payment_method === 'cod' ? ' (espèces encaissées par le GP, aucun paiement en ligne)' : ''}</div>`
               + `<div style="font-weight:600;margin:14px 0 6px">Paiements</div><div class="table-wrap"><table style="min-width:auto"><tbody>${pay}</tbody></table></div>`
               + `<div style="font-weight:600;margin:14px 0 6px">Réclamations</div><div>${clm}</div>`
               + `<div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Fermer</button>${reassignBtn}</div>`
@@ -1280,10 +1300,10 @@
             const { ok, json } = await api('/admin/trips/'+id);
             if (!ok) { toast('Erreur chargement du trajet', 'err'); return; }
             const t = json.data.trip; const missions = json.data.missions || [];
-            const rows = missions.map(m => `<tr><td>${esc(m.mission_code)}</td><td>${esc((m.departure_city||'?')+'→'+(m.arrival_city||'?'))}</td><td>${fcfa(m.price)}</td><td><span class="badge ${badgeFor(m.status)}">${esc(m.status)}</span></td></tr>`).join('')
+            const rows = missions.map(m => `<tr><td>${esc(m.mission_code)}</td><td>${esc((m.departure_city||'?')+'→'+(m.arrival_city||'?'))}</td><td>${fcfa(m.price)}</td><td><span class="badge ${badgeFor(m.status)}">${esc(stFr(m.status))}</span></td></tr>`).join('')
                 || '<tr><td colspan="4" style="color:rgba(255,255,255,.4)">Aucune mission liée</td></tr>';
             openModal(
-                `<h3>${esc(t.trip_code)} <span class="badge ${badgeFor(t.status)}">${esc(t.status)}</span></h3>`
+                `<h3>${esc(t.trip_code)} <span class="badge ${badgeFor(t.status)}">${esc(stFr(t.status))}</span></h3>`
               + `<p class="hint">${esc((t.departure_city||'?')+' → '+(t.arrival_city||'?'))} · ${dt(t.departure_date)} → ${dt(t.arrival_date)}</p>`
               + `<div style="font-size:13px;color:rgba(255,255,255,.7)">GP : ${esc(t.gp_name||'—')} · ${t.gp_phone?`<a href="tel:${esc(t.gp_phone)}">${esc(t.gp_phone)}</a>`:'—'}</div>`
               + `<div style="font-size:13px;color:rgba(255,255,255,.7)">${t.flight_number?('Vol '+esc(t.flight_number)+' '):''}${t.airline?('· '+esc(t.airline)):''} · Capacité ${t.current_packages||0}/${t.max_packages||0} colis · ${esc(String(t.available_weight||'?'))} kg dispo</div>`
@@ -1411,7 +1431,7 @@
                 <button class="btn-cancel" onclick="closeModal()">Fermer</button></div>`
               : `<div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">Fermer</button></div>`;
             openModal(
-                `<h3>${esc(c.claim_code)} <span class="badge ${badgeFor(c.status)}">${esc(c.status)}</span> <span class="badge ${badgeFor(c.priority)}">${esc(c.priority)}</span></h3>`
+                `<h3>${esc(c.claim_code)} <span class="badge ${badgeFor(c.status)}">${esc(stFr(c.status))}</span> <span class="badge ${badgeFor(c.priority)}">${esc(stFr(c.priority))}</span></h3>`
               + `<p class="hint">${esc(c.claim_type)} · ${esc(c.claimant_name||'—')} (${esc(c.claimant_type||'')}) · ${c.mission_code?('Mission '+esc(c.mission_code)):''}</p>`
               + `<div style="font-weight:600;margin-top:6px">${esc(c.title||'')}</div>`
               + `<div style="font-size:14px;color:rgba(255,255,255,.8);margin:4px 0">${esc(c.description||'')}</div>`
@@ -1580,16 +1600,12 @@
             if (!ok) { main.innerHTML = `<div class="empty">${status===403?'Accès refusé (settings:read requis).':'Erreur.'}</div>`; return; }
             const s = json.data; const canW = can('settings:write'); const dis = canW?'':'disabled';
             main.innerHTML = `
-                <div class="page-head"><div><h1>Paramètres</h1><p>Configuration de la plateforme.</p></div></div>
+                <div class="page-head"><div><h1>Paramètres</h1><p>Ces valeurs s'appliquent aux prochains paiements, missions et demandes de retrait (quelques secondes après l'enregistrement). Chaque changement est inscrit au journal d'audit.</p></div></div>
                 <div class="grid-2">
                     <div class="panel"><div class="panel-head"><h3>Commissions & frais</h3></div>
-                        <label>Commission plateforme (%)</label><input id="setCommission" type="number" step="0.1" value="${esc(s.commission_pct)}" ${dis}>
-                        <label>Assurance (%)</label><input id="setInsurance" type="number" step="0.1" value="${esc(s.insurance_pct)}" ${dis}>
-                        <label>Retrait minimum (FCFA)</label><input id="setMinW" type="number" value="${esc(s.min_withdrawal)}" ${dis}>
-                    </div>
-                    <div class="panel"><div class="panel-head"><h3>Couverture</h3></div>
-                        <label>Pays supportés (séparés par des virgules)</label>
-                        <textarea id="setCountries" rows="5" ${dis}>${esc((s.supported_countries||[]).join(', '))}</textarea>
+                        <label>Commission plateforme (%) — entre 0 et 50, prélevée sur chaque paiement de mission</label><input id="setCommission" type="number" min="0" max="50" step="0.1" value="${esc(s.commission_pct)}" ${dis}>
+                        <label>Assurance (%) — entre 0 et 20, appliquée à la valeur déclarée du colis</label><input id="setInsurance" type="number" min="0" max="20" step="0.1" value="${esc(s.insurance_pct)}" ${dis}>
+                        <label>Retrait minimum (FCFA) — nombre entier</label><input id="setMinW" type="number" min="0" step="1" value="${esc(s.min_withdrawal)}" ${dis}>
                     </div>
                 </div>
                 ${canW ? '<div class="modal-actions" style="max-width:320px;margin-top:16px"><button class="btn-confirm" onclick="saveSettings()">Enregistrer</button></div>'
@@ -1600,7 +1616,6 @@
                 commission_pct: Number(document.getElementById('setCommission').value),
                 insurance_pct: Number(document.getElementById('setInsurance').value),
                 min_withdrawal: Number(document.getElementById('setMinW').value),
-                supported_countries: document.getElementById('setCountries').value.split(',').map(x=>x.trim()).filter(Boolean),
             };
             const { ok, json } = await api('/admin/settings', { method:'PUT', body: JSON.stringify(body) });
             notify(ok, 'Paramètres enregistrés', json);

@@ -19,10 +19,20 @@ export async function setupDatabase(): Promise<void> {
 
 /** Vide les données (les rôles admin amorcés par la migration sont conservés). */
 export async function resetData(): Promise<void> {
-  await pool.query(
-    `TRUNCATE users, payments, missions, trips, notifications, wallet_balances,
-              mission_tracking RESTART IDENTITY CASCADE`
-  );
+  // Les écritures d'audit « au mieux » du test précédent peuvent encore être en vol : on réessaie
+  // si PostgreSQL détecte un verrou mutuel (40P01) plutôt que d'échouer un test sans rapport.
+  for (let attempt = 0; ; attempt++) {
+    try {
+      await pool.query(
+        `TRUNCATE users, payments, missions, trips, notifications, wallet_balances,
+                  mission_tracking RESTART IDENTITY CASCADE`
+      );
+      return;
+    } catch (e: any) {
+      if (e?.code !== '40P01' || attempt >= 4) throw e;
+      await new Promise((r) => setTimeout(r, 150));
+    }
+  }
 }
 
 export async function closeDatabase(): Promise<void> {
@@ -53,9 +63,14 @@ export async function registerUser(type: 'expediteur' | 'gp'): Promise<TestUser>
   return { id: res.body.data.user.id, token: res.body.data.token, email };
 }
 
-export async function createAdmin(): Promise<TestUser> {
+/** Admin avec un rôle système (par défaut super_admin) ; `null` = admin sans rôle. */
+export async function createAdmin(roleKey: string | null = 'super_admin'): Promise<TestUser> {
   const u = await registerUser('expediteur');
-  await pool.query(`UPDATE users SET user_type = 'admin' WHERE id = $1`, [u.id]);
+  await pool.query(
+    `UPDATE users SET user_type = 'admin',
+            admin_role_id = (SELECT id FROM admin_role WHERE key = $2) WHERE id = $1`,
+    [u.id, roleKey]
+  );
   const login = await api().post('/api/v1/auth/login').send({ email: u.email, password: 'Passw0rd!x' });
   return { id: u.id, token: login.body.data.token, email: u.email };
 }

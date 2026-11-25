@@ -140,4 +140,8 @@ Hors amorçage, tout exige le rôle `admin` **et** une permission (RBAC, voir `d
 | Rôles | `GET/POST /admin/roles`, `PUT/DELETE /roles/:id` |
 | Audit, diffusion, réglages | `GET /admin/audit`, `POST /admin/broadcast`, `GET/PUT /admin/settings` |
 
-> Les réglages `commission_pct` de l'administration ne sont pas encore reliés au calcul de paiement : la commission vient de `PLATFORM_COMMISSION_PERCENTAGE` (voir `docs/tech-debt.md`).
+> Réglages (`GET/PUT /admin/settings`) : `commission_pct` (0–50), `insurance_pct` (0–20) et `min_withdrawal` (entier) sont lus par le calcul des paiements, des missions et des retraits (cache de 15 s). Tant qu'aucune valeur n'est enregistrée, les variables d'environnement `PLATFORM_COMMISSION_PERCENTAGE`, `INSURANCE_FEE_PERCENTAGE` et `MIN_WITHDRAWAL_AMOUNT` font foi. Chaque changement journalise l'ancienne et la nouvelle valeur.
+>
+> Droits : un jeton admin sans liste de permissions (admin sans rôle) n'a aucun droit. `users:write` ne crée ni ne promeut d'admin et ne modifie pas un compte admin (il faut `roles:manage`) ; on ne peut attribuer ou créer qu'un rôle dont on détient toutes les permissions ; changer un rôle ou ses permissions met fin aux sessions concernées ; le dernier super admin ne peut être ni suspendu, ni supprimé, ni rétrogradé. `GET /admin/stats` et `/admin/activity` ne renvoient que les blocs que le rôle peut lire.
+>
+> Filtres `status` : une valeur inconnue de la base est refusée (400) au lieu de provoquer une erreur SQL. Une mission porte son mode de paiement (`payment_method` : `cod`, `wave`, `orange_money`, `card`) ; `cod` = paiement à la livraison, sans ligne de paiement.

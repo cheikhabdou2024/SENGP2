@@ -1,9 +1,9 @@
-import { config } from '../../config/env';
 import pool from '../../config/database';
 import bcrypt from 'bcryptjs';
 import { Helpers } from '../../utils/helpers';
 import { pushToSegment } from '../../utils/webpush';
 import { safeEqual } from '../../utils/safeEqual';
+import { SETTING_KEYS, SETTING_LIMITS, settingDefaults, invalidateSettingsCache, SettingKey } from '../settings.service';
 
 /** Journal d’audit, diffusion, paramètres de la plateforme, amorçage admin. */
 export class AdminSystemService {
@@ -54,12 +54,8 @@ export class AdminSystemService {
   }
 
   // ---------- Platform settings ----------
-  static SETTING_DEFAULTS: Record<string, any> = {
-    commission_pct: config.commissionPct,
-    insurance_pct: Number(process.env.INSURANCE_FEE_PERCENTAGE) || 2,
-    min_withdrawal: Number(process.env.MIN_WITHDRAWAL_AMOUNT) || 5000,
-    supported_countries: ['Sénégal', 'France', 'USA', 'Canada', 'Maroc', 'Côte d\'Ivoire', 'Mali'],
-  };
+  /** Settings the platform really reads (payment commission, insurance fee, minimum withdrawal). */
+  static get SETTING_DEFAULTS(): Record<string, any> { return settingDefaults(); }
 
   static async getSettings() {
     const r = await pool.query('SELECT key, value, updated_at FROM platform_setting');
@@ -71,18 +67,27 @@ export class AdminSystemService {
   }
 
   static async updateSettings(data: any, adminId: string) {
-    const allowed = Object.keys(this.SETTING_DEFAULTS);
+    const allowed: string[] = [...SETTING_KEYS];
     const keys = Object.keys(data || {}).filter(k => allowed.includes(k));
     if (keys.length === 0) throw new Error('No valid settings provided');
+    for (const k of keys) {
+      const lim = SETTING_LIMITS[k as SettingKey];
+      const v = Number(data[k]);
+      if (!Number.isFinite(v) || v < lim.min || v > lim.max || (lim.integer && !Number.isInteger(v))) {
+        throw new Error(`Invalid value for ${k}: expected ${lim.integer ? 'an integer' : 'a number'} between ${lim.min} and ${lim.max}`);
+      }
+    }
+    const before = await this.getSettings();
     for (const k of keys) {
       await pool.query(
         `INSERT INTO platform_setting (key, value, updated_by, updated_at)
          VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
          ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_by = EXCLUDED.updated_by, updated_at = CURRENT_TIMESTAMP`,
-        [k, JSON.stringify(data[k]), adminId]
+        [k, JSON.stringify(Number(data[k])), adminId]
       );
     }
-    return this.getSettings();
+    invalidateSettingsCache();
+    return { settings: await this.getSettings(), before, changed: keys };
   }
 
   /**

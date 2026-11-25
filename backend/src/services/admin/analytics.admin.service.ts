@@ -152,7 +152,18 @@ export class AdminAnalyticsService {
         GROUP BY payment_method ORDER BY amount DESC`,
       [from, to]
     );
-    return r.rows;
+    // Cash on delivery creates no payment row: count the delivered missions paid that way
+    // (cash collected by the GP, not yet reconciled with the platform).
+    const cod = await pool.query(
+      `SELECT COALESCE(SUM(COALESCE(final_price, offered_price)), 0) AS amount, COUNT(*) AS count
+         FROM missions
+        WHERE payment_method = 'cod' AND status = 'delivered'
+          AND created_at >= ($1)::date AND created_at < (($2)::date + interval '1 day')`,
+      [from, to]
+    );
+    const rows = r.rows;
+    if (Number(cod.rows[0].count) > 0) rows.push({ method: 'cod', amount: cod.rows[0].amount, count: cod.rows[0].count });
+    return rows;
   }
 
   /** Top GPs by completed missions / earnings / rating. */

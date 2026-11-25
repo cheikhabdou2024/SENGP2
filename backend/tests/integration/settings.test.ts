@@ -24,7 +24,7 @@ describe('réglages de la plateforme', () => {
     expect(res.status).toBe(200);
     expect(JSON.stringify(res.body)).not.toContain('priv-test-never-expose');
     expect(JSON.stringify(res.body)).not.toContain('vapid');
-    expect(Object.keys(res.body.data).sort()).toEqual(['commission_pct', 'insurance_pct', 'min_withdrawal', 'supported_countries']);
+    expect(Object.keys(res.body.data).sort()).toEqual(['commission_pct', 'insurance_pct', 'min_withdrawal']);
   });
 
   it('ne permet pas d\'écraser les clés VAPID par PUT /admin/settings', async () => {

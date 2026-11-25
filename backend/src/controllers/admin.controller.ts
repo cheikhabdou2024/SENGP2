@@ -1,11 +1,20 @@
 import { Response } from 'express';
 import { AdminService } from '../services/admin';
+import { AdminForbidden } from '../services/admin/role.admin.service';
+import { hasPermission } from '../utils/permissions';
 import { WithdrawalService } from '../services/withdrawal.service';
 import { ResponseUtil } from '../utils/response';
 import { logAdminAction } from '../utils/audit';
 import { toCsv } from '../utils/csv';
-import { AuthRequest, UserType } from '../types';
+import { AuthRequest } from '../types';
 import logger from '../utils/logger';
+
+/** 403 for a refused right, 404 for a missing target, 400 otherwise. */
+function fail(res: Response, e: any, fallback: string, notFound: string[] = []): void {
+  if (e instanceof AdminForbidden) return void ResponseUtil.forbidden(res, e.message);
+  if (notFound.includes(e.message)) return void ResponseUtil.notFound(res, e.message);
+  ResponseUtil.badRequest(res, e.message || fallback);
+}
 
 /** Pull common list query params. */
 function listParams(req: AuthRequest) {
@@ -21,9 +30,16 @@ function listParams(req: AuthRequest) {
 }
 
 export class AdminController {
-  static async stats(_req: AuthRequest, res: Response): Promise<void> {
+  static async stats(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const data = await AdminService.getStats();
+      const data: any = await AdminService.getStats();
+      // Each block is only shown to admins who may read that domain.
+      const perms = req.user?.permissions;
+      const gate: Record<string, string> = {
+        users: 'users:read', missions: 'missions:read', trips: 'trips:read',
+        payments: 'payments:read', withdrawals: 'withdrawals:read', claims: 'claims:read',
+      };
+      for (const [block, perm] of Object.entries(gate)) if (!hasPermission(perms, perm)) data[block] = null;
       ResponseUtil.success(res, data);
     } catch (e: any) {
       logger.error('Admin stats error:', e);
@@ -34,7 +50,9 @@ export class AdminController {
   static async activity(req: AuthRequest, res: Response): Promise<void> {
     try {
       const limit = parseInt(req.query.limit as string) || 12;
-      const data = await AdminService.getRecentActivity(limit);
+      const perms = req.user?.permissions;
+      const kinds: Record<string, string> = { mission: 'missions:read', payment: 'payments:read', user: 'users:read', claim: 'claims:read' };
+      const data = (await AdminService.getRecentActivity(limit)).filter((a: any) => hasPermission(perms, kinds[a.kind] || '?'));
       ResponseUtil.success(res, data);
     } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Failed'); }
   }
@@ -85,13 +103,10 @@ export class AdminController {
   }
   static async updateUser(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const u = await AdminService.updateUser(req.params.id, req.body);
+      const u = await AdminService.updateUser(req.params.id, req.body, req.user?.permissions);
       void logAdminAction({ req, action: 'user.update', entityType: 'user', entityId: req.params.id, metadata: { fields: Object.keys(req.body || {}) } });
       ResponseUtil.success(res, u, 'User updated');
-    } catch (e: any) {
-      if (e.message === 'User not found') return void ResponseUtil.notFound(res, e.message);
-      ResponseUtil.badRequest(res, e.message || 'Update failed');
-    }
+    } catch (e: any) { fail(res, e, 'Update failed', ['User not found']); }
   }
   static async deleteUser(req: AuthRequest, res: Response): Promise<void> {
     try {
@@ -99,13 +114,10 @@ export class AdminController {
         ResponseUtil.badRequest(res, 'You cannot delete your own admin account');
         return;
       }
-      const r = await AdminService.deleteUser(req.params.id);
+      const r = await AdminService.deleteUser(req.params.id, req.user?.permissions);
       void logAdminAction({ req, action: 'user.delete', entityType: 'user', entityId: req.params.id });
       ResponseUtil.success(res, r, 'User deleted');
-    } catch (e: any) {
-      if (e.message === 'User not found') return void ResponseUtil.notFound(res, e.message);
-      ResponseUtil.badRequest(res, e.message || 'Delete failed');
-    }
+    } catch (e: any) { fail(res, e, 'Delete failed', ['User not found']); }
   }
   static async getUserDetail(req: AuthRequest, res: Response): Promise<void> {
     try {
@@ -123,7 +135,7 @@ export class AdminController {
       ResponseUtil.created(res, u, 'User created');
     } catch (e: any) {
       if (e.message === 'Email already registered') return void ResponseUtil.conflict(res, e.message);
-      ResponseUtil.badRequest(res, e.message || 'Create failed');
+      fail(res, e, 'Create failed');
     }
   }
   static async userStatusSeries(req: AuthRequest, res: Response): Promise<void> {
@@ -276,7 +288,7 @@ export class AdminController {
         { key: 'departure_city', label: 'Départ' }, { key: 'arrival_city', label: 'Arrivée' },
         { key: 'arrival_country', label: 'Pays' }, { key: 'offered_price', label: 'Prix' },
         { key: 'final_price', label: 'Prix final' }, { key: 'package_weight', label: 'Poids' },
-        { key: 'status', label: 'Statut' }, { key: 'tracking_number', label: 'Suivi' },
+        { key: 'status', label: 'Statut' }, { key: 'payment_method', label: 'Paiement' }, { key: 'tracking_number', label: 'Suivi' },
         { key: 'expediteur', label: 'Expéditeur' }, { key: 'gp', label: 'GP' },
       ]);
       void logAdminAction({ req, action: 'mission.export', entityType: 'mission', metadata: { count: rows.length } });
@@ -517,8 +529,7 @@ export class AdminController {
 
   // ---------- Current admin's permissions ----------
   static async myPermissions(req: AuthRequest, res: Response): Promise<void> {
-    // Legacy token (no perms claim) → treat a raw admin as full access.
-    const perms = req.user?.permissions ?? (req.user?.user_type === UserType.ADMIN ? ['*'] : []);
+    const perms = req.user?.permissions ?? [];
     ResponseUtil.success(res, { permissions: perms, user_type: req.user?.user_type });
   }
 
@@ -531,20 +542,17 @@ export class AdminController {
   }
   static async createRole(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const role = await AdminService.createRole(req.body);
+      const role = await AdminService.createRole(req.body, req.user?.permissions);
       void logAdminAction({ req, action: 'role.create', entityType: 'admin_role', entityId: role.id, description: role.name });
       ResponseUtil.created(res, role, 'Role created');
-    } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Create failed'); }
+    } catch (e: any) { fail(res, e, 'Create failed'); }
   }
   static async updateRole(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const role = await AdminService.updateRole(req.params.id, req.body);
+      const role = await AdminService.updateRole(req.params.id, req.body, req.user?.permissions);
       void logAdminAction({ req, action: 'role.update', entityType: 'admin_role', entityId: req.params.id });
       ResponseUtil.success(res, role, 'Role updated');
-    } catch (e: any) {
-      if (e.message === 'Role not found') return void ResponseUtil.notFound(res, e.message);
-      ResponseUtil.badRequest(res, e.message || 'Update failed');
-    }
+    } catch (e: any) { fail(res, e, 'Update failed', ['Role not found']); }
   }
   static async deleteRole(req: AuthRequest, res: Response): Promise<void> {
     try {
@@ -558,13 +566,10 @@ export class AdminController {
   }
   static async setUserRole(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const r = await AdminService.setUserRole(req.params.id, req.body.role_id);
+      const r = await AdminService.setUserRole(req.params.id, req.body.role_id, req.user?.permissions);
       void logAdminAction({ req, action: 'user.set_role', entityType: 'user', entityId: req.params.id, metadata: { role_id: req.body.role_id } });
       ResponseUtil.success(res, r, 'Role assigned');
-    } catch (e: any) {
-      if (e.message === 'User not found' || e.message === 'Role not found') return void ResponseUtil.notFound(res, e.message);
-      ResponseUtil.badRequest(res, e.message || 'Assign failed');
-    }
+    } catch (e: any) { fail(res, e, 'Assign failed', ['User not found', 'Role not found']); }
   }
 
   // ---------- Audit log ----------
@@ -593,9 +598,10 @@ export class AdminController {
   }
   static async updateSettings(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const data = await AdminService.updateSettings(req.body, req.user!.id);
-      void logAdminAction({ req, action: 'settings.update', entityType: 'settings', metadata: { keys: Object.keys(req.body || {}) } });
-      ResponseUtil.success(res, data, 'Paramètres enregistrés');
+      const r = await AdminService.updateSettings(req.body, req.user!.id);
+      const pick = (o: Record<string, any>) => Object.fromEntries(r.changed.map((k: string) => [k, o[k]]));
+      void logAdminAction({ req, action: 'settings.update', entityType: 'settings', metadata: { keys: r.changed, before: pick(r.before), after: pick(r.settings) } });
+      ResponseUtil.success(res, r.settings, 'Paramètres enregistrés');
     } catch (e: any) { ResponseUtil.badRequest(res, e.message || 'Update failed'); }
   }
 

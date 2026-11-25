@@ -138,9 +138,9 @@ export class AuthMiddleware {
   /**
    * Require a specific admin permission (e.g. 'missions:assign').
    *
-   * Reads the permission list embedded in the JWT. As a transition safeguard,
-   * an admin whose token predates RBAC (no `perms` claim) is allowed through —
-   * their next login issues a scoped token. Non-admins are always rejected.
+   * Reads the permission list embedded in the JWT. Safe by default: a token with
+   * no permission list (admin without a role, or a token that predates RBAC)
+   * grants nothing. Non-admins are always rejected.
    */
   static requirePermission(required: string) {
     return (req: AuthRequest, res: Response, next: NextFunction): void => {
@@ -149,12 +149,7 @@ export class AuthMiddleware {
         return;
       }
 
-      // Legacy token issued before RBAC: fall back to admin-gate only.
-      if (req.user.permissions === undefined) {
-        if (req.user.user_type === UserType.ADMIN) {
-          next();
-          return;
-        }
+      if (req.user.user_type !== UserType.ADMIN) {
         ResponseUtil.forbidden(res, 'Insufficient permissions');
         return;
       }

@@ -24,6 +24,8 @@ export class AdminMissionService {
     const rows = await pool.query(
       `SELECT m.id, m.mission_code, m.status, m.arrival_confirmed, m.departure_city, m.arrival_city,
               m.offered_price AS price, m.package_weight AS weight, m.tracking_number, m.created_at,
+              m.payment_method,
+              EXISTS (SELECT 1 FROM payments p WHERE p.mission_id = m.id AND p.transaction_type = 'mission_payment' AND p.status = 'completed') AS paid,
               e.first_name || ' ' || e.last_name AS expediteur_name,
               g.first_name || ' ' || g.last_name AS gp_name, g.phone AS gp_phone, m.updated_at
        FROM missions m
@@ -69,6 +71,7 @@ export class AdminMissionService {
     const r = await pool.query(
       `SELECT m.mission_code, m.departure_city, m.arrival_city, m.arrival_country,
               m.offered_price, m.final_price, m.package_weight, m.status, m.tracking_number, m.created_at,
+              m.payment_method,
               e.first_name || ' ' || e.last_name AS expediteur, g.first_name || ' ' || g.last_name AS gp
          FROM missions m LEFT JOIN users e ON m.expediteur_id = e.id LEFT JOIN users g ON m.gp_id = g.id
          ${where} ORDER BY m.created_at DESC`,

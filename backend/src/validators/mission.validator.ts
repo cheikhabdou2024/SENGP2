@@ -21,6 +21,8 @@ export const createMissionValidator = [
   body('is_insured').optional().isBoolean(),
   body('recipient_name').optional().trim(),
   body('recipient_phone').optional().trim(),
+  // How the sender chose to pay ('cod' = cash on delivery, no online payment).
+  body('payment_method').optional({ nullable: true }).isIn(['cod', 'wave', 'orange_money', 'card']).withMessage('Unsupported payment method'),
 ];
 
 export const updateStatusValidator = [

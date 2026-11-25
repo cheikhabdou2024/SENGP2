@@ -1,8 +1,28 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import { AdminController } from '../controllers/admin.controller';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { UserType } from '../types';
 import { RateLimitMiddleware } from '../middlewares/rateLimit.middleware';
+import { ResponseUtil } from '../utils/response';
+
+/** Status values the database accepts, per listing (an unknown one used to end in a SQL error). */
+export const LIST_STATUSES = {
+  users: ['pending', 'verified', 'suspended', 'deleted'],
+  missions: ['pending', 'matched', 'accepted', 'picked_up', 'in_transit', 'in_customs', 'out_for_delivery', 'delivered', 'cancelled', 'disputed'],
+  trips: ['draft', 'published', 'active', 'completed', 'cancelled'],
+  payments: ['pending', 'processing', 'completed', 'failed', 'refunded', 'cancelled'],
+  withdrawals: ['pending', 'approved', 'processing', 'completed', 'rejected', 'cancelled'],
+  claims: ['open', 'in_progress', 'resolved', 'rejected', 'closed'],
+} as const;
+
+const knownStatus = (list: readonly string[]): RequestHandler => (req, res, next) => {
+  const s = req.query.status;
+  if (s !== undefined && s !== '' && !list.includes(String(s))) {
+    ResponseUtil.badRequest(res, `Invalid status filter: ${String(s)}`);
+    return;
+  }
+  next();
+};
 
 const router = Router();
 const { requirePermission } = AuthMiddleware;
@@ -30,8 +50,8 @@ router.get('/analytics/top-routes', requirePermission('analytics:read'), AdminCo
 router.get('/analytics/gp-performance', requirePermission('analytics:read'), AdminController.analyticsGpPerformance);
 router.get('/analytics/payment-methods', requirePermission('analytics:read'), AdminController.analyticsPaymentMethods);
 
-router.get('/users', requirePermission('users:read'), AdminController.listUsers);
-router.get('/users/export', requirePermission('users:read'), AdminController.exportUsers);
+router.get('/users', requirePermission('users:read'), knownStatus(LIST_STATUSES.users), AdminController.listUsers);
+router.get('/users/export', requirePermission('users:read'), knownStatus(LIST_STATUSES.users), AdminController.exportUsers);
 router.get('/users/status-series', requirePermission('users:read'), AdminController.userStatusSeries);
 router.post('/users', requirePermission('users:write'), AdminController.createUser);
 router.get('/users/:id', requirePermission('users:read'), AdminController.getUserDetail);
@@ -44,8 +64,8 @@ router.get('/kyc/queue', requirePermission('users:verify'), AdminController.list
 router.post('/kyc/:id/approve', requirePermission('users:verify'), AdminController.approveKyc);
 router.post('/kyc/:id/reject', requirePermission('users:verify'), AdminController.rejectKyc);
 
-router.get('/missions', requirePermission('missions:read'), AdminController.listMissions);
-router.get('/missions/export', requirePermission('missions:read'), AdminController.exportMissions);
+router.get('/missions', requirePermission('missions:read'), knownStatus(LIST_STATUSES.missions), AdminController.listMissions);
+router.get('/missions/export', requirePermission('missions:read'), knownStatus(LIST_STATUSES.missions), AdminController.exportMissions);
 router.get('/missions/status-series', requirePermission('missions:read'), AdminController.missionStatusSeries);
 router.get('/missions/:id', requirePermission('missions:read'), AdminController.getMissionDetail);
 router.put('/missions/:id', requirePermission('missions:write'), AdminController.updateMission);
@@ -58,24 +78,24 @@ router.get('/scan-reviews', requirePermission('missions:read'), AdminController.
 router.post('/gps/:id/release', requirePermission('missions:write'), AdminController.releaseGp);
 router.delete('/missions/:id', requirePermission('missions:delete'), AdminController.deleteMission);
 
-router.get('/trips', requirePermission('trips:read'), AdminController.listTrips);
-router.get('/trips/export', requirePermission('trips:read'), AdminController.exportTrips);
+router.get('/trips', requirePermission('trips:read'), knownStatus(LIST_STATUSES.trips), AdminController.listTrips);
+router.get('/trips/export', requirePermission('trips:read'), knownStatus(LIST_STATUSES.trips), AdminController.exportTrips);
 router.get('/trips/status-series', requirePermission('trips:read'), AdminController.tripStatusSeries);
 router.get('/trips/:id', requirePermission('trips:read'), AdminController.getTripDetail);
 router.put('/trips/:id', requirePermission('trips:write'), AdminController.updateTrip);
 router.delete('/trips/:id', requirePermission('trips:delete'), AdminController.deleteTrip);
 
-router.get('/payments', requirePermission('payments:read'), AdminController.listPayments);
-router.get('/payments/export', requirePermission('payments:export'), AdminController.exportPayments);
+router.get('/payments', requirePermission('payments:read'), knownStatus(LIST_STATUSES.payments), AdminController.listPayments);
+router.get('/payments/export', requirePermission('payments:export'), knownStatus(LIST_STATUSES.payments), AdminController.exportPayments);
 router.post('/payments/:id/refund', requirePermission('payments:refund'), AdminController.refundPayment);
 
-router.get('/withdrawals', requirePermission('withdrawals:read'), AdminController.listWithdrawals);
-router.get('/withdrawals/export', requirePermission('withdrawals:read'), AdminController.exportWithdrawals);
+router.get('/withdrawals', requirePermission('withdrawals:read'), knownStatus(LIST_STATUSES.withdrawals), AdminController.listWithdrawals);
+router.get('/withdrawals/export', requirePermission('withdrawals:read'), knownStatus(LIST_STATUSES.withdrawals), AdminController.exportWithdrawals);
 router.put('/withdrawals/:id/approve', requirePermission('withdrawals:approve'), AdminController.approveWithdrawal);
 router.put('/withdrawals/:id/reject', requirePermission('withdrawals:approve'), AdminController.rejectWithdrawal);
 router.put('/withdrawals/:id/paid', requirePermission('withdrawals:payout'), AdminController.payWithdrawal);
 
-router.get('/claims', requirePermission('claims:read'), AdminController.listClaims);
+router.get('/claims', requirePermission('claims:read'), knownStatus(LIST_STATUSES.claims), AdminController.listClaims);
 router.get('/claims/:id/thread', requirePermission('claims:read'), AdminController.claimThread);
 router.post('/claims/:id/reply', requirePermission('claims:write'), AdminController.replyClaim);
 router.post('/claims/:id/compensate', requirePermission('claims:write'), AdminController.compensateClaim);

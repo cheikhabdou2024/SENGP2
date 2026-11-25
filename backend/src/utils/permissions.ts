@@ -29,6 +29,14 @@ export type Permission = typeof ALL_PERMISSIONS[number];
  * Does `granted` satisfy the `required` permission?
  * Supports the global wildcard `*` and per-resource wildcards like `users:*`.
  */
+/**
+ * Can an admin holding `actor` hand out `granted`? Nobody can give away more than
+ * they hold: the wildcard `*` is only grantable by a holder of `*`.
+ */
+export function canGrant(actor: string[] | undefined | null, granted: string[]): boolean {
+  return granted.every((p) => (p === '*' ? !!actor && actor.includes('*') : hasPermission(actor, p)));
+}
+
 export function hasPermission(granted: string[] | undefined | null, required: string): boolean {
   if (!granted || granted.length === 0) return false;
   if (granted.includes('*')) return true;

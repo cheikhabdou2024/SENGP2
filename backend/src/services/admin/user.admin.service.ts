@@ -4,6 +4,8 @@ import { Helpers } from '../../utils/helpers';
 import { resolveEvidenceUrl } from '../../utils/s3';
 import { NotificationService } from '../notification.service';
 import { NotificationType } from '../../types';
+import { hasPermission } from '../../utils/permissions';
+import { AdminRoleService, AdminForbidden } from './role.admin.service';
 import logger from '../../utils/logger';
 
 /** Utilisateurs et vérification d’identité (KYC). */
@@ -71,7 +73,28 @@ export class AdminUserService {
     return r.rows;
   }
 
-  static async updateUser(id: string, data: any) {
+  /**
+   * Admin accounts are managed through roles. Whoever holds only `users:write` can
+   * neither edit nor remove an admin account (password reset, suspension, demotion),
+   * and nobody can turn a user into an admin outside the role assignment.
+   */
+  private static async guardAdminTarget(id: string, actorPerms: string[] | undefined, destructive: boolean) {
+    const t = await pool.query('SELECT user_type FROM users WHERE id = $1 AND deleted_at IS NULL', [id]);
+    if (t.rows.length === 0) throw new Error('User not found');
+    if (t.rows[0].user_type === 'admin') {
+      if (!hasPermission(actorPerms, 'roles:manage')) {
+        throw new AdminForbidden('Admin accounts can only be changed by an admin who manages roles');
+      }
+      if (destructive) await AdminRoleService.assertNotLastSuperAdmin(id);
+      return true;
+    }
+    return false;
+  }
+
+  static async updateUser(id: string, data: any, actorPerms?: string[]) {
+    if (data.user_type === 'admin') throw new AdminForbidden('Assign an admin role to promote a user to admin');
+    const destructive = ['suspended', 'deleted'].includes(data.status) || (!!data.user_type && data.user_type !== 'admin');
+    const targetIsAdmin = await this.guardAdminTarget(id, actorPerms, destructive);
     const allowed = ['first_name', 'last_name', 'phone', 'user_type', 'status', 'country', 'city', 'is_email_verified'];
     const sets: string[] = [];
     const args: any[] = [];
@@ -82,6 +105,12 @@ export class AdminUserService {
     if (data.password) {
       const hash = await bcrypt.hash(data.password, parseInt(process.env.BCRYPT_ROUNDS || '12'));
       sets.push(`password_hash = $${i++}`); args.push(hash);
+      sets.push('token_version = COALESCE(token_version, 0) + 1');
+    }
+    // Demoting an admin drops its role and ends its sessions.
+    if (targetIsAdmin && data.user_type && data.user_type !== 'admin') {
+      sets.push('admin_role_id = NULL');
+      sets.push('token_version = COALESCE(token_version, 0) + 1');
     }
     if (sets.length === 0) throw new Error('No updatable fields provided');
     sets.push(`updated_at = CURRENT_TIMESTAMP`);
@@ -96,7 +125,8 @@ export class AdminUserService {
   }
 
   /** Soft-delete a user (keeps referential integrity for missions/payments). */
-  static async deleteUser(id: string) {
+  static async deleteUser(id: string, actorPerms?: string[]) {
+    await this.guardAdminTarget(id, actorPerms, true);
     const result = await pool.query(
       `UPDATE users SET deleted_at = CURRENT_TIMESTAMP, status = 'suspended'
        WHERE id = $1 AND deleted_at IS NULL RETURNING id`,
@@ -157,7 +187,8 @@ export class AdminUserService {
   static async createUser(data: any) {
     const required = ['email', 'password', 'user_type', 'first_name', 'last_name'];
     for (const f of required) if (!data[f]) throw new Error(`${f} is required`);
-    if (!['expediteur', 'gp', 'admin'].includes(data.user_type)) throw new Error('Invalid user_type');
+    if (data.user_type === 'admin') throw new AdminForbidden('Assign an admin role to promote a user to admin');
+    if (!['expediteur', 'gp'].includes(data.user_type)) throw new Error('Invalid user_type');
     if (String(data.password).length < 8) throw new Error('Password must be at least 8 characters');
 
     const client = await pool.connect();

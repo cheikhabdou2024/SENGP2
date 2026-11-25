@@ -920,7 +920,8 @@
                         offered_price: offered,
                         is_price_negotiable: true,
                         recipient_name: recipientName,
-                        recipient_phone: recipientPhone
+                        recipient_phone: recipientPhone,
+                        payment_method: selectedPaymentMethod
                     })
                 });
                 const missionResult = await missionRes.json();

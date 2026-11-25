@@ -258,8 +258,8 @@ export class AuthService {
 
   /**
    * Resolve the admin permission list for a user from their admin role.
-   * Returns `undefined` for non-admins and for admins with no role assigned
-   * (so the token carries no `perms` claim and the legacy admin-gate applies).
+   * Returns `undefined` for non-admins. An admin with no role gets an empty list,
+   * which grants no right at all.
    */
   private static async resolvePermissions(user: Partial<User>): Promise<string[] | undefined> {
     if (user.user_type !== UserType.ADMIN) return undefined;
@@ -272,13 +272,12 @@ export class AuthService {
         [user.id]
       );
       const perms = r.rows[0]?.permissions;
-      if (!perms) return undefined;
       if (Array.isArray(perms)) return perms;
-      if (typeof perms === 'string') { try { return JSON.parse(perms); } catch { return undefined; } }
-      return undefined;
+      if (typeof perms === 'string') { try { return JSON.parse(perms); } catch { return []; } }
+      return [];
     } catch (e) {
       logger.warn(`Could not resolve permissions for ${user.email}: ${(e as Error).message}`);
-      return undefined;
+      return [];
     }
   }
 
@@ -296,7 +295,7 @@ export class AuthService {
       email: user.email!,
       role: user.user_type!,
     };
-    if (perms && perms.length) payload.perms = perms;
+    if (perms) payload.perms = perms;
     const tv = await pool.query('SELECT COALESCE(token_version, 0) AS tv FROM users WHERE id = $1', [user.id]);
     payload.tv = Number(tv.rows[0]?.tv) || 0;
 

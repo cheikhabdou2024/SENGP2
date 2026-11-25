@@ -41,7 +41,7 @@ Tests d'intégration : `TEST_DATABASE_URL` (le nom de base doit se terminer par 
 
 | Variable | Défaut | Rôle |
 |---|---|---|
-| `PLATFORM_COMMISSION_PERCENTAGE` | `15` | Commission prélevée sur chaque paiement (lue via `config/env.ts`). |
+| `PLATFORM_COMMISSION_PERCENTAGE` | `15` | Commission par défaut, prélevée sur chaque paiement ; une valeur enregistrée dans Paramètres de la console la remplace. |
 | `PAYMENT_CURRENCY` | `XOF` | Devise enregistrée. |
 | `INSURANCE_FEE_PERCENTAGE` | — | Frais d'assurance. |
 | `MIN_WITHDRAWAL_AMOUNT` | — | Montant minimal de retrait. |

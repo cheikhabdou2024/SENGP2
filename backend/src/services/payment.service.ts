@@ -8,6 +8,7 @@ import { AppError } from '../utils/AppError';
 import { getProvider, getProviderByWebhookKey, isCardEnabled } from './providers';
 import { currentLang } from '../i18n';
 import { NotificationService } from './notification.service';
+import { getSetting } from './settings.service';
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -71,7 +72,7 @@ export class PaymentService {
       [mission.id]
     );
 
-    const commissionPct = config.commissionPct;
+    const commissionPct = await getSetting('commission_pct');
     const commission = Helpers.calculateCommission(amount, commissionPct);
     const net_amount = amount - commission;
     const payment_code = Helpers.generateCode('PAY');
@@ -99,6 +100,7 @@ export class PaymentService {
         ]
     );
     const payment = inserted.rows[0];
+    await pool.query('UPDATE missions SET payment_method = $1 WHERE id = $2', [data.payment_method, mission.id]);
 
     try {
       // Back from the provider, the payer lands on a page that knows which payment it is about

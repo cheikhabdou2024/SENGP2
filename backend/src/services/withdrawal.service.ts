@@ -5,8 +5,8 @@ import { NotificationType } from '../types';
 import { NotificationService } from './notification.service';
 import { TemplateKey } from '../i18n';
 import { WalletService } from './wallet.service';
+import { getSetting } from './settings.service';
 
-const MIN_WITHDRAWAL = Number(process.env.MIN_WITHDRAWAL_AMOUNT) || 5000;
 
 export class WithdrawalService {
   /**
@@ -19,6 +19,7 @@ export class WithdrawalService {
     data: { amount: number; method: string; account_number: string; account_name?: string }
   ): Promise<any> {
     const amount = Number(data.amount);
+    const MIN_WITHDRAWAL = await getSetting('min_withdrawal');
     if (!amount || amount < MIN_WITHDRAWAL) {
       throw new Error(`Minimum withdrawal is ${Helpers.formatCurrency(MIN_WITHDRAWAL)}`);
     }

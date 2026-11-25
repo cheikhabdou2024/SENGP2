@@ -3,6 +3,7 @@ import { Mission, MissionStatus, NotificationType, PaginatedResult } from '../ty
 import { Helpers } from '../utils/helpers';
 import logger from '../utils/logger';
 import { NotificationService } from './notification.service';
+import { getSetting } from './settings.service';
 import { MissionAlerts } from './mission-alerts.service';
 import { withTransaction } from '../utils/transaction';
 import { EDITABLE_MISSION_FIELDS } from '../utils/missionAccess';
@@ -23,7 +24,7 @@ export class MissionService {
 
       // Calculate insurance cost if insured
       const insurance_cost = data.is_insured && data.package_value
-        ? Helpers.calculateInsuranceFee(data.package_value)
+        ? Helpers.calculateInsuranceFee(data.package_value, await getSetting('insurance_pct'))
         : 0;
 
       // Insert mission
@@ -33,8 +34,8 @@ export class MissionService {
           arrival_country, arrival_city, delivery_address, package_weight, package_length,
           package_width, package_height, package_description, package_value, package_photos,
           desired_departure_date, desired_arrival_date, offered_price, is_price_negotiable,
-          is_insured, insurance_cost, tracking_number, recipient_name, recipient_phone
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)
+          is_insured, insurance_cost, tracking_number, recipient_name, recipient_phone, payment_method
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)
         RETURNING *`,
         [
           mission_code,
@@ -61,6 +62,7 @@ export class MissionService {
           tracking_number,
           (data as any).recipient_name || null,
           (data as any).recipient_phone || null,
+          (data as any).payment_method || null,
         ]
       );
 
