@@ -15,10 +15,10 @@ export const LIST_STATUSES = {
   claims: ['open', 'in_progress', 'resolved', 'rejected', 'closed'],
 } as const;
 
-const knownStatus = (list: readonly string[]): RequestHandler => (req, res, next) => {
-  const s = req.query.status;
+const knownStatus = (list: readonly string[], param = 'status'): RequestHandler => (req, res, next) => {
+  const s = req.query[param];
   if (s !== undefined && s !== '' && !list.includes(String(s))) {
-    ResponseUtil.badRequest(res, `Invalid status filter: ${String(s)}`);
+    ResponseUtil.badRequest(res, `Invalid ${param} filter: ${String(s)}`);
     return;
   }
   next();
@@ -78,11 +78,12 @@ router.get('/scan-reviews', requirePermission('missions:read'), AdminController.
 router.post('/gps/:id/release', requirePermission('missions:write'), AdminController.releaseGp);
 router.delete('/missions/:id', requirePermission('missions:delete'), AdminController.deleteMission);
 
-router.get('/trips', requirePermission('trips:read'), knownStatus(LIST_STATUSES.trips), AdminController.listTrips);
+router.get('/trips', requirePermission('trips:read'), knownStatus(LIST_STATUSES.trips), knownStatus(['missing', 'pending', 'approved', 'rejected'], 'ticket_status'), AdminController.listTrips);
 router.get('/trips/export', requirePermission('trips:read'), knownStatus(LIST_STATUSES.trips), AdminController.exportTrips);
 router.get('/trips/status-series', requirePermission('trips:read'), AdminController.tripStatusSeries);
 router.get('/trips/:id', requirePermission('trips:read'), AdminController.getTripDetail);
 router.put('/trips/:id', requirePermission('trips:write'), AdminController.updateTrip);
+router.post('/trips/:id/ticket-review', requirePermission('trips:write'), AdminController.reviewTripTicket);
 router.delete('/trips/:id', requirePermission('trips:delete'), AdminController.deleteTrip);
 
 router.get('/payments', requirePermission('payments:read'), knownStatus(LIST_STATUSES.payments), AdminController.listPayments);

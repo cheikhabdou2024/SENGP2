@@ -1,6 +1,7 @@
 import pool from '../../config/database';
 import { Helpers } from '../../utils/helpers';
 import { resolveEvidenceUrl } from '../../utils/s3';
+import QRCode from 'qrcode';
 import { NotificationService } from '../notification.service';
 import { NotificationType } from '../../types';
 import logger from '../../utils/logger';
@@ -291,7 +292,7 @@ export class AdminMissionService {
   }
 
   /** Full mission detail: parties + trip + tracking timeline + payment/claims. */
-  static async getMissionDetail(id: string) {
+  static async getMissionDetail(id: string, baseUrl?: string) {
     const m = await pool.query(
       `SELECT m.*,
               e.first_name || ' ' || e.last_name AS expediteur_name, e.phone AS expediteur_phone, e.email AS expediteur_email,
@@ -311,6 +312,13 @@ export class AdminMissionService {
     if (typeof photos === 'string') { try { photos = JSON.parse(photos); } catch { photos = []; } }
     if (Array.isArray(photos)) mission.package_photos = photos.map((p: string) => resolveEvidenceUrl(p));
     if (mission.qr_code_url) mission.qr_code_url = resolveEvidenceUrl(mission.qr_code_url);
+    // Proof-of-delivery QR (the recipient shows it to the GP). Rebuilt from the secret token on demand.
+    if (mission.delivery_token) {
+      const base = (process.env.PUBLIC_BASE_URL || process.env.APP_BASE_URL || '').replace(/\/$/, '');
+      mission.delivery_confirm_url = `${base}/d/${mission.delivery_token}`;
+      mission.delivery_qr_url = await QRCode.toDataURL(mission.delivery_confirm_url, { margin: 1, width: 240 });
+    }
+    delete mission.delivery_token;
 
     const [tracking, payment, claims] = await Promise.all([
       pool.query(

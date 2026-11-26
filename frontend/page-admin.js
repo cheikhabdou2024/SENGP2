@@ -11,7 +11,7 @@
         let me = null;
         try { me = JSON.parse(localStorage.getItem('userData') || 'null'); } catch (e) {}
 
-        const state = { view: 'todo', page: 1, search: '', status: '', uType: '', mExpediteur: '', tGp: '' };
+        const state = { view: 'todo', page: 1, search: '', status: '', uType: '', mExpediteur: '', tGp: '', tTicket: '' };
         let myPerms = null;   // string[] of the signed-in admin's permissions (['*'] = all)
         let allPerms = [];    // full catalog, for the role editor
 
@@ -103,6 +103,10 @@
         };
         function stFr(v){ return STATUS_FR[String(v||'').toLowerCase()] || String(v||'—'); }
         const PAY_LABEL = { cod:'À la livraison', wave:'Wave', orange_money:'Orange Money', free_money:'Free Money', card:'Carte bancaire', bank_transfer:'Virement', cash:'Espèces' };
+        // Billet d'avion du GP : à vérifier par un admin.
+        const TICKET_FR = { missing:'Manquant', pending:'À vérifier', approved:'Validé', rejected:'Refusé' };
+        function ticketFr(v){ return TICKET_FR[v] || '—'; }
+        function ticketBadge(v){ return { approved:'b-green', pending:'b-yellow', rejected:'b-red', missing:'b-gray' }[v] || 'b-gray'; }
         function payLabel(v){ return v ? (PAY_LABEL[v] || v) : '—'; }
 
         // ---------- Auth ----------
@@ -204,6 +208,7 @@
             if (state.view === 'users' && state.uType) p.set('type', state.uType);
             if (state.view === 'missions' && state.mExpediteur) p.set('exp', state.mExpediteur);
             if (state.view === 'trips' && state.tGp) p.set('gp', state.tGp);
+            if (state.view === 'trips' && state.tTicket) p.set('ticket', state.tTicket);
             if (state.page > 1) p.set('page', state.page);
             const qs = p.toString();
             return '#/' + state.view + (qs ? '?' + qs : '');
@@ -241,7 +246,7 @@
             Object.assign(state, {
                 view, page: Math.max(1, parseInt(params.get('page'), 10) || 1),
                 search: params.get('q') || '', status: params.get('status') || '',
-                uType: params.get('type') || '', mExpediteur: params.get('exp') || '', tGp: params.get('gp') || ''
+                uType: params.get('type') || '', mExpediteur: params.get('exp') || '', tGp: params.get('gp') || '', tTicket: params.get('ticket') || ''
             });
             markNav(view);
             render();
@@ -257,7 +262,7 @@
 
         // `preset` : filtres appliqués d'emblée, ex. switchView('missions', null, { status: 'disputed' }).
         function switchView(view, el, preset){
-            Object.assign(state, { view, page: 1, search: '', status: '', uType: '', mExpediteur: '', tGp: '' }, preset || {});
+            Object.assign(state, { view, page: 1, search: '', status: '', uType: '', mExpediteur: '', tGp: '', tTicket: '' }, preset || {});
             _detail = false;
             markNav(view);
             syncRoute();
@@ -347,6 +352,7 @@
                     <input id="search" placeholder="Rechercher un trajet…" value="${esc(state.search)}">
                     ${statusFilter()}
                     ${gpSel}
+                    <select id="tticket"><option value="">Tous les billets</option>${['pending','approved','rejected','missing'].map(k => `<option value="${k}"${state.tTicket===k?' selected':''}>Billet : ${esc(ticketFr(k))}</option>`).join('')}</select>
                     <button onclick="applyFilters()">Filtrer</button>
                     <span style="margin-left:auto"></span>${exportBtn}
                 </div>
@@ -488,6 +494,8 @@
             if (eEl) state.mExpediteur = eEl.value;
             const gEl = document.getElementById('tgp');
             if (gEl) state.tGp = gEl.value;
+            const kEl = document.getElementById('tticket');
+            if (kEl) state.tTicket = kEl.value;
             state.page = 1;
             loadList();
         }
@@ -844,7 +852,8 @@
                 + (state.status ? `&status=${encodeURIComponent(state.status)}` : '')
                 + (state.view==='users' && state.uType ? `&user_type=${encodeURIComponent(state.uType)}` : '')
                 + (state.view==='missions' && state.mExpediteur ? `&expediteur_id=${encodeURIComponent(state.mExpediteur)}` : '')
-                + (state.view==='trips' && state.tGp ? `&gp_id=${encodeURIComponent(state.tGp)}` : '');
+                + (state.view==='trips' && state.tGp ? `&gp_id=${encodeURIComponent(state.tGp)}` : '')
+                + (state.view==='trips' && state.tTicket ? `&ticket_status=${encodeURIComponent(state.tTicket)}` : '');
             try {
                 const { ok, json } = await api('/admin/' + state.view + q);
                 if (!ok) throw new Error(json.error || 'Erreur');
@@ -934,7 +943,7 @@
                     }
                 },
                 trips: {
-                    head: ['Code','Trajet','GP','Départ','Statut','Cours','Actions'],
+                    head: ['Code','Trajet','GP','Départ','Statut','Billet','Colis','Actions'],
                     row: t => {
                         const acts = [['act-edit','Détails',`showTripDetail('${t.id}')`]];
                         if (can('trips:write')) acts.push(['act-edit','Modifier',`moderateTrip('${t.id}','${esc(t.status)}')`]);
@@ -943,6 +952,7 @@
                         esc(t.trip_code), esc((t.departure_city||'?')+' → '+(t.arrival_city||'?')),
                         esc(t.gp_name||'—'), dt(t.departure_date),
                         `<span class="badge ${badgeFor(t.status)}">${esc(stFr(t.status))}</span>`,
+                        `<span class="badge ${ticketBadge(t.ticket_status)}">${esc(ticketFr(t.ticket_status))}</span>`,
                         `${t.current_packages||0}/${t.max_packages||0}`,
                         actions(acts)
                     ]; }

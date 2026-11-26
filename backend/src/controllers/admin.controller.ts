@@ -26,6 +26,7 @@ function listParams(req: AuthRequest) {
     user_type: (req.query.user_type as string) || undefined,
     expediteur_id: (req.query.expediteur_id as string) || undefined,
     gp_id: (req.query.gp_id as string) || undefined,
+    ticket_status: (req.query.ticket_status as string) || undefined,
   };
 }
 
@@ -121,7 +122,7 @@ export class AdminController {
   }
   static async getUserDetail(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const d = await AdminService.getUserDetail(req.params.id);
+      const d = await AdminService.getUserDetail(req.params.id, `${req.protocol}://${req.get('host')}`);
       ResponseUtil.success(res, d);
     } catch (e: any) {
       if (e.message === 'User not found') return void ResponseUtil.notFound(res, e.message);
@@ -299,7 +300,7 @@ export class AdminController {
   }
   static async getMissionDetail(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const d = await AdminService.getMissionDetail(req.params.id);
+      const d = await AdminService.getMissionDetail(req.params.id, `${req.protocol}://${req.get('host')}`);
       ResponseUtil.success(res, d);
     } catch (e: any) {
       if (e.message === 'Mission not found') return void ResponseUtil.notFound(res, e.message);
@@ -367,6 +368,17 @@ export class AdminController {
     } catch (e: any) {
       if (e.message === 'Trip not found') return void ResponseUtil.notFound(res, e.message);
       ResponseUtil.badRequest(res, e.message || 'Failed');
+    }
+  }
+  static async reviewTripTicket(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const r = await AdminService.reviewTicket(req.params.id, req.body && req.body.decision, req.body && req.body.note, req.user!.id);
+      void logAdminAction({ req, action: 'trip.ticket_review', entityType: 'trip', entityId: req.params.id,
+        metadata: { decision: r.ticket_status, before: r.previous_status, note: r.ticket_review_note || undefined } });
+      ResponseUtil.success(res, r, 'Ticket reviewed');
+    } catch (e: any) {
+      if (e.message === 'Trip not found') return void ResponseUtil.notFound(res, e.message);
+      ResponseUtil.badRequest(res, e.message || 'Review failed');
     }
   }
   static async updateTrip(req: AuthRequest, res: Response): Promise<void> {

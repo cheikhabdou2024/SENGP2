@@ -3,6 +3,9 @@ import { TripService } from '../services/trip.service';
 import { ResponseUtil } from '../utils/response';
 import { AuthRequest, UserType } from '../types';
 import logger from '../utils/logger';
+import crypto from 'crypto';
+import { detectTicketFile } from '../utils/fileType';
+import { isS3Configured, uploadBuffer } from '../utils/s3';
 
 export class TripController {
   /**
@@ -21,10 +24,29 @@ export class TripController {
         return;
       }
 
-      // NOTE: the frontend uploads `flight_ticket_photo` (parsed by multer into
-      // req.file). There is no column to persist it yet, so it is accepted but
-      // not stored. Add a column + storage when ticket verification is built.
-      const trip = await TripService.create(req.body, req.user.id);
+      // The flight ticket (`flight_ticket_photo`, parsed by multer into req.file) is kept so an
+      // admin can check it. The type comes from the file's bytes, never from the client.
+      const file = (req as any).file;
+      let ticketUrl: string | null = null;
+      if (file && file.buffer) {
+        const detected = detectTicketFile(file.buffer);
+        if (!detected) {
+          ResponseUtil.badRequest(res, 'Type de fichier non autorisé pour le billet (photo ou PDF)');
+          return;
+        }
+        try {
+          if (isS3Configured()) {
+            const key = `tickets/${req.user.id}/${Date.now()}-${crypto.randomBytes(6).toString('hex')}.${detected.ext}`;
+            ticketUrl = await uploadBuffer(key, file.buffer, detected.mime);
+          } else if (process.env.NODE_ENV !== 'production') {
+            ticketUrl = `data:${detected.mime};base64,${file.buffer.toString('base64')}`; // local development only
+          }
+        } catch (e: any) {
+          // The trip is still created; the admin sees "billet manquant" and can ask for it again.
+          logger.error('Flight ticket storage failed:', e);
+        }
+      }
+      const trip = await TripService.create(req.body, req.user.id, ticketUrl);
 
       ResponseUtil.created(res, trip, 'Trip created successfully');
     } catch (error: any) {

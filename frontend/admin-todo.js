@@ -19,6 +19,7 @@
     }
     if (can('missions:assign')) jobs.assign = safe('/admin/matching').then(function (r) { return r ? ((r.json.data || {}).missions || []).length : null; });
     if (can('users:verify')) jobs.kyc = safe('/admin/kyc/queue?page=1&limit=1').then(function (r) { return r ? total(r) : null; });
+    if (can('trips:read')) jobs.tickets = safe('/admin/trips?ticket_status=pending&limit=1').then(function (r) { return r ? total(r) : null; });
     if (can('missions:read')) jobs.disputes = safe('/admin/missions?status=disputed&limit=1').then(function (r) { return r ? total(r) : null; });
     if (can('withdrawals:read') || can('claims:read')) {
       jobs.stats = safe('/admin/stats').then(function (r) { return r ? r.json.data : null; });
@@ -36,6 +37,7 @@
       (res.arrivals == null ? null : res.arrivals), 'missions', { status: 'out_for_delivery' });
     add('scans', 'Scans à valider', 'GP ayant terminé leur scan : valider pour leur rendre l\'accès.',
       (res.scans == null ? null : res.scans), 'missions', { status: 'out_for_delivery' });
+    add('tickets', 'Billets d\'avion à vérifier', 'Billets envoyés par les GP : valider ou refuser.', res.tickets, 'trips', { tTicket: 'pending' });
     add('assign', 'Missions à affecter', 'Missions sans GP, avec les trajets compatibles.', res.assign, 'matching');
     add('kyc', 'Identités à vérifier', 'Pièces d\'identité en attente d\'approbation.', res.kyc, 'kyc');
     if (st.withdrawals) add('withdrawals', 'Retraits à valider', 'Demandes de retrait des GP.', st.withdrawals.pending, 'withdrawals', { status: 'pending' },
@@ -87,6 +89,7 @@
     if (state.view === 'todo' && !document.getElementById('modalOv')) draw(document.getElementById('main'), queues);
   }
 
+  window.pollTodoNow = function () { poll(); };
   window.startTodoWatch = function () {
     window.stopTodoWatch();
     timer = setInterval(poll, POLL_MS);

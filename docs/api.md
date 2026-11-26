@@ -132,7 +132,7 @@ Hors amorçage, tout exige le rôle `admin` **et** une permission (RBAC, voir `d
 | Missions | `GET /admin/missions`, `/export`, `/status-series`, `GET/PUT/DELETE /missions/:id`, `POST /missions/:id/assign` (corps `gp_id`, `trip_id` optionnel), `/reassign`, `/confirm-arrival` |
 | Répartition (`missions:assign`) | `GET /admin/matching`, `POST /admin/assignments` (affectation groupée) |
 | Fin de voyage | `GET /admin/scan-reviews`, `POST /admin/gps/:id/release` |
-| Trajets | `GET /admin/trips`, `/export`, `/status-series`, `GET/PUT/DELETE /trips/:id` |
+| Trajets | `GET /admin/trips` (filtres `status`, `gp_id`, `ticket_status`), `/export`, `/status-series`, `GET/PUT/DELETE /trips/:id` (la fiche renvoie le billet signé, les missions à bord avec leur dernière position GPS et les derniers événements), `POST /trips/:id/ticket-review` `{decision: approved\|rejected, note}` (droit `trips:write`, motif obligatoire au refus, le GP est notifié, action journalisée) |
 | Paiements | `GET /admin/payments`, `/export`, `POST /payments/:id/refund` (`payments:refund`, refusé une fois le GP crédité) |
 | Retraits | `GET /admin/withdrawals`, `/export`, `PUT /:id/approve`, `/reject`, `/paid` |
 | Réclamations | `GET /admin/claims`, `/claims/:id/thread`, `POST /reply`, `/compensate`, `PUT /claims/:id` |

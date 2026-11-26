@@ -111,4 +111,13 @@ Cloche en haut à droite = notifications personnelles (remplace l'entrée « Ale
 - Équipe et rôles : bouton « Voir les comptes admin » (liste des utilisateurs filtrée sur les admins).
 - Écart avec la cible : les fiches mission, utilisateur et trajet restent des fenêtres, mais avec leur propre adresse ; les onglets Missions (Toutes / À affecter / En cours / Litiges) et Utilisateurs (Tous / À vérifier / Admins) ne sont pas faits, les tuiles « À traiter » en tiennent lieu.
 
+**Audit des fiches colis, QR, paiements, billets et suivi (26 novembre 2026, non déployé).** Constats puis corrections, vérifiés par captures Playwright (Edge) sur une copie locale avec données fictives :
+- **Billet d'avion jamais enregistré** : le serveur recevait la photo (`flight_ticket_photo`) et la jetait. Corrigé : le fichier (photo ou PDF, type vérifié sur ses octets) est stocké sur S3, le trajet porte `ticket_status` (manquant, à vérifier, validé, refusé), la fiche trajet l'affiche et permet de valider ou refuser (motif obligatoire, GP notifié, journal d'audit). Nouvelle tuile « Billets d'avion à vérifier » dans À traiter, colonne et filtre « Billet » dans Trajets. Un échec de stockage ne bloque pas la création du trajet : il apparaît « Manquant ».
+- **QR code invisible côté admin** : la colonne `qr_code_url` n'est plus alimentée, le QR réel est celui du lien de remise (jeton secret). La fiche mission et la fiche expéditeur le reconstruisent et l'affichent, sans jamais exposer le jeton.
+- **Photos de colis** : renvoyées par le serveur mais jamais montrées. Galerie cliquable dans la fiche mission, vignette par envoi dans la fiche utilisateur.
+- **Fiche mission incomplète** : ajout des acteurs avec liens, itinéraire et dates, dimensions, valeur, assurance, paiement (mobile money ou espèces) avec montants, carte du suivi.
+- **Fiche trajet** : GP (note, identité), vol, capacité, colis à bord avec mode de paiement et dernière position, carte et événements actualisés toutes les 15 s sans recharger.
+- **Cohérence** : mission, trajet et utilisateur se renvoient les uns aux autres par des liens profonds ; tout est en français ; les fiches s'affichent aussi sur téléphone.
+- Tests : `admin-trips.test.ts` (9 cas). Limites connues : l'encaissement des espèces par le GP n'est pas suivi (affichage seulement), les notifications de billet sont en français uniquement, la carte dépend des tuiles OpenStreetMap et de Leaflet (repli en liens si indisponible).
+
 Restent hors périmètre de ces lots : suivi du reversement des espèces par les GP (F2, seconde moitié), remboursement réel chez le fournisseur (F4), lots 3 à 5.

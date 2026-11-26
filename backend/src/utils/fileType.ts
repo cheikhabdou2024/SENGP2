@@ -13,6 +13,13 @@ const ascii = (buf: Buffer, start: number, end: number): string => buf.toString(
  * (photos of identity documents and parcels, voice messages) are recognised;
  * anything else, including SVG, HTML and scripts, returns null.
  */
+/** Flight tickets: a photo or a PDF. Audio and everything else is refused. */
+export function detectTicketFile(buf: Buffer): DetectedFile | null {
+  if (buf && buf.length >= 5 && buf.toString('latin1', 0, 5) === '%PDF-') return { mime: 'application/pdf', ext: 'pdf' };
+  const d = detectFileType(buf);
+  return d && d.mime.startsWith('image/') ? d : null;
+}
+
 export function detectFileType(buf: Buffer): DetectedFile | null {
   if (!buf || buf.length < 12) return null;
 

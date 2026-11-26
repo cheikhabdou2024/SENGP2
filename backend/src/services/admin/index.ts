@@ -41,6 +41,7 @@ export class AdminService {
   static deleteTrip = AdminTripService.deleteTrip.bind(AdminTripService);
   static getTripDetail = AdminTripService.getTripDetail.bind(AdminTripService);
   static updateTrip = AdminTripService.updateTrip.bind(AdminTripService);
+  static reviewTicket = AdminTripService.reviewTicket.bind(AdminTripService);
   static listPayments = AdminPaymentService.listPayments.bind(AdminPaymentService);
   static refundPayment = AdminPaymentService.refundPayment.bind(AdminPaymentService);
   static listPaymentsForExport = AdminPaymentService.listPaymentsForExport.bind(AdminPaymentService);

@@ -242,6 +242,29 @@
             padding: 24px; width: 100%; max-width: 460px; max-height: 88vh; overflow-y:auto;
             box-shadow: 0 30px 70px rgba(0,0,0,.55);
         }
+        .modal.wide { max-width: 980px; }
+        .dg { display:grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        @media (max-width: 800px) { .dg { grid-template-columns: 1fr; } }
+        .dsec { background: rgba(255,255,255,.03); border:1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+        .dsec h4 { font-size: 12px; letter-spacing:.08em; text-transform: uppercase; color: var(--faint); margin: 0 0 10px; display:flex; align-items:center; gap:8px; }
+        .kv { display:flex; justify-content: space-between; gap: 14px; font-size: 13px; padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,.06); }
+        .kv:last-child { border-bottom: 0; }
+        .kv span:first-child { color: rgba(255,255,255,.55); flex-shrink:0; }
+        .kv span:last-child { text-align:right; word-break: break-word; }
+        .gallery { display:flex; flex-wrap:wrap; gap:8px; }
+        .gallery img { width: 118px; height: 88px; object-fit: cover; border-radius: 8px; border:1px solid rgba(255,255,255,.18); cursor: zoom-in; background:#0b0d1c; }
+        .qrbox { display:flex; gap:14px; align-items:center; }
+        .qrbox img { width: 132px; height: 132px; background:#fff; border-radius: 8px; padding: 6px; }
+        .mapbox { height: 270px; border-radius: 10px; border:1px solid rgba(255,255,255,.15); overflow:hidden; background:#0b0d1c; }
+        .live { display:inline-flex; align-items:center; gap:6px; font-size:11px; color:#34d399; font-weight:700; }
+        .live::before { content:''; width:8px; height:8px; border-radius:50%; background:#34d399; animation: pulseLive 1.6s infinite; }
+        @keyframes pulseLive { 0%{box-shadow:0 0 0 0 rgba(52,211,153,.6)} 100%{box-shadow:0 0 0 9px rgba(52,211,153,0)} }
+        .ticketbox img { width:100%; max-height: 300px; object-fit: contain; border-radius: 8px; border:1px solid rgba(255,255,255,.18); background:#0b0d1c; cursor: zoom-in; }
+        .ticketbox iframe { width:100%; height: 300px; border:1px solid rgba(255,255,255,.18); border-radius: 8px; background:#fff; }
+        .lightbox { position:fixed; inset:0; z-index: 400; background: rgba(0,0,0,.88); display:flex; align-items:center; justify-content:center; cursor: zoom-out; }
+        .lightbox img { max-width: 92vw; max-height: 90vh; border-radius: 8px; }
+        .modal a.lnk { color: var(--accent2); text-decoration: none; }
+        .modal a.lnk:hover { text-decoration: underline; }
         .modal h3 { font-size: 17px; margin-bottom: 6px; }
         .modal .hint { font-size: 13px; color: rgba(255,255,255,.55); margin-bottom: 16px; }
         .modal label { display:block; font-size:12px; color:rgba(255,255,255,.7); margin: 12px 0 6px; }
@@ -254,6 +277,7 @@
         .btn-cancel { background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15) !important; color: rgba(255,255,255,.8); }
         .btn-confirm { background: linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
         .btn-danger { background: var(--bad); color:#1a1a2e; }
+        .dsec .btn-confirm, .dsec .btn-danger { padding: 9px 16px; border-radius: 10px; border: 0; font-weight: 700; font-size: 13px; cursor: pointer; }
         /* Form fields inside panels (broadcast / settings) */
         .panel label { display:block; font-size:12px; color:var(--muted); margin:14px 0 6px; }
         .panel input, .panel select, .panel textarea { width:100%; padding:10px 13px; border-radius:10px; border:1px solid var(--border2); background: rgba(255,255,255,.05); color:var(--ink); font-size:14px; font-family:inherit; }
@@ -387,6 +411,9 @@
         </div>
     </div>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script src="page-admin.js"></script>
+    <script src="admin-detail.js"></script>
 </body>
 </html>

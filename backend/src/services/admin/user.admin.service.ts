@@ -2,6 +2,7 @@ import pool from '../../config/database';
 import bcrypt from 'bcryptjs';
 import { Helpers } from '../../utils/helpers';
 import { resolveEvidenceUrl } from '../../utils/s3';
+import QRCode from 'qrcode';
 import { NotificationService } from '../notification.service';
 import { NotificationType } from '../../types';
 import { hasPermission } from '../../utils/permissions';
@@ -137,7 +138,7 @@ export class AdminUserService {
   }
 
   /** Full user detail: profile, KYC docs (presigned), and activity summary. */
-  static async getUserDetail(id: string) {
+  static async getUserDetail(id: string, baseUrl?: string) {
     const u = await pool.query(
       `SELECT id, email, phone, user_type, first_name, last_name, date_of_birth,
               profile_photo_url, status, is_email_verified, is_phone_verified,
@@ -165,10 +166,23 @@ export class AdminUserService {
       pool.query(`SELECT COALESCE(SUM(amount),0) AS total FROM payments WHERE payer_id = $1 AND status = 'completed'`, [id]),
       pool.query(`SELECT COUNT(*) FROM claims WHERE claimant_id = $1`, [id]),
       pool.query(
-        `SELECT id, mission_code, status, departure_city, arrival_city, offered_price AS price, created_at
-           FROM missions WHERE expediteur_id = $1 OR gp_id = $1
-          ORDER BY created_at DESC LIMIT 5`, [id]),
+        `SELECT m.id, m.mission_code, m.status, m.departure_city, m.arrival_city, m.offered_price AS price, m.created_at,
+                m.payment_method, m.package_photos, m.delivery_token, m.package_weight AS weight, m.package_description,
+                EXISTS (SELECT 1 FROM payments p WHERE p.mission_id = m.id AND p.status = 'completed') AS paid,
+                g.first_name || ' ' || g.last_name AS gp_name
+           FROM missions m LEFT JOIN users g ON g.id = m.gp_id
+          WHERE m.expediteur_id = $1 OR m.gp_id = $1
+          ORDER BY m.created_at DESC LIMIT 12`, [id]),
     ]);
+    // Presign the parcel photos.
+    for (const m of recent.rows) {
+      let ph = m.package_photos;
+      if (typeof ph === 'string') { try { ph = JSON.parse(ph); } catch { ph = []; } }
+      m.package_photos = Array.isArray(ph) ? ph.map((p: string) => resolveEvidenceUrl(p)) : [];
+      // The shipment's single QR is the delivery link carrying the secret token; rebuild the image, never expose the token.
+      m.qr_code_url = m.delivery_token ? await QRCode.toDataURL(`${baseUrl || ''}/d/${m.delivery_token}`, { margin: 1, width: 160 }) : null;
+      delete m.delivery_token;
+    }
 
     return {
       user,

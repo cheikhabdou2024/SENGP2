@@ -11,7 +11,7 @@ export class TripService {
    * Accepts both the frontend wire names (`departure_datetime`, `arrival_datetime`)
    * and the canonical column names (`departure_date`, `arrival_date`).
    */
-  static async create(data: any, gpId: string): Promise<Trip> {
+  static async create(data: any, gpId: string, ticketUrl?: string | null): Promise<Trip> {
     const departure_date = data.departure_date || data.departure_datetime;
     const arrival_date = data.arrival_date || data.arrival_datetime;
 
@@ -21,8 +21,8 @@ export class TripService {
       `INSERT INTO trips (
         trip_code, gp_id, departure_country, departure_city, departure_airport_code,
         arrival_country, arrival_city, arrival_airport_code, departure_date, arrival_date,
-        flight_number, airline, available_weight, max_packages, status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+        flight_number, airline, available_weight, max_packages, status, flight_ticket_url, ticket_status
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
       RETURNING *`,
       [
         trip_code,
@@ -40,6 +40,8 @@ export class TripService {
         data.available_weight,
         data.max_packages || 3,
         TripStatus.PUBLISHED,
+        ticketUrl || null,
+        ticketUrl ? 'pending' : 'missing',
       ]
     );
 

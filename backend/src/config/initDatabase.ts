@@ -45,6 +45,12 @@ export async function initDatabase(): Promise<void> {
     // Payment method chosen by the sender ('cod' = cash on delivery, which creates no payment row).
     await pool.query('ALTER TABLE missions ADD COLUMN IF NOT EXISTS payment_method VARCHAR(20)');
     await pool.query('ALTER TABLE missions ADD COLUMN IF NOT EXISTS recipient_phone VARCHAR(30)');
+    // Flight ticket sent by the GP, checked by an admin: missing | pending | approved | rejected.
+    await pool.query('ALTER TABLE trips ADD COLUMN IF NOT EXISTS flight_ticket_url TEXT');
+    await pool.query(`ALTER TABLE trips ADD COLUMN IF NOT EXISTS ticket_status VARCHAR(20) NOT NULL DEFAULT 'missing'`);
+    await pool.query('ALTER TABLE trips ADD COLUMN IF NOT EXISTS ticket_reviewed_by UUID REFERENCES users(id)');
+    await pool.query('ALTER TABLE trips ADD COLUMN IF NOT EXISTS ticket_reviewed_at TIMESTAMP');
+    await pool.query('ALTER TABLE trips ADD COLUMN IF NOT EXISTS ticket_review_note TEXT');
     // National ID card back side (recto = existing identity_document_url).
     await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS identity_document_url_back VARCHAR(500)');
     // Admin → GP mission assignment notifications (new enum value; PG12+).
